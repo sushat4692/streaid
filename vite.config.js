@@ -14,6 +14,7 @@ module.exports = {
             "twitch-auth",
             "twitch-electron-auth-provider",
             "electron-store",
+            "dotenv",
         ],
     },
 };

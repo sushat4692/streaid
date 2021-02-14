@@ -1,11 +1,15 @@
 import React from "react";
 
-import AppStore, { Action } from "../store/App";
+// Store
+import IsInitedStore from "../store/IsInited";
+
+// Utils
+import { request } from "../util/request";
 
 const InitComponent: React.FC = () => {
-    const clickHandler = () => {
-        window.getSettings();
-        AppStore.dispatch({ type: Action.UPDATE, state: { isInited: true } });
+    const clickHandler = async () => {
+        await request("get:settings", null, null);
+        IsInitedStore.dispatch({ type: "ENABLE" });
     };
 
     return (

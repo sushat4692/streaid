@@ -1,63 +1,58 @@
 import React, { useEffect, useState } from "react";
 
-import AppStore, { Action } from "../store/App";
+// Type
+import {
+    RequestSettingType,
+    ResponseSettingType,
+} from "../../types/SettingType";
+
+// Store
+import UsernameStore from "../store/Username";
+import ChannelsStore from "../store/Channels";
+import IsInitedStore from "../store/IsInited";
+import IsConnectingStore from "../store/IsConnecting";
+
+// Utils
+import { request } from "../util/request";
 
 const SettnigComponent: React.FC = () => {
-    const [username, updateUsername] = useState("");
-    const [channels, updateChannels] = useState("");
-
-    AppStore.subscribe(() => {
-        updateUsername(AppStore.getState().username);
-        updateChannels(AppStore.getState().channels);
-    });
+    const [username, updateUsername] = useState(UsernameStore.getState());
+    const [channels, updateChannels] = useState(ChannelsStore.getState());
 
     const saveSettings = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        AppStore.dispatch({ type: Action.START_CONNECTING });
+        IsConnectingStore.dispatch({ type: "ENABLE" });
 
         const submitChannels = channels.split(",");
-        await window.saveSettings({ channels: submitChannels });
+        await request<RequestSettingType, ResponseSettingType>(
+            "save:settings",
+            {
+                channels: submitChannels,
+            },
+            null
+        );
 
-        AppStore.dispatch({ type: Action.STOP_CONNECTING });
+        IsConnectingStore.dispatch({ type: "DISABLE" });
     };
     const signoutHandler = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        AppStore.dispatch({ type: Action.START_CONNECTING });
+        IsConnectingStore.dispatch({ type: "ENABLE" });
 
-        await window.signOut();
+        await request("signout", null, null);
 
-        AppStore.dispatch({ type: Action.STOP_CONNECTING });
-
-        AppStore.dispatch({ type: Action.UPDATE, state: { isInited: false } });
+        IsInitedStore.dispatch({ type: "DISABLE" });
+        IsConnectingStore.dispatch({ type: "DISABLE" });
     };
 
     useEffect(() => {
-        (async () => {
-            AppStore.dispatch({ type: Action.START_CONNECTING });
-
-            const defaultValue = await (async () => {
-                if (typeof window.getSettings === "function") {
-                    return await window.getSettings();
-                } else {
-                    return {
-                        username: "",
-                        channels: [],
-                    };
-                }
-            })();
-
-            AppStore.dispatch({
-                type: Action.UPDATE,
-                state: {
-                    username: defaultValue.username,
-                    channels: defaultValue.channels.join(","),
-                },
-            });
-
-            AppStore.dispatch({ type: Action.STOP_CONNECTING });
-        })();
+        UsernameStore.subscribe(() => {
+            updateUsername(UsernameStore.getState());
+        });
+        ChannelsStore.subscribe(() => {
+            updateChannels(ChannelsStore.getState());
+        });
     }, []);
 
     return (
@@ -88,9 +83,9 @@ const SettnigComponent: React.FC = () => {
                         className="form-control"
                         value={channels}
                         onChange={(e) =>
-                            AppStore.dispatch({
-                                type: Action.UPDATE,
-                                state: { channels: e.target.value },
+                            ChannelsStore.dispatch({
+                                type: "UPDATE",
+                                state: e.target.value,
                             })
                         }
                     />

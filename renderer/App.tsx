@@ -1,49 +1,40 @@
 import React, { useEffect, useState } from "react";
 
 // Context
-import AppStore, { Action } from "./store/App";
+import IsInitedStore from "./store/IsInited";
+import IsConnectedStore from "./store/IsConnected";
+import IsConnectingStore from "./store/IsConnecting";
 
 // Layout
 import LoadingComponent from "./component/LoadingComponent";
 import InitView from "./view/InitView";
 import LayoutView from "./view/LayoutView";
 
-type SettingType = {
-    username: string;
-    password: string;
-    channels: string[];
-};
+// Utils
+import { request, requestEvent } from "./util/request";
 
-declare global {
-    interface Window {
-        getInit: () => Promise<boolean>;
-        getSettings: () => Promise<SettingType>;
-        saveSettings: (values: { channels: string[] }) => Promise<any>;
-        signOut: () => Promise<any>;
-        connectToTwicth: () => Promise<any>;
-        disConnectToTwicth: () => Promise<any>;
-        botConnected: () => void;
-        botDisconnected: () => void;
-    }
-}
 const App: React.FC = () => {
     const [isInited, updateIsInited] = useState(false);
 
     useEffect(() => {
-        AppStore.subscribe(() => {
-            updateIsInited(AppStore.getState().isInited);
+        IsInitedStore.subscribe(() => {
+            updateIsInited(IsInitedStore.getState());
+        });
+
+        requestEvent("bot:connected", () => {
+            IsConnectedStore.dispatch({ type: "ENABLE" });
+        });
+        requestEvent("bot:disconnected", () => {
+            IsConnectedStore.dispatch({ type: "DISABLE" });
         });
 
         (async () => {
-            AppStore.dispatch({ type: Action.START_CONNECTING });
+            IsConnectingStore.dispatch({ type: "ENABLE" });
 
-            const isInited = await window.getInit();
-            AppStore.dispatch({
-                type: Action.UPDATE,
-                state: { isInited },
-            });
+            const isInited: boolean = await request("get:init", null, true);
+            IsInitedStore.dispatch({ type: "UPDATE", state: isInited });
 
-            AppStore.dispatch({ type: Action.STOP_CONNECTING });
+            IsConnectingStore.dispatch({ type: "DISABLE" });
         })();
     }, []);
 

@@ -1,49 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import AppStore, { Action } from "../store/App";
+import IsConnectedStore from "../store/IsConnected";
+import IsConnectingStore from "../store/IsConnecting";
+
+// Util
+import { request } from "../util/request";
 
 const ConnectComonent: React.FC = () => {
-    const [isConnected, updateIsConnected] = useState(false);
+    const [isConnected, updateIsConnected] = useState(
+        IsConnectedStore.getState()
+    );
 
-    window.botConnected = () => {
-        AppStore.dispatch({
-            type: Action.UPDATE,
-            state: { isConnected: true },
+    useEffect(() => {
+        IsConnectedStore.subscribe(() => {
+            updateIsConnected(IsConnectedStore.getState());
+            IsConnectingStore.dispatch({ type: "DISABLE" });
         });
-        updateIsConnected(true);
-
-        AppStore.dispatch({ type: Action.STOP_CONNECTING });
-    };
-    window.botDisconnected = () => {
-        AppStore.dispatch({
-            type: Action.UPDATE,
-            state: { isConnected: false },
-        });
-        updateIsConnected(false);
-
-        AppStore.dispatch({ type: Action.STOP_CONNECTING });
-    };
+    });
 
     const clickHandler = async () => {
-        AppStore.dispatch({ type: Action.START_CONNECTING });
+        IsConnectingStore.dispatch({ type: "ENABLE" });
 
         if (isConnected) {
-            await window.disConnectToTwicth();
+            await request("bot:disconnect", null, null);
         } else {
-            await window.connectToTwicth();
+            await request("bot:connect", null, null);
         }
     };
 
     return (
-        <section className="mt-4">
-            <h2>Connect</h2>
+        <div className="d-grid gap-2 d-md-block">
             <button
                 className={isConnected ? "btn btn-danger" : "btn btn-primary"}
                 onClick={clickHandler}
             >
                 {isConnected ? "Disconnect" : "Connect"}
             </button>
-        </section>
+        </div>
     );
 };
 

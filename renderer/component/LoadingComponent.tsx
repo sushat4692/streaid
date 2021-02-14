@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 
-import AppStore from "../store/App";
+import IsConnectingStore from "../store/IsConnecting";
 
 const LoadingComponent: React.FC = () => {
     const [isConnecting, updateIsConnecting] = useState(false);
 
     useEffect(() => {
-        AppStore.subscribe(() => {
-            updateIsConnecting(AppStore.getState().isConnecting);
+        IsConnectingStore.subscribe(() => {
+            updateIsConnecting(IsConnectingStore.getState());
         });
     });
 

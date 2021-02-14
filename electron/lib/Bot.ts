@@ -4,6 +4,9 @@ import tmi from "tmi.js";
 // Store
 import store from "../store";
 
+// Model
+import Chatter from "../model/Chatter";
+
 class Bot {
     private client: tmi.Client | null = null;
 
@@ -21,7 +24,6 @@ class Bot {
             },
             channels: store.get("channels"),
         };
-        console.log(opts);
 
         // Create a client with our options
         this.client = tmi.client(opts);
@@ -44,18 +46,28 @@ class Bot {
     }
 
     // Called every time a message comes in
-    onMessageHandler(target, context, msg, self) {
+    async onMessageHandler(
+        channel: string,
+        userstate: tmi.ChatUserstate,
+        message: string,
+        self: boolean
+    ) {
         if (self) {
             return;
         } // Ignore messages from the bot
 
         // Remove whitespace from chat message
-        const commandName = msg.trim();
+        const commandName = message.trim();
+
+        await Chatter.query().insert({
+            user_name: userstate.username,
+            display_name: userstate["display-name"],
+        });
 
         // If the command is known, let's execute it
         if (commandName === "!dice") {
             const num = this.rollDice();
-            this.client?.say(target, `You rolled a ${num}`);
+            this.client?.say(channel, `You rolled a ${num}`);
             console.log(`* Executed ${commandName} command`);
         } else {
             console.log(`* Unknown command ${commandName}`);
