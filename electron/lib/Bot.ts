@@ -4,9 +4,6 @@ import tmi from "tmi.js";
 // Store
 import store from "../store";
 
-// Model
-import Chatter from "../model/Chatter";
-
 class Bot {
     private client: tmi.Client | null = null;
 
@@ -59,11 +56,6 @@ class Bot {
         // Remove whitespace from chat message
         const commandName = message.trim();
 
-        await Chatter.query().insert({
-            user_name: userstate.username,
-            display_name: userstate["display-name"],
-        });
-
         // If the command is known, let's execute it
         if (commandName === "!dice") {
             const num = this.rollDice();
@@ -71,6 +63,12 @@ class Bot {
             console.log(`* Executed ${commandName} command`);
         } else {
             console.log(`* Unknown command ${commandName}`);
+        }
+
+        const wins = BrowserWindow.getAllWindows();
+        if (wins.length) {
+            const win = wins[0];
+            win.webContents.send("bot:message", userstate);
         }
     }
 

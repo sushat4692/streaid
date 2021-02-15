@@ -15,7 +15,7 @@ import IsConnectingStore from "../store/IsConnecting";
 // Utils
 import { request } from "../util/request";
 
-const SettnigComponent: React.FC = () => {
+const SettnigPage: React.FC = () => {
     const [username, updateUsername] = useState(UsernameStore.getState());
     const [channels, updateChannels] = useState(ChannelsStore.getState());
 
@@ -102,4 +102,4 @@ const SettnigComponent: React.FC = () => {
     );
 };
 
-export default SettnigComponent;
+export default SettnigPage;

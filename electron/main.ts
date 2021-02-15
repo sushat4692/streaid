@@ -4,14 +4,11 @@ import path from "path";
 // Library
 import Bot from "./lib/Bot";
 import TwitchAPI from "./lib/TwitchAPI";
-import ModelInit from "./Model/init";
 
 // Store
 import store from "./store";
 
 async function createWindow() {
-    await ModelInit();
-
     const win = new BrowserWindow({
         width: 800,
         height: 600,

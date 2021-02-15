@@ -6,4 +6,3 @@ build/*
 *.local
 !.gitkeep
 .env
-/db

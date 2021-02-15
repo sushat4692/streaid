@@ -14,7 +14,7 @@ const LoadingComponent: React.FC = () => {
     return isConnecting ? (
         <div
             className="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-            style={{ background: "rgba(255, 255, 255, 0.8)" }}
+            style={{ background: "rgba(255, 255, 255, 0.8)", zIndex: 2000 }}
         >
             <div className="spinner-border" role="status">
                 <span className="visually-hidden">Loading...</span>

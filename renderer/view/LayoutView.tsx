@@ -6,6 +6,7 @@ import { ResponseSettingType } from "../../types/SettingType";
 
 // Component
 import SettingPage from "../page/SettingPage";
+import ChattersPage from "../page/ChattersPage";
 import ConnectComponent from "../component/ConnectComponent";
 
 // Store
@@ -70,6 +71,13 @@ const Layout: React.FC = () => {
                             >
                                 Home
                             </Link>
+                            <Link
+                                className="nav-link"
+                                aria-current="page"
+                                to="/chatters"
+                            >
+                                Chatters
+                            </Link>
                         </div>
                         <ConnectComponent />
                     </div>
@@ -79,6 +87,9 @@ const Layout: React.FC = () => {
             <div className="container-fluid">
                 <main>
                     <Switch>
+                        <Route path="/chatters">
+                            <ChattersPage />
+                        </Route>
                         <Route path="/">
                             <SettingPage />
                         </Route>

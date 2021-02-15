@@ -24,9 +24,9 @@ export const requestSync = <T, R>(key: string, args: T, _default: R): R => {
     }
 };
 
-export const requestEvent = (
+export const requestEvent = <R>(
     key: string,
-    callback: (event: IpcRendererEvent, ...args: any[]) => void
+    callback: (event: IpcRendererEvent, args: R) => void
 ) => {
     if (typeof window.ipcRenderer !== "undefined") {
         window.ipcRenderer.on(key, callback);
