@@ -10,16 +10,21 @@ const shoutOut = async (postChannel: string, username: string) => {
         return;
     }
 
-    console.log(postChannel);
-    console.log(username);
-
     const User = await TwitchAPI.getUserByName(username);
     if (!User) {
+        Bot.client.action(
+            postChannel,
+            `Target user "${username}" was't found, please check again`
+        );
         return;
     }
 
     const shoutOutChannel = await TwitchAPI.getChannelInfo(User);
     if (!shoutOutChannel) {
+        Bot.client.action(
+            postChannel,
+            `Failed to get Channel information of "${User.displayName}" channel, please try again later`
+        );
         return;
     }
 

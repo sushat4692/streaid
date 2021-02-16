@@ -7,6 +7,7 @@ import { pushRaider } from "../database/Raider";
 
 // Store
 import store from "../store";
+import ShoutOut from "./commands/ShoutOut";
 
 class Bot {
     private _client: tmi.Client | null = null;
@@ -38,7 +39,7 @@ class Bot {
 
         // Register our event handlers (defined below)
         this._client.on("message", this.onMessageHandler.bind(this));
-        this._client.on('raided', this.onRaidedHandler.bind(this))
+        this._client.on("raided", this.onRaidedHandler.bind(this));
         this._client.on("connected", this.onConnectedHandler.bind(this));
         this._client.on("disconnected", this.onDisConnectedHandler.bind(this));
 
@@ -73,15 +74,35 @@ class Bot {
     ) {
         if (self) {
             return;
-        } // Ignore messages from the bot
+        }
 
-        // Remove whitespace from chat message
-        const commandName = message.trim();
+        const messages = message.trim().split(/\s/);
+        const commandName = messages.shift();
 
-        // If the command is known, let's execute it
-        if (commandName === "!dice") {
-            const num = this.rollDice();
-            this.client?.say(channel, `You rolled a ${num}`);
+        console.log({ messages, commandName });
+
+        let existsCommand: boolean = false;
+        switch (commandName) {
+            case "!dice": {
+                const num = this.rollDice();
+                this.client?.say(channel, `You rolled a ${num}`);
+                existsCommand = true;
+                break;
+            }
+            case "!so": {
+                if (messages.length) {
+                    ShoutOut(channel, messages[0]);
+                } else {
+                    console.log(
+                        `* You need to add username: e.g. !so {username}`
+                    );
+                }
+                existsCommand = true;
+                break;
+            }
+        }
+
+        if (existsCommand) {
             console.log(`* Executed ${commandName} command`);
         } else {
             console.log(`* Unknown command ${commandName}`);
@@ -91,7 +112,7 @@ class Bot {
 
         const win = this.getWindow();
         if (win) {
-            win.webContents.send("bot:message", {channel, userstate});
+            win.webContents.send("bot:message", { channel, userstate });
         }
     }
 
@@ -105,16 +126,16 @@ class Bot {
     async onRaidedHandler(channel: string, username: string, viewers: number) {
         const raider = {
             username,
-            viewers
-        }
+            viewers,
+        };
         pushRaider({
             username,
-            viewers
-        })
+            viewers,
+        });
 
         const win = this.getWindow();
         if (win) {
-            win.webContents.send("bot:raided", raider);
+            win.webContents.send("bot:raided", { channel, raider });
         }
     }
 
@@ -127,10 +148,6 @@ class Bot {
         const sides = 6;
         return Math.floor(Math.random() * sides) + 1;
     }
-
-    /**
-     * Shoutout Command
-     */
 
     /**
      * Called every time the bot connects to Twitch chat
@@ -179,8 +196,8 @@ export default Bot;
 let instance: Bot;
 export const getInstance = () => {
     if (!instance) {
-        instance = new Bot()
+        instance = new Bot();
     }
 
     return instance;
-}
+};

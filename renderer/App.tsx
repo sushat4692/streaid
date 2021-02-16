@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { ChatUserstate } from "tmi.js";
 
 // Context
 import IsInitedStore from "./store/IsInited";
 import IsConnectedStore from "./store/IsConnected";
 import IsConnectingStore from "./store/IsConnecting";
 import CattersStore, { ChatterRowType } from "./store/Chatters";
+import RaidersStore, { RaiderRowType } from "./store/Raiders";
 
 // Layout
 import LoadingComponent from "./component/LoadingComponent";
@@ -31,6 +31,9 @@ const App: React.FC = () => {
         });
         requestEvent<ChatterRowType>("bot:message", (_, values) => {
             CattersStore.dispatch({ type: "PUT", state: values });
+        });
+        requestEvent<RaiderRowType>("bot:raided", (_, values) => {
+            RaidersStore.dispatch({ type: "PUT", state: values });
         });
 
         (async () => {

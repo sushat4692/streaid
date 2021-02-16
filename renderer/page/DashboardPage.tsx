@@ -11,10 +11,25 @@ const DashboardPage: React.FC = () => {
                     <div className="card-body">
                         <h5 className="card-title">Chatters</h5>
                         <p className="card-text">
-                            Display user list that comment on this session
+                            Display user list that comment to target channel
                         </p>
                         <Link
                             to="/chatters"
+                            className="btn btn-primary stretched-link"
+                        >
+                            Check
+                        </Link>
+                    </div>
+                </div>
+
+                <div className="card">
+                    <div className="card-body">
+                        <h5 className="card-title">Raiders</h5>
+                        <p className="card-text">
+                            Display user list that raided to target channel
+                        </p>
+                        <Link
+                            to="/raiders"
                             className="btn btn-primary stretched-link"
                         >
                             Check

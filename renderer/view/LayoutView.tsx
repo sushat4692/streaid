@@ -8,6 +8,7 @@ import { ResponseSettingType } from "../../types/SettingType";
 import DashboardPage from "../page/DashboardPage";
 import SettingPage from "../page/SettingPage";
 import ChattersPage from "../page/ChattersPage";
+import RaidersPage from "../page/RaidersPage";
 import ConnectComponent from "../component/ConnectComponent";
 
 // Store
@@ -82,6 +83,13 @@ const Layout: React.FC = () => {
                             <Link
                                 className="nav-link"
                                 aria-current="page"
+                                to="/raiders"
+                            >
+                                Raiders
+                            </Link>
+                            <Link
+                                className="nav-link"
+                                aria-current="page"
                                 to="/settings"
                             >
                                 Settings
@@ -97,6 +105,9 @@ const Layout: React.FC = () => {
                     <Switch>
                         <Route path="/chatters">
                             <ChattersPage />
+                        </Route>
+                        <Route path="/raiders">
+                            <RaidersPage />
                         </Route>
                         <Route path="/settings">
                             <SettingPage />
