@@ -2,8 +2,11 @@ import { app, BrowserWindow, ipcMain } from "electron";
 import path from "path";
 
 // Library
-import Bot from "./lib/Bot";
-import TwitchAPI from "./lib/TwitchAPI";
+import { getInstance as getBotInstance } from "./lib/Bot";
+import { getInstance as getTwichAPIInstance } from "./lib/TwitchAPI";
+
+// Command
+import ShoutOut from "./lib/commands/ShoutOut";
 
 // Store
 import store from "./store";
@@ -45,6 +48,7 @@ ipcMain.handle("get:init", () => {
 });
 
 ipcMain.handle("get:settings", async () => {
+    const TwitchAPI = getTwichAPIInstance();
     TwitchAPI.init("__twitch_api_key__");
     const token = await TwitchAPI.getAccessToken();
     const user = await TwitchAPI.getUserInfo();
@@ -69,15 +73,34 @@ ipcMain.handle("save:settings", (_, values) => {
 });
 
 ipcMain.handle("signout", async () => {
+    const Bot = getBotInstance();
+    const TwitchAPI = getTwichAPIInstance();
+
     await Bot.disconnect();
     await TwitchAPI.disconnect();
     store.set("api.inited", false);
+
+    return;
 });
 
-ipcMain.handle("bot:connect", async () => {
+ipcMain.handle("bot:connect", () => {
+    const Bot = getBotInstance();
     Bot.connect();
+
+    return;
 });
 
-ipcMain.handle("bot:disconnect", async () => {
+ipcMain.handle("bot:disconnect", () => {
+    const Bot = getBotInstance();
     Bot.disconnect();
+
+    return;
 });
+
+ipcMain.handle(
+    "bot:shoutout",
+    async (_e, values: { postChannel: string; username: string }) => {
+        await ShoutOut(values.postChannel, values.username);
+        return;
+    }
+);

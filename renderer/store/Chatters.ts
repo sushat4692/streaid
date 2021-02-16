@@ -1,20 +1,28 @@
 import { Reducer, createStore } from "redux";
 import { ChatUserstate } from "tmi.js";
 
-export type ActionType = {
-    type: "PUT" | "DELETE";
-    state: ChatUserstate;
+export type ChatterRowType = {
+    channel: string;
+    userstate: ChatUserstate;
 };
 
-const reducer: Reducer<ChatUserstate[], ActionType> = (
-    state: ChatUserstate[] = [],
+export type ActionType = {
+    type: "PUT" | "DELETE";
+    state: ChatterRowType;
+};
+
+const reducer: Reducer<ChatterRowType[], ActionType> = (
+    state: ChatterRowType[] = [],
     action
 ) => {
     switch (action.type) {
         case "PUT":
             if (
                 !state.some(
-                    (userstate) => userstate.username === action.state.username
+                    (row) =>
+                        row.channel === action.state.channel &&
+                        row.userstate.username ===
+                            action.state.userstate.username
                 )
             ) {
                 state.push(action.state);
@@ -22,7 +30,9 @@ const reducer: Reducer<ChatUserstate[], ActionType> = (
             return state;
         case "DELETE":
             return state.filter(
-                (userstate) => userstate.username !== action.state.username
+                (row) =>
+                    row.channel !== action.state.channel ||
+                    row.userstate.username !== action.state.userstate.username
             );
         default:
             return state;

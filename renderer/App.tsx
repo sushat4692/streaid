@@ -5,7 +5,7 @@ import { ChatUserstate } from "tmi.js";
 import IsInitedStore from "./store/IsInited";
 import IsConnectedStore from "./store/IsConnected";
 import IsConnectingStore from "./store/IsConnecting";
-import CattersStore from "./store/Chatters";
+import CattersStore, { ChatterRowType } from "./store/Chatters";
 
 // Layout
 import LoadingComponent from "./component/LoadingComponent";
@@ -29,8 +29,8 @@ const App: React.FC = () => {
         requestEvent("bot:disconnected", () => {
             IsConnectedStore.dispatch({ type: "DISABLE" });
         });
-        requestEvent<ChatUserstate>("bot:message", (_, userstate) => {
-            CattersStore.dispatch({ type: "PUT", state: userstate });
+        requestEvent<ChatterRowType>("bot:message", (_, values) => {
+            CattersStore.dispatch({ type: "PUT", state: values });
         });
 
         (async () => {

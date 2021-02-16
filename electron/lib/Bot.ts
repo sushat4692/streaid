@@ -3,13 +3,21 @@ import tmi from "tmi.js";
 
 // Model
 import { pushChatter } from "../database/Chatter";
+import { pushRaider } from "../database/Raider";
 
 // Store
 import store from "../store";
 
 class Bot {
-    private client: tmi.Client | null = null;
+    private _client: tmi.Client | null = null;
 
+    get client() {
+        return this._client;
+    }
+
+    /**
+     * Connect to target channel
+     */
     connect() {
         // Define configuration options
         const opts: tmi.Options = {
@@ -26,26 +34,37 @@ class Bot {
         };
 
         // Create a client with our options
-        this.client = tmi.client(opts);
+        this._client = tmi.client(opts);
 
         // Register our event handlers (defined below)
-        this.client.on("message", this.onMessageHandler.bind(this));
-        this.client.on("connected", this.onConnectedHandler.bind(this));
-        this.client.on("disconnected", this.onDisConnectedHandler.bind(this));
+        this._client.on("message", this.onMessageHandler.bind(this));
+        this._client.on('raided', this.onRaidedHandler.bind(this))
+        this._client.on("connected", this.onConnectedHandler.bind(this));
+        this._client.on("disconnected", this.onDisConnectedHandler.bind(this));
 
         // Connect to Twitch:
-        this.client.connect().catch(console.error);
+        this._client.connect().catch(console.error);
     }
 
+    /**
+     * Disconnected
+     */
     async disconnect() {
         if (this.client) {
             await this.client.disconnect();
         }
 
-        this.client = null;
+        this._client = null;
     }
 
-    // Called every time a message comes in
+    /**
+     * Called every time a message comes in
+     *
+     * @param channel
+     * @param userstate
+     * @param message
+     * @param self
+     */
     async onMessageHandler(
         channel: string,
         userstate: tmi.ChatUserstate,
@@ -70,37 +89,98 @@ class Bot {
 
         await pushChatter(userstate);
 
-        const wins = BrowserWindow.getAllWindows();
-        if (wins.length) {
-            const win = wins[0];
-            win.webContents.send("bot:message", userstate);
+        const win = this.getWindow();
+        if (win) {
+            win.webContents.send("bot:message", {channel, userstate});
         }
     }
 
-    // Function called when the "dice" command is issued
+    /**
+     * Called every time a raider comes in
+     *
+     * @param channel
+     * @param username
+     * @param viewers
+     */
+    async onRaidedHandler(channel: string, username: string, viewers: number) {
+        const raider = {
+            username,
+            viewers
+        }
+        pushRaider({
+            username,
+            viewers
+        })
+
+        const win = this.getWindow();
+        if (win) {
+            win.webContents.send("bot:raided", raider);
+        }
+    }
+
+    /**
+     * Command test
+     *
+     * @command dice
+     */
     rollDice() {
         const sides = 6;
         return Math.floor(Math.random() * sides) + 1;
     }
 
-    // Called every time the bot connects to Twitch chat
+    /**
+     * Shoutout Command
+     */
+
+    /**
+     * Called every time the bot connects to Twitch chat
+     *
+     * @param addr
+     * @param port
+     */
     onConnectedHandler(addr: string, port: number) {
         console.log(`* Connected to ${addr}:${port}`);
 
-        const win = BrowserWindow.getFocusedWindow();
+        const win = this.getWindow();
         if (win) {
             win.webContents.send("bot:connected");
         }
     }
 
+    /**
+     * Called every time the bot disconnects from Twitch chat
+     *
+     * @param reason
+     */
     onDisConnectedHandler(reason: string) {
         console.log(`* Disconnected by ${reason}`);
 
-        const win = BrowserWindow.getFocusedWindow();
+        const win = this.getWindow();
         if (win) {
             win.webContents.send("bot:disconnected");
         }
     }
+
+    /**
+     * Get Electron Window
+     * Now only one window, so get first window from getAllWindows
+     */
+    private getWindow() {
+        const wins = BrowserWindow.getAllWindows();
+        if (!wins.length) {
+            return null;
+        }
+        return wins[0];
+    }
 }
 
-export default new Bot();
+export default Bot;
+
+let instance: Bot;
+export const getInstance = () => {
+    if (!instance) {
+        instance = new Bot()
+    }
+
+    return instance;
+}

@@ -1,5 +1,11 @@
 import { session } from "electron";
-import { AccessToken, ApiClient, HelixPrivilegedUser } from "twitch";
+import {
+    AccessToken,
+    ApiClient,
+    HelixPrivilegedUser,
+    HelixUser,
+    HelixChannel,
+} from "twitch";
 import { ElectronAuthProvider } from "twitch-electron-auth-provider";
 
 // Store
@@ -80,10 +86,39 @@ class TwitchAPI {
         return user;
     }
 
+    async getUserByName(username: string): Promise<HelixUser | null> {
+        const User = await this.client?.helix.users.getUserByName(username);
+
+        if (!User) {
+            return null;
+        }
+
+        return User;
+    }
+
+    async getChannelInfo(User: HelixUser): Promise<HelixChannel | null> {
+        const channel = await this.client?.helix.channels.getChannelInfo(User);
+
+        if (!channel) {
+            return null;
+        }
+
+        return channel;
+    }
+
     async disconnect() {
         await session.defaultSession.clearStorageData();
         store.clear();
     }
 }
 
-export default new TwitchAPI();
+export default TwitchAPI;
+
+let instance: TwitchAPI;
+export const getInstance = () => {
+    if (!instance) {
+        instance = new TwitchAPI();
+    }
+
+    return instance;
+};

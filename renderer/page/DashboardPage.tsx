@@ -6,7 +6,7 @@ const DashboardPage: React.FC = () => {
         <section className="mt-4">
             <h2>Dashboard</h2>
 
-            <div className="d-grid">
+            <div className="d-grid gap-3">
                 <div className="card">
                     <div className="card-body">
                         <h5 className="card-title">Chatters</h5>
@@ -24,10 +24,8 @@ const DashboardPage: React.FC = () => {
 
                 <div className="card">
                     <div className="card-body">
-                        <h5 className="card-title">Chatters</h5>
-                        <p className="card-text">
-                            Display user list that comment on this session
-                        </p>
+                        <h5 className="card-title">Settings</h5>
+                        <p className="card-text">Setting connecting channel</p>
                         <Link
                             to="/settings"
                             className="btn btn-primary stretched-link"

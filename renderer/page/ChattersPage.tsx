@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { ChatUserstate } from "tmi.js";
 
 // Store
-import ChattersStore from "../store/Chatters";
+import ChattersStore, { ChatterRowType } from "../store/Chatters";
 
 // Component
 import ChatterRowComponent from "../component/ChatterRowComponent";
 
 const ChattersPage: React.FC = () => {
-    const [chatters, updateChatters] = useState<ChatUserstate[]>(
+    const [chatters, updateChatters] = useState<ChatterRowType[]>(
         ChattersStore.getState()
     );
 
@@ -26,10 +25,12 @@ const ChattersPage: React.FC = () => {
                 <colgroup>
                     <col />
                     <col />
-                    <col width="130" />
+                    <col />
+                    <col width="160" />
                 </colgroup>
                 <thead>
                     <tr>
+                        <th scope="col">Channel</th>
                         <th scope="col">Username</th>
                         <th scope="col">Displayname</th>
                         <th scope="col"></th>
@@ -40,7 +41,7 @@ const ChattersPage: React.FC = () => {
                         return (
                             <ChatterRowComponent
                                 chatter={chatter}
-                                key={chatter.id}
+                                key={chatter.userstate.id}
                             ></ChatterRowComponent>
                         );
                     })}
