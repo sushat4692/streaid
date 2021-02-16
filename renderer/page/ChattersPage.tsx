@@ -19,7 +19,7 @@ const ChattersPage: React.FC = () => {
     });
 
     return (
-        <>
+        <section className="mt-4">
             <h2>Chatters</h2>
 
             <table className="table">
@@ -46,7 +46,7 @@ const ChattersPage: React.FC = () => {
                     })}
                 </tbody>
             </table>
-        </>
+        </section>
     );
 };
 

@@ -15,6 +15,10 @@ module.exports = {
             "twitch-electron-auth-provider",
             "electron-store",
             "dotenv",
+            "fs-extra",
+            "nedb-promises",
+            "path",
+            "electron-is-dev",
         ],
     },
 };

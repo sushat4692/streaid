@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { ResponseSettingType } from "../../types/SettingType";
 
 // Component
+import DashboardPage from "../page/DashboardPage";
 import SettingPage from "../page/SettingPage";
 import ChattersPage from "../page/ChattersPage";
 import ConnectComponent from "../component/ConnectComponent";
@@ -45,9 +46,9 @@ const Layout: React.FC = () => {
         <Router>
             <header className="navbar navbar-expand-md navbar-dark sticky-top bg-dark shadow">
                 <div className="container-fluid">
-                    <a className="navbar-brand" href="#">
+                    <Link className="navbar-brand" to="/">
                         Twitch Support Tool
-                    </a>
+                    </Link>
                     <button
                         className="navbar-toggler"
                         type="button"
@@ -78,6 +79,13 @@ const Layout: React.FC = () => {
                             >
                                 Chatters
                             </Link>
+                            <Link
+                                className="nav-link"
+                                aria-current="page"
+                                to="/settings"
+                            >
+                                Settings
+                            </Link>
                         </div>
                         <ConnectComponent />
                     </div>
@@ -90,8 +98,11 @@ const Layout: React.FC = () => {
                         <Route path="/chatters">
                             <ChattersPage />
                         </Route>
-                        <Route path="/">
+                        <Route path="/settings">
                             <SettingPage />
+                        </Route>
+                        <Route path="/">
+                            <DashboardPage />
                         </Route>
                     </Switch>
                 </main>

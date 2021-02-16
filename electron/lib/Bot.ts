@@ -1,6 +1,9 @@
 import { BrowserWindow } from "electron";
 import tmi from "tmi.js";
 
+// Model
+import { pushChatter } from "../database/Chatter";
+
 // Store
 import store from "../store";
 
@@ -64,6 +67,8 @@ class Bot {
         } else {
             console.log(`* Unknown command ${commandName}`);
         }
+
+        await pushChatter(userstate);
 
         const wins = BrowserWindow.getAllWindows();
         if (wins.length) {
