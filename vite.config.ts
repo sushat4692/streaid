@@ -1,7 +1,9 @@
-module.exports = {
+import { defineConfig } from "vite";
+import reactRefresh from "@vitejs/plugin-react-refresh";
+
+export default defineConfig({
     base: "./",
-    jsx: "react",
-    plugins: [require("vite-plugin-react")],
+    plugins: [reactRefresh()],
 
     optimizeDeps: {
         exclude: [
@@ -21,4 +23,4 @@ module.exports = {
             "electron-is-dev",
         ],
     },
-};
+});
