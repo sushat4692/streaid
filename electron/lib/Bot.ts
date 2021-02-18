@@ -4,6 +4,7 @@ import tmi from "tmi.js";
 // Model
 import { pushChatter } from "../database/Chatter";
 import { pushRaider } from "../database/Raider";
+import { pushHost } from "../database/Host";
 
 // Store
 import store from "../store";
@@ -40,6 +41,7 @@ class Bot {
         // Register our event handlers (defined below)
         this._client.on("message", this.onMessageHandler.bind(this));
         this._client.on("raided", this.onRaidedHandler.bind(this));
+        this._client.on("hosted", this.onHostedHandler.bind(this));
         this._client.on("connected", this.onConnectedHandler.bind(this));
         this._client.on("disconnected", this.onDisConnectedHandler.bind(this));
 
@@ -136,6 +138,36 @@ class Bot {
         const win = this.getWindow();
         if (win) {
             win.webContents.send("bot:raided", { channel, raider });
+        }
+    }
+
+    /**
+     * Called every time a hosted
+     *
+     * @param channel
+     * @param username
+     * @param viewers
+     */
+    async onHostedHandler(
+        channel: string,
+        username: string,
+        viewers: number,
+        autohost: boolean
+    ) {
+        const hosted = {
+            username,
+            viewers,
+            autohost,
+        };
+        pushHost({
+            username,
+            viewers,
+            autohost,
+        });
+
+        const win = this.getWindow();
+        if (win) {
+            win.webContents.send("bot:hosted", { channel, hosted });
         }
     }
 

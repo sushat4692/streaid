@@ -9,6 +9,7 @@ import DashboardPage from "../page/DashboardPage";
 import SettingPage from "../page/SettingPage";
 import ChattersPage from "../page/ChattersPage";
 import RaidersPage from "../page/RaidersPage";
+import HostsPage from "../page/HostsPage";
 import ConnectComponent from "../component/ConnectComponent";
 
 // Store
@@ -90,6 +91,13 @@ const Layout: React.FC = () => {
                             <Link
                                 className="nav-link"
                                 aria-current="page"
+                                to="/hosts"
+                            >
+                                Hosts
+                            </Link>
+                            <Link
+                                className="nav-link"
+                                aria-current="page"
                                 to="/settings"
                             >
                                 Settings
@@ -108,6 +116,9 @@ const Layout: React.FC = () => {
                         </Route>
                         <Route path="/raiders">
                             <RaidersPage />
+                        </Route>
+                        <Route path="/hosts">
+                            <HostsPage />
                         </Route>
                         <Route path="/settings">
                             <SettingPage />

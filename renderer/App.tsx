@@ -6,6 +6,7 @@ import IsConnectedStore from "./store/IsConnected";
 import IsConnectingStore from "./store/IsConnecting";
 import CattersStore, { ChatterRowType } from "./store/Chatters";
 import RaidersStore, { RaiderRowType } from "./store/Raiders";
+import HostsStore, { HostRowType } from "./store/Hosts";
 
 // Layout
 import LoadingComponent from "./component/LoadingComponent";
@@ -34,6 +35,9 @@ const App: React.FC = () => {
         });
         requestEvent<RaiderRowType>("bot:raided", (_, values) => {
             RaidersStore.dispatch({ type: "PUT", state: values });
+        });
+        requestEvent<HostRowType>("bot:hosted", (_, values) => {
+            HostsStore.dispatch({ type: "PUT", state: values });
         });
 
         (async () => {
