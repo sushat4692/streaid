@@ -2,6 +2,7 @@ import { Reducer, createStore } from "redux";
 import { ChatUserstate } from "tmi.js";
 
 export type ChatterRowType = {
+    id: string;
     channel: string;
     userstate: ChatUserstate;
 };
@@ -29,11 +30,7 @@ const reducer: Reducer<ChatterRowType[], ActionType> = (
             }
             return state;
         case "DELETE":
-            return state.filter(
-                (row) =>
-                    row.channel !== action.state.channel ||
-                    row.userstate.username !== action.state.userstate.username
-            );
+            return state.filter((row) => row.id !== action.state.id);
         default:
             return state;
     }

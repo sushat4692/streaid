@@ -1,6 +1,7 @@
 import { Reducer, createStore } from "redux";
 
 export type HostRowType = {
+    id: string;
     channel: string;
     host: { username: string; viewers: number; autohost: boolean };
 };
@@ -18,6 +19,8 @@ const reducer: Reducer<HostRowType[], ActionType> = (
         case "PUT":
             state.push(action.state);
             return state;
+        case "DELETE":
+            return state.filter((row) => row.id !== action.state.id);
         default:
             return state;
     }

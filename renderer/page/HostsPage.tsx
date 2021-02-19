@@ -16,34 +16,38 @@ const ChattersPage: React.FC = () => {
     });
 
     return (
-        <section className="mt-4">
+        <section className="my-4">
             <h2>Hosts</h2>
 
-            <table className="table">
-                <colgroup>
-                    <col />
-                    <col />
-                    <col width="100" />
-                    <col width="100" />
-                    <col width="160" />
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th scope="col">Channel</th>
-                        <th scope="col">Username</th>
-                        <th scope="col">Viewers</th>
-                        <th scope="col">Autoloaded</th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {hosts.map((host) => {
-                        return (
-                            <HostRowComponent host={host}></HostRowComponent>
-                        );
-                    })}
-                </tbody>
-            </table>
+            <div className="table-responsive">
+                <table className="table">
+                    <colgroup>
+                        <col />
+                        <col />
+                        <col width="100" />
+                        <col width="100" />
+                        <col width="160" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th scope="col">Channel</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Viewers</th>
+                            <th scope="col">Autoloaded</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {hosts.map((host) => {
+                            return (
+                                <HostRowComponent
+                                    host={host}
+                                ></HostRowComponent>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
         </section>
     );
 };

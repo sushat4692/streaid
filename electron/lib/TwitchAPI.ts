@@ -5,6 +5,7 @@ import {
     HelixPrivilegedUser,
     HelixUser,
     HelixChannel,
+    HelixGame,
 } from "twitch";
 import { ElectronAuthProvider } from "twitch-electron-auth-provider";
 
@@ -104,6 +105,28 @@ class TwitchAPI {
         }
 
         return channel;
+    }
+
+    async getGame(gameId: string): Promise<HelixGame | null> {
+        const game = await this.client?.helix.games.getGameById(gameId);
+
+        if (!game) {
+            return null;
+        }
+
+        return game;
+    }
+
+    async getGamesList(gameName: string): Promise<HelixGame[]> {
+        const gameList = await this.client?.helix.games.getGamesByNames([
+            gameName,
+        ]);
+
+        if (!gameList) {
+            return [];
+        }
+
+        return gameList;
     }
 
     async disconnect() {

@@ -18,35 +18,37 @@ const ChattersPage: React.FC = () => {
     });
 
     return (
-        <section className="mt-4">
+        <section className="my-4">
             <h2>Chatters</h2>
 
-            <table className="table">
-                <colgroup>
-                    <col />
-                    <col />
-                    <col />
-                    <col width="160" />
-                </colgroup>
-                <thead>
-                    <tr>
-                        <th scope="col">Channel</th>
-                        <th scope="col">Username</th>
-                        <th scope="col">Displayname</th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {chatters.map((chatter) => {
-                        return (
-                            <ChatterRowComponent
-                                chatter={chatter}
-                                key={chatter.userstate.id}
-                            ></ChatterRowComponent>
-                        );
-                    })}
-                </tbody>
-            </table>
+            <div className="table-responsive">
+                <table className="table">
+                    <colgroup>
+                        <col />
+                        <col />
+                        <col />
+                        <col width="160" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th scope="col">Channel</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Displayname</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {chatters.map((chatter) => {
+                            return (
+                                <ChatterRowComponent
+                                    chatter={chatter}
+                                    key={chatter.userstate.id}
+                                ></ChatterRowComponent>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            </div>
         </section>
     );
 };

@@ -6,15 +6,16 @@ import { ResponseSettingType } from "../../types/SettingType";
 
 // Component
 import DashboardPage from "../page/DashboardPage";
-import SettingPage from "../page/SettingPage";
 import ChattersPage from "../page/ChattersPage";
 import RaidersPage from "../page/RaidersPage";
 import HostsPage from "../page/HostsPage";
+import ChannelPage from "../page/ChannelPage";
+import SettingPage from "../page/SettingPage";
 import ConnectComponent from "../component/ConnectComponent";
 
 // Store
-import UsernameStore from "../store/Username";
-import ChannelsStore from "../store/Channels";
+import SettingUsernameStore from "../store/SettingUsername";
+import SettingChannelsStore from "../store/SettingChannels";
 import IsConnectingStore from "../store/IsConnecting";
 
 // Utils
@@ -31,11 +32,11 @@ const Layout: React.FC = () => {
                 { username: "", channels: [] }
             );
 
-            UsernameStore.dispatch({
+            SettingUsernameStore.dispatch({
                 type: "UPDATE",
                 state: defaultValue.username,
             });
-            ChannelsStore.dispatch({
+            SettingChannelsStore.dispatch({
                 type: "UPDATE",
                 state: defaultValue.channels.join(","),
             });
@@ -66,7 +67,7 @@ const Layout: React.FC = () => {
                         className="collapse navbar-collapse"
                         id="navbarNavAltMarkup"
                     >
-                        <div className="navbar-nav me-auto mb-2 mb-lg-0">
+                        <div className="navbar-nav me-auto mb-2 mb-md-0">
                             <Link
                                 className="nav-link"
                                 aria-current="page"
@@ -98,6 +99,15 @@ const Layout: React.FC = () => {
                             <Link
                                 className="nav-link"
                                 aria-current="page"
+                                to="/channel"
+                            >
+                                Channel
+                            </Link>
+                        </div>
+                        <div className="navbar-nav mb-2 mb-md-0 me-0 me-md-2">
+                            <Link
+                                className="nav-link"
+                                aria-current="page"
                                 to="/settings"
                             >
                                 Settings
@@ -119,6 +129,9 @@ const Layout: React.FC = () => {
                         </Route>
                         <Route path="/hosts">
                             <HostsPage />
+                        </Route>
+                        <Route path="/channel">
+                            <ChannelPage />
                         </Route>
                         <Route path="/settings">
                             <SettingPage />

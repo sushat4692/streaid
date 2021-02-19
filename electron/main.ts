@@ -72,6 +72,58 @@ ipcMain.handle("save:settings", (_, values) => {
     };
 });
 
+ipcMain.handle("channel:info", async (_, values) => {
+    const TwitchAPI = getTwichAPIInstance();
+
+    const User = await TwitchAPI.getUserByName(values.username);
+    if (!User) {
+        return false;
+    }
+
+    const Channel = await TwitchAPI.getChannelInfo(User);
+    if (!Channel) {
+        return false;
+    }
+
+    return {
+        id: Channel.id,
+        name: Channel.name,
+        displayName: Channel.displayName,
+        language: Channel.language,
+        gameId: Channel.gameId,
+        gameName: Channel.gameName,
+        title: Channel.title,
+    };
+});
+
+ipcMain.handle("channel:game", async (_, values) => {
+    const TwitchAPI = getTwichAPIInstance();
+    const game = await TwitchAPI.getGame(values.gameId);
+
+    if (!game) {
+        return null;
+    }
+
+    return {
+        id: game.id,
+        name: game.name,
+        boxArtUrl: game.boxArtUrl,
+    };
+});
+
+ipcMain.handle("channel:games", async (_, values) => {
+    const TwitchAPI = getTwichAPIInstance();
+    const games = await TwitchAPI.getGamesList(values.gameName);
+
+    return games.map((game) => {
+        return {
+            id: game.id,
+            name: game.name,
+            boxArtUrl: game.boxArtUrl,
+        };
+    });
+});
+
 ipcMain.handle("signout", async () => {
     const Bot = getBotInstance();
     const TwitchAPI = getTwichAPIInstance();

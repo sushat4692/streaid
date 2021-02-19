@@ -7,8 +7,8 @@ import {
 } from "../../types/SettingType";
 
 // Store
-import UsernameStore from "../store/Username";
-import ChannelsStore from "../store/Channels";
+import SettingUsernameStore from "../store/SettingUsername";
+import SettingChannelsStore from "../store/SettingChannels";
 import IsInitedStore from "../store/IsInited";
 import IsConnectingStore from "../store/IsConnecting";
 
@@ -16,8 +16,12 @@ import IsConnectingStore from "../store/IsConnecting";
 import { request } from "../util/request";
 
 const SettnigPage: React.FC = () => {
-    const [username, updateUsername] = useState(UsernameStore.getState());
-    const [channels, updateChannels] = useState(ChannelsStore.getState());
+    const [username, updateUsername] = useState(
+        SettingUsernameStore.getState()
+    );
+    const [channels, updateChannels] = useState(
+        SettingChannelsStore.getState()
+    );
 
     const saveSettings = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -47,16 +51,16 @@ const SettnigPage: React.FC = () => {
     };
 
     useEffect(() => {
-        UsernameStore.subscribe(() => {
-            updateUsername(UsernameStore.getState());
+        SettingUsernameStore.subscribe(() => {
+            updateUsername(SettingUsernameStore.getState());
         });
-        ChannelsStore.subscribe(() => {
-            updateChannels(ChannelsStore.getState());
+        SettingChannelsStore.subscribe(() => {
+            updateChannels(SettingChannelsStore.getState());
         });
     }, []);
 
     return (
-        <section className="mt-4">
+        <section className="my-4">
             <form onSubmit={saveSettings}>
                 <h2>Settings</h2>
                 <div className="mb-3">
@@ -83,7 +87,7 @@ const SettnigPage: React.FC = () => {
                         className="form-control"
                         value={channels}
                         onChange={(e) =>
-                            ChannelsStore.dispatch({
+                            SettingChannelsStore.dispatch({
                                 type: "UPDATE",
                                 state: e.target.value,
                             })
