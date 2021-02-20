@@ -43,7 +43,7 @@ const Layout: React.FC = () => {
 
             IsConnectingStore.dispatch({ type: "DISABLE" });
         })();
-    });
+    }, []);
 
     return (
         <Router>

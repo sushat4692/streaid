@@ -15,7 +15,7 @@ const ChattersPage: React.FC = () => {
         RaidersStore.subscribe(() => {
             updateRaiders([...RaidersStore.getState()]);
         });
-    });
+    }, []);
 
     return (
         <section className="my-4">

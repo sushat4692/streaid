@@ -54,6 +54,21 @@ const DashboardPage: React.FC = () => {
 
                 <div className="card">
                     <div className="card-body">
+                        <h5 className="card-title">Channel</h5>
+                        <p className="card-text">
+                            You can update Channel information.
+                        </p>
+                        <Link
+                            to="/channel"
+                            className="btn btn-primary stretched-link"
+                        >
+                            Check
+                        </Link>
+                    </div>
+                </div>
+
+                <div className="card">
+                    <div className="card-body">
                         <h5 className="card-title">Settings</h5>
                         <p className="card-text">Setting connecting channel</p>
                         <Link

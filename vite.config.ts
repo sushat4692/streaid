@@ -7,20 +7,21 @@ export default defineConfig({
 
     optimizeDeps: {
         exclude: [
+            "dotenv",
+            "electron-is-dev",
+            "electron-store",
+            "fs-extra",
             "jsdom",
+            "nedb-promises",
             "node-fetch",
-            "encoding",
+            "tmi.js",
             "tslib",
             "twitch",
-            "fs",
             "twitch-auth",
             "twitch-electron-auth-provider",
+            "fs",
             "electron-store",
-            "dotenv",
-            "fs-extra",
-            "nedb-promises",
             "path",
-            "electron-is-dev",
         ],
     },
 });

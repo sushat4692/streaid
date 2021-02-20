@@ -13,7 +13,7 @@ const ChattersPage: React.FC = () => {
         HostsStore.subscribe(() => {
             updateHosts([...HostsStore.getState()]);
         });
-    });
+    }, []);
 
     return (
         <section className="my-4">

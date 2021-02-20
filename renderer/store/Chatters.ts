@@ -1,10 +1,10 @@
 import { Reducer, createStore } from "redux";
-import { ChatUserstate } from "tmi.js";
+// import { ChatUserstate } from "tmi.js";
 
 export type ChatterRowType = {
     id: string;
     channel: string;
-    userstate: ChatUserstate;
+    userstate: any;
 };
 
 export type ActionType = {

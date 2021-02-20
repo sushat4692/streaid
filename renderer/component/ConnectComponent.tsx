@@ -16,7 +16,7 @@ const ConnectComonent: React.FC = () => {
             updateIsConnected(IsConnectedStore.getState());
             IsConnectingStore.dispatch({ type: "DISABLE" });
         });
-    });
+    }, []);
 
     const clickHandler = async () => {
         IsConnectingStore.dispatch({ type: "ENABLE" });

@@ -81,33 +81,34 @@ class Bot {
         const messages = message.trim().split(/\s/);
         const commandName = messages.shift();
 
-        console.log({ messages, commandName });
-
-        let existsCommand: boolean = false;
-        switch (commandName) {
-            case "!dice": {
-                const num = this.rollDice();
-                this.client?.say(channel, `You rolled a ${num}`);
-                existsCommand = true;
-                break;
-            }
-            case "!so": {
-                if (messages.length) {
-                    ShoutOut(channel, messages[0]);
-                } else {
-                    console.log(
-                        `* You need to add username: e.g. !so {username}`
-                    );
+        // Run command
+        if (commandName && commandName.charAt(0) === "!") {
+            let existsCommand: boolean = false;
+            switch (commandName) {
+                case "!dice": {
+                    const num = this.rollDice();
+                    this.client?.say(channel, `You rolled a ${num}`);
+                    existsCommand = true;
+                    break;
                 }
-                existsCommand = true;
-                break;
+                case "!so": {
+                    if (messages.length) {
+                        ShoutOut(channel, messages[0]);
+                    } else {
+                        console.log(
+                            `* You need to add username: e.g. !so {username}`
+                        );
+                    }
+                    existsCommand = true;
+                    break;
+                }
             }
-        }
 
-        if (existsCommand) {
-            console.log(`* Executed ${commandName} command`);
-        } else {
-            console.log(`* Unknown command ${commandName}`);
+            if (existsCommand) {
+                console.log(`* Executed ${commandName} command`);
+            } else {
+                console.log(`* Unknown command ${commandName}`);
+            }
         }
 
         await pushChatter(userstate);

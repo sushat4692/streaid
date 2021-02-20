@@ -11,6 +11,16 @@ import ShoutOut from "./lib/commands/ShoutOut";
 // Store
 import store from "./store";
 
+// Database
+import {
+    pushChannelTemplate,
+    getChannelTemplate,
+    removeChannelTemplate,
+} from "./database/ChannelTemplate";
+
+// Const
+import { getCode } from "./const/language";
+
 async function createWindow() {
     const win = new BrowserWindow({
         width: 800,
@@ -85,6 +95,8 @@ ipcMain.handle("channel:info", async (_, values) => {
         return false;
     }
 
+    const Tags = await TwitchAPI.getChannelTags(User);
+
     return {
         id: Channel.id,
         name: Channel.name,
@@ -93,6 +105,14 @@ ipcMain.handle("channel:info", async (_, values) => {
         gameId: Channel.gameId,
         gameName: Channel.gameName,
         title: Channel.title,
+        tags: Tags.map((Tag) => {
+            return {
+                id: Tag.id,
+                isAuto: Tag.isAuto,
+                name: Tag.getName(getCode(Channel.language)),
+                description: Tag.getDescription(getCode(Channel.language)),
+            };
+        }),
     };
 });
 
@@ -113,15 +133,93 @@ ipcMain.handle("channel:game", async (_, values) => {
 
 ipcMain.handle("channel:games", async (_, values) => {
     const TwitchAPI = getTwichAPIInstance();
-    const games = await TwitchAPI.getGamesList(values.gameName);
+    const games = await TwitchAPI.getGameList(values.gameName);
 
-    return games.map((game) => {
+    if (!games) {
+        return [];
+    }
+
+    return games.data.map((game) => {
         return {
             id: game.id,
             name: game.name,
             boxArtUrl: game.boxArtUrl,
         };
     });
+});
+
+ipcMain.handle("channel:tags", async (_, values) => {
+    const TwitchAPI = getTwichAPIInstance();
+    const tags = await TwitchAPI.getTagList();
+
+    const User = await TwitchAPI.getUserByName(values.username);
+    if (!User) {
+        return [];
+    }
+
+    const Channel = await TwitchAPI.getChannelInfo(User);
+    if (!Channel) {
+        return [];
+    }
+
+    if (!tags) {
+        return [];
+    }
+
+    return tags.data.map((Tag) => {
+        return {
+            id: Tag.id,
+            isAuto: Tag.isAuto,
+            name: Tag.getName(getCode(Channel.language)),
+            description: Tag.getDescription(getCode(Channel.language)),
+        };
+    });
+});
+
+ipcMain.handle("channel:update", async (_, values) => {
+    const TwitchAPI = getTwichAPIInstance();
+
+    const User = await TwitchAPI.getUserByName(values.username);
+    if (!User) {
+        return [];
+    }
+
+    TwitchAPI.updateChannelInfo(User, {
+        title: values.title,
+        gameId: values.gameId,
+        language: values.language,
+    });
+});
+
+const getChannelTempalteList = async () => {
+    const templates = await getChannelTemplate();
+
+    return templates.map((template) => {
+        return {
+            id: template._id,
+            title: template.title,
+            gameId: template.gameId,
+            gameName: template.gameName,
+            boxArtUrl: template.boxArtUrl,
+            language: template.language,
+            createdAt: template.createdAt,
+            updatedAt: template.updatedAt,
+        };
+    });
+};
+
+ipcMain.handle("channel:template", async () => {
+    return await getChannelTempalteList();
+});
+
+ipcMain.handle("channel:template:push", async (_, values) => {
+    await pushChannelTemplate(values);
+    return await getChannelTempalteList();
+});
+
+ipcMain.handle("channel:template:delete", async (_, values) => {
+    await removeChannelTemplate(values.id);
+    return await getChannelTempalteList();
 });
 
 ipcMain.handle("signout", async () => {

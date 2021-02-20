@@ -1,7 +1,7 @@
 import React from "react";
 
 // Store
-import CatterStore, { ChatterRowType } from "../store/Chatters";
+import ChatterStore, { ChatterRowType } from "../store/Chatters";
 
 // Component
 import ShoutOutButtonComponent from "./ShoutOutButtonComponent";
@@ -12,7 +12,7 @@ type Props = {
 
 const ChatterRowComponent: React.FC<Props> = ({ chatter }) => {
     const deleteClickHandler = () => {
-        CatterStore.dispatch({ type: "DELETE", state: chatter });
+        ChatterStore.dispatch({ type: "DELETE", state: chatter });
     };
 
     return (

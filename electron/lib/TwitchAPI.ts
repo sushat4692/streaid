@@ -2,15 +2,19 @@ import { session } from "electron";
 import {
     AccessToken,
     ApiClient,
+    HelixPaginatedResult,
     HelixPrivilegedUser,
     HelixUser,
     HelixChannel,
     HelixGame,
+    HelixTag,
 } from "twitch";
 import { ElectronAuthProvider } from "twitch-electron-auth-provider";
+import isDev from "electron-is-dev";
 
 // Store
 import store from "../store";
+import { HelixChannelUpdate } from "twitch/lib/API/Helix/Channel/HelixChannelApi";
 
 class TwitchAPI {
     _clientId: string = "";
@@ -29,6 +33,9 @@ class TwitchAPI {
 
         this._client = new ApiClient({
             authProvider: this._provider,
+            logger: {
+                minLevel: isDev ? 4 : 0,
+            },
         });
     }
 
@@ -56,6 +63,7 @@ class TwitchAPI {
         this._accessToken = await this._provider
             .getAccessToken([
                 "user:read:email",
+                "user:edit:broadcast",
                 "channel_read",
                 "channel_editor",
                 "chat:read",
@@ -107,6 +115,20 @@ class TwitchAPI {
         return channel;
     }
 
+    async updateChannelInfo(User: HelixUser, data: HelixChannelUpdate) {
+        await this.client?.helix.channels.updateChannelInfo(User, data);
+    }
+
+    async getChannelTags(User: HelixUser): Promise<HelixTag[]> {
+        const tags = await this.client?.helix.streams.getStreamTags(User);
+
+        if (!tags) {
+            return [];
+        }
+
+        return tags;
+    }
+
     async getGame(gameId: string): Promise<HelixGame | null> {
         const game = await this.client?.helix.games.getGameById(gameId);
 
@@ -117,16 +139,28 @@ class TwitchAPI {
         return game;
     }
 
-    async getGamesList(gameName: string): Promise<HelixGame[]> {
-        const gameList = await this.client?.helix.games.getGamesByNames([
-            gameName,
-        ]);
+    async getGameList(
+        gameName: string
+    ): Promise<HelixPaginatedResult<HelixGame> | null> {
+        const gameList = await this.client?.helix.search.searchCategories(
+            gameName
+        );
 
         if (!gameList) {
-            return [];
+            return null;
         }
 
         return gameList;
+    }
+
+    async getTagList() {
+        const tagList = await this.client?.helix.tags.getAllStreamTags();
+
+        if (!tagList) {
+            return null;
+        }
+
+        return tagList;
     }
 
     async disconnect() {

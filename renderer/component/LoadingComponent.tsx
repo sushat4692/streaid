@@ -9,11 +9,11 @@ const LoadingComponent: React.FC = () => {
         IsConnectingStore.subscribe(() => {
             updateIsConnecting(IsConnectingStore.getState());
         });
-    });
+    }, []);
 
     return isConnecting ? (
         <div
-            className="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+            className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
             style={{ background: "rgba(255, 255, 255, 0.8)", zIndex: 2000 }}
         >
             <div className="spinner-border" role="status">
