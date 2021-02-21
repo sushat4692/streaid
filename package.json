@@ -1,7 +1,13 @@
 {
     "name": "twitch-support-tool",
-    "version": "2.3.1",
+    "version": "0.0.1",
     "main": "./dist/main.js",
+    "description": "Streaming support tool for Twitch",
+    "author": {
+        "name": "SUSH",
+        "email": "sush@sus-happy.net",
+        "url": "https://sus-happy.net/"
+    },
     "scripts": {
         "dev": "vite",
         "build": "npm run build:vite && npm run build:electron",
