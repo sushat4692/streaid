@@ -15,7 +15,10 @@ import ConnectComponent from "../component/ConnectComponent";
 
 // Store
 import SettingUsernameStore from "../store/SettingUsername";
-import SettingChannelsStore from "../store/SettingChannels";
+import SettingChannelStore from "../store/SettingChannel";
+import SettingShoutOutMessageStore from "../store/SettingShoutOutMessage";
+import SettingShoutOutNotFoundStore from "../store/SettingShoutOutNotFound";
+import SettingShoutOutFailedStore from "../store/SettingShoutOutFailed";
 import IsConnectingStore from "../store/IsConnecting";
 
 // Utils
@@ -26,19 +29,37 @@ const Layout: React.FC = () => {
         (async () => {
             IsConnectingStore.dispatch({ type: "ENABLE" });
 
-            const defaultValue = await request<any, ResponseSettingType>(
-                "get:settings",
+            const defaultValue = await request<null, ResponseSettingType>(
+                "settings:get",
                 null,
-                { username: "", channels: [] }
+                {
+                    username: "",
+                    channel: "",
+                    shoutout_message: "",
+                    shoutout_not_found: "",
+                    shoutout_failed: "",
+                }
             );
 
             SettingUsernameStore.dispatch({
                 type: "UPDATE",
                 state: defaultValue.username,
             });
-            SettingChannelsStore.dispatch({
+            SettingChannelStore.dispatch({
                 type: "UPDATE",
-                state: defaultValue.channels.join(","),
+                state: defaultValue.channel,
+            });
+            SettingShoutOutMessageStore.dispatch({
+                type: "UPDATE",
+                state: defaultValue.shoutout_message,
+            });
+            SettingShoutOutNotFoundStore.dispatch({
+                type: "UPDATE",
+                state: defaultValue.shoutout_not_found,
+            });
+            SettingShoutOutFailedStore.dispatch({
+                type: "UPDATE",
+                state: defaultValue.shoutout_failed,
             });
 
             IsConnectingStore.dispatch({ type: "DISABLE" });

@@ -3,7 +3,7 @@ import Select, { OptionTypeBase } from "react-select";
 import AsyncSelect from "react-select/async";
 
 // Store
-import SettingChannelsStore from "../store/SettingChannels";
+import SettingChannelStore from "../store/SettingChannel";
 import ChannelTemplateStore, {
     ChannelTemplateRowType,
 } from "../store/ChannelTemplate";
@@ -62,7 +62,7 @@ const ChannelPage: React.FC = () => {
             ChannelInterface | false
         >(
             "channel:info",
-            { username: SettingChannelsStore.getState() },
+            { username: SettingChannelStore.getState() },
             {
                 id: "id",
                 name: "",
@@ -158,7 +158,7 @@ const ChannelPage: React.FC = () => {
             // Get tag list
             // const tagList = await request<{ username: string }, TagInterface[]>(
             //     "channel:tags",
-            //     { username: SettingChannelsStore.getState() },
+            //     { username: SettingChannelStore.getState() },
             //     []
             // );
             // console.log(tagList);
@@ -229,7 +229,7 @@ const ChannelPage: React.FC = () => {
         >(
             "channel:update",
             {
-                username: SettingChannelsStore.getState(),
+                username: SettingChannelStore.getState(),
                 title,
                 gameId: game.id,
                 language,
@@ -418,7 +418,7 @@ const ChannelPage: React.FC = () => {
                             <col />
                             <col />
                             <col />
-                            <col />
+                            <col width="140" />
                             <col width="160" />
                         </colgroup>
                         <thead>
@@ -433,7 +433,7 @@ const ChannelPage: React.FC = () => {
                         <tbody>
                             {channelTemplates.map((channelTemplate) => (
                                 <ChannelTemplateRowComponent
-                                    key={channelTemplate.id}
+                                    key={channelTemplate._id}
                                     channelTemplate={channelTemplate}
                                 />
                             ))}

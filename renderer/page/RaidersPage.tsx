@@ -25,15 +25,15 @@ const ChattersPage: React.FC = () => {
                 <table className="table">
                     <colgroup>
                         <col />
-                        <col />
                         <col width="100" />
+                        <col width="140" />
                         <col width="160" />
                     </colgroup>
                     <thead>
                         <tr>
-                            <th scope="col">Channel</th>
                             <th scope="col">Username</th>
                             <th scope="col">Viewers</th>
+                            <th scope="col">Created</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
@@ -42,6 +42,7 @@ const ChattersPage: React.FC = () => {
                             return (
                                 <RaiderRowComponent
                                     raider={raider}
+                                    key={raider._id}
                                 ></RaiderRowComponent>
                             );
                         })}

@@ -46,7 +46,7 @@ const ChannelTemplateRowComponent: React.FC<Props> = ({ channelTemplate }) => {
                 id: string;
             },
             ChannelTemplateRowType[]
-        >("channel:template:delete", { id: channelTemplate.id }, []);
+        >("channel:template:delete", { id: channelTemplate._id }, []);
 
         ChannelTemplateStore.dispatch({ type: "UPDATE", state: templates });
     };
@@ -54,9 +54,9 @@ const ChannelTemplateRowComponent: React.FC<Props> = ({ channelTemplate }) => {
     return (
         <tr>
             <td scope="row">{channelTemplate.title}</td>
-            <td scope="row">{channelTemplate.gameName}</td>
+            <td>{channelTemplate.gameName}</td>
             <td>{getLabel(channelTemplate.language)}</td>
-            <td>{moment(channelTemplate.createdAt).format()}</td>
+            <td>{moment(channelTemplate.createdAt).format("MMM Do, kk:mm")}</td>
             <td>
                 <button
                     className="btn btn-sm btn-primary me-2"

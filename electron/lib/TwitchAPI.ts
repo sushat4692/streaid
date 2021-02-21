@@ -13,7 +13,7 @@ import { ElectronAuthProvider } from "twitch-electron-auth-provider";
 import isDev from "electron-is-dev";
 
 // Store
-import store from "../store";
+import { getInstance as getStoreInstance } from "../store";
 import { HelixChannelUpdate } from "twitch/lib/API/Helix/Channel/HelixChannelApi";
 
 class TwitchAPI {
@@ -105,6 +105,16 @@ class TwitchAPI {
         return User;
     }
 
+    async getUserById(id: string): Promise<HelixUser | null> {
+        const User = await this.client?.helix.users.getUserById(id);
+
+        if (!User) {
+            return null;
+        }
+
+        return User;
+    }
+
     async getChannelInfo(User: HelixUser): Promise<HelixChannel | null> {
         const channel = await this.client?.helix.channels.getChannelInfo(User);
 
@@ -164,6 +174,7 @@ class TwitchAPI {
     }
 
     async disconnect() {
+        const store = getStoreInstance();
         await session.defaultSession.clearStorageData();
         store.clear();
     }

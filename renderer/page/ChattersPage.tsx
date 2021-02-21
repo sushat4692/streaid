@@ -5,6 +5,7 @@ import ChattersStore, { ChatterRowType } from "../store/Chatters";
 
 // Component
 import ChatterRowComponent from "../component/ChatterRowComponent";
+import { request } from "../util/request";
 
 const ChattersPage: React.FC = () => {
     const [chatters, updateChatters] = useState<ChatterRowType[]>(
@@ -15,6 +16,15 @@ const ChattersPage: React.FC = () => {
         ChattersStore.subscribe(() => {
             updateChatters([...ChattersStore.getState()]);
         });
+
+        (async () => {
+            const chatters = await request<{}, ChatterRowType[]>(
+                "chatter",
+                {},
+                []
+            );
+            ChattersStore.dispatch({ type: "UPDATE", state: chatters });
+        })();
     }, []);
 
     return (
@@ -26,14 +36,14 @@ const ChattersPage: React.FC = () => {
                     <colgroup>
                         <col />
                         <col />
-                        <col />
+                        <col width="140" />
                         <col width="160" />
                     </colgroup>
                     <thead>
                         <tr>
-                            <th scope="col">Channel</th>
                             <th scope="col">Username</th>
                             <th scope="col">Displayname</th>
+                            <th scope="col">Created</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
@@ -42,7 +52,7 @@ const ChattersPage: React.FC = () => {
                             return (
                                 <ChatterRowComponent
                                     chatter={chatter}
-                                    key={chatter.userstate.id}
+                                    key={chatter._id}
                                 ></ChatterRowComponent>
                             );
                         })}

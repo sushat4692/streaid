@@ -6,12 +6,14 @@ import IsConnectingStore from "../store/IsConnecting";
 import { request } from "../util/request";
 
 type Props = {
-    channel: string;
+    channel?: string;
+    roomId?: string;
     username: string;
     className?: string;
 };
 
 const ShoutOutButtonComponent: React.FC<Props> = ({
+    roomId,
     channel,
     username,
     className,
@@ -19,9 +21,12 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
     const clickHandler = async () => {
         IsConnectingStore.dispatch({ type: "ENABLE" });
 
-        await request<{ postChannel: string; username: string }, null>(
+        await request<
+            { postRoomId?: string; postChannel?: string; username: string },
+            null
+        >(
             "bot:shoutout",
-            { postChannel: channel, username },
+            { postRoomId: roomId, postChannel: channel, username },
             null
         );
 

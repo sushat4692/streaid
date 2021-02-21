@@ -1,7 +1,11 @@
 import React from "react";
+import moment from "moment";
 
 // Store
 import ChatterStore, { ChatterRowType } from "../store/Chatters";
+
+// Utility
+import { request } from "../util/request";
 
 // Component
 import ShoutOutButtonComponent from "./ShoutOutButtonComponent";
@@ -11,20 +15,27 @@ type Props = {
 };
 
 const ChatterRowComponent: React.FC<Props> = ({ chatter }) => {
-    const deleteClickHandler = () => {
-        ChatterStore.dispatch({ type: "DELETE", state: chatter });
+    const deleteClickHandler = async () => {
+        const chatters = await request<
+            {
+                id: string;
+            },
+            ChatterRowType[]
+        >("chatter:delete", { id: chatter._id }, []);
+
+        ChatterStore.dispatch({ type: "UPDATE", state: chatters });
     };
 
     return (
         <tr>
-            <td scope="row">{chatter.channel}</td>
-            <td scope="row">{chatter.userstate.username}</td>
-            <td>{chatter.userstate["display-name"]}</td>
+            <td scope="row">{chatter.username}</td>
+            <td>{chatter["display-name"]}</td>
+            <td>{moment(chatter.createdAt).format("MMM Do, kk:mm")}</td>
             <td>
                 <ShoutOutButtonComponent
                     className="btn btn-sm btn-success me-1"
-                    channel={chatter.channel}
-                    username={chatter.userstate.username}
+                    roomId={chatter["room-id"]}
+                    username={chatter.username}
                 />
                 <button
                     className="btn btn-sm btn-danger"

@@ -31,22 +31,22 @@ const App: React.FC = () => {
         requestEvent("bot:disconnected", () => {
             IsConnectedStore.dispatch({ type: "DISABLE" });
         });
-        requestEvent<ChatterRowType>("bot:message", (_, values) => {
+        requestEvent<ChatterRowType[]>("bot:chatted", (_, values) => {
             CattersStore.dispatch({
-                type: "PUT",
-                state: { ...values, ...{ id: nanoid() } },
+                type: "UPDATE",
+                state: values,
             });
         });
-        requestEvent<RaiderRowType>("bot:raided", (_, values) => {
+        requestEvent<RaiderRowType[]>("bot:raided", (_, values) => {
             RaidersStore.dispatch({
-                type: "PUT",
-                state: { ...values, ...{ id: nanoid() } },
+                type: "UPDATE",
+                state: values,
             });
         });
-        requestEvent<HostRowType>("bot:hosted", (_, values) => {
+        requestEvent<HostRowType[]>("bot:hosted", (_, values) => {
             HostsStore.dispatch({
-                type: "PUT",
-                state: { ...values, ...{ id: nanoid() } },
+                type: "UPDATE",
+                state: values,
             });
         });
 

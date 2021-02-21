@@ -1,13 +1,13 @@
-import { BrowserWindow } from "electron";
+import { BrowserWindow, Notification } from "electron";
 import tmi from "tmi.js";
 
 // Model
-import { pushChatter } from "../database/Chatter";
-import { pushRaider } from "../database/Raider";
-import { pushHost } from "../database/Host";
+import { getChatters, pushChatter } from "../database/Chatter";
+import { getRaiders, pushRaider } from "../database/Raider";
+import { getHosts, pushHost } from "../database/Host";
 
 // Store
-import store from "../store";
+import { getInstance as getStoreInstance } from "../store";
 import ShoutOut from "./commands/ShoutOut";
 
 class Bot {
@@ -21,6 +21,8 @@ class Bot {
      * Connect to target channel
      */
     connect() {
+        const store = getStoreInstance();
+
         // Define configuration options
         const opts: tmi.Options = {
             options: { debug: true },
@@ -32,7 +34,7 @@ class Bot {
                 username: store.get("username"),
                 password: store.get("password"),
             },
-            channels: store.get("channels"),
+            channels: [store.get("channel")],
         };
 
         // Create a client with our options
@@ -93,7 +95,10 @@ class Bot {
                 }
                 case "!so": {
                     if (messages.length) {
-                        ShoutOut(channel, messages[0]);
+                        ShoutOut({
+                            postChannel: channel,
+                            username: messages[0],
+                        });
                     } else {
                         console.log(
                             `* You need to add username: e.g. !so {username}`
@@ -111,11 +116,18 @@ class Bot {
             }
         }
 
-        await pushChatter(userstate);
+        if (await pushChatter(userstate)) {
+            const notification = new Notification({
+                title: `Chatter has come`,
+                body: `Thank you for coming "${userstate["display-name"]}"`,
+                silent: false,
+            });
+            notification.show();
+        }
 
         const win = this.getWindow();
         if (win) {
-            win.webContents.send("bot:message", { channel, userstate });
+            win.webContents.send("bot:chatted", await getChatters());
         }
     }
 
@@ -127,18 +139,22 @@ class Bot {
      * @param viewers
      */
     async onRaidedHandler(channel: string, username: string, viewers: number) {
-        const raider = {
-            username,
-            viewers,
-        };
         pushRaider({
+            channel,
             username,
             viewers,
         });
 
+        const notification = new Notification({
+            title: `${viewers} Raider has come`,
+            body: `Thank you for raiding "${username}"`,
+            silent: false,
+        });
+        notification.show();
+
         const win = this.getWindow();
         if (win) {
-            win.webContents.send("bot:raided", { channel, raider });
+            win.webContents.send("bot:raided", await getRaiders());
         }
     }
 
@@ -155,20 +171,23 @@ class Bot {
         viewers: number,
         autohost: boolean
     ) {
-        const hosted = {
-            username,
-            viewers,
-            autohost,
-        };
         pushHost({
+            channel,
             username,
             viewers,
             autohost,
         });
 
+        const notification = new Notification({
+            title: `Start ${viewers} Hosting`,
+            body: `Thank you for hosting "${username}"`,
+            silent: false,
+        });
+        notification.show();
+
         const win = this.getWindow();
         if (win) {
-            win.webContents.send("bot:hosted", { channel, hosted });
+            win.webContents.send("bot:hosted", await getHosts());
         }
     }
 

@@ -1,26 +1,24 @@
 import { Reducer, createStore } from "redux";
+import { Document } from "../../types/Document";
 
-export type RaiderRowType = {
-    id: string;
+export interface RaiderRowType extends Document {
     channel: string;
-    raider: { username: string; viewers: number };
-};
+    username: string;
+    viewers: number;
+}
 
-export type ActionType = {
-    type: "PUT" | "DELETE";
-    state: RaiderRowType;
-};
+export interface ActionType {
+    type: "UPDATE";
+    state: RaiderRowType[];
+}
 
 const reducer: Reducer<RaiderRowType[], ActionType> = (
     state: RaiderRowType[] = [],
     action
 ) => {
     switch (action.type) {
-        case "PUT":
-            state.push(action.state);
-            return state;
-        case "DELETE":
-            return state.filter((row) => row.id !== action.state.id);
+        case "UPDATE":
+            return [...action.state];
         default:
             return state;
     }

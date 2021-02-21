@@ -8,7 +8,7 @@ import { request } from "../util/request";
 
 const InitComponent: React.FC = () => {
     const clickHandler = async () => {
-        await request("get:settings", null, null);
+        await request("settings:get", null, null);
         IsInitedStore.dispatch({ type: "ENABLE" });
     };
 

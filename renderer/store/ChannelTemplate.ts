@@ -1,15 +1,13 @@
 import { Reducer, createStore } from "redux";
+import { Document } from "../../types/Document";
 
-export type ChannelTemplateRowType = {
-    id: string;
+export interface ChannelTemplateRowType extends Document {
     title: string;
     gameId: string;
     gameName: string;
     boxArtUrl: string;
     language: string;
-    createdAt: Date;
-    updatedAt: Date;
-};
+}
 
 export type ActionType = {
     type: "PUT" | "UPDATE";
