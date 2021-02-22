@@ -25,12 +25,22 @@ const SettingSoundComponent: React.FC = () => {
     const [raidVolume, updateRaidVolume] = useState(getRaidVolume());
     const [hostVolume, updateHostVolume] = useState(getHostVolume());
 
-    const clickHandler = (fileName: string) => {
-        return async (e: React.FormEvent) => {
+    const selectFileHandler = (mode: string) => {
+        return async (e: React.MouseEvent) => {
             e.preventDefault();
 
-            if (await request("setting:notification_sound", fileName, null)) {
+            if (await request("setting:notification:sound", mode, null)) {
                 window.alert("Saved!");
+            }
+        };
+    };
+
+    const playFileHandler = (mode: string) => {
+        return async (e: React.MouseEvent) => {
+            e.preventDefault();
+
+            if (!(await request("setting:notification:play", mode, false))) {
+                window.alert("Sound file is not defined!");
             }
         };
     };
@@ -53,115 +63,144 @@ const SettingSoundComponent: React.FC = () => {
 
             <h3>Chatter</h3>
             <div className="row align-items-center mb-0 mb-md-3">
-                <div className="mb-3 mb-md-0 col-md-3">
+                <div className="mb-3 mb-md-0 col-md-2">
                     <button
                         className="btn btn-success"
-                        onClick={clickHandler("chatter")}
+                        onClick={selectFileHandler("chatter")}
                     >
                         Select File
                     </button>
                 </div>
 
-                <div className="mb-3 mb-md-0 col-md-9">
+                <div className="mb-3 mb-md-0 col-md-10">
                     <label className="form-label">Volume</label>
-                    <input
-                        type="range"
-                        className="form-range"
-                        id="chatter_volume"
-                        min={0}
-                        max={1}
-                        step={0.1}
-                        value={chatterVolume}
-                        onChange={async (e) => {
-                            const value = parseFloat(e.target.value);
-                            updateChatterVolumeStore(value);
 
-                            await request(
-                                "setting:notification_volume",
-                                {
-                                    mode: "chatter_volume",
-                                    value,
-                                },
-                                null
-                            );
-                        }}
-                    ></input>
+                    <div className="d-flex align-items-center">
+                        <button
+                            className="btn btn-link me-2"
+                            onClick={playFileHandler("chatter")}
+                        >
+                            <i className="bi bi-play-circle"></i>
+                        </button>
+
+                        <input
+                            type="range"
+                            className="form-range"
+                            id="chatter_volume"
+                            min={0}
+                            max={1}
+                            step={0.01}
+                            value={chatterVolume}
+                            onChange={async (e) => {
+                                const value = parseFloat(e.target.value);
+                                updateChatterVolumeStore(value);
+
+                                await request(
+                                    "setting:notification:volume",
+                                    {
+                                        mode: "chatter_volume",
+                                        value,
+                                    },
+                                    null
+                                );
+                            }}
+                        ></input>
+                    </div>
                 </div>
             </div>
 
             <h3>Raid</h3>
             <div className="row align-items-center mb-0 mb-md-3">
-                <div className="mb-3 mb-md-0 col-md-3">
+                <div className="mb-3 mb-md-0 col-md-2">
                     <button
                         className="btn btn-success"
-                        onClick={clickHandler("raid")}
+                        onClick={selectFileHandler("raid")}
                     >
                         Select File
                     </button>
                 </div>
 
-                <div className="mb-3 mb-md-0 col-md-9">
+                <div className="mb-3 mb-md-0 col-md-10">
                     <label className="form-label">Volume</label>
-                    <input
-                        type="range"
-                        className="form-range"
-                        id="raid_volume"
-                        min={0}
-                        max={1}
-                        step={0.1}
-                        value={raidVolume}
-                        onChange={async (e) => {
-                            const value = parseFloat(e.target.value);
-                            updateRaidVolumeStore(value);
 
-                            await request(
-                                "setting:notification_volume",
-                                {
-                                    mode: "raid_volume",
-                                    value,
-                                },
-                                null
-                            );
-                        }}
-                    ></input>
+                    <div className="d-flex align-items-center">
+                        <button
+                            className="btn btn-link me-2"
+                            onClick={playFileHandler("raid")}
+                        >
+                            <i className="bi bi-play-circle"></i>
+                        </button>
+
+                        <input
+                            type="range"
+                            className="form-range"
+                            id="raid_volume"
+                            min={0}
+                            max={1}
+                            step={0.01}
+                            value={raidVolume}
+                            onChange={async (e) => {
+                                const value = parseFloat(e.target.value);
+                                updateRaidVolumeStore(value);
+
+                                await request(
+                                    "setting:notification:volume",
+                                    {
+                                        mode: "raid_volume",
+                                        value,
+                                    },
+                                    null
+                                );
+                            }}
+                        ></input>
+                    </div>
                 </div>
             </div>
 
             <h3>Host</h3>
             <div className="row align-items-center mb-0 mb-md-3">
-                <div className="mb-3 mb-md-0 col-md-3">
+                <div className="mb-3 mb-md-0 col-md-2">
                     <button
                         className="btn btn-success"
-                        onClick={clickHandler("host")}
+                        onClick={selectFileHandler("host")}
                     >
                         Select File
                     </button>
                 </div>
 
-                <div className="mb-3 mb-md-0 col-md-9">
+                <div className="mb-3 mb-md-0 col-md-10">
                     <label className="form-label">Volume</label>
-                    <input
-                        type="range"
-                        className="form-range"
-                        id="host_volume"
-                        min={0}
-                        max={1}
-                        step={0.1}
-                        value={hostVolume}
-                        onChange={async (e) => {
-                            const value = parseFloat(e.target.value);
-                            updateHostVolumeStore(value);
 
-                            await request(
-                                "setting:notification_volume",
-                                {
-                                    mode: "host_volume",
-                                    value,
-                                },
-                                null
-                            );
-                        }}
-                    ></input>
+                    <div className="d-flex align-items-center">
+                        <button
+                            className="btn btn-link me-2"
+                            onClick={playFileHandler("host")}
+                        >
+                            <i className="bi bi-play-circle"></i>
+                        </button>
+                        <input
+                            type="range"
+                            className="form-range"
+                            id="host_volume"
+                            min={0}
+                            max={1}
+                            step={0.01}
+                            value={hostVolume}
+                            onChange={async (e) => {
+                                const value = parseFloat(e.target.value);
+                                updateHostVolumeStore(value);
+
+                                await request(
+                                    "setting:notification:volume",
+                                    {
+                                        mode: "host_volume",
+                                        value,
+                                    },
+                                    null
+                                );
+                            }}
+                        ></input>
+                    </div>
                 </div>
             </div>
         </section>

@@ -11,19 +11,27 @@ export const playSound = async (
     mode: "chatter" | "raid" | "host"
 ) => {
     if (!win) {
-        return;
+        return false;
     }
 
     const soundFile = path.join(
         isDev ? "." : app.getPath("userData"),
         `data/${mode}.mp3`
     );
-    const result = await stat(soundFile);
-    if (result.isFile()) {
-        const store = getStoreInstance();
-        const gain = store.get(`${mode}_volume`, 1);
 
-        const source = await readFile(soundFile);
-        win.webContents.send("sound:play", { source, gain });
+    try {
+        const result = await stat(soundFile);
+        if (!result.isFile()) {
+            return false;
+        }
+    } catch {
+        return false;
     }
+
+    const store = getStoreInstance();
+    const gain = store.get(`${mode}_volume`, 1);
+
+    const source = await readFile(soundFile);
+    win.webContents.send("sound:play", { source, gain });
+    return true;
 };

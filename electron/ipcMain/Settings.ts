@@ -11,6 +11,7 @@ import { getInstance as getStoreInstance } from "../store";
 
 // Util
 import { getWindow } from "../util/window";
+import { playSound } from "../util/Sound";
 
 ipcMain.handle("settings:get", async () => {
     const store = getStoreInstance();
@@ -59,7 +60,7 @@ ipcMain.handle("setting:shoutout_message", (_, values) => {
     return values;
 });
 
-ipcMain.handle("setting:notification_sound", async (_, values) => {
+ipcMain.handle("setting:notification:sound", async (_, values) => {
     const win = getWindow();
     if (!win) {
         return false;
@@ -88,8 +89,13 @@ ipcMain.handle("setting:notification_sound", async (_, values) => {
     return true;
 });
 
-ipcMain.handle("setting:notification_volume", async (_, values) => {
+ipcMain.handle("setting:notification:volume", async (_, values) => {
     const store = getStoreInstance();
     store.set(values.mode, values.value);
     return;
+});
+
+ipcMain.handle("setting:notification:play", async (_, values) => {
+    const win = getWindow();
+    return await playSound(win, values);
 });
