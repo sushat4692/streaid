@@ -24,4 +24,16 @@ const reducer: Reducer<RaiderRowType[], ActionType> = (
     }
 };
 
-export default createStore(reducer);
+const store = createStore(reducer);
+
+export const getState = () => store.getState();
+
+export const subscribe = (listener: () => void) => {
+    store.subscribe(listener);
+};
+
+export const updateAction = (state: RaiderRowType[]) => {
+    store.dispatch({ type: "UPDATE", state });
+};
+
+export default store;

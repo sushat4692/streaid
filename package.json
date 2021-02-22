@@ -32,7 +32,6 @@
         "fs-extra": "^9.1.0",
         "jsdom": "^16.4.0",
         "moment": "^2.29.1",
-        "nanoid": "^3.1.20",
         "nedb-promises": "^4.1.1",
         "node-fetch": "^2.6.1",
         "react": "^17.0.1",

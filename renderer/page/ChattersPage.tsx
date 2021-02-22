@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from "react";
 
 // Store
-import ChattersStore, { ChatterRowType } from "../store/Chatters";
+import {
+    getState,
+    subscribe,
+    updateAction,
+    ChatterRowType,
+} from "../store/Chatters";
 
 // Component
 import ChatterRowComponent from "../component/ChatterRowComponent";
 import { request } from "../util/request";
 
 const ChattersPage: React.FC = () => {
-    const [chatters, updateChatters] = useState<ChatterRowType[]>(
-        ChattersStore.getState()
-    );
+    const [chatters, updateChatters] = useState<ChatterRowType[]>(getState());
 
     useEffect(() => {
-        ChattersStore.subscribe(() => {
-            updateChatters([...ChattersStore.getState()]);
+        subscribe(() => {
+            updateChatters([...getState()]);
         });
 
         (async () => {
@@ -23,7 +26,7 @@ const ChattersPage: React.FC = () => {
                 {},
                 []
             );
-            ChattersStore.dispatch({ type: "UPDATE", state: chatters });
+            updateAction(chatters);
         })();
     }, []);
 

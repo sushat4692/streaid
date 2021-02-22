@@ -29,4 +29,16 @@ const reducer: Reducer<ChannelTemplateRowType[], ActionType> = (
     }
 };
 
-export default createStore(reducer);
+const store = createStore(reducer);
+
+export const getState = () => store.getState();
+
+export const subscribe = (listener: () => void) => {
+    store.subscribe(listener);
+};
+
+export const updateAction = (state: ChannelTemplateRowType[]) => {
+    store.dispatch({ type: "UPDATE", state });
+};
+
+export default store;

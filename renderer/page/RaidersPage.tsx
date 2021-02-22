@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
 
 // Store
-import RaidersStore, { RaiderRowType } from "../store/Raiders";
+import { getState, subscribe, RaiderRowType } from "../store/Raiders";
 
 // Component
 import RaiderRowComponent from "../component/RaiderRowComponent";
 
 const ChattersPage: React.FC = () => {
-    const [raiders, updateRaiders] = useState<RaiderRowType[]>(
-        RaidersStore.getState()
-    );
+    const [raiders, updateRaiders] = useState<RaiderRowType[]>(getState());
 
     useEffect(() => {
-        RaidersStore.subscribe(() => {
-            updateRaiders([...RaidersStore.getState()]);
+        subscribe(() => {
+            updateRaiders([...getState()]);
         });
     }, []);
 

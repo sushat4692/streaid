@@ -1,6 +1,6 @@
 import React from "react";
 
-import IsConnectingStore from "../store/IsConnecting";
+import { enableAction, disableAction } from "../store/IsConnecting";
 
 // Util
 import { request } from "../util/request";
@@ -19,7 +19,7 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
     className,
 }) => {
     const clickHandler = async () => {
-        IsConnectingStore.dispatch({ type: "ENABLE" });
+        enableAction();
 
         await request<
             { postRoomId?: string; postChannel?: string; username: string },
@@ -30,7 +30,7 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
             null
         );
 
-        IsConnectingStore.dispatch({ type: "DISABLE" });
+        disableAction();
     };
 
     return (

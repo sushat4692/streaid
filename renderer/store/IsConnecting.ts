@@ -21,4 +21,24 @@ const reducer: Reducer<boolean, ActionType> = (
     }
 };
 
-export default createStore(reducer);
+const store = createStore(reducer);
+
+export const getState = () => store.getState();
+
+export const subscribe = (listener: () => void) => {
+    store.subscribe(listener);
+};
+
+export const enableAction = () => {
+    store.dispatch({ type: "ENABLE" });
+};
+
+export const disableAction = () => {
+    store.dispatch({ type: "DISABLE" });
+};
+
+export const updateAction = (state: boolean) => {
+    store.dispatch({ type: "UPDATE", state });
+};
+
+export default store;

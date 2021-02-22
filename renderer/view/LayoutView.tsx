@@ -14,12 +14,12 @@ import SettingPage from "../page/SettingPage";
 import ConnectComponent from "../component/ConnectComponent";
 
 // Store
-import SettingUsernameStore from "../store/SettingUsername";
-import SettingChannelStore from "../store/SettingChannel";
-import SettingShoutOutMessageStore from "../store/SettingShoutOutMessage";
-import SettingShoutOutNotFoundStore from "../store/SettingShoutOutNotFound";
-import SettingShoutOutFailedStore from "../store/SettingShoutOutFailed";
-import IsConnectingStore from "../store/IsConnecting";
+import { updateAction as updateSettingUsername } from "../store/SettingUsername";
+import { updateAction as updateSettingChannel } from "../store/SettingChannel";
+import { updateAction as updateShoutOutMessage } from "../store/SettingShoutOutMessage";
+import { updateAction as updateShoutOutNotFound } from "../store/SettingShoutOutNotFound";
+import { updateAction as updateShoutOutFailed } from "../store/SettingShoutOutFailed";
+import { enableAction, disableAction } from "../store/IsConnecting";
 
 // Utils
 import { request } from "../util/request";
@@ -27,7 +27,7 @@ import { request } from "../util/request";
 const Layout: React.FC = () => {
     useEffect(() => {
         (async () => {
-            IsConnectingStore.dispatch({ type: "ENABLE" });
+            enableAction();
 
             const defaultValue = await request<null, ResponseSettingType>(
                 "settings:get",
@@ -41,28 +41,13 @@ const Layout: React.FC = () => {
                 }
             );
 
-            SettingUsernameStore.dispatch({
-                type: "UPDATE",
-                state: defaultValue.username,
-            });
-            SettingChannelStore.dispatch({
-                type: "UPDATE",
-                state: defaultValue.channel,
-            });
-            SettingShoutOutMessageStore.dispatch({
-                type: "UPDATE",
-                state: defaultValue.shoutout_message,
-            });
-            SettingShoutOutNotFoundStore.dispatch({
-                type: "UPDATE",
-                state: defaultValue.shoutout_not_found,
-            });
-            SettingShoutOutFailedStore.dispatch({
-                type: "UPDATE",
-                state: defaultValue.shoutout_failed,
-            });
+            updateSettingUsername(defaultValue.username);
+            updateSettingChannel(defaultValue.channel);
+            updateShoutOutMessage(defaultValue.shoutout_message);
+            updateShoutOutNotFound(defaultValue.shoutout_not_found);
+            updateShoutOutFailed(defaultValue.shoutout_failed);
 
-            IsConnectingStore.dispatch({ type: "DISABLE" });
+            disableAction();
         })();
     }, []);
 

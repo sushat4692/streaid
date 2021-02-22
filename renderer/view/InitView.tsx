@@ -1,7 +1,7 @@
 import React from "react";
 
 // Store
-import IsInitedStore from "../store/IsInited";
+import { enableAction } from "../store/IsInited";
 
 // Utils
 import { request } from "../util/request";
@@ -9,7 +9,7 @@ import { request } from "../util/request";
 const InitComponent: React.FC = () => {
     const clickHandler = async () => {
         await request("settings:get", null, null);
-        IsInitedStore.dispatch({ type: "ENABLE" });
+        enableAction();
     };
 
     return (

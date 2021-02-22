@@ -2,13 +2,13 @@ import React from "react";
 import moment from "moment";
 
 // Store
-import ChannelTemplateStore, {
+import {
     ChannelTemplateRowType,
+    updateAction as updateChannelTemplate,
 } from "../store/ChannelTemplate";
-
-import ChannelTitleStore from "../store/ChannelTitle";
-import ChannelGameStore from "../store/ChannelGame";
-import ChannelLanguageStore from "../store/ChannelLanguage";
+import { updateAction as updateChannelTitle } from "../store/ChannelTitle";
+import { updateAction as updateChannelGame } from "../store/ChannelGame";
+import { updateAction as updateChannelLanguage } from "../store/ChannelLanguage";
 
 // Utility
 import { request } from "../util/request";
@@ -22,22 +22,13 @@ type Props = {
 
 const ChannelTemplateRowComponent: React.FC<Props> = ({ channelTemplate }) => {
     const updateClickHandler = async () => {
-        ChannelTitleStore.dispatch({
-            type: "UPDATE",
-            state: channelTemplate.title,
+        updateChannelTitle(channelTemplate.title);
+        updateChannelGame({
+            id: channelTemplate.gameId,
+            name: channelTemplate.gameName,
+            boxArtUrl: channelTemplate.boxArtUrl,
         });
-        ChannelGameStore.dispatch({
-            type: "UPDATE",
-            state: {
-                id: channelTemplate.gameId,
-                name: channelTemplate.gameName,
-                boxArtUrl: channelTemplate.boxArtUrl,
-            },
-        });
-        ChannelLanguageStore.dispatch({
-            type: "UPDATE",
-            state: channelTemplate.language,
-        });
+        updateChannelLanguage(channelTemplate.language);
     };
 
     const deleteClickHandler = async () => {
@@ -48,7 +39,7 @@ const ChannelTemplateRowComponent: React.FC<Props> = ({ channelTemplate }) => {
             ChannelTemplateRowType[]
         >("channel:template:delete", { id: channelTemplate._id }, []);
 
-        ChannelTemplateStore.dispatch({ type: "UPDATE", state: templates });
+        updateChannelTemplate(templates);
     };
 
     return (

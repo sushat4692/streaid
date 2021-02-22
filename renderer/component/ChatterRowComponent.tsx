@@ -2,7 +2,7 @@ import React from "react";
 import moment from "moment";
 
 // Store
-import ChatterStore, { ChatterRowType } from "../store/Chatters";
+import { updateAction, ChatterRowType } from "../store/Chatters";
 
 // Utility
 import { request } from "../util/request";
@@ -23,7 +23,7 @@ const ChatterRowComponent: React.FC<Props> = ({ chatter }) => {
             ChatterRowType[]
         >("chatter:delete", { id: chatter._id }, []);
 
-        ChatterStore.dispatch({ type: "UPDATE", state: chatters });
+        updateAction(chatters);
     };
 
     return (

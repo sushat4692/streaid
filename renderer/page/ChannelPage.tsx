@@ -3,16 +3,36 @@ import Select, { OptionTypeBase } from "react-select";
 import AsyncSelect from "react-select/async";
 
 // Store
-import SettingChannelStore from "../store/SettingChannel";
-import ChannelTemplateStore, {
+import { getState as getChannel } from "../store/SettingChannel";
+import {
+    getState as getChannelTemplate,
+    subscribe as subscribeChannelTemplate,
+    updateAction as updateChannelTemplate,
     ChannelTemplateRowType,
 } from "../store/ChannelTemplate";
-import IsConnectingStore from "../store/IsConnecting";
-
-import ChannelTitleStore from "../store/ChannelTitle";
-import ChannelGameStore, { GameInterface } from "../store/ChannelGame";
-import ChannelLanguageStore from "../store/ChannelLanguage";
-import ChannelTagsStore, { TagInterface } from "../store/ChannelTags";
+import { enableAction, disableAction } from "../store/IsConnecting";
+import {
+    getState as getChannelTitle,
+    subscribe as subscribeChannelTitle,
+    updateAction as updateChannelTitle,
+} from "../store/ChannelTitle";
+import {
+    getState as getChannelGame,
+    subscribe as subscribeChannelGame,
+    updateAction as updateChannelGame,
+    GameInterface,
+} from "../store/ChannelGame";
+import {
+    getState as getChannelLanguage,
+    subscribe as subscribeChannelLanguage,
+    updateAction as updateChannelLanguage,
+} from "../store/ChannelLanguage";
+import {
+    getState as getChannelTags,
+    subscribe as subscribeChannelTags,
+    updateAction as updateChannelTags,
+    TagInterface,
+} from "../store/ChannelTags";
 
 // Utility
 import { request } from "../util/request";
@@ -55,14 +75,14 @@ const ChannelPage: React.FC = () => {
     const [tagOption, updateTagOption] = useState<TagInterface[]>([]);
 
     const getChannelInformation = async () => {
-        IsConnectingStore.dispatch({ type: "ENABLE" });
+        enableAction();
 
         const Channel = await request<
             { username: string },
             ChannelInterface | false
         >(
             "channel:info",
-            { username: SettingChannelStore.getState() },
+            { username: getChannel() },
             {
                 id: "id",
                 name: "",
@@ -78,14 +98,8 @@ const ChannelPage: React.FC = () => {
         console.log(Channel);
 
         if (Channel) {
-            ChannelTitleStore.dispatch({
-                type: "UPDATE",
-                state: Channel.title,
-            });
-            ChannelLanguageStore.dispatch({
-                type: "UPDATE",
-                state: Channel.language,
-            });
+            updateChannelTitle(Channel.title);
+            updateChannelLanguage(Channel.language);
 
             const game = await request<
                 { gameId: string },
@@ -97,13 +111,10 @@ const ChannelPage: React.FC = () => {
             );
 
             if (game) {
-                ChannelGameStore.dispatch({
-                    type: "UPDATE",
-                    state: {
-                        id: game.id,
-                        name: game.name,
-                        boxArtUrl: game.boxArtUrl,
-                    },
+                updateChannelGame({
+                    id: game.id,
+                    name: game.name,
+                    boxArtUrl: game.boxArtUrl,
                 });
 
                 updateDefaultGameOption({
@@ -114,36 +125,33 @@ const ChannelPage: React.FC = () => {
             }
         }
 
-        IsConnectingStore.dispatch({ type: "DISABLE" });
+        disableAction();
 
         return Channel;
     };
 
     useEffect(() => {
-        ChannelTitleStore.subscribe(() => {
-            updateTitle(ChannelTitleStore.getState());
+        subscribeChannelTitle(() => {
+            updateTitle(getChannelTitle());
         });
-        ChannelGameStore.subscribe(() => {
-            updateGame(ChannelGameStore.getState());
+        subscribeChannelGame(() => {
+            updateGame(getChannelGame());
         });
-        ChannelLanguageStore.subscribe(() => {
-            updateLanguage(ChannelLanguageStore.getState());
+        subscribeChannelLanguage(() => {
+            updateLanguage(getChannelLanguage());
         });
-        ChannelTagsStore.subscribe(() => {
-            updateTags(ChannelTagsStore.getState());
+        subscribeChannelTags(() => {
+            updateTags(getChannelTags());
         });
-        ChannelTemplateStore.subscribe(() => {
-            updateChannelTemplates(ChannelTemplateStore.getState());
+        subscribeChannelTemplate(() => {
+            updateChannelTemplates(getChannelTemplate());
         });
 
         (async () => {
             // Get Channel Information
             const Channel = await getChannelInformation();
             if (Channel) {
-                ChannelTagsStore.dispatch({
-                    type: "UPDATE",
-                    state: Channel.tags || [],
-                });
+                updateChannelTags(Channel.tags || []);
 
                 if (Channel.language) {
                     const selectedLanguage = languageList.find(
@@ -158,14 +166,14 @@ const ChannelPage: React.FC = () => {
             // Get tag list
             // const tagList = await request<{ username: string }, TagInterface[]>(
             //     "channel:tags",
-            //     { username: SettingChannelStore.getState() },
+            //     { username: getChannel() },
             //     []
             // );
             // console.log(tagList);
             // updateTagOption(tagList);
 
             // Get Templates
-            IsConnectingStore.dispatch({ type: "ENABLE" });
+            enableAction();
             const templates = await request<null, ChannelTemplateRowType[]>(
                 "channel:template",
                 null,
@@ -183,11 +191,8 @@ const ChannelPage: React.FC = () => {
                 ]
             );
             console.log(templates);
-            ChannelTemplateStore.dispatch({
-                type: "UPDATE",
-                state: templates || [],
-            });
-            IsConnectingStore.dispatch({ type: "DISABLE" });
+            updateChannelTemplate(templates || []);
+            disableAction();
 
             updateIsLoaded(true);
         })();
@@ -216,7 +221,7 @@ const ChannelPage: React.FC = () => {
 
     const submitHandler = async (e: React.FormEvent) => {
         e.preventDefault();
-        IsConnectingStore.dispatch({ type: "ENABLE" });
+        enableAction();
 
         await request<
             {
@@ -229,7 +234,7 @@ const ChannelPage: React.FC = () => {
         >(
             "channel:update",
             {
-                username: SettingChannelStore.getState(),
+                username: getChannel(),
                 title,
                 gameId: game.id,
                 language,
@@ -237,13 +242,13 @@ const ChannelPage: React.FC = () => {
             null
         );
 
-        IsConnectingStore.dispatch({ type: "DISABLE" });
+        disableAction();
         await getChannelInformation();
     };
 
     const onClickSaveTemplateHandler = async (e: React.MouseEvent) => {
         e.preventDefault();
-        IsConnectingStore.dispatch({ type: "ENABLE" });
+        enableAction();
 
         const templates = await request<
             {
@@ -266,12 +271,9 @@ const ChannelPage: React.FC = () => {
             []
         );
 
-        ChannelTemplateStore.dispatch({
-            type: "UPDATE",
-            state: templates || [],
-        });
+        updateChannelTemplate(templates || []);
 
-        IsConnectingStore.dispatch({ type: "DISABLE" });
+        disableAction();
     };
 
     return (
@@ -298,10 +300,7 @@ const ChannelPage: React.FC = () => {
                                 className="form-control form-control-lg"
                                 value={title}
                                 onChange={(e) =>
-                                    ChannelTitleStore.dispatch({
-                                        type: "UPDATE",
-                                        state: e.target.value,
-                                    })
+                                    updateChannelTitle(e.target.value)
                                 }
                             />
                         </div>
@@ -342,13 +341,10 @@ const ChannelPage: React.FC = () => {
                                 getOptionValue={(option) => option.id}
                                 loadOptions={loadGameOptions}
                                 onChange={(e) => {
-                                    ChannelGameStore.dispatch({
-                                        type: "UPDATE",
-                                        state: {
-                                            id: e.id,
-                                            name: e.name,
-                                            boxArtUrl: e.boxArtUrl,
-                                        },
+                                    updateChannelGame({
+                                        id: e.id,
+                                        name: e.name,
+                                        boxArtUrl: e.boxArtUrl,
                                     });
                                 }}
                             />
@@ -364,12 +360,7 @@ const ChannelPage: React.FC = () => {
                                 id="language"
                                 defaultValue={defaultLanguageOption}
                                 options={languageList}
-                                onChange={(e) =>
-                                    ChannelLanguageStore.dispatch({
-                                        type: "UPDATE",
-                                        state: e.value,
-                                    })
-                                }
+                                onChange={(e) => updateChannelLanguage(e.value)}
                             />
                         </div>
 

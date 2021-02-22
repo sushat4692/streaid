@@ -2,7 +2,7 @@ import React from "react";
 import moment from "moment";
 
 // Store
-import HostStore, { HostRowType } from "../store/Hosts";
+import { updateAction, HostRowType } from "../store/Hosts";
 
 // Utility
 import { request } from "../util/request";
@@ -23,7 +23,7 @@ const ChatterRowComponent: React.FC<Props> = ({ host }) => {
             HostRowType[]
         >("chatter:delete", { id: host._id }, []);
 
-        HostStore.dispatch({ type: "UPDATE", state: hosts });
+        updateAction(hosts);
     };
 
     return (

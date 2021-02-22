@@ -14,4 +14,19 @@ const reducer: Reducer<string, ActionType> = (state: string = "", action) => {
     }
 };
 
-export default createStore(reducer);
+const store = createStore(reducer);
+
+export const getState = () => store.getState();
+
+export const subscribe = (listener: () => void) => {
+    store.subscribe(listener);
+};
+
+export const updateAction = (state: string) => {
+    store.dispatch({
+        type: "UPDATE",
+        state,
+    });
+};
+
+export default store;

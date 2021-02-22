@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { nanoid } from "nanoid";
 
 // Context
 import IsInitedStore from "./store/IsInited";

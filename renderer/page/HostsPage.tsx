@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
 
 // Store
-import HostsStore, { HostRowType } from "../store/Hosts";
+import { getState, subscribe, HostRowType } from "../store/Hosts";
 
 // Component
 import HostRowComponent from "../component/HostRowComponent";
 
 const ChattersPage: React.FC = () => {
-    const [hosts, updateHosts] = useState<HostRowType[]>(HostsStore.getState());
+    const [hosts, updateHosts] = useState<HostRowType[]>(getState());
 
     useEffect(() => {
-        HostsStore.subscribe(() => {
-            updateHosts([...HostsStore.getState()]);
+        subscribe(() => {
+            updateHosts([...getState()]);
         });
     }, []);
 

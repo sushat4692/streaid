@@ -2,7 +2,7 @@ import React from "react";
 import moment from "moment";
 
 // Store
-import RaiderStore, { RaiderRowType } from "../store/Raiders";
+import { RaiderRowType, updateAction } from "../store/Raiders";
 
 // Utility
 import { request } from "../util/request";
@@ -23,7 +23,7 @@ const ChatterRowComponent: React.FC<Props> = ({ raider }) => {
             RaiderRowType[]
         >("chatter:delete", { id: raider._id }, []);
 
-        RaiderStore.dispatch({ type: "UPDATE", state: raiders });
+        updateAction(raiders);
     };
 
     return (

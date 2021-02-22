@@ -1,25 +1,29 @@
 import React, { useEffect, useState } from "react";
 
-import IsConnectedStore from "../store/IsConnected";
-import IsConnectingStore from "../store/IsConnecting";
+import {
+    getState as getIsConnected,
+    subscribe as subscribeIsConnected,
+} from "../store/IsConnected";
+import {
+    enableAction as enableIsConnecting,
+    disableAction as disableIsConnecting,
+} from "../store/IsConnecting";
 
 // Util
 import { request } from "../util/request";
 
 const ConnectComonent: React.FC = () => {
-    const [isConnected, updateIsConnected] = useState(
-        IsConnectedStore.getState()
-    );
+    const [isConnected, updateIsConnected] = useState(getIsConnected());
 
     useEffect(() => {
-        IsConnectedStore.subscribe(() => {
-            updateIsConnected(IsConnectedStore.getState());
-            IsConnectingStore.dispatch({ type: "DISABLE" });
+        subscribeIsConnected(() => {
+            updateIsConnected(getIsConnected());
+            disableIsConnecting();
         });
     }, []);
 
     const clickHandler = async () => {
-        IsConnectingStore.dispatch({ type: "ENABLE" });
+        enableIsConnecting();
 
         if (isConnected) {
             await request("bot:disconnect", null, null);
