@@ -66,7 +66,7 @@ const SettingBotComponent: React.FC = () => {
 
     return (
         <section className="my-4">
-            <h2>Settings</h2>
+            <h2>Bot Target Channel</h2>
 
             <form onSubmit={submitHandler}>
                 <div className="mb-3">

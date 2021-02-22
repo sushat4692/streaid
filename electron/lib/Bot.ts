@@ -1,4 +1,4 @@
-import { BrowserWindow, Notification } from "electron";
+import { Notification } from "electron";
 import tmi from "tmi.js";
 
 // Model
@@ -9,6 +9,10 @@ import { getHosts, pushHost } from "../database/Host";
 // Store
 import { getInstance as getStoreInstance } from "../store";
 import ShoutOut from "./commands/ShoutOut";
+
+// Util
+import { getWindow } from "../util/window";
+import { playSound } from "../util/Sound";
 
 class Bot {
     private _client: tmi.Client | null = null;
@@ -116,16 +120,18 @@ class Bot {
             }
         }
 
+        const win = getWindow();
+
         if (await pushChatter(userstate)) {
             const notification = new Notification({
                 title: `Chatter has come`,
                 body: `Thank you for coming "${userstate["display-name"]}"`,
-                silent: false,
+                silent: true,
             });
             notification.show();
+            playSound(win, "chatter");
         }
 
-        const win = this.getWindow();
         if (win) {
             win.webContents.send("bot:chatted", await getChatters());
         }
@@ -145,14 +151,15 @@ class Bot {
             viewers,
         });
 
+        const win = getWindow();
         const notification = new Notification({
             title: `${viewers} Raider has come`,
             body: `Thank you for raiding "${username}"`,
-            silent: false,
+            silent: true,
         });
         notification.show();
+        playSound(win, "raid");
 
-        const win = this.getWindow();
         if (win) {
             win.webContents.send("bot:raided", await getRaiders());
         }
@@ -178,14 +185,15 @@ class Bot {
             autohost,
         });
 
+        const win = getWindow();
         const notification = new Notification({
             title: `Start ${viewers} Hosting`,
             body: `Thank you for hosting "${username}"`,
-            silent: false,
+            silent: true,
         });
         notification.show();
+        playSound(win, "host");
 
-        const win = this.getWindow();
         if (win) {
             win.webContents.send("bot:hosted", await getHosts());
         }
@@ -210,7 +218,7 @@ class Bot {
     onConnectedHandler(addr: string, port: number) {
         console.log(`* Connected to ${addr}:${port}`);
 
-        const win = this.getWindow();
+        const win = getWindow();
         if (win) {
             win.webContents.send("bot:connected");
         }
@@ -224,22 +232,10 @@ class Bot {
     onDisConnectedHandler(reason: string) {
         console.log(`* Disconnected by ${reason}`);
 
-        const win = this.getWindow();
+        const win = getWindow();
         if (win) {
             win.webContents.send("bot:disconnected");
         }
-    }
-
-    /**
-     * Get Electron Window
-     * Now only one window, so get first window from getAllWindows
-     */
-    private getWindow() {
-        const wins = BrowserWindow.getAllWindows();
-        if (!wins.length) {
-            return null;
-        }
-        return wins[0];
     }
 }
 

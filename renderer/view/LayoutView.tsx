@@ -19,6 +19,9 @@ import { updateAction as updateSettingChannel } from "../store/SettingChannel";
 import { updateAction as updateShoutOutMessage } from "../store/SettingShoutOutMessage";
 import { updateAction as updateShoutOutNotFound } from "../store/SettingShoutOutNotFound";
 import { updateAction as updateShoutOutFailed } from "../store/SettingShoutOutFailed";
+import { updateAction as updateChatterVolume } from "../store/SoundChatterVolume";
+import { updateAction as updateRaidVolume } from "../store/SoundRaidVolume";
+import { updateAction as updateHostVolume } from "../store/SoundHostVolume";
 import { enableAction, disableAction } from "../store/IsConnecting";
 
 // Utils
@@ -38,6 +41,9 @@ const Layout: React.FC = () => {
                     shoutout_message: "",
                     shoutout_not_found: "",
                     shoutout_failed: "",
+                    chatter_volume: 1,
+                    raid_volume: 1,
+                    host_volume: 1,
                 }
             );
 
@@ -46,6 +52,9 @@ const Layout: React.FC = () => {
             updateShoutOutMessage(defaultValue.shoutout_message);
             updateShoutOutNotFound(defaultValue.shoutout_not_found);
             updateShoutOutFailed(defaultValue.shoutout_failed);
+            updateChatterVolume(defaultValue.chatter_volume);
+            updateRaidVolume(defaultValue.raid_volume);
+            updateHostVolume(defaultValue.host_volume);
 
             disableAction();
         })();

@@ -49,6 +49,24 @@ const App: React.FC = () => {
             });
         });
 
+        requestEvent<{ source: Uint8Array; gain: number }>(
+            "sound:play",
+            async (_, values) => {
+                const context = new AudioContext();
+
+                const gainNode = context.createGain();
+                gainNode.gain.value = values.gain;
+                gainNode.connect(context.destination);
+
+                const source = context.createBufferSource();
+                source.buffer = await context.decodeAudioData(
+                    values.source.buffer
+                );
+                source.connect(gainNode);
+                source.start(0);
+            }
+        );
+
         (async () => {
             IsConnectingStore.dispatch({ type: "ENABLE" });
 

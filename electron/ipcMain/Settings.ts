@@ -1,10 +1,16 @@
-import { ipcMain } from "electron";
+import { app, ipcMain, dialog } from "electron";
+import { readFile, writeFile } from "fs-extra";
+import isDev from "electron-is-dev";
+import path from "path";
 
 // Library
 import { getInstance as getTwichAPIInstance } from "../lib/TwitchAPI";
 
 // Store
 import { getInstance as getStoreInstance } from "../store";
+
+// Util
+import { getWindow } from "../util/window";
 
 ipcMain.handle("settings:get", async () => {
     const store = getStoreInstance();
@@ -18,6 +24,9 @@ ipcMain.handle("settings:get", async () => {
     const shoutout_message = store.get("shoutout_message");
     const shoutout_not_found = store.get("shoutout_not_found");
     const shoutout_failed = store.get("shoutout_failed");
+    const chatter_volume = store.get("chatter_volume");
+    const raid_volume = store.get("raid_volume");
+    const host_volume = store.get("host_volume");
 
     store.set("api.inited", true);
     return {
@@ -26,6 +35,9 @@ ipcMain.handle("settings:get", async () => {
         shoutout_message,
         shoutout_not_found,
         shoutout_failed,
+        chatter_volume,
+        raid_volume,
+        host_volume,
     };
 });
 
@@ -45,4 +57,39 @@ ipcMain.handle("setting:shoutout_message", (_, values) => {
     store.set("shoutout_not_found", values.shoutout_not_found);
     store.set("shoutout_failed", values.shoutout_failed);
     return values;
+});
+
+ipcMain.handle("setting:notification_sound", async (_, values) => {
+    const win = getWindow();
+    if (!win) {
+        return false;
+    }
+
+    const file = await dialog.showOpenDialog(win, {
+        properties: ["openFile"],
+        filters: [
+            {
+                name: "Document",
+                extensions: ["mp3"],
+            },
+        ],
+    });
+
+    if (!file || file.canceled) {
+        return false;
+    }
+
+    const buffer = await readFile(file.filePaths[0]);
+    await writeFile(
+        path.join(isDev ? "." : app.getPath("userData"), `data/${values}.mp3`),
+        buffer
+    );
+
+    return true;
+});
+
+ipcMain.handle("setting:notification_volume", async (_, values) => {
+    const store = getStoreInstance();
+    store.set(values.mode, values.value);
+    return;
 });
