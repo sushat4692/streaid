@@ -2,16 +2,12 @@ import { app, BrowserWindow } from "electron";
 import path from "path";
 
 async function createWindow() {
-    app.commandLine.appendSwitch(
-        "--autoplay-policy",
-        "no-user-gesture-required"
-    );
-
     const win = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: true,
+            nodeIntegration: false,
+            contextIsolation: true,
             preload: path.join(__dirname, "preload.js"),
         },
     });

@@ -9,26 +9,26 @@ export const request = async <T, R>(
 ): Promise<R> => {
     console.log(key);
 
-    if (typeof window.ipcRenderer === "undefined") {
+    if (typeof window.api === "undefined") {
         return new Promise((resolve) => resolve(_default));
     } else {
-        return await window.ipcRenderer.invoke(key, args);
+        return await window.api.invoke<R>(key, args);
     }
 };
 
 export const requestSync = <T, R>(key: string, args: T, _default: R): R => {
-    if (typeof window.ipcRenderer === "undefined") {
+    if (typeof window.api === "undefined") {
         return _default;
     } else {
-        return window.ipcRenderer.sendSync(key, args);
+        return window.api.sendSync<R>(key, args);
     }
 };
 
-export const requestEvent = <R>(
+export const requestEvent = <T>(
     key: string,
-    callback: (event: IpcRendererEvent, args: R) => void
+    callback: (event: IpcRendererEvent, args: T) => void
 ) => {
-    if (typeof window.ipcRenderer !== "undefined") {
-        window.ipcRenderer.on(key, callback);
+    if (typeof window.api !== "undefined") {
+        window.api.on(key, callback);
     }
 };
