@@ -59,7 +59,7 @@ const ChannelTemplateRowComponent: React.FC<Props> = ({ channelTemplate }) => {
                     className="btn btn-sm btn-danger"
                     onClick={deleteClickHandler}
                 >
-                    Delete
+                    <i className="bi bi-trash"></i>
                 </button>
             </td>
         </tr>

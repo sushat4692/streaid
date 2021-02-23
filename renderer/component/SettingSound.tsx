@@ -59,15 +59,16 @@ const SettingSoundComponent: React.FC = () => {
 
     return (
         <section className="my-4">
-            <h2>Notification Sound</h2>
+            <h3>Notification Sound</h3>
 
-            <h3>Chatter</h3>
-            <div className="row align-items-center mb-0 mb-md-3">
-                <div className="mb-3 mb-md-0 col-md-2">
+            <h4>Chatter</h4>
+            <div className="row mb-0 mb-md-3">
+                <div className="mb-3 mb-md-0 col-md-2 text-center d-grid">
                     <button
                         className="btn btn-success"
                         onClick={selectFileHandler("chatter")}
                     >
+                        <i className="bi bi-save me-2"></i>
                         Select File
                     </button>
                 </div>
@@ -109,13 +110,14 @@ const SettingSoundComponent: React.FC = () => {
                 </div>
             </div>
 
-            <h3>Raid</h3>
-            <div className="row align-items-center mb-0 mb-md-3">
-                <div className="mb-3 mb-md-0 col-md-2">
+            <h4>Raid</h4>
+            <div className="row mb-0 mb-md-3">
+                <div className="mb-3 mb-md-0 col-md-2 text-center d-grid">
                     <button
                         className="btn btn-success"
                         onClick={selectFileHandler("raid")}
                     >
+                        <i className="bi bi-save me-2"></i>
                         Select File
                     </button>
                 </div>
@@ -157,13 +159,14 @@ const SettingSoundComponent: React.FC = () => {
                 </div>
             </div>
 
-            <h3>Host</h3>
-            <div className="row align-items-center mb-0 mb-md-3">
-                <div className="mb-3 mb-md-0 col-md-2">
+            <h4>Host</h4>
+            <div className="row mb-0 mb-md-3">
+                <div className="mb-3 mb-md-0 col-md-2 text-center d-grid">
                     <button
                         className="btn btn-success"
                         onClick={selectFileHandler("host")}
                     >
+                        <i className="bi bi-save me-2"></i>
                         Select File
                     </button>
                 </div>

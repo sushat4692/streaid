@@ -2,46 +2,46 @@ import React from "react";
 import moment from "moment";
 
 // Store
-import { updateAction, ChatterRowType } from "../store/Chatters";
+import { RaiderRowType, updateAction } from "../store/Raiders";
 
 // Utility
 import { request } from "../util/request";
 
 // Component
-import ShoutOutButtonComponent from "./ShoutOutButtonComponent";
+import ShoutOutButtonComponent from "./ShoutOutButton";
 
 type Props = {
-    chatter: ChatterRowType;
+    raider: RaiderRowType;
 };
 
-const ChatterRowComponent: React.FC<Props> = ({ chatter }) => {
+const ChatterRowComponent: React.FC<Props> = ({ raider }) => {
     const deleteClickHandler = async () => {
-        const chatters = await request<
+        const raiders = await request<
             {
                 id: string;
             },
-            ChatterRowType[]
-        >("chatter:delete", { id: chatter._id }, []);
+            RaiderRowType[]
+        >("chatter:delete", { id: raider._id }, []);
 
-        updateAction(chatters);
+        updateAction(raiders);
     };
 
     return (
         <tr>
-            <td scope="row">{chatter.username}</td>
-            <td>{chatter["display-name"]}</td>
-            <td>{moment(chatter.createdAt).format("MMM Do, kk:mm")}</td>
+            <td scope="row">{raider.username}</td>
+            <td>{raider.viewers}</td>
+            <td>{moment(raider.createdAt).format("MMM Do, kk:mm")}</td>
             <td>
                 <ShoutOutButtonComponent
                     className="btn btn-sm btn-success me-1"
-                    roomId={chatter["room-id"]}
-                    username={chatter.username}
+                    channel={raider.channel}
+                    username={raider.username}
                 />
                 <button
                     className="btn btn-sm btn-danger"
                     onClick={deleteClickHandler}
                 >
-                    Delete
+                    <i className="bi bi-trash"></i>
                 </button>
             </td>
         </tr>

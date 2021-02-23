@@ -30,10 +30,6 @@ app.on("activate", () => {
     }
 });
 
-app.on("ready", async () => {
-    // const channel = await api.client.kraken.channels.getMyChannel()
-});
-
 import "./ipcMain/Init";
 import "./ipcMain/Settings";
 import "./ipcMain/Channel";

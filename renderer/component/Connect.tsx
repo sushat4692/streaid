@@ -38,6 +38,7 @@ const ConnectComonent: React.FC = () => {
                 className={isConnected ? "btn btn-danger" : "btn btn-primary"}
                 onClick={clickHandler}
             >
+                <i className="bi bi-link-45deg me-2"></i>
                 {isConnected ? "Disconnect" : "Connect"}
             </button>
         </div>

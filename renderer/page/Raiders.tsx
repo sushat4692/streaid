@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { getState, subscribe, RaiderRowType } from "../store/Raiders";
 
 // Component
-import RaiderRowComponent from "../component/RaiderRowComponent";
+import RaiderRowComponent from "../component/RaiderRow";
 
 const ChattersPage: React.FC = () => {
     const [raiders, updateRaiders] = useState<RaiderRowType[]>(getState());
@@ -17,7 +17,10 @@ const ChattersPage: React.FC = () => {
 
     return (
         <section className="my-4">
-            <h2>Raiders</h2>
+            <h2 className="display-6 mb-3 fw-bolder">
+                <i className="bi bi-tornado me-2"></i>
+                Raiders
+            </h2>
 
             <div className="table-responsive">
                 <table className="table">

@@ -5,13 +5,13 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { ResponseSettingType } from "../../types/SettingType";
 
 // Component
-import DashboardPage from "../page/DashboardPage";
-import ChattersPage from "../page/ChattersPage";
-import RaidersPage from "../page/RaidersPage";
-import HostsPage from "../page/HostsPage";
-import ChannelPage from "../page/ChannelPage";
-import SettingPage from "../page/SettingPage";
-import ConnectComponent from "../component/ConnectComponent";
+import DashboardPage from "../page/Dashboard";
+import ChattersPage from "../page/Chatters";
+import RaidersPage from "../page/Raiders";
+import HostsPage from "../page/Hosts";
+import ChannelPage from "../page/Channel";
+import SettingPage from "../page/Setting";
+import ConnectComponent from "../component/Connect";
 
 // Store
 import { updateAction as updateSettingUsername } from "../store/SettingUsername";
@@ -65,6 +65,7 @@ const Layout: React.FC = () => {
             <header className="navbar navbar-expand-md navbar-dark sticky-top bg-dark shadow">
                 <div className="container-fluid">
                     <Link className="navbar-brand" to="/">
+                        <i className="bi bi-twitch me-2"></i>
                         Twitch Support Tool
                     </Link>
                     <button
@@ -83,13 +84,6 @@ const Layout: React.FC = () => {
                         id="navbarNavAltMarkup"
                     >
                         <div className="navbar-nav me-auto mb-2 mb-md-0">
-                            <Link
-                                className="nav-link"
-                                aria-current="page"
-                                to="/"
-                            >
-                                Home
-                            </Link>
                             <Link
                                 className="nav-link"
                                 aria-current="page"

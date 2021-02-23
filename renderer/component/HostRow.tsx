@@ -8,7 +8,7 @@ import { updateAction, HostRowType } from "../store/Hosts";
 import { request } from "../util/request";
 
 // Component
-import ShoutOutButtonComponent from "./ShoutOutButtonComponent";
+import ShoutOutButtonComponent from "./ShoutOutButton";
 
 type Props = {
     host: HostRowType;
@@ -42,7 +42,7 @@ const ChatterRowComponent: React.FC<Props> = ({ host }) => {
                     className="btn btn-sm btn-danger"
                     onClick={deleteClickHandler}
                 >
-                    Delete
+                    <i className="bi bi-trash"></i>
                 </button>
             </td>
         </tr>

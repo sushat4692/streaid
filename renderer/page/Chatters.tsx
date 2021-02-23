@@ -9,7 +9,7 @@ import {
 } from "../store/Chatters";
 
 // Component
-import ChatterRowComponent from "../component/ChatterRowComponent";
+import ChatterRowComponent from "../component/ChatterRow";
 import { request } from "../util/request";
 
 const ChattersPage: React.FC = () => {
@@ -32,7 +32,10 @@ const ChattersPage: React.FC = () => {
 
     return (
         <section className="my-4">
-            <h2>Chatters</h2>
+            <h2 className="display-6 mb-3 fw-bolder">
+                <i className="bi bi-chat me-2"></i>
+                Chatters
+            </h2>
 
             <div className="table-responsive">
                 <table className="table">

@@ -1,7 +1,5 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
 
-import "../types/window";
-
 contextBridge.exposeInMainWorld("api", {
     invoke: async (channel, ...args) => {
         return await ipcRenderer.invoke(channel, ...args);

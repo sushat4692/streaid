@@ -41,7 +41,7 @@ import { request } from "../util/request";
 import { list as languageList } from "../const/languages";
 
 // Components
-import ChannelTemplateRowComponent from "../component/ChannelTemplateRowComponent";
+import ChannelTemplateRowComponent from "../component/ChannelTemplateRow";
 
 interface ChannelInterface {
     id: string;
@@ -278,8 +278,13 @@ const ChannelPage: React.FC = () => {
 
     return (
         <>
+            <h2 className="display-6 mt-4 mb-3 fw-bolder">
+                <i className="bi bi-camera-reels me-2"></i>
+                Channel
+            </h2>
+
             <section className="my-4">
-                <h2>Channel Setting</h2>
+                <h3>Channel Information</h3>
 
                 {!isLoaded ? (
                     ""
@@ -400,8 +405,9 @@ const ChannelPage: React.FC = () => {
                     </form>
                 )}
             </section>
+
             <section className="my-4">
-                <h2>Channel Template</h2>
+                <h3>Channel Template</h3>
 
                 <div className="table-responsive">
                     <table className="table">

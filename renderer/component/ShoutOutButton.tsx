@@ -38,6 +38,7 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
             className={className || "btn btn-success"}
             onClick={clickHandler}
         >
+            <i className="bi bi-speaker me-2"></i>
             ShoutOut
         </button>
     );

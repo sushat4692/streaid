@@ -65,7 +65,7 @@ const SettingBotComponent: React.FC = () => {
 
     return (
         <section className="my-4">
-            <h2>Shoutout Message</h2>
+            <h3>Shoutout Message</h3>
 
             <div className="row">
                 <form
@@ -112,7 +112,10 @@ const SettingBotComponent: React.FC = () => {
                         ></textarea>
                     </div>
 
-                    <button className="btn btn-primary">Save</button>
+                    <button className="btn btn-primary">
+                        <i className="bi bi-archive me-2"></i>
+                        Save
+                    </button>
                 </form>
 
                 <div className="col-md-4">

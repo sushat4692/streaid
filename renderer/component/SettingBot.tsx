@@ -66,7 +66,7 @@ const SettingBotComponent: React.FC = () => {
 
     return (
         <section className="my-4">
-            <h2>Bot Target Channel</h2>
+            <h3>Bot Target Channel</h3>
 
             <form onSubmit={submitHandler}>
                 <div className="mb-3">
@@ -98,10 +98,17 @@ const SettingBotComponent: React.FC = () => {
                         * You can add multiple channnels separated by comma (,)
                     </p>
                 </div>
-                <button className="btn btn-primary me-2">Save</button>
-                <button className="btn btn-danger" onClick={signoutHandler}>
-                    Signout
-                </button>
+
+                <div className="d-flex justify-content-between">
+                    <button className="btn btn-primary">
+                        <i className="bi bi-archive me-2"></i>
+                        Save
+                    </button>
+                    <button className="btn btn-danger" onClick={signoutHandler}>
+                        <i className="bi bi-box-arrow-in-right me-2"></i>
+                        Signout
+                    </button>
+                </div>
             </form>
         </section>
     );
