@@ -1,18 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useRecoilState } from "recoil";
 
-// Store
-import { getState, subscribe, HostRowType } from "../store/Hosts";
+// Recoil
+import HostsState, { HostRowType } from "../atom/Hosts";
 
 // Component
 import HostRowComponent from "../component/HostRow";
 
+// Util
+import { request } from "../util/request";
+
 const ChattersPage: React.FC = () => {
-    const [hosts, updateHosts] = useState<HostRowType[]>(getState());
+    const [hosts, updateHosts] = useRecoilState(HostsState);
 
     useEffect(() => {
-        subscribe(() => {
-            updateHosts([...getState()]);
-        });
+        (async () => {
+            const hosts = await request<{}, HostRowType[]>("host", {}, []);
+            updateHosts([...hosts]);
+        })();
     }, []);
 
     return (

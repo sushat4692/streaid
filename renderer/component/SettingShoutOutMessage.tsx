@@ -1,35 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useRecoilState, useSetRecoilState } from "recoil";
 
-// Store
-import {
-    getState as getMessage,
-    subscribe as subscribeMessage,
-    updateAction as updateMessage,
-} from "../store/SettingShoutOutMessage";
-import {
-    getState as getNotFound,
-    subscribe as subscribeNotFound,
-    updateAction as updateNotFound,
-} from "../store/SettingShoutOutNotFound";
-import {
-    getState as getFailed,
-    subscribe as subscribeFailed,
-    updateAction as updateFailed,
-} from "../store/SettingShoutOutFailed";
-import { enableAction, disableAction } from "../store/IsConnecting";
+// Recoil
+import ShoutOutMessageState from "../atom/SettingShoutOutMessage";
+import ShoutOutNotFoundState from "../atom/SettingShoutOutNotFound";
+import ShoutOutFailedState from "../atom/SettingShoutOutFailed";
+import IsConnectingState from "../atom/IsConnecting";
 
 // Utils
 import { request } from "../util/request";
 
 const SettingBotComponent: React.FC = () => {
-    const [shoutOutMessage, updateShoutOutMessage] = useState(getMessage());
-    const [shoutOutNotFound, updateShoutOutNotFound] = useState(getNotFound());
-    const [shoutOutFailed, updateShoutOutFailed] = useState(getFailed());
+    const [shoutOutMessage, updateShoutOutMessage] = useRecoilState(
+        ShoutOutMessageState
+    );
+    const [shoutOutNotFound, updateShoutOutNotFound] = useRecoilState(
+        ShoutOutNotFoundState
+    );
+    const [shoutOutFailed, updateShoutOutFailed] = useRecoilState(
+        ShoutOutFailedState
+    );
+    const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
     const submitHandler = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        enableAction();
+        updateIsConnecting(true);
 
         await request<
             {
@@ -48,20 +44,8 @@ const SettingBotComponent: React.FC = () => {
             null
         );
 
-        disableAction();
+        updateIsConnecting(false);
     };
-
-    useEffect(() => {
-        subscribeMessage(() => {
-            updateShoutOutMessage(getMessage());
-        });
-        subscribeNotFound(() => {
-            updateShoutOutNotFound(getNotFound());
-        });
-        subscribeFailed(() => {
-            updateShoutOutFailed(getFailed());
-        });
-    }, []);
 
     return (
         <section className="my-4">
@@ -82,7 +66,9 @@ const SettingBotComponent: React.FC = () => {
                             rows={3}
                             className="form-control"
                             value={shoutOutMessage}
-                            onChange={(e) => updateMessage(e.target.value)}
+                            onChange={(e) =>
+                                updateShoutOutMessage(e.target.value)
+                            }
                         ></textarea>
                     </div>
 
@@ -94,7 +80,9 @@ const SettingBotComponent: React.FC = () => {
                             rows={3}
                             className="form-control"
                             value={shoutOutFailed}
-                            onChange={(e) => updateNotFound(e.target.value)}
+                            onChange={(e) =>
+                                updateShoutOutNotFound(e.target.value)
+                            }
                         ></textarea>
                     </div>
 
@@ -108,7 +96,9 @@ const SettingBotComponent: React.FC = () => {
                             rows={3}
                             className="form-control"
                             value={shoutOutNotFound}
-                            onChange={(e) => updateFailed(e.target.value)}
+                            onChange={(e) =>
+                                updateShoutOutFailed(e.target.value)
+                            }
                         ></textarea>
                     </div>
 

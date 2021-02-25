@@ -35,4 +35,6 @@ import "./ipcMain/Settings";
 import "./ipcMain/Channel";
 import "./ipcMain/ChannelTemplate";
 import "./ipcMain/Chatter";
+import "./ipcMain/Raider";
+import "./ipcMain/Host";
 import "./ipcMain/Bot";

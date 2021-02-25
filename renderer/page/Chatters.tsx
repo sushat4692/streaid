@@ -1,32 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useRecoilState } from "recoil";
 
-// Store
-import {
-    getState,
-    subscribe,
-    updateAction,
-    ChatterRowType,
-} from "../store/Chatters";
+// Recoil
+import ChattersState, { ChatterRowType } from "../atom/Chatters";
 
 // Component
 import ChatterRowComponent from "../component/ChatterRow";
+
+// Util
 import { request } from "../util/request";
 
 const ChattersPage: React.FC = () => {
-    const [chatters, updateChatters] = useState<ChatterRowType[]>(getState());
+    const [chatters, updateChatters] = useRecoilState(ChattersState);
 
     useEffect(() => {
-        subscribe(() => {
-            updateChatters([...getState()]);
-        });
-
         (async () => {
             const chatters = await request<{}, ChatterRowType[]>(
                 "chatter",
                 {},
                 []
             );
-            updateAction(chatters);
+            updateChatters([...chatters]);
         })();
     }, []);
 

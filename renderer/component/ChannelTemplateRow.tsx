@@ -1,14 +1,14 @@
 import React from "react";
+import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
-// Store
-import {
+// Recoil
+import ChannelTemplateState, {
     ChannelTemplateRowType,
-    updateAction as updateChannelTemplate,
-} from "../store/ChannelTemplate";
-import { updateAction as updateChannelTitle } from "../store/ChannelTitle";
-import { updateAction as updateChannelGame } from "../store/ChannelGame";
-import { updateAction as updateChannelLanguage } from "../store/ChannelLanguage";
+} from "../atom/ChannelTemplate";
+import ChannelTitleState from "../atom/ChannelTitle";
+import ChannelGameState from "../atom/ChannelGame";
+import ChannelLanguageState from "../atom/ChannelLanguage";
 
 // Utility
 import { request } from "../util/request";
@@ -21,6 +21,11 @@ type Props = {
 };
 
 const ChannelTemplateRowComponent: React.FC<Props> = ({ channelTemplate }) => {
+    const updateChannelTemplate = useSetRecoilState(ChannelTemplateState);
+    const updateChannelTitle = useSetRecoilState(ChannelTitleState);
+    const updateChannelGame = useSetRecoilState(ChannelGameState);
+    const updateChannelLanguage = useSetRecoilState(ChannelLanguageState);
+
     const updateClickHandler = async () => {
         updateChannelTitle(channelTemplate.title);
         updateChannelGame({

@@ -1,15 +1,18 @@
 import React from "react";
+import { useSetRecoilState } from "recoil";
 
-// Store
-import { enableAction } from "../store/IsInited";
+// Recoil
+import IsInitedState from "../atom/IsInited";
 
 // Utils
 import { request } from "../util/request";
 
 const InitComponent: React.FC = () => {
+    const updateIsInited = useSetRecoilState(IsInitedState);
+
     const clickHandler = async () => {
         await request("settings:get", null, null);
-        enableAction();
+        updateIsInited(true);
     };
 
     return (

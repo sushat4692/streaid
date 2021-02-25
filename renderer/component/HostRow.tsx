@@ -1,8 +1,9 @@
 import React from "react";
+import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
-// Store
-import { updateAction, HostRowType } from "../store/Hosts";
+// Recoil
+import HostsState, { HostRowType } from "../atom/Hosts";
 
 // Utility
 import { request } from "../util/request";
@@ -15,15 +16,17 @@ type Props = {
 };
 
 const ChatterRowComponent: React.FC<Props> = ({ host }) => {
+    const updateHostsState = useSetRecoilState(HostsState);
+
     const deleteClickHandler = async () => {
         const hosts = await request<
             {
                 id: string;
             },
             HostRowType[]
-        >("chatter:delete", { id: host._id }, []);
+        >("host:delete", { id: host._id }, []);
 
-        updateAction(hosts);
+        updateHostsState([...hosts]);
     };
 
     return (

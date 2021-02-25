@@ -1,6 +1,8 @@
 import React from "react";
+import { useSetRecoilState } from "recoil";
 
-import { enableAction, disableAction } from "../store/IsConnecting";
+// Recoil
+import IsConnectingState from "../atom/IsConnecting";
 
 // Util
 import { request } from "../util/request";
@@ -18,8 +20,10 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
     username,
     className,
 }) => {
+    const updateIsConnecting = useSetRecoilState(IsConnectingState);
+
     const clickHandler = async () => {
-        enableAction();
+        updateIsConnecting(true);
 
         await request<
             { postRoomId?: string; postChannel?: string; username: string },
@@ -30,7 +34,7 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
             null
         );
 
-        disableAction();
+        updateIsConnecting(false);
     };
 
     return (

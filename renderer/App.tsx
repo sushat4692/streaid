@@ -1,25 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useRecoilState, useSetRecoilState } from "recoil";
 
-// Context
-import {
-    getState as getIsInited,
-    subscribe as subscribeIsInited,
-    updateAction as updateIsInitedStore,
-} from "./store/IsInited";
-import {
-    enableAction as enableIsConnected,
-    disableAction as disableIsConnected,
-} from "./store/IsConnected";
-import {
-    enableAction as enableIsConnecting,
-    disableAction as disableIsConnecting,
-} from "./store/IsConnecting";
-import {
-    updateAction as updateChatter,
-    ChatterRowType,
-} from "./store/Chatters";
-import { updateAction as updateRaiders, RaiderRowType } from "./store/Raiders";
-import { updateAction as updateHosts, HostRowType } from "./store/Hosts";
+// Recoil
+import IsInitedState from "./atom/IsInited";
+import IsConnectedState from "./atom/IsConnected";
+import IsConnectingState from "./atom/IsConnecting";
+import RaidersState, { RaiderRowType } from "./atom/Raiders";
+import ChattersState, { ChatterRowType } from "./atom/Chatters";
+import HostsState, { HostRowType } from "./atom/Hosts";
 
 // Layout
 import LoadingComponent from "./component/Loading";
@@ -30,27 +18,28 @@ import LayoutView from "./view/Layout";
 import { request, requestEvent } from "./util/request";
 
 const App: React.FC = () => {
-    const [isInited, updateIsInited] = useState(false);
+    const [isInited, updateIsInited] = useRecoilState(IsInitedState);
+    const updateIsConnected = useSetRecoilState(IsConnectedState);
+    const updateIsConnecting = useSetRecoilState(IsConnectingState);
+    const updateRaiders = useSetRecoilState(RaidersState);
+    const updateChatters = useSetRecoilState(ChattersState);
+    const updateHosts = useSetRecoilState(HostsState);
 
     useEffect(() => {
-        subscribeIsInited(() => {
-            updateIsInited(getIsInited());
-        });
-
         requestEvent("bot:connected", () => {
-            enableIsConnected();
+            updateIsConnected(true);
         });
         requestEvent("bot:disconnected", () => {
-            disableIsConnected();
+            updateIsConnected(false);
         });
         requestEvent<ChatterRowType[]>("bot:chatted", (_, values) => {
-            updateChatter(values);
+            updateChatters([...values]);
         });
         requestEvent<RaiderRowType[]>("bot:raided", (_, values) => {
-            updateRaiders(values);
+            updateRaiders([...values]);
         });
         requestEvent<HostRowType[]>("bot:hosted", (_, values) => {
-            updateHosts(values);
+            updateHosts([...values]);
         });
 
         requestEvent<{ source: Uint8Array; gain: number }>(
@@ -72,12 +61,12 @@ const App: React.FC = () => {
         );
 
         (async () => {
-            enableIsConnecting();
+            updateIsConnecting(true);
 
             const isInited: boolean = await request("get:init", null, true);
-            updateIsInitedStore(isInited);
+            updateIsInited(isInited);
 
-            disableIsConnecting();
+            updateIsConnecting(false);
         })();
     }, []);
 

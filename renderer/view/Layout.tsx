@@ -1,8 +1,20 @@
 import React, { useEffect } from "react";
+import { useSetRecoilState } from "recoil";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 // Type
 import { ResponseSettingType } from "../../types/SettingType";
+
+// Recoil
+import SettingUsernameState from "../atom/SettingUsername";
+import SettingChannelState from "../atom/SettingChannel";
+import ShoutOutMessageState from "../atom/SettingShoutOutMessage";
+import ShoutOutNotFoundState from "../atom/SettingShoutOutNotFound";
+import ShoutOutFailedState from "../atom/SettingShoutOutFailed";
+import SoundChatterVolumeState from "../atom/SoundChatterVolume";
+import SoundRaidVolumeState from "../atom/SoundRaidVolume";
+import SoundHostVolumeState from "../atom/SoundHostVolume";
+import IsConnectingState from "../atom/IsConnecting";
 
 // Component
 import DashboardPage from "../page/Dashboard";
@@ -13,24 +25,23 @@ import ChannelPage from "../page/Channel";
 import SettingPage from "../page/Setting";
 import ConnectComponent from "../component/Connect";
 
-// Store
-import { updateAction as updateSettingUsername } from "../store/SettingUsername";
-import { updateAction as updateSettingChannel } from "../store/SettingChannel";
-import { updateAction as updateShoutOutMessage } from "../store/SettingShoutOutMessage";
-import { updateAction as updateShoutOutNotFound } from "../store/SettingShoutOutNotFound";
-import { updateAction as updateShoutOutFailed } from "../store/SettingShoutOutFailed";
-import { updateAction as updateChatterVolume } from "../store/SoundChatterVolume";
-import { updateAction as updateRaidVolume } from "../store/SoundRaidVolume";
-import { updateAction as updateHostVolume } from "../store/SoundHostVolume";
-import { enableAction, disableAction } from "../store/IsConnecting";
-
 // Utils
 import { request } from "../util/request";
 
 const Layout: React.FC = () => {
+    const updateSettingUsername = useSetRecoilState(SettingUsernameState);
+    const updateSettingChannel = useSetRecoilState(SettingChannelState);
+    const updateShoutOutMessage = useSetRecoilState(ShoutOutMessageState);
+    const updateShoutOutNotFound = useSetRecoilState(ShoutOutNotFoundState);
+    const updateShoutOutFailed = useSetRecoilState(ShoutOutFailedState);
+    const updateSoundChatterVolume = useSetRecoilState(SoundChatterVolumeState);
+    const updateSoundRaidVolume = useSetRecoilState(SoundRaidVolumeState);
+    const updateSoundHostVolume = useSetRecoilState(SoundHostVolumeState);
+    const updateIsConnecting = useSetRecoilState(IsConnectingState);
+
     useEffect(() => {
         (async () => {
-            enableAction();
+            updateIsConnecting(true);
 
             const defaultValue = await request<null, ResponseSettingType>(
                 "settings:get",
@@ -52,11 +63,11 @@ const Layout: React.FC = () => {
             updateShoutOutMessage(defaultValue.shoutout_message);
             updateShoutOutNotFound(defaultValue.shoutout_not_found);
             updateShoutOutFailed(defaultValue.shoutout_failed);
-            updateChatterVolume(defaultValue.chatter_volume);
-            updateRaidVolume(defaultValue.raid_volume);
-            updateHostVolume(defaultValue.host_volume);
+            updateSoundChatterVolume(defaultValue.chatter_volume);
+            updateSoundRaidVolume(defaultValue.raid_volume);
+            updateSoundHostVolume(defaultValue.host_volume);
 
-            disableAction();
+            updateIsConnecting(false);
         })();
     }, []);
 

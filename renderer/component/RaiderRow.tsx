@@ -1,8 +1,9 @@
 import React from "react";
+import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
-// Store
-import { RaiderRowType, updateAction } from "../store/Raiders";
+// Recoil
+import RaidersState, { RaiderRowType } from "../atom/Raiders";
 
 // Utility
 import { request } from "../util/request";
@@ -15,15 +16,17 @@ type Props = {
 };
 
 const ChatterRowComponent: React.FC<Props> = ({ raider }) => {
+    const updateRaidersState = useSetRecoilState(RaidersState);
+
     const deleteClickHandler = async () => {
         const raiders = await request<
             {
                 id: string;
             },
             RaiderRowType[]
-        >("chatter:delete", { id: raider._id }, []);
+        >("raider:delete", { id: raider._id }, []);
 
-        updateAction(raiders);
+        updateRaidersState([...raiders]);
     };
 
     return (

@@ -1,8 +1,9 @@
 import React from "react";
+import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
-// Store
-import { updateAction, ChatterRowType } from "../store/Chatters";
+// Recoil
+import ChattersState, { ChatterRowType } from "../atom/Chatters";
 
 // Utility
 import { request } from "../util/request";
@@ -15,6 +16,8 @@ type Props = {
 };
 
 const ChatterRowComponent: React.FC<Props> = ({ chatter }) => {
+    const updateChatters = useSetRecoilState(ChattersState);
+
     const deleteClickHandler = async () => {
         const chatters = await request<
             {
@@ -23,7 +26,7 @@ const ChatterRowComponent: React.FC<Props> = ({ chatter }) => {
             ChatterRowType[]
         >("chatter:delete", { id: chatter._id }, []);
 
-        updateAction(chatters);
+        updateChatters([...chatters]);
     };
 
     return (

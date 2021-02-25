@@ -1,15 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useRecoilValue } from "recoil";
 
-import { getState, subscribe } from "../store/IsConnecting";
+// Recoil
+import IsConnectingState from "../atom/IsConnecting";
 
 const LoadingComponent: React.FC = () => {
-    const [isConnecting, updateIsConnecting] = useState(false);
-
-    useEffect(() => {
-        subscribe(() => {
-            updateIsConnecting(getState());
-        });
-    }, []);
+    const isConnecting = useRecoilValue(IsConnectingState);
 
     return isConnecting ? (
         <div

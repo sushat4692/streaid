@@ -1,4 +1,4 @@
-import { Reducer, createStore } from "redux";
+import { atom } from "recoil";
 import { Document } from "../../types/Document";
 
 interface Badges {
@@ -48,33 +48,9 @@ export interface ChatterRowType extends Document {
     [paramater: string]: any;
 }
 
-export type ActionType = {
-    type: "UPDATE";
-    state: ChatterRowType[];
-};
+const state = atom<ChatterRowType[]>({
+    key: "Chatters",
+    default: [],
+});
 
-const reducer: Reducer<ChatterRowType[], ActionType> = (
-    state: ChatterRowType[] = [],
-    action
-) => {
-    switch (action.type) {
-        case "UPDATE":
-            return [...action.state];
-        default:
-            return state;
-    }
-};
-
-const store = createStore(reducer);
-
-export const getState = () => store.getState();
-
-export const subscribe = (listener: () => void) => {
-    store.subscribe(listener);
-};
-
-export const updateAction = (state: ChatterRowType[]) => {
-    store.dispatch({ type: "UPDATE", state });
-};
-
-export default store;
+export default state;

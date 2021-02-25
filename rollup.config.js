@@ -16,6 +16,7 @@ export default [
         },
         plugins: [
             pluginReplace({
+                preventAssignment: true,
                 __twitch_api_key__: process.env.CLIENT_ID,
             }),
             pluginEsbuild({

@@ -1,38 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import Select, { OptionTypeBase } from "react-select";
 import AsyncSelect from "react-select/async";
 
-// Store
-import { getState as getChannel } from "../store/SettingChannel";
-import {
-    getState as getChannelTemplate,
-    subscribe as subscribeChannelTemplate,
-    updateAction as updateChannelTemplate,
+// Recoil
+import SettingChannelState from "../atom/SettingChannel";
+import ChannelTitleState from "../atom/ChannelTitle";
+import ChannelGameState, { GameInterface } from "../atom/ChannelGame";
+import ChannelLanguageState from "../atom/ChannelLanguage";
+import ChannelTagsState, { TagInterface } from "../atom/ChannelTags";
+import ChannelTemplateState, {
     ChannelTemplateRowType,
-} from "../store/ChannelTemplate";
-import { enableAction, disableAction } from "../store/IsConnecting";
-import {
-    getState as getChannelTitle,
-    subscribe as subscribeChannelTitle,
-    updateAction as updateChannelTitle,
-} from "../store/ChannelTitle";
-import {
-    getState as getChannelGame,
-    subscribe as subscribeChannelGame,
-    updateAction as updateChannelGame,
-    GameInterface,
-} from "../store/ChannelGame";
-import {
-    getState as getChannelLanguage,
-    subscribe as subscribeChannelLanguage,
-    updateAction as updateChannelLanguage,
-} from "../store/ChannelLanguage";
-import {
-    getState as getChannelTags,
-    subscribe as subscribeChannelTags,
-    updateAction as updateChannelTags,
-    TagInterface,
-} from "../store/ChannelTags";
+} from "../atom/ChannelTemplate";
+import IsConnectingState from "../atom/IsConnecting";
 
 // Utility
 import { request } from "../util/request";
@@ -55,13 +35,15 @@ interface ChannelInterface {
 }
 
 const ChannelPage: React.FC = () => {
-    const [title, updateTitle] = useState<string>("");
-    const [game, updateGame] = useState<GameInterface>(null);
-    const [language, updateLanguage] = useState<string>("");
-    const [tags, updateTags] = useState<TagInterface[]>([]);
-    const [channelTemplates, updateChannelTemplates] = useState<
-        ChannelTemplateRowType[]
-    >([]);
+    const channel = useRecoilValue(SettingChannelState);
+    const [title, updateTitle] = useRecoilState(ChannelTitleState);
+    const [game, updateGame] = useRecoilState(ChannelGameState);
+    const [language, updateLanguage] = useRecoilState(ChannelLanguageState);
+    const [tags, updateTags] = useRecoilState(ChannelTagsState);
+    const [channelTemplates, updateChannelTemplates] = useRecoilState(
+        ChannelTemplateState
+    );
+    const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
     const [isLoaded, updateIsLoaded] = useState(false);
     const [
@@ -75,14 +57,14 @@ const ChannelPage: React.FC = () => {
     const [tagOption, updateTagOption] = useState<TagInterface[]>([]);
 
     const getChannelInformation = async () => {
-        enableAction();
+        updateIsConnecting(true);
 
         const Channel = await request<
             { username: string },
             ChannelInterface | false
         >(
             "channel:info",
-            { username: getChannel() },
+            { username: channel },
             {
                 id: "id",
                 name: "",
@@ -98,8 +80,8 @@ const ChannelPage: React.FC = () => {
         console.log(Channel);
 
         if (Channel) {
-            updateChannelTitle(Channel.title);
-            updateChannelLanguage(Channel.language);
+            updateTitle(Channel.title);
+            updateLanguage(Channel.language);
 
             const game = await request<
                 { gameId: string },
@@ -111,7 +93,7 @@ const ChannelPage: React.FC = () => {
             );
 
             if (game) {
-                updateChannelGame({
+                updateGame({
                     id: game.id,
                     name: game.name,
                     boxArtUrl: game.boxArtUrl,
@@ -125,33 +107,17 @@ const ChannelPage: React.FC = () => {
             }
         }
 
-        disableAction();
+        updateIsConnecting(false);
 
         return Channel;
     };
 
     useEffect(() => {
-        subscribeChannelTitle(() => {
-            updateTitle(getChannelTitle());
-        });
-        subscribeChannelGame(() => {
-            updateGame(getChannelGame());
-        });
-        subscribeChannelLanguage(() => {
-            updateLanguage(getChannelLanguage());
-        });
-        subscribeChannelTags(() => {
-            updateTags(getChannelTags());
-        });
-        subscribeChannelTemplate(() => {
-            updateChannelTemplates(getChannelTemplate());
-        });
-
         (async () => {
             // Get Channel Information
             const Channel = await getChannelInformation();
             if (Channel) {
-                updateChannelTags(Channel.tags || []);
+                updateTags(Channel.tags || []);
 
                 if (Channel.language) {
                     const selectedLanguage = languageList.find(
@@ -166,20 +132,20 @@ const ChannelPage: React.FC = () => {
             // Get tag list
             // const tagList = await request<{ username: string }, TagInterface[]>(
             //     "channel:tags",
-            //     { username: getChannel() },
+            //     { username: channel },
             //     []
             // );
             // console.log(tagList);
             // updateTagOption(tagList);
 
             // Get Templates
-            enableAction();
+            updateIsConnecting(true);
             const templates = await request<null, ChannelTemplateRowType[]>(
                 "channel:template",
                 null,
                 [
                     {
-                        id: "1",
+                        _id: "1",
                         title: "title",
                         gameId: "1",
                         gameName: "name",
@@ -191,8 +157,8 @@ const ChannelPage: React.FC = () => {
                 ]
             );
             console.log(templates);
-            updateChannelTemplate(templates || []);
-            disableAction();
+            updateChannelTemplates(templates || []);
+            updateIsConnecting(false);
 
             updateIsLoaded(true);
         })();
@@ -221,7 +187,7 @@ const ChannelPage: React.FC = () => {
 
     const submitHandler = async (e: React.FormEvent) => {
         e.preventDefault();
-        enableAction();
+        updateIsConnecting(true);
 
         await request<
             {
@@ -234,7 +200,7 @@ const ChannelPage: React.FC = () => {
         >(
             "channel:update",
             {
-                username: getChannel(),
+                username: channel,
                 title,
                 gameId: game.id,
                 language,
@@ -242,13 +208,13 @@ const ChannelPage: React.FC = () => {
             null
         );
 
-        disableAction();
+        updateIsConnecting(false);
         await getChannelInformation();
     };
 
     const onClickSaveTemplateHandler = async (e: React.MouseEvent) => {
         e.preventDefault();
-        enableAction();
+        updateIsConnecting(true);
 
         const templates = await request<
             {
@@ -271,9 +237,9 @@ const ChannelPage: React.FC = () => {
             []
         );
 
-        updateChannelTemplate(templates || []);
+        updateChannelTemplates(templates || []);
 
-        disableAction();
+        updateIsConnecting(false);
     };
 
     return (
@@ -304,9 +270,7 @@ const ChannelPage: React.FC = () => {
                                 id="title"
                                 className="form-control form-control-lg"
                                 value={title}
-                                onChange={(e) =>
-                                    updateChannelTitle(e.target.value)
-                                }
+                                onChange={(e) => updateTitle(e.target.value)}
                             />
                         </div>
 
@@ -346,7 +310,7 @@ const ChannelPage: React.FC = () => {
                                 getOptionValue={(option) => option.id}
                                 loadOptions={loadGameOptions}
                                 onChange={(e) => {
-                                    updateChannelGame({
+                                    updateGame({
                                         id: e.id,
                                         name: e.name,
                                         boxArtUrl: e.boxArtUrl,
@@ -365,7 +329,7 @@ const ChannelPage: React.FC = () => {
                                 id="language"
                                 defaultValue={defaultLanguageOption}
                                 options={languageList}
-                                onChange={(e) => updateChannelLanguage(e.value)}
+                                onChange={(e) => updateLanguage(e.value)}
                             />
                         </div>
 

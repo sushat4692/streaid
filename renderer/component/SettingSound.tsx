@@ -1,29 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useRecoilState } from "recoil";
 
-// Store
-import {
-    getState as getChatterVolume,
-    subscribe as subscribeChatterVolume,
-    updateAction as updateChatterVolumeStore,
-} from "../store/SoundChatterVolume";
-import {
-    getState as getRaidVolume,
-    subscribe as subscribeRaidVolume,
-    updateAction as updateRaidVolumeStore,
-} from "../store/SoundRaidVolume";
-import {
-    getState as getHostVolume,
-    subscribe as subscribeHostVolume,
-    updateAction as updateHostVolumeStore,
-} from "../store/SoundHostVolume";
+// Recoil
+import SoundChatterVolumeState from "../atom/SoundChatterVolume";
+import SoundRaidVolumeState from "../atom/SoundRaidVolume";
+import SoundHostVolumeState from "../atom/SoundHostVolume";
 
 // Util
 import { request } from "../util/request";
 
 const SettingSoundComponent: React.FC = () => {
-    const [chatterVolume, updateChatterVolume] = useState(getChatterVolume());
-    const [raidVolume, updateRaidVolume] = useState(getRaidVolume());
-    const [hostVolume, updateHostVolume] = useState(getHostVolume());
+    const [chatterVolume, updateChatterVolume] = useRecoilState(
+        SoundChatterVolumeState
+    );
+    const [raidVolume, updateRaidVolume] = useRecoilState(SoundRaidVolumeState);
+    const [hostVolume, updateHostVolume] = useRecoilState(SoundHostVolumeState);
 
     const selectFileHandler = (mode: string) => {
         return async (e: React.MouseEvent) => {
@@ -44,18 +35,6 @@ const SettingSoundComponent: React.FC = () => {
             }
         };
     };
-
-    useEffect(() => {
-        subscribeChatterVolume(() => {
-            updateChatterVolume(getChatterVolume());
-        });
-        subscribeRaidVolume(() => {
-            updateRaidVolume(getRaidVolume());
-        });
-        subscribeHostVolume(() => {
-            updateHostVolume(getHostVolume());
-        });
-    }, []);
 
     return (
         <section className="my-4">
@@ -94,7 +73,7 @@ const SettingSoundComponent: React.FC = () => {
                             value={chatterVolume}
                             onChange={async (e) => {
                                 const value = parseFloat(e.target.value);
-                                updateChatterVolumeStore(value);
+                                updateChatterVolume(value);
 
                                 await request(
                                     "setting:notification:volume",
@@ -143,7 +122,7 @@ const SettingSoundComponent: React.FC = () => {
                             value={raidVolume}
                             onChange={async (e) => {
                                 const value = parseFloat(e.target.value);
-                                updateRaidVolumeStore(value);
+                                updateRaidVolume(value);
 
                                 await request(
                                     "setting:notification:volume",
@@ -191,7 +170,7 @@ const SettingSoundComponent: React.FC = () => {
                             value={hostVolume}
                             onChange={async (e) => {
                                 const value = parseFloat(e.target.value);
-                                updateHostVolumeStore(value);
+                                updateHostVolume(value);
 
                                 await request(
                                     "setting:notification:volume",

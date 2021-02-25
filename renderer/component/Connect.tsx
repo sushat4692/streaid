@@ -1,35 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 
-import {
-    getState as getIsConnected,
-    subscribe as subscribeIsConnected,
-} from "../store/IsConnected";
-import {
-    enableAction as enableIsConnecting,
-    disableAction as disableIsConnecting,
-} from "../store/IsConnecting";
+// Recoil
+import IsConnectedState from "../atom/IsConnected";
+import IsConnectingState from "../atom/IsConnecting";
 
 // Util
 import { request } from "../util/request";
 
 const ConnectComonent: React.FC = () => {
-    const [isConnected, updateIsConnected] = useState(getIsConnected());
-
-    useEffect(() => {
-        subscribeIsConnected(() => {
-            updateIsConnected(getIsConnected());
-            disableIsConnecting();
-        });
-    }, []);
+    const isConnected = useRecoilValue(IsConnectedState);
+    const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
     const clickHandler = async () => {
-        enableIsConnecting();
+        updateIsConnecting(true);
 
         if (isConnected) {
             await request("bot:disconnect", null, null);
         } else {
             await request("bot:connect", null, null);
         }
+
+        updateIsConnecting(false);
     };
 
     return (

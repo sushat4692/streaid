@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 
 // Type
 import {
@@ -6,33 +7,25 @@ import {
     ResponseSettingType,
 } from "../../types/SettingType";
 
-// Store
-import {
-    getState as getUsername,
-    subscribe as subscribeUsernameStore,
-} from "../store/SettingUsername";
-import {
-    getState as getChannel,
-    subscribe as subscribeChannelStore,
-    updateAction as updateChannelStore,
-} from "../store/SettingChannel";
-import { disableAction as disableIsInited } from "../store/IsInited";
-import {
-    enableAction as enableIsConnected,
-    disableAction as disableIsConnected,
-} from "../store/IsConnecting";
+// Recoil
+import SettingUsernameState from "../atom/SettingUsername";
+import SettingChannelState from "../atom/SettingChannel";
+import IsInitedState from "../atom/IsInited";
+import IsConnectingState from "../atom/IsConnecting";
 
 // Utils
 import { request } from "../util/request";
 
 const SettingBotComponent: React.FC = () => {
-    const [username, updateUsername] = useState(getUsername());
-    const [channel, updateChannel] = useState(getChannel());
+    const username = useRecoilValue(SettingUsernameState);
+    const [channel, updateChannel] = useRecoilState(SettingChannelState);
+    const updateIsInited = useSetRecoilState(IsInitedState);
+    const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
     const submitHandler = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        enableIsConnected();
+        updateIsConnecting(true);
 
         await request<RequestSettingType, ResponseSettingType>(
             "settings:store",
@@ -42,27 +35,18 @@ const SettingBotComponent: React.FC = () => {
             null
         );
 
-        disableIsConnected();
+        updateIsConnecting(false);
     };
     const signoutHandler = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        enableIsConnected();
+        updateIsConnecting(true);
 
         await request("signout", null, null);
 
-        disableIsInited();
-        disableIsConnected();
+        updateIsInited(false);
+        updateIsConnecting(false);
     };
-
-    useEffect(() => {
-        subscribeUsernameStore(() => {
-            updateUsername(getUsername());
-        });
-        subscribeChannelStore(() => {
-            updateChannel(getChannel());
-        });
-    }, []);
 
     return (
         <section className="my-4">
@@ -92,7 +76,7 @@ const SettingBotComponent: React.FC = () => {
                         id="channel"
                         className="form-control"
                         value={channel}
-                        onChange={(e) => updateChannelStore(e.target.value)}
+                        onChange={(e) => updateChannel(e.target.value)}
                     />
                     <p className="form-text">
                         * You can add multiple channnels separated by comma (,)

@@ -1,18 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useRecoilState } from "recoil";
 
-// Store
-import { getState, subscribe, RaiderRowType } from "../store/Raiders";
+// Recoil
+import RaidersState, { RaiderRowType } from "../atom/Raiders";
 
 // Component
 import RaiderRowComponent from "../component/RaiderRow";
 
+// Util
+import { request } from "../util/request";
+
 const ChattersPage: React.FC = () => {
-    const [raiders, updateRaiders] = useState<RaiderRowType[]>(getState());
+    const [raiders, updateRaiders] = useRecoilState(RaidersState);
 
     useEffect(() => {
-        subscribe(() => {
-            updateRaiders([...getState()]);
-        });
+        (async () => {
+            const raiders = await request<{}, RaiderRowType[]>(
+                "raider",
+                {},
+                []
+            );
+            updateRaiders([...raiders]);
+        })();
     }, []);
 
     return (
