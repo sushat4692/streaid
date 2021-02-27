@@ -16,9 +16,9 @@ const ChattersPage: React.FC = () => {
 
     useEffect(() => {
         (async () => {
-            const raiders = await request<{}, RaiderRowType[]>(
+            const raiders = await request<null, RaiderRowType[]>(
                 "raider",
-                {},
+                null,
                 []
             );
             updateRaiders([...raiders]);

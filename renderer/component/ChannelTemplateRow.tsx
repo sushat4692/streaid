@@ -21,7 +21,9 @@ type Props = {
     channelTemplate: ChannelTemplateRowType;
 };
 
-const ChannelTemplateRowComponent: React.FC<Props> = ({ channelTemplate }) => {
+const ChannelTemplateRowComponent: React.FC<Props> = ({
+    channelTemplate,
+}: Props) => {
     const updateChannelTemplate = useSetRecoilState(ChannelTemplateState);
     const updateChannelTitle = useSetRecoilState(ChannelTitleState);
     const updateChannelGame = useSetRecoilState(ChannelGameState);
