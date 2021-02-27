@@ -112,7 +112,7 @@
         },
         "mac": {
             "icon": "build/icons/icon.icns",
-            "target": "zip"
+            "target": "dmg"
         },
         "win": {
             "icon": "build/icons/icon.ico",
