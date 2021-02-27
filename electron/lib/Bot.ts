@@ -89,7 +89,7 @@ class Bot {
 
         // Run command
         if (commandName && commandName.charAt(0) === "!") {
-            let existsCommand: boolean = false;
+            let existsCommand = false;
             switch (commandName) {
                 case "!dice": {
                     const num = this.rollDice();

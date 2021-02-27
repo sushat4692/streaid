@@ -17,7 +17,7 @@ import { getInstance as getStoreInstance } from "../store";
 import { HelixChannelUpdate } from "twitch/lib/API/Helix/Channel/HelixChannelApi";
 
 class TwitchAPI {
-    _clientId: string = "";
+    _clientId = "";
     _client: ApiClient | null = null;
     _provider: ElectronAuthProvider | null = null;
     _accessToken: AccessToken | void | null = null;

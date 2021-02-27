@@ -15,7 +15,7 @@ type Props = {
     raider: RaiderRowType;
 };
 
-const ChatterRowComponent: React.FC<Props> = ({ raider }) => {
+const ChatterRowComponent: React.FC<Props> = ({ raider }: Props) => {
     const updateRaidersState = useSetRecoilState(RaidersState);
 
     const deleteClickHandler = async () => {
