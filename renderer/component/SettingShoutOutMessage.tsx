@@ -1,5 +1,6 @@
 import React from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
+import { FormattedMessage } from "react-intl";
 
 // Recoil
 import ShoutOutMessageState from "../atom/SettingShoutOutMessage";
@@ -49,7 +50,12 @@ const SettingBotComponent: React.FC = () => {
 
     return (
         <section className="my-4">
-            <h3>Shoutout Message</h3>
+            <h3>
+                <FormattedMessage
+                    id="Component.SettingShoutOutMessage.Header"
+                    defaultMessage="Shoutout Message"
+                />
+            </h3>
 
             <div className="row">
                 <form
@@ -57,8 +63,11 @@ const SettingBotComponent: React.FC = () => {
                     onSubmit={submitHandler}
                 >
                     <div className="mb-3">
-                        <label htmlFor="shoutout_message">
-                            ShoutOut Message
+                        <label htmlFor="shoutout_message" className="mb-1">
+                            <FormattedMessage
+                                id="Component.SettingShoutOutMessage.Message"
+                                defaultMessage="ShoutOut Message Template"
+                            />
                         </label>
                         <textarea
                             name="shoutout_message"
@@ -73,7 +82,12 @@ const SettingBotComponent: React.FC = () => {
                     </div>
 
                     <div className="mb-3">
-                        <label htmlFor="shoutout_failed">Failed Message</label>
+                        <label htmlFor="shoutout_failed" className="mb-1">
+                            <FormattedMessage
+                                id="Component.SettingShoutOutMessage.Failed"
+                                defaultMessage="Failed Message Template"
+                            />
+                        </label>
                         <textarea
                             name="shoutout_failed"
                             id="shoutout_failed"
@@ -87,8 +101,11 @@ const SettingBotComponent: React.FC = () => {
                     </div>
 
                     <div className="mb-3">
-                        <label htmlFor="shoutout_not_found">
-                            Not Found Message
+                        <label htmlFor="shoutout_not_found" className="mb-1">
+                            <FormattedMessage
+                                id="Component.SettingShoutOutMessage.NotFound"
+                                defaultMessage="Not Found Message Template"
+                            />
                         </label>
                         <textarea
                             name="shoutout_not_found"
@@ -104,7 +121,10 @@ const SettingBotComponent: React.FC = () => {
 
                     <button className="btn btn-primary">
                         <i className="bi bi-archive me-2"></i>
-                        Save
+                        <FormattedMessage
+                            id="Common.Submit"
+                            defaultMessage="Submit"
+                        />
                     </button>
                 </form>
 
@@ -116,8 +136,18 @@ const SettingBotComponent: React.FC = () => {
                         </colgroup>
                         <thead>
                             <tr>
-                                <th scope="col">Variable</th>
-                                <th scope="col">Description</th>
+                                <th scope="col">
+                                    <FormattedMessage
+                                        id="Common.Variable.Variable"
+                                        defaultMessage="Variable"
+                                    />
+                                </th>
+                                <th scope="col">
+                                    <FormattedMessage
+                                        id="Common.Variable.Description"
+                                        defaultMessage="Description"
+                                    />
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -125,25 +155,45 @@ const SettingBotComponent: React.FC = () => {
                                 <td scope="row">
                                     <code>%url%</code>
                                 </td>
-                                <td>Target Channel URL</td>
+                                <td>
+                                    <FormattedMessage
+                                        id="Common.Variable.Url.Description"
+                                        defaultMessage="Target Channel URL"
+                                    />
+                                </td>
                             </tr>
                             <tr>
                                 <td scope="row">
                                     <code>%username%</code>
                                 </td>
-                                <td>Target User Display Name</td>
+                                <td>
+                                    <FormattedMessage
+                                        id="Common.Variable.Username.Description"
+                                        defaultMessage="Target User Display Name"
+                                    />
+                                </td>
                             </tr>
                             <tr>
                                 <td scope="row">
                                     <code>%user_id%</code>
                                 </td>
-                                <td>Target User ID</td>
+                                <td>
+                                    <FormattedMessage
+                                        id="Common.Variable.UserId.Description"
+                                        defaultMessage="Target User ID"
+                                    />
+                                </td>
                             </tr>
                             <tr>
                                 <td scope="row">
                                     <code>%category%</code>
                                 </td>
-                                <td>Target Category/Game name</td>
+                                <td>
+                                    <FormattedMessage
+                                        id="Common.Variable.Category.Description"
+                                        defaultMessage="Target Category/Game name"
+                                    />
+                                </td>
                             </tr>
                         </tbody>
                     </table>

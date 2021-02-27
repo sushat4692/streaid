@@ -1,6 +1,7 @@
 import React from "react";
 import { useSetRecoilState } from "recoil";
 import moment from "moment";
+import { FormattedMessage } from "react-intl";
 
 // Recoil
 import ChannelTemplateState, {
@@ -58,7 +59,10 @@ const ChannelTemplateRowComponent: React.FC<Props> = ({ channelTemplate }) => {
                     className="btn btn-sm btn-primary me-2"
                     onClick={updateClickHandler}
                 >
-                    Apply
+                    <FormattedMessage
+                        id="Common.Apply"
+                        defaultMessage="Apply"
+                    />
                 </button>
                 <button
                     className="btn btn-sm btn-danger"

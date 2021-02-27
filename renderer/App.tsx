@@ -1,8 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
+import { IntlProvider } from "react-intl";
+
+// Languages
+import languages from "./lang/index";
 
 // Recoil
 import IsInitedState from "./atom/IsInited";
+import LocaleState from "./atom/Locale";
 import IsConnectedState from "./atom/IsConnected";
 import IsConnectingState from "./atom/IsConnecting";
 import RaidersState, { RaiderRowType } from "./atom/Raiders";
@@ -19,11 +24,14 @@ import { request, requestEvent } from "./util/request";
 
 const App: React.FC = () => {
     const [isInited, updateIsInited] = useRecoilState(IsInitedState);
+    const [locale, updateLocale] = useRecoilState(LocaleState);
     const updateIsConnected = useSetRecoilState(IsConnectedState);
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
     const updateRaiders = useSetRecoilState(RaidersState);
     const updateChatters = useSetRecoilState(ChattersState);
     const updateHosts = useSetRecoilState(HostsState);
+
+    const [messages, updateMessages] = useState(languages[locale]);
 
     useEffect(() => {
         requestEvent("bot:connected", () => {
@@ -63,6 +71,9 @@ const App: React.FC = () => {
         (async () => {
             updateIsConnecting(true);
 
+            const settingLocale = await request("setting:locale", {}, "en-us");
+            updateLocale(settingLocale);
+
             const isInited: boolean = await request("get:init", null, true);
             updateIsInited(isInited);
 
@@ -70,11 +81,15 @@ const App: React.FC = () => {
         })();
     }, []);
 
+    useEffect(() => {
+        updateMessages(languages[locale]);
+    }, [locale]);
+
     return (
-        <>
+        <IntlProvider messages={messages} locale={locale} defaultLocale="en-us">
             {isInited ? <LayoutView /> : <InitView />}
             <LoadingComponent />
-        </>
+        </IntlProvider>
     );
 };
 

@@ -1,13 +1,15 @@
 import { ipcMain } from "electron";
 
+// Store
+import { getInstance as getStoreInstance } from "../store";
+
 // Library
 import { getInstance as getTwichAPIInstance } from "../lib/TwitchAPI";
 
-// Const
-import { getCode } from "../const/language";
-
 ipcMain.handle("channel:info", async (_, values) => {
     const TwitchAPI = getTwichAPIInstance();
+    const store = getStoreInstance();
+    const locale = store.get("locale");
 
     const User = await TwitchAPI.getUserByName(values.username);
     if (!User) {
@@ -33,8 +35,8 @@ ipcMain.handle("channel:info", async (_, values) => {
             return {
                 id: Tag.id,
                 isAuto: Tag.isAuto,
-                name: Tag.getName(getCode(Channel.language)),
-                description: Tag.getDescription(getCode(Channel.language)),
+                name: Tag.getName(locale),
+                description: Tag.getDescription(locale),
             };
         }),
     };
@@ -74,6 +76,9 @@ ipcMain.handle("channel:games", async (_, values) => {
 
 ipcMain.handle("channel:tags", async (_, values) => {
     const TwitchAPI = getTwichAPIInstance();
+    const store = getStoreInstance();
+    const locale = store.get("locale");
+
     const tags = await TwitchAPI.getTagList();
 
     const User = await TwitchAPI.getUserByName(values.username);
@@ -94,8 +99,8 @@ ipcMain.handle("channel:tags", async (_, values) => {
         return {
             id: Tag.id,
             isAuto: Tag.isAuto,
-            name: Tag.getName(getCode(Channel.language)),
-            description: Tag.getDescription(getCode(Channel.language)),
+            name: Tag.getName(locale),
+            description: Tag.getDescription(locale),
         };
     });
 });

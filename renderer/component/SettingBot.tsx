@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { FormattedMessage } from "react-intl";
 
 // Type
 import {
@@ -22,21 +23,16 @@ const SettingBotComponent: React.FC = () => {
     const updateIsInited = useSetRecoilState(IsInitedState);
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
-    const submitHandler = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        updateIsConnecting(true);
-
-        await request<RequestSettingType, ResponseSettingType>(
+    useEffect(() => {
+        request<RequestSettingType, ResponseSettingType>(
             "settings:store",
             {
                 channel,
             },
             null
         );
+    }, [username, channel]);
 
-        updateIsConnecting(false);
-    };
     const signoutHandler = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -50,50 +46,61 @@ const SettingBotComponent: React.FC = () => {
 
     return (
         <section className="my-4">
-            <h3>Bot Target Channel</h3>
+            <h3>
+                <FormattedMessage
+                    id="Component.SettingBot.Header"
+                    defaultMessage="Bot Target Channel"
+                />
+            </h3>
 
-            <form onSubmit={submitHandler}>
-                <div className="mb-3">
-                    <label htmlFor="username" className="form-label">
-                        Username
-                    </label>
-                    <input
-                        type="text"
-                        name="username"
-                        id="username"
-                        className="form-control"
-                        value={username}
-                        readOnly
+            <div className="mb-3">
+                <label htmlFor="username" className="form-label">
+                    <FormattedMessage
+                        id="Common.Label.Username"
+                        defaultMessage="Username"
                     />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="channel" className="form-label">
-                        Channels
-                    </label>
-                    <input
-                        type="text"
-                        name="channel"
-                        id="channel"
-                        className="form-control"
-                        value={channel}
-                        onChange={(e) => updateChannel(e.target.value)}
+                </label>
+                <input
+                    type="text"
+                    name="username"
+                    id="username"
+                    className="form-control"
+                    value={username}
+                    readOnly
+                />
+            </div>
+            <div className="mb-3">
+                <label htmlFor="channel" className="form-label">
+                    <FormattedMessage
+                        id="Common.Label.Channel"
+                        defaultMessage="Channel"
                     />
-                    <p className="form-text">
-                        * You can add multiple channnels separated by comma (,)
-                    </p>
-                </div>
+                </label>
+                <input
+                    type="text"
+                    name="channel"
+                    id="channel"
+                    className="form-control"
+                    value={channel}
+                    onChange={(e) => updateChannel(e.target.value)}
+                />
+                <p className="form-text">
+                    <FormattedMessage
+                        id="Component.SettingBot.ChannelHelp"
+                        defaultMessage="* If you set same channel with username, you can update channel information"
+                    />
+                </p>
+            </div>
 
-                <div className="d-flex justify-content-between">
-                    <button className="btn btn-primary">
-                        <i className="bi bi-archive me-2"></i>
-                        Save
-                    </button>
-                    <button className="btn btn-danger" onClick={signoutHandler}>
-                        <i className="bi bi-box-arrow-in-right me-2"></i>
-                        Signout
-                    </button>
-                </div>
-            </form>
+            <div className="d-flex justify-content-end">
+                <button className="btn btn-danger" onClick={signoutHandler}>
+                    <i className="bi bi-box-arrow-in-right me-2"></i>
+                    <FormattedMessage
+                        id="Common.SignOut"
+                        defaultMessage="Signout"
+                    />
+                </button>
+            </div>
         </section>
     );
 };

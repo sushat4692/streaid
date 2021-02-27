@@ -1,5 +1,6 @@
 import React from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useIntl } from "react-intl";
 
 // Recoil
 import IsConnectedState from "../atom/IsConnected";
@@ -11,6 +12,7 @@ import { request } from "../util/request";
 const ConnectComonent: React.FC = () => {
     const isConnected = useRecoilValue(IsConnectedState);
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
+    const intl = useIntl();
 
     const clickHandler = async () => {
         updateIsConnecting(true);
@@ -31,7 +33,15 @@ const ConnectComonent: React.FC = () => {
                 onClick={clickHandler}
             >
                 <i className="bi bi-link-45deg me-2"></i>
-                {isConnected ? "Disconnect" : "Connect"}
+                {isConnected
+                    ? intl.formatMessage({
+                          id: "Component.Connect.Disable",
+                          defaultMessage: "Disconnect",
+                      })
+                    : intl.formatMessage({
+                          id: "Component.Connect.Enable",
+                          defaultMessage: "Connect",
+                      })}
             </button>
         </div>
     );

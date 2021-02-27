@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useRecoilState } from "recoil";
+import { FormattedMessage } from "react-intl";
 
 // Recoil
 import RaidersState, { RaiderRowType } from "../atom/Raiders";
@@ -28,8 +29,18 @@ const ChattersPage: React.FC = () => {
         <section className="my-4">
             <h2 className="display-6 mb-3 fw-bolder">
                 <i className="bi bi-tornado me-2"></i>
-                Raiders
+                <FormattedMessage
+                    id="Common.Raiders.Name"
+                    defaultMessage="Raiders"
+                />
             </h2>
+
+            <p className="lead">
+                <FormattedMessage
+                    id="Common.Raiders.Description"
+                    defaultMessage="Display user list that raided to target channel."
+                />
+            </p>
 
             <div className="table-responsive">
                 <table className="table">
@@ -41,9 +52,24 @@ const ChattersPage: React.FC = () => {
                     </colgroup>
                     <thead>
                         <tr>
-                            <th scope="col">Username</th>
-                            <th scope="col">Viewers</th>
-                            <th scope="col">Created</th>
+                            <th scope="col">
+                                <FormattedMessage
+                                    id="Common.Label.Username"
+                                    defaultMessage="Username"
+                                />
+                            </th>
+                            <th scope="col">
+                                <FormattedMessage
+                                    id="Common.Label.Viewers"
+                                    defaultMessage="Viewers"
+                                />
+                            </th>
+                            <th scope="col">
+                                <FormattedMessage
+                                    id="Common.Label.Created"
+                                    defaultMessage="Created"
+                                />
+                            </th>
                             <th scope="col"></th>
                         </tr>
                     </thead>

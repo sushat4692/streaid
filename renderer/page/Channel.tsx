@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import Select, { OptionTypeBase } from "react-select";
 import AsyncSelect from "react-select/async";
+import { FormattedMessage, useIntl } from "react-intl";
 
 // Recoil
 import SettingChannelState from "../atom/SettingChannel";
@@ -35,6 +36,8 @@ interface ChannelInterface {
 }
 
 const ChannelPage: React.FC = () => {
+    const intl = useIntl();
+
     const channel = useRecoilValue(SettingChannelState);
     const [title, updateTitle] = useRecoilState(ChannelTitleState);
     const [game, updateGame] = useRecoilState(ChannelGameState);
@@ -76,8 +79,6 @@ const ChannelPage: React.FC = () => {
                 tags: [],
             }
         );
-
-        console.log(Channel);
 
         if (Channel) {
             updateTitle(Channel.title);
@@ -156,7 +157,6 @@ const ChannelPage: React.FC = () => {
                     },
                 ]
             );
-            console.log(templates);
             updateChannelTemplates(templates || []);
             updateIsConnecting(false);
 
@@ -246,23 +246,37 @@ const ChannelPage: React.FC = () => {
         <>
             <h2 className="display-6 mt-4 mb-3 fw-bolder">
                 <i className="bi bi-camera-reels me-2"></i>
-                Channel
+                <FormattedMessage
+                    id="Common.Channel.Name"
+                    defaultMessage="Channel"
+                />
             </h2>
 
+            <p className="lead">
+                <FormattedMessage
+                    id="Common.Channel.Description"
+                    defaultMessage="You can check/update Channel information."
+                />
+            </p>
+
             <section className="my-4">
-                <h3>Channel Information</h3>
+                <h3>
+                    <FormattedMessage
+                        id="Page.Channel.Information.Header"
+                        defaultMessage="Channel Information"
+                    />
+                </h3>
 
                 {!isLoaded ? (
                     ""
                 ) : (
                     <form onSubmit={submitHandler}>
-                        <div className="alert alert-info">
-                            You can update Channel information.
-                        </div>
-
                         <div className="mb-3">
                             <label htmlFor="title" className="form-label">
-                                Title
+                                <FormattedMessage
+                                    id="Common.Label.Title"
+                                    defaultMessage="Title"
+                                />
                             </label>
                             <input
                                 type="text"
@@ -276,7 +290,10 @@ const ChannelPage: React.FC = () => {
 
                         <div className="mb-3">
                             <label htmlFor="gameId" className="form-label">
-                                Category
+                                <FormattedMessage
+                                    id="Common.Label.Category"
+                                    defaultMessage="Category"
+                                />
                             </label>
 
                             <div className="d-flex align-items-center mb-2">
@@ -316,12 +333,19 @@ const ChannelPage: React.FC = () => {
                                         boxArtUrl: e.boxArtUrl,
                                     });
                                 }}
+                                placeholder={intl.formatMessage({
+                                    id: "Common.Select.Placeholder",
+                                    defaultMessage: "Select...",
+                                })}
                             />
                         </div>
 
                         <div className="mb-3">
                             <label htmlFor="language" className="form-label">
-                                Language
+                                <FormattedMessage
+                                    id="Common.Label.Language"
+                                    defaultMessage="Language"
+                                />
                             </label>
 
                             <Select
@@ -330,16 +354,26 @@ const ChannelPage: React.FC = () => {
                                 defaultValue={defaultLanguageOption}
                                 options={languageList}
                                 onChange={(e) => updateLanguage(e.value)}
+                                placeholder={intl.formatMessage({
+                                    id: "Common.Select.Placeholder",
+                                    defaultMessage: "Select...",
+                                })}
                             />
                         </div>
 
                         <div className="mb-3">
                             <label htmlFor="tags" className="form-label">
-                                Tags
+                                <FormattedMessage
+                                    id="Common.Label.Tags"
+                                    defaultMessage="Tags"
+                                />
                             </label>
 
                             <div className="alert alert-warning">
-                                Tags are not editable for now
+                                <FormattedMessage
+                                    id="Page.Channel.Information.TagNotice"
+                                    defaultMessage="Tags are not editable for now"
+                                />
                             </div>
 
                             <Select
@@ -350,6 +384,10 @@ const ChannelPage: React.FC = () => {
                                 getOptionLabel={(option) => option.name}
                                 getOptionValue={(option) => option.id}
                                 loadOptions={loadTagOptions}
+                                placeholder={intl.formatMessage({
+                                    id: "Common.Select.Placeholder",
+                                    defaultMessage: "Select...",
+                                })}
                             />
                         </div>
 
@@ -359,11 +397,17 @@ const ChannelPage: React.FC = () => {
                                 className="btn btn-success me-auto"
                                 onClick={onClickSaveTemplateHandler}
                             >
-                                Save to Template
+                                <FormattedMessage
+                                    id="Page.Channel.Information.SaveTemplate"
+                                    defaultMessage="Save to Template"
+                                />
                             </button>
 
                             <button type="submit" className="btn btn-primary">
-                                Submit
+                                <FormattedMessage
+                                    id="Common.Submit"
+                                    defaultMessage="Submit"
+                                />
                             </button>
                         </div>
                     </form>
@@ -371,7 +415,12 @@ const ChannelPage: React.FC = () => {
             </section>
 
             <section className="my-4">
-                <h3>Channel Template</h3>
+                <h3>
+                    <FormattedMessage
+                        id="Page.Channel.Template.Header"
+                        defaultMessage="Channel Template"
+                    />
+                </h3>
 
                 <div className="table-responsive">
                     <table className="table">
@@ -384,10 +433,30 @@ const ChannelPage: React.FC = () => {
                         </colgroup>
                         <thead>
                             <tr>
-                                <th scope="col">Title</th>
-                                <th scope="col">Category</th>
-                                <th scope="col">Language</th>
-                                <th scope="col">Created</th>
+                                <th scope="col">
+                                    <FormattedMessage
+                                        id="Common.Label.Title"
+                                        defaultMessage="Title"
+                                    />
+                                </th>
+                                <th scope="col">
+                                    <FormattedMessage
+                                        id="Common.Label.Category"
+                                        defaultMessage="Category"
+                                    />
+                                </th>
+                                <th scope="col">
+                                    <FormattedMessage
+                                        id="Common.Label.Language"
+                                        defaultMessage="Language"
+                                    />
+                                </th>
+                                <th scope="col">
+                                    <FormattedMessage
+                                        id="Common.Label.Created"
+                                        defaultMessage="Created"
+                                    />
+                                </th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>

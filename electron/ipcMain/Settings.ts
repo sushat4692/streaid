@@ -13,6 +13,16 @@ import { getInstance as getStoreInstance } from "../store";
 import { getWindow } from "../util/window";
 import { playSound } from "../util/Sound";
 
+ipcMain.handle("setting:locale", async () => {
+    const store = getStoreInstance();
+    return store.get("locale", "en-us");
+});
+
+ipcMain.handle("setting:locale:update", async (_, values) => {
+    const store = getStoreInstance();
+    return store.set("locale", values);
+});
+
 ipcMain.handle("settings:get", async () => {
     const store = getStoreInstance();
     const TwitchAPI = getTwichAPIInstance();

@@ -2,6 +2,7 @@ import Store from "electron-store";
 
 export interface StoreType {
     "api.inited": boolean;
+    locale: string;
     username: string;
     password: string;
     channel: string;
@@ -17,6 +18,10 @@ const schema: Store.Schema<StoreType> = {
         type: "boolean",
         default: false,
     },
+    locale: {
+        type: "string",
+        default: "en-us",
+    },
     username: {
         type: "string",
         default: "username",
@@ -27,7 +32,7 @@ const schema: Store.Schema<StoreType> = {
     },
     channel: {
         type: "string",
-        default: "channelname",
+        default: "",
     },
     shoutout_message: {
         type: "string",

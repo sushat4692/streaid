@@ -7,8 +7,6 @@ export const request = async <T, R>(
     args: T,
     _default: R
 ): Promise<R> => {
-    console.log(key);
-
     if (typeof window.api === "undefined") {
         return new Promise((resolve) => resolve(_default));
     } else {

@@ -1,6 +1,12 @@
 import React, { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    NavLink,
+} from "react-router-dom";
+import { FormattedMessage } from "react-intl";
 
 // Type
 import { ResponseSettingType } from "../../types/SettingType";
@@ -17,6 +23,7 @@ import SoundHostVolumeState from "../atom/SoundHostVolume";
 import IsConnectingState from "../atom/IsConnecting";
 
 // Component
+import NeedSettingPage from "../page/NeedSetting";
 import DashboardPage from "../page/Dashboard";
 import ChattersPage from "../page/Chatters";
 import RaidersPage from "../page/Raiders";
@@ -27,8 +34,11 @@ import ConnectComponent from "../component/Connect";
 
 // Utils
 import { request } from "../util/request";
+import { useSettingState } from "../util/setting";
 
 const Layout: React.FC = () => {
+    const setting = useSettingState();
+
     const updateSettingUsername = useSetRecoilState(SettingUsernameState);
     const updateSettingChannel = useSetRecoilState(SettingChannelState);
     const updateShoutOutMessage = useSetRecoilState(ShoutOutMessageState);
@@ -75,10 +85,13 @@ const Layout: React.FC = () => {
         <Router>
             <header className="navbar navbar-expand-md navbar-dark sticky-top bg-dark shadow">
                 <div className="container-fluid">
-                    <Link className="navbar-brand" to="/">
+                    <NavLink className="navbar-brand" to="/">
                         <i className="bi bi-twitch me-2"></i>
-                        Twitch Support Tool
-                    </Link>
+                        <FormattedMessage
+                            id="Common.Title"
+                            defaultMessage="Twitch Support Tool"
+                        />
+                    </NavLink>
                     <button
                         className="navbar-toggler"
                         type="button"
@@ -95,43 +108,74 @@ const Layout: React.FC = () => {
                         id="navbarNavAltMarkup"
                     >
                         <div className="navbar-nav me-auto mb-2 mb-md-0">
-                            <Link
-                                className="nav-link"
-                                aria-current="page"
+                            <NavLink
+                                className={
+                                    setting.isEnableBot
+                                        ? "nav-link"
+                                        : "nav-link disabled"
+                                }
+                                activeClassName="active"
                                 to="/chatters"
                             >
-                                Chatters
-                            </Link>
-                            <Link
-                                className="nav-link"
-                                aria-current="page"
+                                <FormattedMessage
+                                    id="Common.Chatters.Name"
+                                    defaultMessage="Chatters"
+                                />
+                            </NavLink>
+                            <NavLink
+                                className={
+                                    setting.isEnableBot
+                                        ? "nav-link"
+                                        : "nav-link disabled"
+                                }
+                                activeClassName="active"
                                 to="/raiders"
                             >
-                                Raiders
-                            </Link>
-                            <Link
-                                className="nav-link"
-                                aria-current="page"
+                                <FormattedMessage
+                                    id="Common.Raiders.Name"
+                                    defaultMessage="Raiders"
+                                />
+                            </NavLink>
+                            <NavLink
+                                className={
+                                    setting.isEnableBot
+                                        ? "nav-link"
+                                        : "nav-link disabled"
+                                }
+                                activeClassName="active"
                                 to="/hosts"
                             >
-                                Hosts
-                            </Link>
-                            <Link
-                                className="nav-link"
-                                aria-current="page"
+                                <FormattedMessage
+                                    id="Common.Hosts.Name"
+                                    defaultMessage="Hosts"
+                                />
+                            </NavLink>
+                            <NavLink
+                                className={
+                                    setting.isEnableChannel
+                                        ? "nav-link"
+                                        : "nav-link disabled"
+                                }
+                                activeClassName="active"
                                 to="/channel"
                             >
-                                Channel
-                            </Link>
+                                <FormattedMessage
+                                    id="Common.Channel.Name"
+                                    defaultMessage="Channel"
+                                />
+                            </NavLink>
                         </div>
                         <div className="navbar-nav mb-2 mb-md-0 me-0 me-md-2">
-                            <Link
+                            <NavLink
                                 className="nav-link"
-                                aria-current="page"
+                                activeClassName="active"
                                 to="/settings"
                             >
-                                Settings
-                            </Link>
+                                <FormattedMessage
+                                    id="Common.Settings.Name"
+                                    defaultMessage="Settings"
+                                />
+                            </NavLink>
                         </div>
                         <ConnectComponent />
                     </div>
@@ -140,26 +184,37 @@ const Layout: React.FC = () => {
 
             <div className="container-fluid">
                 <main>
-                    <Switch>
-                        <Route path="/chatters">
-                            <ChattersPage />
-                        </Route>
-                        <Route path="/raiders">
-                            <RaidersPage />
-                        </Route>
-                        <Route path="/hosts">
-                            <HostsPage />
-                        </Route>
-                        <Route path="/channel">
-                            <ChannelPage />
-                        </Route>
-                        <Route path="/settings">
-                            <SettingPage />
-                        </Route>
-                        <Route path="/">
-                            <DashboardPage />
-                        </Route>
-                    </Switch>
+                    {setting.isEnableBot ? (
+                        <Switch>
+                            <Route path="/chatters">
+                                <ChattersPage />
+                            </Route>
+                            <Route path="/raiders">
+                                <RaidersPage />
+                            </Route>
+                            <Route path="/hosts">
+                                <HostsPage />
+                            </Route>
+                            <Route path="/channel">
+                                <ChannelPage />
+                            </Route>
+                            <Route path="/settings">
+                                <SettingPage />
+                            </Route>
+                            <Route path="/">
+                                <DashboardPage />
+                            </Route>
+                        </Switch>
+                    ) : (
+                        <Switch>
+                            <Route path="/settings">
+                                <SettingPage />
+                            </Route>
+                            <Route path="/">
+                                <NeedSettingPage />
+                            </Route>
+                        </Switch>
+                    )}
                 </main>
             </div>
         </Router>

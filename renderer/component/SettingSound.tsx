@@ -1,5 +1,6 @@
 import React from "react";
 import { useRecoilState } from "recoil";
+import { FormattedMessage } from "react-intl";
 
 // Recoil
 import SoundChatterVolumeState from "../atom/SoundChatterVolume";
@@ -38,9 +39,19 @@ const SettingSoundComponent: React.FC = () => {
 
     return (
         <section className="my-4">
-            <h3>Notification Sound</h3>
+            <h3>
+                <FormattedMessage
+                    id="Component.SettingSound.Header"
+                    defaultMessage="Notification Sound"
+                />
+            </h3>
 
-            <h4>Chatter</h4>
+            <h4>
+                <FormattedMessage
+                    id="Common.Chatters.Name"
+                    defaultMessage="Chatters"
+                />
+            </h4>
             <div className="row mb-0 mb-md-3">
                 <div className="mb-3 mb-md-0 col-md-2 text-center d-grid">
                     <button
@@ -48,12 +59,20 @@ const SettingSoundComponent: React.FC = () => {
                         onClick={selectFileHandler("chatter")}
                     >
                         <i className="bi bi-save me-2"></i>
-                        Select File
+                        <FormattedMessage
+                            id="Common.Label.SelectFile"
+                            defaultMessage="Select File"
+                        />
                     </button>
                 </div>
 
                 <div className="mb-3 mb-md-0 col-md-10">
-                    <label className="form-label">Volume</label>
+                    <label className="form-label">
+                        <FormattedMessage
+                            id="Common.Label.Volume"
+                            defaultMessage="Volume"
+                        />
+                    </label>
 
                     <div className="d-flex align-items-center">
                         <button
@@ -89,7 +108,12 @@ const SettingSoundComponent: React.FC = () => {
                 </div>
             </div>
 
-            <h4>Raid</h4>
+            <h4>
+                <FormattedMessage
+                    id="Common.Raiders.Name"
+                    defaultMessage="Raiders"
+                />
+            </h4>
             <div className="row mb-0 mb-md-3">
                 <div className="mb-3 mb-md-0 col-md-2 text-center d-grid">
                     <button
@@ -97,12 +121,20 @@ const SettingSoundComponent: React.FC = () => {
                         onClick={selectFileHandler("raid")}
                     >
                         <i className="bi bi-save me-2"></i>
-                        Select File
+                        <FormattedMessage
+                            id="Common.Label.SelectFile"
+                            defaultMessage="Select File"
+                        />
                     </button>
                 </div>
 
                 <div className="mb-3 mb-md-0 col-md-10">
-                    <label className="form-label">Volume</label>
+                    <label className="form-label">
+                        <FormattedMessage
+                            id="Common.Label.Volume"
+                            defaultMessage="Volume"
+                        />
+                    </label>
 
                     <div className="d-flex align-items-center">
                         <button
@@ -138,7 +170,12 @@ const SettingSoundComponent: React.FC = () => {
                 </div>
             </div>
 
-            <h4>Host</h4>
+            <h4>
+                <FormattedMessage
+                    id="Common.Hosts.Name"
+                    defaultMessage="Hosts"
+                />
+            </h4>
             <div className="row mb-0 mb-md-3">
                 <div className="mb-3 mb-md-0 col-md-2 text-center d-grid">
                     <button
@@ -146,12 +183,20 @@ const SettingSoundComponent: React.FC = () => {
                         onClick={selectFileHandler("host")}
                     >
                         <i className="bi bi-save me-2"></i>
-                        Select File
+                        <FormattedMessage
+                            id="Common.Label.SelectFile"
+                            defaultMessage="Select File"
+                        />
                     </button>
                 </div>
 
                 <div className="mb-3 mb-md-0 col-md-10">
-                    <label className="form-label">Volume</label>
+                    <label className="form-label">
+                        <FormattedMessage
+                            id="Common.Label.Volume"
+                            defaultMessage="Volume"
+                        />
+                    </label>
 
                     <div className="d-flex align-items-center">
                         <button

@@ -1,5 +1,6 @@
 import React from "react";
 import { useSetRecoilState } from "recoil";
+import { FormattedMessage } from "react-intl";
 
 // Recoil
 import IsConnectingState from "../atom/IsConnecting";
@@ -43,7 +44,10 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
             onClick={clickHandler}
         >
             <i className="bi bi-speaker me-2"></i>
-            ShoutOut
+            <FormattedMessage
+                id="Common.Label.ShoutOut"
+                defaultMessage="ShoutOut"
+            />
         </button>
     );
 };
