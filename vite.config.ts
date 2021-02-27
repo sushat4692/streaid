@@ -11,7 +11,6 @@ export default defineConfig({
             "electron-is-dev",
             "electron-store",
             "fs-extra",
-            "jsdom",
             "nedb-promises",
             "node-fetch",
             "tmi.js",

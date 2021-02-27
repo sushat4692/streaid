@@ -16,7 +16,7 @@ const ChattersPage: React.FC = () => {
 
     useEffect(() => {
         (async () => {
-            const hosts = await request<{}, HostRowType[]>("host", {}, []);
+            const hosts = await request<null, HostRowType[]>("host", null, []);
             updateHosts([...hosts]);
         })();
     }, []);

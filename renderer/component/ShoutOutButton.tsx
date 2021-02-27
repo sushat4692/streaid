@@ -20,7 +20,7 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
     channel,
     username,
     className,
-}) => {
+}: Props) => {
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
     const clickHandler = async () => {

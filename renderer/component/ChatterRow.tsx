@@ -15,7 +15,7 @@ type Props = {
     chatter: ChatterRowType;
 };
 
-const ChatterRowComponent: React.FC<Props> = ({ chatter }) => {
+const ChatterRowComponent: React.FC<Props> = ({ chatter }: Props) => {
     const updateChatters = useSetRecoilState(ChattersState);
 
     const deleteClickHandler = async () => {

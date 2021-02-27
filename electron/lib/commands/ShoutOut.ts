@@ -27,7 +27,11 @@ const shoutOut = async (values: {
             return values.postChannel;
         }
 
-        const User = await TwitchAPI.getUserById(values.postRoomId!);
+        if (!values.postRoomId) {
+            return null;
+        }
+
+        const User = await TwitchAPI.getUserById(values.postRoomId);
         if (!User) {
             return null;
         }
@@ -41,16 +45,16 @@ const shoutOut = async (values: {
 
     const replaceVariableMessage = (
         message: string,
-        hasUser: boolean = true,
-        hasChannel: boolean = true
+        hasUser = true,
+        hasChannel = true
     ) => {
         return message
             .replaceAll("%url%", `https://www.twitch.tv/${values.username}`)
-            .replaceAll("%username%", hasUser ? User!.displayName : "")
+            .replaceAll("%username%", hasUser && User ? User.displayName : "")
             .replaceAll("%user_id%", values.username)
             .replaceAll(
                 "%category%",
-                hasChannel ? shoutOutChannel!.gameName : ""
+                hasChannel && shoutOutChannel ? shoutOutChannel.gameName : ""
             );
     };
 

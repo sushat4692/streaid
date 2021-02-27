@@ -15,7 +15,7 @@ type Props = {
     host: HostRowType;
 };
 
-const ChatterRowComponent: React.FC<Props> = ({ host }) => {
+const ChatterRowComponent: React.FC<Props> = ({ host }: Props) => {
     const updateHostsState = useSetRecoilState(HostsState);
 
     const deleteClickHandler = async () => {

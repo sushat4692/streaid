@@ -16,9 +16,9 @@ const ChattersPage: React.FC = () => {
 
     useEffect(() => {
         (async () => {
-            const chatters = await request<{}, ChatterRowType[]>(
+            const chatters = await request<null, ChatterRowType[]>(
                 "chatter",
-                {},
+                null,
                 []
             );
             updateChatters([...chatters]);

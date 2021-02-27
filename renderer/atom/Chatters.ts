@@ -45,7 +45,7 @@ export interface ChatterRowType extends Document {
     "user-id"?: string;
     "tmi-sent-ts"?: string;
     flags?: string;
-    [paramater: string]: any;
+    [paramater: string]: unknown;
 }
 
 const state = atom<ChatterRowType[]>({

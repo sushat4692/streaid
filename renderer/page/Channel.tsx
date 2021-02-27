@@ -57,7 +57,7 @@ const ChannelPage: React.FC = () => {
         defaultLanguageOption,
         updateDefaultLanguageOption,
     ] = useState<OptionTypeBase>(null);
-    const [tagOption, updateTagOption] = useState<TagInterface[]>([]);
+    const [tagOption, _updateTagOption] = useState<TagInterface[]>([]);
 
     const getChannelInformation = async () => {
         updateIsConnecting(true);
