@@ -15,6 +15,7 @@ const messages: { [key: string]: string } = {
     "Common.Channel.Name": "Channel",
     "Common.Channel.Description": "You can check/update Channel information.",
     "Common.Settings.Name": "Settings",
+    "Common.License.Name": "License",
     "Common.Label.Username": "Username",
     "Common.Label.Channel": "チャンネル",
     "Common.Label.Displayname": "Displayname",

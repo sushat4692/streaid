@@ -2,9 +2,14 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 
+// Component
+import MetaComponent from "../component/Meta";
+
 export const NeedSettingPage: React.FC = () => {
     return (
         <section className="my-4">
+            <MetaComponent />
+
             <h2 className="display-4 mb-4 py-4 text-center fw-bolder">
                 <i className="bi bi-twitch me-2"></i>
                 <FormattedMessage

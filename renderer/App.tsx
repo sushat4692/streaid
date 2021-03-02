@@ -36,9 +36,11 @@ const App: React.FC = () => {
     useEffect(() => {
         requestEvent("bot:connected", () => {
             updateIsConnected(true);
+            updateIsConnecting(false);
         });
         requestEvent("bot:disconnected", () => {
             updateIsConnected(false);
+            updateIsConnecting(false);
         });
         requestEvent<ChatterRowType[]>("bot:chatted", (_, values) => {
             updateChatters([...values]);

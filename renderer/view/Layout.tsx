@@ -1,12 +1,6 @@
 import React, { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    NavLink,
-} from "react-router-dom";
-import { FormattedMessage } from "react-intl";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 // Type
 import { ResponseSettingType } from "../../types/SettingType";
@@ -23,6 +17,7 @@ import SoundHostVolumeState from "../atom/SoundHostVolume";
 import IsConnectingState from "../atom/IsConnecting";
 
 // Component
+import HeaderComponent from "../component/Header";
 import NeedSettingPage from "../page/NeedSetting";
 import DashboardPage from "../page/Dashboard";
 import ChattersPage from "../page/Chatters";
@@ -30,7 +25,7 @@ import RaidersPage from "../page/Raiders";
 import HostsPage from "../page/Hosts";
 import ChannelPage from "../page/Channel";
 import SettingPage from "../page/Setting";
-import ConnectComponent from "../component/Connect";
+import LicensePage from "../page/License";
 
 // Utils
 import { request } from "../util/request";
@@ -83,104 +78,7 @@ const Layout: React.FC = () => {
 
     return (
         <Router>
-            <header className="navbar navbar-expand-md navbar-dark sticky-top bg-dark shadow">
-                <div className="container-fluid">
-                    <NavLink className="navbar-brand" to="/">
-                        <i className="bi bi-twitch me-2"></i>
-                        <FormattedMessage
-                            id="Common.Title"
-                            defaultMessage="Twitch Support Tool"
-                        />
-                    </NavLink>
-                    <button
-                        className="navbar-toggler"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#navbarNavAltMarkup"
-                        aria-controls="navbarNavAltMarkup"
-                        aria-expanded="false"
-                        aria-label="Toggle navigation"
-                    >
-                        <span className="navbar-toggler-icon"></span>
-                    </button>
-                    <div
-                        className="collapse navbar-collapse"
-                        id="navbarNavAltMarkup"
-                    >
-                        <div className="navbar-nav me-auto mb-2 mb-md-0">
-                            <NavLink
-                                className={
-                                    setting.isEnableBot
-                                        ? "nav-link"
-                                        : "nav-link disabled"
-                                }
-                                activeClassName="active"
-                                to="/chatters"
-                            >
-                                <FormattedMessage
-                                    id="Common.Chatters.Name"
-                                    defaultMessage="Chatters"
-                                />
-                            </NavLink>
-                            <NavLink
-                                className={
-                                    setting.isEnableBot
-                                        ? "nav-link"
-                                        : "nav-link disabled"
-                                }
-                                activeClassName="active"
-                                to="/raiders"
-                            >
-                                <FormattedMessage
-                                    id="Common.Raiders.Name"
-                                    defaultMessage="Raiders"
-                                />
-                            </NavLink>
-                            <NavLink
-                                className={
-                                    setting.isEnableBot
-                                        ? "nav-link"
-                                        : "nav-link disabled"
-                                }
-                                activeClassName="active"
-                                to="/hosts"
-                            >
-                                <FormattedMessage
-                                    id="Common.Hosts.Name"
-                                    defaultMessage="Hosts"
-                                />
-                            </NavLink>
-                            <NavLink
-                                className={
-                                    setting.isEnableChannel
-                                        ? "nav-link"
-                                        : "nav-link disabled"
-                                }
-                                activeClassName="active"
-                                to="/channel"
-                            >
-                                <FormattedMessage
-                                    id="Common.Channel.Name"
-                                    defaultMessage="Channel"
-                                />
-                            </NavLink>
-                        </div>
-                        <div className="navbar-nav mb-2 mb-md-0 me-0 me-md-2">
-                            <NavLink
-                                className="nav-link"
-                                activeClassName="active"
-                                to="/settings"
-                            >
-                                <FormattedMessage
-                                    id="Common.Settings.Name"
-                                    defaultMessage="Settings"
-                                />
-                            </NavLink>
-                        </div>
-                        <ConnectComponent />
-                    </div>
-                </div>
-            </header>
+            <HeaderComponent />
 
             <div className="container-fluid">
                 <main>
@@ -201,6 +99,9 @@ const Layout: React.FC = () => {
                             <Route path="/settings">
                                 <SettingPage />
                             </Route>
+                            <Route path="/license">
+                                <LicensePage />
+                            </Route>
                             <Route path="/">
                                 <DashboardPage />
                             </Route>
@@ -209,6 +110,9 @@ const Layout: React.FC = () => {
                         <Switch>
                             <Route path="/settings">
                                 <SettingPage />
+                            </Route>
+                            <Route path="/license">
+                                <LicensePage />
                             </Route>
                             <Route path="/">
                                 <NeedSettingPage />
