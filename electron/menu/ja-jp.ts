@@ -24,12 +24,13 @@ const template: (MenuItem | MenuItemConstructorOptions)[] = [
     },
     {
         role: "help",
+        label: "ヘルプ",
         submenu: [
             {
                 label: "詳細はこちら",
                 click: async () => {
                     await shell.openExternal(
-                        "https://twitch-support-tool-docs.vercel.app/ja"
+                        "https://twitch-support-tool-docs.vercel.app/jp"
                     );
                 },
             },

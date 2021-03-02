@@ -18,7 +18,8 @@
         "pack:win": "electron-builder --win --x64",
         "electron": "electron ./dist/main.js",
         "lint": "eslint --ext .ts,tsx electron/** renderer/**",
-        "lint:fix": "eslint --fix --ext .ts,tsx electron/** renderer/**"
+        "lint:fix": "eslint --fix --ext .ts,tsx electron/** renderer/**",
+        "make:license": "ts-node ./cmd/license.ts"
     },
     "dependencies": {
         "@popperjs/core": "^2.8.6",
@@ -29,6 +30,7 @@
         "electron-is-dev": "^1.2.0",
         "electron-store": "^7.0.2",
         "fs-extra": "^9.1.0",
+        "license-report": "^4.5.0",
         "moment": "^2.29.1",
         "nedb-promises": "^4.1.1",
         "node-fetch": "^2.6.1",

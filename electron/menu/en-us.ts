@@ -24,6 +24,7 @@ const template: (MenuItem | MenuItemConstructorOptions)[] = [
     },
     {
         role: "help",
+        label: "Help",
         submenu: [
             {
                 label: "Learn More",
