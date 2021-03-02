@@ -7,6 +7,9 @@ import Select from "react-select";
 import LocaleState from "../atom/Locale";
 import IsInitedState from "../atom/IsInited";
 
+// Component
+import MetaComponent from "../component/Meta";
+
 // Utils
 import { request } from "../util/request";
 
@@ -31,6 +34,8 @@ const InitComponent: React.FC = () => {
 
     return (
         <div className="container-fluid">
+            <MetaComponent />
+
             <section className="d-flex justify-content-center align-items-center py-4 min-vh-100">
                 <div>
                     <h2 className="display-4 mb-4 py-4 text-center fw-bolder">

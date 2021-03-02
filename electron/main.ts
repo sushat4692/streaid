@@ -1,6 +1,12 @@
 import { app, BrowserWindow } from "electron";
 import path from "path";
 
+// Store
+import { getInstance as getStoreInstance } from "./store";
+
+// Menu
+import { setMenu } from "./menu";
+
 async function createWindow() {
     const win = new BrowserWindow({
         width: 800,
@@ -16,7 +22,14 @@ async function createWindow() {
     // win.webContents.openDevTools();
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+    const store = getStoreInstance();
+    const locale = store.get("locale");
+
+    setMenu(locale);
+
+    createWindow();
+});
 
 app.on("window-all-closed", async () => {
     if (process.platform !== "darwin") {

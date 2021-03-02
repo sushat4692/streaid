@@ -5,11 +5,16 @@ import { FormattedMessage } from "react-intl";
 // Util
 import { useSettingState } from "../util/setting";
 
+// Component
+import MetaComponent from "../component/Meta";
+
 const DashboardPage: React.FC = () => {
     const setting = useSettingState();
 
     return (
         <section className="my-4">
+            <MetaComponent />
+
             <h2 className="display-4 mb-4 py-4 text-center fw-bolder">
                 <i className="bi bi-twitch me-2"></i>
                 <FormattedMessage

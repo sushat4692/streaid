@@ -6,6 +6,7 @@ import { FormattedMessage } from "react-intl";
 import ChattersState, { ChatterRowType } from "../atom/Chatters";
 
 // Component
+import MetaComponent from "../component/Meta";
 import ChatterRowComponent from "../component/ChatterRow";
 
 // Util
@@ -27,6 +28,11 @@ const ChattersPage: React.FC = () => {
 
     return (
         <section className="my-4">
+            <MetaComponent
+                id="Common.Chatters.Name"
+                defaultMessage="Chatters"
+            />
+
             <h2 className="display-6 mb-3 fw-bolder">
                 <i className="bi bi-chat me-2"></i>
                 <FormattedMessage

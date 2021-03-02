@@ -22,6 +22,7 @@ import { request } from "../util/request";
 import { list as languageList } from "../const/languages";
 
 // Components
+import MetaComponent from "../component/Meta";
 import ChannelTemplateRowComponent from "../component/ChannelTemplateRow";
 
 interface ChannelInterface {
@@ -244,6 +245,8 @@ const ChannelPage: React.FC = () => {
 
     return (
         <>
+            <MetaComponent id="Common.Channel.Name" defaultMessage="Channel" />
+
             <h2 className="display-6 mt-4 mb-3 fw-bolder">
                 <i className="bi bi-camera-reels me-2"></i>
                 <FormattedMessage

@@ -36,9 +36,11 @@ const App: React.FC = () => {
     useEffect(() => {
         requestEvent("bot:connected", () => {
             updateIsConnected(true);
+            updateIsConnecting(false);
         });
         requestEvent("bot:disconnected", () => {
             updateIsConnected(false);
+            updateIsConnecting(false);
         });
         requestEvent<ChatterRowType[]>("bot:chatted", (_, values) => {
             updateChatters([...values]);
@@ -71,7 +73,7 @@ const App: React.FC = () => {
         (async () => {
             updateIsConnecting(true);
 
-            const settingLocale = await request("setting:locale", {}, "en-us");
+            const settingLocale = await request("setting:locale", {}, "ja-jp");
             updateLocale(settingLocale);
 
             const isInited: boolean = await request("get:init", null, true);

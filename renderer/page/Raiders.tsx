@@ -6,6 +6,7 @@ import { FormattedMessage } from "react-intl";
 import RaidersState, { RaiderRowType } from "../atom/Raiders";
 
 // Component
+import MetaComponent from "../component/Meta";
 import RaiderRowComponent from "../component/RaiderRow";
 
 // Util
@@ -27,6 +28,8 @@ const ChattersPage: React.FC = () => {
 
     return (
         <section className="my-4">
+            <MetaComponent id="Common.Raiders.Name" defaultMessage="Raiders" />
+
             <h2 className="display-6 mb-3 fw-bolder">
                 <i className="bi bi-tornado me-2"></i>
                 <FormattedMessage

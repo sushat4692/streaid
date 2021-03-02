@@ -6,6 +6,7 @@ import { FormattedMessage } from "react-intl";
 import HostsState, { HostRowType } from "../atom/Hosts";
 
 // Component
+import MetaComponent from "../component/Meta";
 import HostRowComponent from "../component/HostRow";
 
 // Util
@@ -23,6 +24,8 @@ const ChattersPage: React.FC = () => {
 
     return (
         <section className="my-4">
+            <MetaComponent id="Common.Hosts.Name" defaultMessage="Hosts" />
+
             <h2 className="display-6 mb-3 fw-bolder">
                 <i className="bi bi-display me-2"></i>
                 <FormattedMessage
