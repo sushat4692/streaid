@@ -22,8 +22,6 @@ const ConnectComonent: React.FC = () => {
         } else {
             await request("bot:connect", null, null);
         }
-
-        updateIsConnecting(false);
     };
 
     return (
