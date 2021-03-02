@@ -1,6 +1,6 @@
 {
     "name": "twitch-support-tool",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "main": "./dist/main.js",
     "description": "Streaming support tool for Twitch",
     "author": {
@@ -18,7 +18,8 @@
         "pack:win": "electron-builder --win --x64",
         "electron": "electron ./dist/main.js",
         "lint": "eslint --ext .ts,tsx electron/** renderer/**",
-        "lint:fix": "eslint --fix --ext .ts,tsx electron/** renderer/**"
+        "lint:fix": "eslint --fix --ext .ts,tsx electron/** renderer/**",
+        "make:license": "ts-node ./cmd/license.ts"
     },
     "dependencies": {
         "@popperjs/core": "^2.8.6",
@@ -29,11 +30,13 @@
         "electron-is-dev": "^1.2.0",
         "electron-store": "^7.0.2",
         "fs-extra": "^9.1.0",
+        "license-report": "^4.5.0",
         "moment": "^2.29.1",
         "nedb-promises": "^4.1.1",
         "node-fetch": "^2.6.1",
         "react": "^17.0.1",
         "react-dom": "^17.0.1",
+        "react-helmet": "^6.1.0",
         "react-intl": "^5.13.1",
         "react-router-dom": "^5.2.0",
         "react-select": "^4.1.0",
@@ -53,6 +56,7 @@
         "@types/node-fetch": "^2.5.8",
         "@types/react": "^17.0.2",
         "@types/react-dom": "^17.0.1",
+        "@types/react-helmet": "^6.1.0",
         "@types/react-router-dom": "^5.1.7",
         "@types/react-select": "^4.0.13",
         "@types/tmi.js": "^1.7.1",

@@ -13,6 +13,9 @@ import { getInstance as getStoreInstance } from "../store";
 import { getWindow } from "../util/window";
 import { playSound } from "../util/Sound";
 
+// Menu
+import { setMenu } from "../menu";
+
 ipcMain.handle("setting:locale", async () => {
     const store = getStoreInstance();
     return store.get("locale", "en-us");
@@ -20,6 +23,7 @@ ipcMain.handle("setting:locale", async () => {
 
 ipcMain.handle("setting:locale:update", async (_, values) => {
     const store = getStoreInstance();
+    setMenu(values);
     return store.set("locale", values);
 });
 
