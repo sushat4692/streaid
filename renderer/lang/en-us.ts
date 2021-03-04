@@ -14,9 +14,13 @@ const messages: { [key: string]: string } = {
         "Display user list that hosted to target channel.",
     "Common.Channel.Name": "Channel",
     "Common.Channel.Description": "You can check/update Channel information.",
+    "Common.UserMemo.Name": "User memo",
+    "Common.UserMemo.Description":
+        "You can store the target additional information.",
     "Common.Settings.Name": "Settings",
     "Common.License.Name": "License",
-    "Common.Label.Username": "Username",
+    "Common.Label.Username": "User name",
+    "Common.Label.NickName": "Nick name",
     "Common.Label.Channel": "チャンネル",
     "Common.Label.Displayname": "Displayname",
     "Common.Label.Autoloaded": "Autoloaded",
@@ -32,6 +36,7 @@ const messages: { [key: string]: string } = {
     "Common.Select.Placeholder": "Select...",
     "Common.Submit": "Submit",
     "Common.Apply": "Apply",
+    "Common.Close": "Close",
     "Common.SignIn": "Signin",
     "Common.SignOut": "Signout",
     "Common.Variable.Variable": "Variable",
@@ -87,6 +92,8 @@ const messages: { [key: string]: string } = {
     "Component.SettingShoutOutMessage.NotFound": "Not Found Message Template",
     // SettingSound
     "Component.SettingSound.Header": "Notification Sound",
+    // User
+    "Component.User.Memo": "Memo",
 };
 
 export default messages;

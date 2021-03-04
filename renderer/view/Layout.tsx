@@ -24,6 +24,7 @@ import ChattersPage from "../page/Chatters";
 import RaidersPage from "../page/Raiders";
 import HostsPage from "../page/Hosts";
 import ChannelPage from "../page/Channel";
+import UserMemoPage from "../page/UserMemo";
 import SettingPage from "../page/Setting";
 import LicensePage from "../page/License";
 
@@ -95,6 +96,9 @@ const Layout: React.FC = () => {
                             </Route>
                             <Route path="/channel">
                                 <ChannelPage />
+                            </Route>
+                            <Route path="/user_memo">
+                                <UserMemoPage />
                             </Route>
                             <Route path="/settings">
                                 <SettingPage />

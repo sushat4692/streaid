@@ -9,15 +9,11 @@ import IsConnectingState from "../atom/IsConnecting";
 import { request } from "../util/request";
 
 type Props = {
-    channel?: string;
-    roomId?: string;
     username: string;
     className?: string;
 };
 
 const ShoutOutButtonComponent: React.FC<Props> = ({
-    roomId,
-    channel,
     username,
     className,
 }: Props) => {
@@ -26,14 +22,7 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
     const clickHandler = async () => {
         updateIsConnecting(true);
 
-        await request<
-            { postRoomId?: string; postChannel?: string; username: string },
-            null
-        >(
-            "bot:shoutout",
-            { postRoomId: roomId, postChannel: channel, username },
-            null
-        );
+        await request<string, null>("bot:shoutout", username, null);
 
         updateIsConnecting(false);
     };

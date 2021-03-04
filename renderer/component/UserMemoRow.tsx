@@ -3,7 +3,7 @@ import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
 // Recoil
-import RaidersState, { RaiderRowType } from "../atom/Raiders";
+import UserMemoState, { UserMemoRowType } from "../atom/UserMemo";
 
 // Utility
 import { request } from "../util/request";
@@ -13,34 +13,34 @@ import UserComponent from "./User";
 import ShoutOutButtonComponent from "./ShoutOutButton";
 
 type Props = {
-    raider: RaiderRowType;
+    usermemo: UserMemoRowType;
 };
 
-const RaiderRowComponent: React.FC<Props> = ({ raider }: Props) => {
-    const updateRaidersState = useSetRecoilState(RaidersState);
+const UserMemoRowComponent: React.FC<Props> = ({ usermemo }: Props) => {
+    const updateUserMemo = useSetRecoilState(UserMemoState);
 
     const deleteClickHandler = async () => {
-        const raiders = await request<
+        const usermemos = await request<
             {
                 id: string;
             },
-            RaiderRowType[]
-        >("raider:delete", { id: raider._id }, []);
+            UserMemoRowType[]
+        >("usermemo:delete", { id: usermemo._id }, []);
 
-        updateRaidersState([...raiders]);
+        updateUserMemo([...usermemos]);
     };
 
     return (
         <tr>
             <td scope="row">
-                <UserComponent username={raider.username} />
+                <UserComponent username={usermemo.username} />
             </td>
-            <td>{raider.viewers}</td>
-            <td>{moment(raider.createdAt).format("MMM Do, kk:mm")}</td>
+            <td>{usermemo.nickname}</td>
+            <td>{moment(usermemo.createdAt).format("MMM Do, kk:mm")}</td>
             <td>
                 <ShoutOutButtonComponent
                     className="btn btn-sm btn-success me-1"
-                    username={raider.username}
+                    username={usermemo.username}
                 />
                 <button
                     className="btn btn-sm btn-danger"
@@ -53,4 +53,4 @@ const RaiderRowComponent: React.FC<Props> = ({ raider }: Props) => {
     );
 };
 
-export default RaiderRowComponent;
+export default UserMemoRowComponent;

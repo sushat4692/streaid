@@ -20,13 +20,7 @@ ipcMain.handle("bot:disconnect", () => {
     return;
 });
 
-ipcMain.handle(
-    "bot:shoutout",
-    async (
-        _e,
-        values: { postRoomId?: string; postChannel?: string; username: string }
-    ) => {
-        await ShoutOut(values);
-        return;
-    }
-);
+ipcMain.handle("bot:shoutout", async (_e, username: string) => {
+    await ShoutOut(username);
+    return;
+});

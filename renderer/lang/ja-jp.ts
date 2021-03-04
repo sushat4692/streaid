@@ -12,11 +12,14 @@ const messages: { [key: string]: string } = {
     "Common.Hosts.Name": "ホスト",
     "Common.Hosts.Description":
         "ホストをしてくれたユーザーの一覧を表示します。",
+    "Common.UserMemo.Name": "ユーザメモ",
+    "Common.UserMemo.Description": "ユーザの追加情報を保存します。",
     "Common.Channel.Name": "チャンネル",
     "Common.Channel.Description": "チャンネル情報の確認・更新します。",
     "Common.Settings.Name": "設定",
     "Common.License.Name": "ライセンス",
     "Common.Label.Username": "ユーザー名",
+    "Common.Label.NickName": "ニックネーム",
     "Common.Label.Channel": "チャンネル",
     "Common.Label.Displayname": "表示名",
     "Common.Label.Autoloaded": "自動ホスト",
@@ -32,6 +35,7 @@ const messages: { [key: string]: string } = {
     "Common.Select.Placeholder": "選択してください",
     "Common.Submit": "送信",
     "Common.Apply": "反映",
+    "Common.Close": "閉じる",
     "Common.SignIn": "ログイン",
     "Common.SignOut": "ログアウト",
     "Common.Variable.Variable": "変数名",
@@ -52,7 +56,8 @@ const messages: { [key: string]: string } = {
     /**
      * Pages
      */
-    // Chatters
+    // NeedSetting
+    "Page.NeedSetting.Lead": "アプリの設定を始めに行ってください。",
     // Channel
     "Page.Channel.Information.Header": "チャンネル情報",
     "Page.Channel.Information.TagNotice": "タグは現在編集不可です",
@@ -88,6 +93,8 @@ const messages: { [key: string]: string } = {
         "シャウトアウト対象不明時テンプレート",
     // SettingSound
     "Component.SettingSound.Header": "通知音設定",
+    // User
+    "Component.User.Memo": "メモ",
 };
 
 export default messages;

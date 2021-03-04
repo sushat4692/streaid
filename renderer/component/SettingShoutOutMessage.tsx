@@ -1,6 +1,7 @@
 import React from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
+import TextareaAutosize from "react-textarea-autosize";
 
 // Recoil
 import ShoutOutMessageState from "../atom/SettingShoutOutMessage";
@@ -69,7 +70,7 @@ const SettingBotComponent: React.FC = () => {
                                 defaultMessage="ShoutOut Message Template"
                             />
                         </label>
-                        <textarea
+                        <TextareaAutosize
                             name="shoutout_message"
                             id="shoutout_message"
                             rows={3}
@@ -78,7 +79,7 @@ const SettingBotComponent: React.FC = () => {
                             onChange={(e) =>
                                 updateShoutOutMessage(e.target.value)
                             }
-                        ></textarea>
+                        />
                     </div>
 
                     <div className="mb-3">
@@ -88,16 +89,16 @@ const SettingBotComponent: React.FC = () => {
                                 defaultMessage="Failed Message Template"
                             />
                         </label>
-                        <textarea
+                        <TextareaAutosize
                             name="shoutout_failed"
                             id="shoutout_failed"
                             rows={3}
                             className="form-control"
                             value={shoutOutFailed}
                             onChange={(e) =>
-                                updateShoutOutNotFound(e.target.value)
+                                updateShoutOutFailed(e.target.value)
                             }
-                        ></textarea>
+                        />
                     </div>
 
                     <div className="mb-3">
@@ -107,16 +108,16 @@ const SettingBotComponent: React.FC = () => {
                                 defaultMessage="Not Found Message Template"
                             />
                         </label>
-                        <textarea
+                        <TextareaAutosize
                             name="shoutout_not_found"
                             id="shoutout_not_found"
                             rows={3}
                             className="form-control"
                             value={shoutOutNotFound}
                             onChange={(e) =>
-                                updateShoutOutFailed(e.target.value)
+                                updateShoutOutNotFound(e.target.value)
                             }
-                        ></textarea>
+                        />
                     </div>
 
                     <button className="btn btn-primary">

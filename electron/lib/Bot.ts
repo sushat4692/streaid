@@ -99,10 +99,7 @@ class Bot {
                 }
                 case "!so": {
                     if (messages.length) {
-                        ShoutOut({
-                            postChannel: channel,
-                            username: messages[0],
-                        });
+                        ShoutOut(messages[0]);
                     } else {
                         console.log(
                             `* You need to add username: e.g. !so {username}`

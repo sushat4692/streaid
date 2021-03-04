@@ -153,6 +153,37 @@ const DashboardPage: React.FC = () => {
                         </Link>
                     </div>
                 </div>
+
+                <div className="card">
+                    <div className="card-body">
+                        <h5 className="card-title">
+                            <i className="bi bi-people me-2"></i>
+                            <FormattedMessage
+                                id="Common.UserMemo.Name"
+                                defaultMessage="Channel"
+                            />
+                        </h5>
+                        <p className="card-text">
+                            <FormattedMessage
+                                id="Common.UserMemo.Description"
+                                defaultMessage="You can store the target additional information."
+                            />
+                        </p>
+                        <Link
+                            to="/user_memo"
+                            className={
+                                setting.isEnableBot
+                                    ? "btn btn-primary stretched-link"
+                                    : "btn btn-primary disabled"
+                            }
+                        >
+                            <FormattedMessage
+                                id="View.Dashboard.CheckButton"
+                                defaultMessage="Check"
+                            />
+                        </Link>
+                    </div>
+                </div>
             </div>
         </section>
     );

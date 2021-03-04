@@ -51,3 +51,4 @@ import "./ipcMain/Chatter";
 import "./ipcMain/Raider";
 import "./ipcMain/Host";
 import "./ipcMain/Bot";
+import "./ipcMain/UserMemo";

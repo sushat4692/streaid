@@ -101,6 +101,20 @@ const HeaderComponent: React.FC = () => {
                                 defaultMessage="Channel"
                             />
                         </NavLink>
+                        <NavLink
+                            className={
+                                setting.isEnableBot
+                                    ? "nav-link"
+                                    : "nav-link disabled"
+                            }
+                            activeClassName="active"
+                            to="/user_memo"
+                        >
+                            <FormattedMessage
+                                id="Common.UserMemo.Name"
+                                defaultMessage="User memo"
+                            />
+                        </NavLink>
                     </div>
                     <div className="navbar-nav mb-2 mb-md-0 me-0 me-md-2">
                         <NavLink

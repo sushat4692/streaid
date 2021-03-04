@@ -1,59 +1,51 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
 
 // Recoil
-import ChattersState, { ChatterRowType } from "../atom/Chatters";
+import UserMemoState, { UserMemoRowType } from "../atom/UserMemo";
 
 // Component
 import MetaComponent from "../component/Meta";
-import ChatterRowComponent from "../component/ChatterRow";
+import UserMemoRowComponent from "../component/UserMemoRow";
 
 // Util
 import { request } from "../util/request";
 
-const ChattersPage: React.FC = () => {
-    const [chatters, updateChatters] = useRecoilState(ChattersState);
+const UserMemoPage: React.FC = () => {
+    const [userMemos, updateUserMemos] = useRecoilState(UserMemoState);
 
     useEffect(() => {
         (async () => {
-            const chatters = await request<null, ChatterRowType[]>(
-                "chatter",
+            const memos = await request<null, UserMemoRowType[]>(
+                "usermemo",
                 null,
-                [
-                    {
-                        _id: "1",
-                        "message-type": "chat",
-                        username: "username",
-                        "display-name": "displayname",
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                    },
-                ]
+                []
             );
-            updateChatters([...chatters]);
+
+            updateUserMemos(memos);
         })();
     }, []);
 
     return (
         <section className="my-4">
             <MetaComponent
-                id="Common.Chatters.Name"
-                defaultMessage="Chatters"
+                id="Common.UserMemo.Name"
+                defaultMessage="User memo"
             />
 
             <h2 className="display-6 mb-3 fw-bolder">
-                <i className="bi bi-chat me-2"></i>
+                <i className="bi bi-people me-2"></i>
                 <FormattedMessage
-                    id="Common.Chatters.Name"
-                    defaultMessage="Chatters"
+                    id="Common.UserMemo.Name"
+                    defaultMessage="User memo"
                 />
             </h2>
 
             <p className="lead">
                 <FormattedMessage
-                    id="Common.Chatters.Description"
-                    defaultMessage="Display user list that comment to target channel."
+                    id="Common.UserMemo.Description"
+                    defaultMessage="You can store the target additional information."
                 />
             </p>
 
@@ -75,8 +67,8 @@ const ChattersPage: React.FC = () => {
                             </th>
                             <th scope="col">
                                 <FormattedMessage
-                                    id="Common.Label.Displayname"
-                                    defaultMessage="Displayname"
+                                    id="Common.Label.NickName"
+                                    defaultMessage="Nick name"
                                 />
                             </th>
                             <th scope="col">
@@ -89,12 +81,12 @@ const ChattersPage: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {chatters.map((chatter) => {
+                        {userMemos.map((usermemo) => {
                             return (
-                                <ChatterRowComponent
-                                    chatter={chatter}
-                                    key={chatter._id}
-                                ></ChatterRowComponent>
+                                <UserMemoRowComponent
+                                    usermemo={usermemo}
+                                    key={usermemo._id}
+                                ></UserMemoRowComponent>
                             );
                         })}
                     </tbody>
@@ -104,4 +96,4 @@ const ChattersPage: React.FC = () => {
     );
 };
 
-export default ChattersPage;
+export default UserMemoPage;
