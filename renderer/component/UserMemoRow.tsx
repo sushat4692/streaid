@@ -35,7 +35,6 @@ const UserMemoRowComponent: React.FC<Props> = ({ usermemo }: Props) => {
             <td scope="row">
                 <UserComponent username={usermemo.username} />
             </td>
-            <td>{usermemo.nickname}</td>
             <td>{moment(usermemo.createdAt).format("MMM Do, kk:mm")}</td>
             <td>
                 <ShoutOutButtonComponent

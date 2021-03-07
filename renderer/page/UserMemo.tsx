@@ -53,7 +53,6 @@ const UserMemoPage: React.FC = () => {
                 <table className="table">
                     <colgroup>
                         <col />
-                        <col />
                         <col width="140" />
                         <col width="160" />
                     </colgroup>
@@ -64,8 +63,7 @@ const UserMemoPage: React.FC = () => {
                                     id="Common.Label.Username"
                                     defaultMessage="Username"
                                 />
-                            </th>
-                            <th scope="col">
+                                /
                                 <FormattedMessage
                                     id="Common.Label.NickName"
                                     defaultMessage="Nick name"

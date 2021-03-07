@@ -57,6 +57,11 @@ const ChattersPage: React.FC = () => {
                                     id="Common.Label.Username"
                                     defaultMessage="Username"
                                 />
+                                /
+                                <FormattedMessage
+                                    id="Common.Label.NickName"
+                                    defaultMessage="Nick name"
+                                />
                             </th>
                             <th scope="col">
                                 <FormattedMessage

@@ -41,6 +41,7 @@
         "react-router-dom": "^5.2.0",
         "react-select": "^4.1.0",
         "react-textarea-autosize": "^8.3.2",
+        "react-tooltip": "^4.2.15",
         "recoil": "^0.1.2",
         "tmi.js": "^1.7.2",
         "twitch": "^4.4.12",
@@ -117,5 +118,9 @@
         "linux": {
             "icon": "build/icons"
         }
+    },
+    "volta": {
+        "node": "14.16.0",
+        "npm": "7.6.1"
     }
 }

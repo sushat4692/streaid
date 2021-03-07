@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useSetRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
 import TextareaAutosize from "react-textarea-autosize";
+import ReactTooltip from "react-tooltip";
 import { Modal } from "bootstrap";
 
 // Recoil
@@ -9,6 +10,7 @@ import UserMemoState, { UserMemoRowType } from "../atom/UserMemo";
 
 // Util
 import { request } from "../util/request";
+import { nl2br } from "../util/nl2br";
 
 interface Props {
     username: string;
@@ -21,6 +23,21 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
     const [nickname, updateNickname] = useState("");
     const [memo, updateMemo] = useState("");
     const updateUserMemo = useSetRecoilState(UserMemoState);
+
+    const getUserMemoInformation = async () => {
+        return await request<string, UserMemoRowType>(
+            "usermemo:one",
+            username,
+            {
+                _id: "1",
+                username: "username",
+                nickname: "nickname",
+                memo: "memo",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            }
+        );
+    };
 
     const onSubmitHandler = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -44,19 +61,25 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
         }
     };
 
+    const closeHandler = async () => {
+        const usermemo = await getUserMemoInformation();
+
+        if (usermemo) {
+            updateNickname(usermemo.nickname);
+            updateMemo(usermemo.memo);
+        }
+
+        if (modalClass) {
+            modalClass.toggle();
+        }
+    };
+
     useEffect(() => {
         if (modal.current) {
             updateModalClass(new Modal(modal.current));
         }
 
-        request<string, UserMemoRowType>("usermemo:one", username, {
-            _id: "1",
-            username: "username",
-            nickname: "nickname",
-            memo: "memo",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-        }).then((usermemo) => {
+        getUserMemoInformation().then((usermemo) => {
             if (usermemo) {
                 updateNickname(usermemo.nickname);
                 updateMemo(usermemo.memo);
@@ -66,15 +89,37 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
 
     return (
         <>
-            <button
-                className="btn btn-link"
-                onClick={() => {
-                    if (modalClass) {
-                        modalClass.toggle();
-                    }
-                }}
-            >
-                {username}
+            {nickname.length ? (
+                <>
+                    <span
+                        className="d-inline-block"
+                        data-tip={memo ? memo : false}
+                    >
+                        {nickname}
+                    </span>
+                    {memo.length ? (
+                        <ReactTooltip
+                            place="right"
+                            type="dark"
+                            effect="solid"
+                            getContent={(content) => {
+                                return (
+                                    <div style={{ whiteSpace: "pre-wrap" }}>
+                                        {content}
+                                    </div>
+                                );
+                            }}
+                        />
+                    ) : (
+                        ""
+                    )}
+                </>
+            ) : (
+                username
+            )}
+
+            <button className="btn btn-link btn-sm" onClick={closeHandler}>
+                <i className="bi bi-pencil"></i>
             </button>
 
             <form
@@ -91,11 +136,7 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
                                 type="button"
                                 className="btn-close"
                                 aria-label="Close"
-                                onClick={() => {
-                                    if (modalClass) {
-                                        modalClass.hide();
-                                    }
-                                }}
+                                onClick={closeHandler}
                             ></button>
                         </div>
                         <div className="modal-body">
@@ -135,11 +176,7 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
                             <button
                                 type="button"
                                 className="btn btn-secondary"
-                                onClick={() => {
-                                    if (modalClass) {
-                                        modalClass.hide();
-                                    }
-                                }}
+                                onClick={closeHandler}
                             >
                                 <FormattedMessage
                                     id="Common.Close"

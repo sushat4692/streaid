@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { NavLink, useHistory } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
+// import { Collapse } from "bootstrap";
 
 // Component
 import ConnectComponent from "./Connect";
@@ -23,11 +24,7 @@ const HeaderComponent: React.FC = () => {
         <header className="navbar navbar-expand-md navbar-dark sticky-top bg-dark shadow">
             <div className="container-fluid">
                 <NavLink className="navbar-brand" to="/">
-                    <i className="bi bi-twitch me-2"></i>
-                    <FormattedMessage
-                        id="Common.Title"
-                        defaultMessage="Twitch Support Tool"
-                    />
+                    <i className="bi bi-twitch"></i>
                 </NavLink>
                 <button
                     className="navbar-toggler"
