@@ -12,6 +12,7 @@ import ShoutOutMessageState from "../atom/SettingShoutOutMessage";
 import ShoutOutNotFoundState from "../atom/SettingShoutOutNotFound";
 import ShoutOutFailedState from "../atom/SettingShoutOutFailed";
 import SoundChatterVolumeState from "../atom/SoundChatterVolume";
+import SoundChatVolumeState from "../atom/SoundChatVolume";
 import SoundRaidVolumeState from "../atom/SoundRaidVolume";
 import SoundHostVolumeState from "../atom/SoundHostVolume";
 import IsConnectingState from "../atom/IsConnecting";
@@ -41,6 +42,7 @@ const Layout: React.FC = () => {
     const updateShoutOutNotFound = useSetRecoilState(ShoutOutNotFoundState);
     const updateShoutOutFailed = useSetRecoilState(ShoutOutFailedState);
     const updateSoundChatterVolume = useSetRecoilState(SoundChatterVolumeState);
+    const updateSoundChatVolume = useSetRecoilState(SoundChatVolumeState);
     const updateSoundRaidVolume = useSetRecoilState(SoundRaidVolumeState);
     const updateSoundHostVolume = useSetRecoilState(SoundHostVolumeState);
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
@@ -59,6 +61,7 @@ const Layout: React.FC = () => {
                     shoutout_not_found: "",
                     shoutout_failed: "",
                     chatter_volume: 1,
+                    chat_volume: 1,
                     raid_volume: 1,
                     host_volume: 1,
                 }
@@ -70,6 +73,7 @@ const Layout: React.FC = () => {
             updateShoutOutNotFound(defaultValue.shoutout_not_found);
             updateShoutOutFailed(defaultValue.shoutout_failed);
             updateSoundChatterVolume(defaultValue.chatter_volume);
+            updateSoundChatVolume(defaultValue.chat_volume);
             updateSoundRaidVolume(defaultValue.raid_volume);
             updateSoundHostVolume(defaultValue.host_volume);
 

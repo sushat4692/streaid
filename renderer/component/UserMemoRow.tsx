@@ -45,7 +45,7 @@ const UserMemoRowComponent: React.FC<Props> = ({ usermemo }: Props) => {
                     className="btn btn-sm btn-danger"
                     onClick={deleteClickHandler}
                 >
-                    <i className="bi bi-trash"></i>
+                    <i className="bi bi-trash" />
                 </button>
             </td>
         </tr>

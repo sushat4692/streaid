@@ -8,7 +8,7 @@ import { getInstance as getStoreInstance } from "../store";
 
 export const playSound = async (
     win: BrowserWindow | null,
-    mode: "chatter" | "raid" | "host"
+    mode: "chatter" | "chat" | "raid" | "host"
 ) => {
     if (!win) {
         return false;

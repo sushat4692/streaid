@@ -121,7 +121,7 @@ const SettingBotComponent: React.FC = () => {
                     </div>
 
                     <button className="btn btn-primary">
-                        <i className="bi bi-archive me-2"></i>
+                        <i className="bi bi-archive me-2" />
                         <FormattedMessage
                             id="Common.Submit"
                             defaultMessage="Submit"

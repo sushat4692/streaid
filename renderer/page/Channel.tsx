@@ -248,7 +248,7 @@ const ChannelPage: React.FC = () => {
             <MetaComponent id="Common.Channel.Name" defaultMessage="Channel" />
 
             <h2 className="display-6 mt-4 mb-3 fw-bolder">
-                <i className="bi bi-camera-reels me-2"></i>
+                <i className="bi bi-camera-reels me-2" />
                 <FormattedMessage
                     id="Common.Channel.Name"
                     defaultMessage="Channel"
@@ -460,7 +460,7 @@ const ChannelPage: React.FC = () => {
                                         defaultMessage="Created"
                                     />
                                 </th>
-                                <th scope="col"></th>
+                                <th scope="col" />
                             </tr>
                         </thead>
                         <tbody>

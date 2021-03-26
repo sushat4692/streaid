@@ -3,6 +3,7 @@ const messages: { [key: string]: string } = {
      * Common
      */
     "Common.Title": "Twitch Support Tool",
+    "Common.Chats.Name": "Chats",
     "Common.Chatters.Name": "Chatters",
     "Common.Chatters.Description":
         "Display user list that comment to target channel.",
@@ -92,6 +93,12 @@ const messages: { [key: string]: string } = {
     "Component.SettingShoutOutMessage.NotFound": "Not Found Message Template",
     // SettingSound
     "Component.SettingSound.Header": "Notification Sound",
+    "Component.SettingSoundChats.Descript":
+        "Play selected sound per all the chats",
+    "Component.SettingSoundChatters.Descript":
+        "Play selected sound per the first chat per persons",
+    "Component.SettingSoundHosts.Descript": "Play selected sound per raids",
+    "Component.SettingSoundRaiders.Descript": "Play selected sound per hosts",
     // User
     "Component.User.Memo": "Memo",
 };

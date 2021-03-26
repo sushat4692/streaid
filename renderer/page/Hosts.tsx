@@ -27,7 +27,7 @@ const ChattersPage: React.FC = () => {
             <MetaComponent id="Common.Hosts.Name" defaultMessage="Hosts" />
 
             <h2 className="display-6 mb-3 fw-bolder">
-                <i className="bi bi-display me-2"></i>
+                <i className="bi bi-display me-2" />
                 <FormattedMessage
                     id="Common.Hosts.Name"
                     defaultMessage="Hosts"
@@ -81,16 +81,13 @@ const ChattersPage: React.FC = () => {
                                     defaultMessage="Created"
                                 />
                             </th>
-                            <th scope="col"></th>
+                            <th scope="col" />
                         </tr>
                     </thead>
                     <tbody>
                         {hosts.map((host) => {
                             return (
-                                <HostRowComponent
-                                    host={host}
-                                    key={host._id}
-                                ></HostRowComponent>
+                                <HostRowComponent host={host} key={host._id} />
                             );
                         })}
                     </tbody>

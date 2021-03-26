@@ -127,6 +127,8 @@ class Bot {
             });
             notification.show();
             playSound(win, "chatter");
+        } else {
+            playSound(win, "chat");
         }
 
         if (win) {

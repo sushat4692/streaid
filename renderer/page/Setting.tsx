@@ -17,7 +17,7 @@ const SettnigPage: React.FC = () => {
             />
 
             <h2 className="display-6 mt-4 mb-3 fw-bolder">
-                <i className="bi bi-gear me-2"></i>
+                <i className="bi bi-gear me-2" />
                 <FormattedMessage
                     id="Common.Settings.Name"
                     defaultMessage="Settings"

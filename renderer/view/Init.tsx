@@ -39,7 +39,7 @@ const InitComponent: React.FC = () => {
             <section className="d-flex justify-content-center align-items-center py-4 min-vh-100">
                 <div>
                     <h2 className="display-4 mb-4 py-4 text-center fw-bolder">
-                        <i className="bi bi-twitch me-2"></i>
+                        <i className="bi bi-twitch me-2" />
                         <FormattedMessage
                             id="Common.Title"
                             defaultMessage="Twitch Support Tool"
@@ -71,7 +71,7 @@ const InitComponent: React.FC = () => {
                                     id: "Common.Select.Placeholder",
                                     defaultMessage: "Select...",
                                 })}
-                            ></Select>
+                            />
                         </div>
 
                         <button

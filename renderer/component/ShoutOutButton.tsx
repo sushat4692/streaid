@@ -32,7 +32,7 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
             className={className || "btn btn-success"}
             onClick={clickHandler}
         >
-            <i className="bi bi-speaker me-2"></i>
+            <i className="bi bi-speaker me-2" />
             <FormattedMessage
                 id="Common.Label.ShoutOut"
                 defaultMessage="ShoutOut"

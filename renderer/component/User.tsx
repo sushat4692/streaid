@@ -10,7 +10,6 @@ import UserMemoState, { UserMemoRowType } from "../atom/UserMemo";
 
 // Util
 import { request } from "../util/request";
-import { nl2br } from "../util/nl2br";
 
 interface Props {
     username: string;
@@ -89,37 +88,53 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
 
     return (
         <>
-            {nickname.length ? (
+            {memo.length ? (
                 <>
                     <span
                         className="d-inline-block"
                         data-tip={memo ? memo : false}
                     >
-                        {nickname}
+                        {nickname.length ? (
+                            <>
+                                {nickname}
+                                <small className="ms-2 text-muted">
+                                    ({username})
+                                </small>
+                            </>
+                        ) : (
+                            username
+                        )}
                     </span>
-                    {memo.length ? (
-                        <ReactTooltip
-                            place="right"
-                            type="dark"
-                            effect="solid"
-                            getContent={(content) => {
-                                return (
-                                    <div style={{ whiteSpace: "pre-wrap" }}>
-                                        {content}
-                                    </div>
-                                );
-                            }}
-                        />
-                    ) : (
-                        ""
-                    )}
+                    <ReactTooltip
+                        place="right"
+                        type="dark"
+                        effect="solid"
+                        getContent={(content) => {
+                            return (
+                                <div style={{ whiteSpace: "pre-wrap" }}>
+                                    {content}
+                                </div>
+                            );
+                        }}
+                    />
                 </>
             ) : (
-                username
+                <>
+                    {nickname.length ? (
+                        <>
+                            {nickname}
+                            <small className="ms-2 text-muted">
+                                ({username})
+                            </small>
+                        </>
+                    ) : (
+                        username
+                    )}
+                </>
             )}
 
             <button className="btn btn-link btn-sm" onClick={closeHandler}>
-                <i className="bi bi-pencil"></i>
+                <i className="bi bi-pencil" />
             </button>
 
             <form
@@ -137,7 +152,7 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
                                 className="btn-close"
                                 aria-label="Close"
                                 onClick={closeHandler}
-                            ></button>
+                            />
                         </div>
                         <div className="modal-body">
                             <div className="mb-3">
@@ -154,7 +169,7 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
                                     onChange={(e) => {
                                         updateNickname(e.target.value);
                                     }}
-                                ></input>
+                                />
                             </div>
                             <div className="mb-3">
                                 <label className="form-label">

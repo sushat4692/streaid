@@ -16,7 +16,7 @@ const DashboardPage: React.FC = () => {
             <MetaComponent />
 
             <h2 className="display-4 mb-4 py-4 text-center fw-bolder">
-                <i className="bi bi-twitch me-2"></i>
+                <i className="bi bi-twitch me-2" />
                 <FormattedMessage
                     id="Common.Title"
                     defaultMessage="Twitch Support Tool"
@@ -33,7 +33,7 @@ const DashboardPage: React.FC = () => {
                 <div className="card">
                     <div className="card-body">
                         <h5 className="card-title">
-                            <i className="bi bi-chat me-2"></i>
+                            <i className="bi bi-chat me-2" />
                             <FormattedMessage
                                 id="Common.Chatters.Name"
                                 defaultMessage="Chatters"
@@ -64,7 +64,7 @@ const DashboardPage: React.FC = () => {
                 <div className="card">
                     <div className="card-body">
                         <h5 className="card-title">
-                            <i className="bi bi-tornado me-2"></i>
+                            <i className="bi bi-tornado me-2" />
                             <FormattedMessage
                                 id="Common.Raiders.Name"
                                 defaultMessage="Raiders"
@@ -95,7 +95,7 @@ const DashboardPage: React.FC = () => {
                 <div className="card">
                     <div className="card-body">
                         <h5 className="card-title">
-                            <i className="bi bi-display me-2"></i>
+                            <i className="bi bi-display me-2" />
                             <FormattedMessage
                                 id="Common.Hosts.Name"
                                 defaultMessage="Hosts"
@@ -126,7 +126,7 @@ const DashboardPage: React.FC = () => {
                 <div className="card">
                     <div className="card-body">
                         <h5 className="card-title">
-                            <i className="bi bi-camera-reels me-2"></i>
+                            <i className="bi bi-camera-reels me-2" />
                             <FormattedMessage
                                 id="Common.Channel.Name"
                                 defaultMessage="Channel"
@@ -157,7 +157,7 @@ const DashboardPage: React.FC = () => {
                 <div className="card">
                     <div className="card-body">
                         <h5 className="card-title">
-                            <i className="bi bi-people me-2"></i>
+                            <i className="bi bi-people me-2" />
                             <FormattedMessage
                                 id="Common.UserMemo.Name"
                                 defaultMessage="Channel"

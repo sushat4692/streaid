@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
 
@@ -35,7 +35,7 @@ const UserMemoPage: React.FC = () => {
             />
 
             <h2 className="display-6 mb-3 fw-bolder">
-                <i className="bi bi-people me-2"></i>
+                <i className="bi bi-people me-2" />
                 <FormattedMessage
                     id="Common.UserMemo.Name"
                     defaultMessage="User memo"
@@ -75,7 +75,7 @@ const UserMemoPage: React.FC = () => {
                                     defaultMessage="Created"
                                 />
                             </th>
-                            <th scope="col"></th>
+                            <th scope="col" />
                         </tr>
                     </thead>
                     <tbody>
@@ -84,7 +84,7 @@ const UserMemoPage: React.FC = () => {
                                 <UserMemoRowComponent
                                     usermemo={usermemo}
                                     key={usermemo._id}
-                                ></UserMemoRowComponent>
+                                />
                             );
                         })}
                     </tbody>

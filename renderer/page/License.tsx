@@ -17,7 +17,7 @@ const DashboardPage: React.FC = () => {
             <MetaComponent id="Common.License.Name" defaultMessage="License" />
 
             <h2 className="display-6 mb-3 fw-bolder">
-                <i className="bi bi-book me-2"></i>
+                <i className="bi bi-book me-2" />
                 <FormattedMessage
                     id="Common.License.Name"
                     defaultMessage="License"

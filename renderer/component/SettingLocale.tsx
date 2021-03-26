@@ -47,7 +47,7 @@ const SettingBotComponent: React.FC = () => {
                     id: "Common.Select.Placeholder",
                     defaultMessage: "Select...",
                 })}
-            ></Select>
+            />
         </section>
     );
 };

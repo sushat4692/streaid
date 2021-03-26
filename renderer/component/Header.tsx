@@ -24,7 +24,7 @@ const HeaderComponent: React.FC = () => {
         <header className="navbar navbar-expand-md navbar-dark sticky-top bg-dark shadow">
             <div className="container-fluid">
                 <NavLink className="navbar-brand" to="/">
-                    <i className="bi bi-twitch"></i>
+                    <i className="bi bi-twitch" />
                 </NavLink>
                 <button
                     className="navbar-toggler"
@@ -35,7 +35,7 @@ const HeaderComponent: React.FC = () => {
                     aria-expanded="false"
                     aria-label="Toggle navigation"
                 >
-                    <span className="navbar-toggler-icon"></span>
+                    <span className="navbar-toggler-icon" />
                 </button>
                 <div
                     className="collapse navbar-collapse"

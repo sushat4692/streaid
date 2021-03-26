@@ -3,6 +3,7 @@ const messages: { [key: string]: string } = {
      * Common
      */
     "Common.Title": "Twitchサポートツール",
+    "Common.Chats.Name": "チャット毎",
     "Common.Chatters.Name": "チャット",
     "Common.Chatters.Description":
         "チャットをしてくれたユーザーの一覧を表示します。",
@@ -93,6 +94,12 @@ const messages: { [key: string]: string } = {
         "シャウトアウト対象不明時テンプレート",
     // SettingSound
     "Component.SettingSound.Header": "通知音設定",
+    "Component.SettingSoundChats.Descript":
+        "全てのチャット毎にサウンドを鳴らします",
+    "Component.SettingSoundChatters.Descript":
+        "初めてチャットをされた時にサウンドを鳴らします",
+    "Component.SettingSoundHosts.Descript": "レイド毎にサウンドを鳴らします",
+    "Component.SettingSoundRaiders.Descript": "ホスト毎にサウンドを鳴らします",
     // User
     "Component.User.Memo": "メモ",
 };

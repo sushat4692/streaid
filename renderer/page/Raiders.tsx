@@ -31,7 +31,7 @@ const ChattersPage: React.FC = () => {
             <MetaComponent id="Common.Raiders.Name" defaultMessage="Raiders" />
 
             <h2 className="display-6 mb-3 fw-bolder">
-                <i className="bi bi-tornado me-2"></i>
+                <i className="bi bi-tornado me-2" />
                 <FormattedMessage
                     id="Common.Raiders.Name"
                     defaultMessage="Raiders"
@@ -78,7 +78,7 @@ const ChattersPage: React.FC = () => {
                                     defaultMessage="Created"
                                 />
                             </th>
-                            <th scope="col"></th>
+                            <th scope="col" />
                         </tr>
                     </thead>
                     <tbody>
@@ -87,7 +87,7 @@ const ChattersPage: React.FC = () => {
                                 <RaiderRowComponent
                                     raider={raider}
                                     key={raider._id}
-                                ></RaiderRowComponent>
+                                />
                             );
                         })}
                     </tbody>

@@ -11,7 +11,7 @@ export const NeedSettingPage: React.FC = () => {
             <MetaComponent />
 
             <h2 className="display-4 mb-4 py-4 text-center fw-bolder">
-                <i className="bi bi-twitch me-2"></i>
+                <i className="bi bi-twitch me-2" />
                 <FormattedMessage
                     id="Common.Title"
                     defaultMessage="Twitch Support Tool"

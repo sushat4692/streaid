@@ -43,7 +43,7 @@ const ChattersPage: React.FC = () => {
             />
 
             <h2 className="display-6 mb-3 fw-bolder">
-                <i className="bi bi-chat me-2"></i>
+                <i className="bi bi-chat me-2" />
                 <FormattedMessage
                     id="Common.Chatters.Name"
                     defaultMessage="Chatters"
@@ -90,7 +90,7 @@ const ChattersPage: React.FC = () => {
                                     defaultMessage="Created"
                                 />
                             </th>
-                            <th scope="col"></th>
+                            <th scope="col" />
                         </tr>
                     </thead>
                     <tbody>
@@ -99,7 +99,7 @@ const ChattersPage: React.FC = () => {
                                 <ChatterRowComponent
                                     chatter={chatter}
                                     key={chatter._id}
-                                ></ChatterRowComponent>
+                                />
                             );
                         })}
                     </tbody>
