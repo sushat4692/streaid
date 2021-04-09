@@ -4,8 +4,7 @@ import { RecoilRoot } from "recoil";
 
 import App from "./App";
 
-import "bootstrap/scss/bootstrap.scss";
-import "bootstrap";
+import "./styles.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 ReactDOM.render(

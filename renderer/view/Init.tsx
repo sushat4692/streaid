@@ -16,6 +16,9 @@ import { request } from "../util/request";
 // Const
 import { list as localeList } from "../const/locales";
 
+// Style
+import styles from "./Init.module.css";
+
 const InitComponent: React.FC = () => {
     const intl = useIntl();
     const [locale, updateLocate] = useRecoilState(LocaleState);
@@ -36,34 +39,29 @@ const InitComponent: React.FC = () => {
         <div className="container-fluid">
             <MetaComponent />
 
-            <section className="d-flex justify-content-center align-items-center py-4 min-vh-100">
+            <section className={styles.wrap}>
                 <div>
-                    <h2 className="display-4 mb-4 py-4 text-center fw-bolder">
-                        <i className="bi bi-twitch me-2" />
+                    <h2 className={styles.title}>
+                        <i className={`bi bi-twitch ${styles.title__icon}`} />
                         <FormattedMessage
                             id="Common.Title"
                             defaultMessage="Twitch Support Tool"
                         />
                     </h2>
 
-                    <div
-                        style={{
-                            width: "100%",
-                            maxWidth: "330px",
-                            margin: "auto",
-                        }}
-                    >
-                        <h2 className="h3 mb-3 text-center">
+                    <div className={styles.form}>
+                        <h2 className={styles.form__label}>
                             <FormattedMessage
                                 id="View.Init.Header"
                                 defaultMessage="Signin to Twitch"
                             />
                         </h2>
 
-                        <div className="mb-3">
+                        <div className={styles.form__select}>
                             <Select
                                 name="language"
                                 id="language"
+                                classNamePrefix="react-select"
                                 defaultValue={defaultLocale}
                                 options={localeList}
                                 onChange={updateLocaleHandler}
@@ -75,7 +73,7 @@ const InitComponent: React.FC = () => {
                         </div>
 
                         <button
-                            className="w-100 btn btn-lg btn-primary"
+                            className="btn btn-block btn-lg btn-primary"
                             onClick={clickHandler}
                         >
                             <FormattedMessage

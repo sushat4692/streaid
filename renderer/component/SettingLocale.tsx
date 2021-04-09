@@ -40,6 +40,7 @@ const SettingBotComponent: React.FC = () => {
             <Select
                 name="language"
                 id="language"
+                classNamePrefix="react-select"
                 defaultValue={defaultLocale}
                 options={localeList}
                 onChange={onChangeHandler}

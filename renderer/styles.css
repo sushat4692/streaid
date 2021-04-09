@@ -1,0 +1,54 @@
+@tailwind base;
+
+:root {
+    --color-primary: #8c45f7;
+    --color-primary--hover: #7d2df6;
+}
+
+body {
+    @apply bg-white dark:bg-gray-800 text-gray-800 dark:text-white;
+}
+
+.has-header {
+    @apply pt-16;
+}
+
+.container-fluid {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/**
+ * Button
+ */
+.btn {
+    @apply text-base font-bold inline-flex items-center justify-center rounded-md bg-gray-600 hover:bg-gray-700 text-white py-2 md:py-3 px-3 md:px-4;
+}
+
+.btn-sm {
+    @apply text-sm py-1 md:py-2 px-2 md:px-3;
+}
+
+.btn-block {
+    @apply flex w-full px-0;
+}
+
+.btn-primary {
+    background: var(--color-primary);
+}
+
+.btn-primary:hover {
+    background: var(--color-primary--hover);
+}
+
+/**
+ * Select
+ */
+.react-select {
+}
+
+.react-select__option {
+    @apply text-gray-800 !important;
+}
+.react-select__option--is-selected {
+    @apply text-white !important;
+}

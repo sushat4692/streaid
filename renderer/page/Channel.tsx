@@ -354,6 +354,7 @@ const ChannelPage: React.FC = () => {
                             <Select
                                 name="language"
                                 id="language"
+                                classNamePrefix="react-select"
                                 defaultValue={defaultLanguageOption}
                                 options={languageList}
                                 onChange={(e) => updateLanguage(e.value)}
@@ -380,6 +381,7 @@ const ChannelPage: React.FC = () => {
                             </div>
 
                             <Select
+                                classNamePrefix="react-select"
                                 isMulti
                                 isDisabled
                                 options={tagOption}

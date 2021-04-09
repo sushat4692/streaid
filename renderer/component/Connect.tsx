@@ -9,7 +9,11 @@ import IsConnectingState from "../atom/IsConnecting";
 // Util
 import { request } from "../util/request";
 
-const ConnectComonent: React.FC = () => {
+interface Props {
+    isBlock?: boolean;
+}
+
+const ConnectComonent: React.FC<Props> = ({ isBlock = false }: Props) => {
     const isConnected = useRecoilValue(IsConnectedState);
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
     const intl = useIntl();
@@ -25,23 +29,23 @@ const ConnectComonent: React.FC = () => {
     };
 
     return (
-        <div className="d-grid gap-2 d-md-block">
-            <button
-                className={isConnected ? "btn btn-danger" : "btn btn-primary"}
-                onClick={clickHandler}
-            >
-                <i className="bi bi-link-45deg me-2" />
-                {isConnected
-                    ? intl.formatMessage({
-                          id: "Component.Connect.Disable",
-                          defaultMessage: "Disconnect",
-                      })
-                    : intl.formatMessage({
-                          id: "Component.Connect.Enable",
-                          defaultMessage: "Connect",
-                      })}
-            </button>
-        </div>
+        <button
+            className={`btn ${isConnected ? "btn-danger" : "btn-primary"} ${
+                isBlock ? "btn-block" : ""
+            }`}
+            onClick={clickHandler}
+        >
+            <i className="bi bi-link-45deg me-2" />
+            {isConnected
+                ? intl.formatMessage({
+                      id: "Component.Connect.Disable",
+                      defaultMessage: "Disconnect",
+                  })
+                : intl.formatMessage({
+                      id: "Component.Connect.Enable",
+                      defaultMessage: "Connect",
+                  })}
+        </button>
     );
 };
 

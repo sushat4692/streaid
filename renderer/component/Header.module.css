@@ -1,0 +1,80 @@
+.nav {
+    @apply bg-gray-800 dark:bg-gray-900 fixed w-full z-50;
+}
+
+.nav__inner {
+    @apply flex items-center justify-between h-16;
+}
+
+.nav__list {
+    @apply flex items-center;
+}
+
+.nav__list__brand {
+    @apply text-2xl flex-shrink-0;
+}
+
+.nav__list__menu {
+    @apply hidden md:block;
+}
+
+.nav__list__menu__inner {
+    @apply ml-10 flex items-baseline space-x-4;
+}
+
+.nav__list__menu__button {
+    @apply text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium;
+}
+.nav__list__menu__button[data-disable="true"] {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.nav__side {
+    @apply hidden md:block;
+}
+
+.nav__side__inner {
+    @apply ml-4 flex items-center md:ml-6;
+}
+
+.nav__side__inner__button {
+    @apply md:mr-2;
+}
+
+.nav__burger {
+    @apply -mr-2 flex md:hidden;
+}
+
+.nav__burger__button {
+    @apply bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white;
+}
+
+.nav__burger__button__label {
+    @apply sr-only;
+}
+
+.nav__burger__button__icon {
+    @apply h-6 w-6 hidden;
+}
+.nav__burger__button__icon[data-visible="true"] {
+    @apply block;
+}
+
+.nav__mobile {
+    @apply hidden;
+    @apply md:hidden !important;
+}
+.nav__mobile[data-visible="true"] {
+    @apply block;
+}
+.nav__mobile__menu {
+    @apply px-2 pt-2 pb-3 space-y-1 sm:px-3;
+}
+.nav__mobile__menu__button {
+    @apply text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium;
+}
+.nav__mobile__menu__button[data-disable="true"] {
+    opacity: 0.6;
+    pointer-events: none;
+}

@@ -3,7 +3,6 @@ import { useSetRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
 import TextareaAutosize from "react-textarea-autosize";
 import ReactTooltip from "react-tooltip";
-import { Modal } from "bootstrap";
 
 // Recoil
 import UserMemoState, { UserMemoRowType } from "../atom/UserMemo";
@@ -17,7 +16,7 @@ interface Props {
 
 const UserComponent: React.FC<Props> = ({ username }: Props) => {
     const modal = useRef<HTMLFormElement>(null);
-    const [modalClass, updateModalClass] = useState<Modal>(null);
+    // const [modalClass, updateModalClass] = useState<Modal>(null);
 
     const [nickname, updateNickname] = useState("");
     const [memo, updateMemo] = useState("");
@@ -55,9 +54,9 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
         );
 
         updateUserMemo([...usermemos]);
-        if (modalClass) {
-            modalClass.toggle();
-        }
+        // if (modalClass) {
+        //     modalClass.toggle();
+        // }
     };
 
     const closeHandler = async () => {
@@ -68,15 +67,15 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
             updateMemo(usermemo.memo);
         }
 
-        if (modalClass) {
-            modalClass.toggle();
-        }
+        // if (modalClass) {
+        //     modalClass.toggle();
+        // }
     };
 
     useEffect(() => {
-        if (modal.current) {
-            updateModalClass(new Modal(modal.current));
-        }
+        // if (modal.current) {
+        //     updateModalClass(new Modal(modal.current));
+        // }
 
         getUserMemoInformation().then((usermemo) => {
             if (usermemo) {
