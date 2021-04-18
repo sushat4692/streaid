@@ -12,6 +12,7 @@ import { getInstance as getStoreInstance } from "../store";
 // Util
 import { getWindow } from "../util/window";
 import { playSound } from "../util/Sound";
+import { setCache } from "../util/Sound";
 
 // Menu
 import { setMenu } from "../menu";
@@ -101,6 +102,7 @@ ipcMain.handle("setting:notification:sound", async (_, values) => {
         path.join(isDev ? "." : app.getPath("userData"), `data/${values}.mp3`),
         buffer
     );
+    setCache(values, buffer);
 
     return true;
 });

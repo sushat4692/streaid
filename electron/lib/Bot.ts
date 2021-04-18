@@ -8,7 +8,7 @@ import { getHosts, pushHost } from "../database/Host";
 
 // Store
 import { getInstance as getStoreInstance } from "../store";
-import ShoutOut from "./commands/ShoutOut";
+import { useCommand } from "./commands";
 
 // Util
 import { getWindow } from "../util/window";
@@ -89,24 +89,14 @@ class Bot {
 
         // Run command
         if (commandName && commandName.charAt(0) === "!") {
-            let existsCommand = false;
-            switch (commandName) {
-                case "!dice": {
-                    const num = this.rollDice();
-                    this.client?.say(channel, `You rolled a ${num}`);
-                    existsCommand = true;
-                    break;
-                }
-                case "!so": {
-                    if (messages.length) {
-                        ShoutOut(messages[0]);
-                    } else {
-                        console.log(
-                            `* You need to add username: e.g. !so {username}`
-                        );
-                    }
-                    existsCommand = true;
-                    break;
+            const command = useCommand();
+
+            const existsCommand = command.exists(commandName);
+            if (existsCommand) {
+                const message = await command.trigger(commandName, ...messages);
+
+                if (message) {
+                    this.client?.action(channel, message);
                 }
             }
 

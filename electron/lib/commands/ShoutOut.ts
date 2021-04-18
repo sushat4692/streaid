@@ -1,23 +1,20 @@
 // Library
-import { getInstance as getBotInstance } from "../Bot";
 import { getInstance as getTwichAPIInstance } from "../TwitchAPI";
 
 // Store
 import { getInstance as getStoreInstance } from "../../store";
 
-const shoutOut = async (username: string) => {
-    const Bot = getBotInstance();
+export const shoutOut = async (username: string, showWindow = "") => {
+    if (!username) {
+        return `* You need to add username: e.g. !so {username}`;
+    }
+
+    if (showWindow) {
+        console.log(showWindow);
+    }
+
     const TwitchAPI = getTwichAPIInstance();
     const store = getStoreInstance();
-
-    if (!Bot.client) {
-        return;
-    }
-
-    const channelName = store.get("channel");
-    if (!channelName) {
-        return;
-    }
 
     const replaceVariableMessage = (
         message: string,
@@ -36,30 +33,21 @@ const shoutOut = async (username: string) => {
 
     const User = await TwitchAPI.getUserByName(username);
     if (!User) {
-        Bot.client.action(
-            channelName,
-            replaceVariableMessage(
-                store.get("shoutout_not_found"),
-                false,
-                false
-            )
+        return replaceVariableMessage(
+            store.get("shoutout_not_found"),
+            false,
+            false
         );
-        return;
     }
 
     const shoutOutChannel = await TwitchAPI.getChannelInfo(User);
     if (!shoutOutChannel) {
-        Bot.client.action(
-            channelName,
-            replaceVariableMessage(store.get("shoutout_failed"), true, false)
+        return replaceVariableMessage(
+            store.get("shoutout_failed"),
+            true,
+            false
         );
-        return;
     }
 
-    Bot.client.action(
-        channelName,
-        replaceVariableMessage(store.get("shoutout_message"))
-    );
+    return replaceVariableMessage(store.get("shoutout_message"));
 };
-
-export default shoutOut;

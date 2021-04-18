@@ -4,7 +4,10 @@ import { ipcMain } from "electron";
 import { getInstance as getBotInstance } from "../lib/Bot";
 
 // Command
-import ShoutOut from "../lib/commands/ShoutOut";
+import { useCommand } from "../lib/commands";
+
+// Store
+import { getInstance as getStoreInstance } from "../store";
 
 ipcMain.handle("bot:connect", () => {
     const Bot = getBotInstance();
@@ -21,6 +24,19 @@ ipcMain.handle("bot:disconnect", () => {
 });
 
 ipcMain.handle("bot:shoutout", async (_e, username: string) => {
-    await ShoutOut(username);
+    const Bot = getBotInstance();
+    const store = getStoreInstance();
+
+    const channelName = store.get("channel");
+    if (!Bot.client || !channelName) {
+        return;
+    }
+
+    const command = useCommand();
+    const message = await command.trigger("!so", username);
+
+    if (message) {
+        Bot.client.action(channelName, message);
+    }
     return;
 });

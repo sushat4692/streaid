@@ -56,6 +56,9 @@ input, select, textarea {
 .section__lead {
     @apply mb-2 pl-3 border-l-2 border-solid border-gray-300 dark:border-gray-500;
 }
+.section__desc {
+    @apply mb-2;
+}
 
 /**
  * Table

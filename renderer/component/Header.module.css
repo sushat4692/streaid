@@ -19,7 +19,7 @@
 }
 
 .nav__list__menu__inner {
-    @apply ml-6 flex items-baseline;
+    @apply ml-2 flex items-baseline;
 }
 
 .nav__list__menu__button {
