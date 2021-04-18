@@ -29,6 +29,14 @@ const ChattersPage: React.FC = () => {
                         createdAt: new Date(),
                         updatedAt: new Date(),
                     },
+                    {
+                        _id: "2",
+                        "message-type": "chat",
+                        username: "username",
+                        "display-name": "displayname",
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
                 ]
             );
             updateChatters([...chatters]);
@@ -36,76 +44,84 @@ const ChattersPage: React.FC = () => {
     }, []);
 
     return (
-        <section className="my-4">
+        <>
             <MetaComponent
                 id="Common.Chatters.Name"
                 defaultMessage="Chatters"
             />
 
-            <h2 className="display-6 mb-3 fw-bolder">
-                <i className="bi bi-chat me-2" />
-                <FormattedMessage
-                    id="Common.Chatters.Name"
-                    defaultMessage="Chatters"
-                />
-            </h2>
-
-            <p className="lead">
-                <FormattedMessage
-                    id="Common.Chatters.Description"
-                    defaultMessage="Display user list that comment to target channel."
-                />
-            </p>
-
-            <div className="table-responsive">
-                <table className="table">
-                    <colgroup>
-                        <col />
-                        <col />
-                        <col width="140" />
-                        <col width="160" />
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th scope="col">
-                                <FormattedMessage
-                                    id="Common.Label.Username"
-                                    defaultMessage="Username"
-                                />
-                                /
-                                <FormattedMessage
-                                    id="Common.Label.NickName"
-                                    defaultMessage="Nick name"
-                                />
-                            </th>
-                            <th scope="col">
-                                <FormattedMessage
-                                    id="Common.Label.Displayname"
-                                    defaultMessage="Displayname"
-                                />
-                            </th>
-                            <th scope="col">
-                                <FormattedMessage
-                                    id="Common.Label.Created"
-                                    defaultMessage="Created"
-                                />
-                            </th>
-                            <th scope="col" />
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {chatters.map((chatter) => {
-                            return (
-                                <ChatterRowComponent
-                                    chatter={chatter}
-                                    key={chatter._id}
-                                />
-                            );
-                        })}
-                    </tbody>
-                </table>
+            <div className="page-header">
+                <div className="container-fluid">
+                    <h1 className="page-header__text">
+                        <i className="bi bi-chat page-header__icon" />
+                        <FormattedMessage
+                            id="Common.Chatters.Name"
+                            defaultMessage="Chatters"
+                        />
+                    </h1>
+                </div>
             </div>
-        </section>
+
+            <div className="container-fluid">
+                <section className="section">
+                    <p className="section__lead">
+                        <FormattedMessage
+                            id="Common.Chatters.Description"
+                            defaultMessage="Display user list that comment to target channel."
+                        />
+                    </p>
+
+                    <div className="table-responsive">
+                        <table className="table">
+                            <colgroup>
+                                <col />
+                                <col />
+                                <col width="140" />
+                                <col width="160" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+                                        <FormattedMessage
+                                            id="Common.Label.Username"
+                                            defaultMessage="Username"
+                                        />
+                                        /
+                                        <FormattedMessage
+                                            id="Common.Label.NickName"
+                                            defaultMessage="Nick name"
+                                        />
+                                    </th>
+                                    <th scope="col">
+                                        <FormattedMessage
+                                            id="Common.Label.Displayname"
+                                            defaultMessage="Displayname"
+                                        />
+                                    </th>
+                                    <th scope="col">
+                                        <FormattedMessage
+                                            id="Common.Label.Created"
+                                            defaultMessage="Created"
+                                        />
+                                    </th>
+                                    <th scope="col" />
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {chatters.map((chatter) => {
+                                    return (
+                                        <ChatterRowComponent
+                                            chatter={chatter}
+                                            key={chatter._id}
+                                        />
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </>
     );
 };
 

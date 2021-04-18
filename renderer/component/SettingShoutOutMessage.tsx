@@ -12,6 +12,9 @@ import IsConnectingState from "../atom/IsConnecting";
 // Utils
 import { request } from "../util/request";
 
+// Style
+import styles from "./SettingShoutOutMessage.module.css";
+
 const SettingBotComponent: React.FC = () => {
     const [shoutOutMessage, updateShoutOutMessage] = useRecoilState(
         ShoutOutMessageState
@@ -50,21 +53,21 @@ const SettingBotComponent: React.FC = () => {
     };
 
     return (
-        <section className="my-4">
-            <h3>
+        <section className="section">
+            <h2 className="section__header">
                 <FormattedMessage
                     id="Component.SettingShoutOutMessage.Header"
                     defaultMessage="Shoutout Message"
                 />
-            </h3>
+            </h2>
 
-            <div className="row">
-                <form
-                    className="col-md-8 mb-3 mb-md-0"
-                    onSubmit={submitHandler}
-                >
-                    <div className="mb-3">
-                        <label htmlFor="shoutout_message" className="mb-1">
+            <div className={styles.row}>
+                <form className={styles.form} onSubmit={submitHandler}>
+                    <div className="form-field">
+                        <label
+                            htmlFor="shoutout_message"
+                            className="form-field__label"
+                        >
                             <FormattedMessage
                                 id="Component.SettingShoutOutMessage.Message"
                                 defaultMessage="ShoutOut Message Template"
@@ -82,8 +85,11 @@ const SettingBotComponent: React.FC = () => {
                         />
                     </div>
 
-                    <div className="mb-3">
-                        <label htmlFor="shoutout_failed" className="mb-1">
+                    <div className="form-field">
+                        <label
+                            htmlFor="shoutout_failed"
+                            className="form-field__label"
+                        >
                             <FormattedMessage
                                 id="Component.SettingShoutOutMessage.Failed"
                                 defaultMessage="Failed Message Template"
@@ -101,8 +107,11 @@ const SettingBotComponent: React.FC = () => {
                         />
                     </div>
 
-                    <div className="mb-3">
-                        <label htmlFor="shoutout_not_found" className="mb-1">
+                    <div className="form-field">
+                        <label
+                            htmlFor="shoutout_not_found"
+                            className="form-field__label"
+                        >
                             <FormattedMessage
                                 id="Component.SettingShoutOutMessage.NotFound"
                                 defaultMessage="Not Found Message Template"
@@ -120,16 +129,18 @@ const SettingBotComponent: React.FC = () => {
                         />
                     </div>
 
-                    <button className="btn btn-primary">
-                        <i className="bi bi-archive me-2" />
-                        <FormattedMessage
-                            id="Common.Submit"
-                            defaultMessage="Submit"
-                        />
-                    </button>
+                    <div className="form-field__action">
+                        <button className="btn is-primary">
+                            <i className="bi bi-archive btn__icon" />
+                            <FormattedMessage
+                                id="Common.Submit"
+                                defaultMessage="Submit"
+                            />
+                        </button>
+                    </div>
                 </form>
 
-                <div className="col-md-4">
+                <div className={styles.description}>
                     <table className="table">
                         <colgroup>
                             <col width="120" />

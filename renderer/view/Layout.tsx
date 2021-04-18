@@ -55,8 +55,8 @@ const Layout: React.FC = () => {
                 "settings:get",
                 null,
                 {
-                    username: "",
-                    channel: "",
+                    username: "channel",
+                    channel: "channel",
                     shoutout_message: "",
                     shoutout_not_found: "",
                     shoutout_failed: "",
@@ -86,50 +86,48 @@ const Layout: React.FC = () => {
             <HeaderComponent />
 
             <div className="has-header">
-                <div className="container-fluid">
-                    <main>
-                        {setting.isEnableBot ? (
-                            <Switch>
-                                <Route path="/chatters">
-                                    <ChattersPage />
-                                </Route>
-                                <Route path="/raiders">
-                                    <RaidersPage />
-                                </Route>
-                                <Route path="/hosts">
-                                    <HostsPage />
-                                </Route>
-                                <Route path="/channel">
-                                    <ChannelPage />
-                                </Route>
-                                <Route path="/user_memo">
-                                    <UserMemoPage />
-                                </Route>
-                                <Route path="/settings">
-                                    <SettingPage />
-                                </Route>
-                                <Route path="/license">
-                                    <LicensePage />
-                                </Route>
-                                <Route path="/">
-                                    <DashboardPage />
-                                </Route>
-                            </Switch>
-                        ) : (
-                            <Switch>
-                                <Route path="/settings">
-                                    <SettingPage />
-                                </Route>
-                                <Route path="/license">
-                                    <LicensePage />
-                                </Route>
-                                <Route path="/">
-                                    <NeedSettingPage />
-                                </Route>
-                            </Switch>
-                        )}
-                    </main>
-                </div>
+                <main>
+                    {setting.isEnableBot ? (
+                        <Switch>
+                            <Route path="/chatters">
+                                <ChattersPage />
+                            </Route>
+                            <Route path="/raiders">
+                                <RaidersPage />
+                            </Route>
+                            <Route path="/hosts">
+                                <HostsPage />
+                            </Route>
+                            <Route path="/channel">
+                                <ChannelPage />
+                            </Route>
+                            <Route path="/user_memo">
+                                <UserMemoPage />
+                            </Route>
+                            <Route path="/settings">
+                                <SettingPage />
+                            </Route>
+                            <Route path="/license">
+                                <LicensePage />
+                            </Route>
+                            <Route path="/">
+                                <DashboardPage />
+                            </Route>
+                        </Switch>
+                    ) : (
+                        <Switch>
+                            <Route path="/settings">
+                                <SettingPage />
+                            </Route>
+                            <Route path="/license">
+                                <LicensePage />
+                            </Route>
+                            <Route path="/">
+                                <NeedSettingPage />
+                            </Route>
+                        </Switch>
+                    )}
+                </main>
             </div>
         </Router>
     );

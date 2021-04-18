@@ -1,9 +1,9 @@
 .nav {
-    @apply bg-gray-800 dark:bg-gray-900 fixed w-full z-50;
+    @apply bg-gray-800 dark:bg-gray-900 fixed w-full z-30;
 }
 
 .nav__inner {
-    @apply flex items-center justify-between h-16;
+    @apply flex items-center justify-between h-16 md:h-10;
 }
 
 .nav__list {
@@ -11,7 +11,7 @@
 }
 
 .nav__list__brand {
-    @apply text-2xl flex-shrink-0;
+    @apply text-white text-2xl flex-shrink-0;
 }
 
 .nav__list__menu {
@@ -19,11 +19,11 @@
 }
 
 .nav__list__menu__inner {
-    @apply ml-10 flex items-baseline space-x-4;
+    @apply ml-6 flex items-baseline;
 }
 
 .nav__list__menu__button {
-    @apply text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium;
+    @apply text-gray-300 hover:bg-gray-700 hover:text-white px-3 text-sm font-medium flex items-center h-10;
 }
 .nav__list__menu__button[data-disable="true"] {
     opacity: 0.6;
@@ -35,7 +35,7 @@
 }
 
 .nav__side__inner {
-    @apply ml-4 flex items-center md:ml-6;
+    @apply ml-4 flex items-center;
 }
 
 .nav__side__inner__button {

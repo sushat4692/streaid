@@ -38,16 +38,18 @@ const RaiderRowComponent: React.FC<Props> = ({ raider }: Props) => {
             <td>{raider.viewers}</td>
             <td>{moment(raider.createdAt).format("MMM Do, kk:mm")}</td>
             <td>
-                <ShoutOutButtonComponent
-                    className="btn btn-sm btn-success me-1"
-                    username={raider.username}
-                />
-                <button
-                    className="btn btn-sm btn-danger"
-                    onClick={deleteClickHandler}
-                >
-                    <i className="bi bi-trash" />
-                </button>
+                <div className="btn-group">
+                    <ShoutOutButtonComponent
+                        className="btn is-small btn-success me-1"
+                        username={raider.username}
+                    />
+                    <button
+                        className="btn is-small btn-danger"
+                        onClick={deleteClickHandler}
+                    >
+                        <i className="bi bi-trash" />
+                    </button>
+                </div>
             </td>
         </tr>
     );

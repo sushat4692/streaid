@@ -22,7 +22,7 @@ const messages: { [key: string]: string } = {
     "Common.License.Name": "License",
     "Common.Label.Username": "User name",
     "Common.Label.NickName": "Nick name",
-    "Common.Label.Channel": "チャンネル",
+    "Common.Label.Channel": "Channel",
     "Common.Label.Displayname": "Displayname",
     "Common.Label.Autoloaded": "Autoloaded",
     "Common.Label.Viewers": "Viewers",

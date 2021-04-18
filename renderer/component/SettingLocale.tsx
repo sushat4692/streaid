@@ -29,13 +29,13 @@ const SettingBotComponent: React.FC = () => {
     };
 
     return (
-        <section className="my-4">
-            <h3>
+        <section className="section">
+            <h2 className="section__header">
                 <FormattedMessage
                     id="Component.SettingLocale.Header"
                     defaultMessage="Language"
                 />
-            </h3>
+            </h2>
 
             <Select
                 name="language"

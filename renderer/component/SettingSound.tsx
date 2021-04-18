@@ -9,13 +9,13 @@ import SettingSoundHostsComponent from "./SettingSoundHosts";
 
 const SettingSoundComponent: React.FC = () => {
     return (
-        <section className="my-4">
-            <h3>
+        <section className="section">
+            <h2 className="section__header">
                 <FormattedMessage
                     id="Component.SettingSound.Header"
                     defaultMessage="Notification Sound"
                 />
-            </h3>
+            </h2>
 
             <SettingSoundChattersComponent />
             <SettingSoundChatsComponent />

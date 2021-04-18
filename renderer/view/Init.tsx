@@ -73,7 +73,7 @@ const InitComponent: React.FC = () => {
                         </div>
 
                         <button
-                            className="btn btn-block btn-lg btn-primary"
+                            className="btn is-block is-large is-primary"
                             onClick={clickHandler}
                         >
                             <FormattedMessage

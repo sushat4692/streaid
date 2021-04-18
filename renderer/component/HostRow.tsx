@@ -39,16 +39,18 @@ const HostsRowComponent: React.FC<Props> = ({ host }: Props) => {
             <td>{host.autohost ? "true" : "false"}</td>
             <td>{moment(host.createdAt).format("MMM Do, kk:mm")}</td>
             <td>
-                <ShoutOutButtonComponent
-                    className="btn btn-sm btn-success me-1"
-                    username={host.username}
-                />
-                <button
-                    className="btn btn-sm btn-danger"
-                    onClick={deleteClickHandler}
-                >
-                    <i className="bi bi-trash" />
-                </button>
+                <div className="btn-group">
+                    <ShoutOutButtonComponent
+                        className="btn is-small btn-success me-1"
+                        username={host.username}
+                    />
+                    <button
+                        className="btn is-small btn-danger"
+                        onClick={deleteClickHandler}
+                    >
+                        <i className="bi bi-trash" />
+                    </button>
+                </div>
             </td>
         </tr>
     );

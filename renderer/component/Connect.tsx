@@ -30,12 +30,12 @@ const ConnectComonent: React.FC<Props> = ({ isBlock = false }: Props) => {
 
     return (
         <button
-            className={`btn ${isConnected ? "btn-danger" : "btn-primary"} ${
-                isBlock ? "btn-block" : ""
+            className={`btn ${isConnected ? "btn-danger" : "is-primary"} ${
+                isBlock ? "is-block" : ""
             }`}
             onClick={clickHandler}
         >
-            <i className="bi bi-link-45deg me-2" />
+            <i className="bi bi-link-45deg btn__icon" />
             {isConnected
                 ? intl.formatMessage({
                       id: "Component.Connect.Disable",

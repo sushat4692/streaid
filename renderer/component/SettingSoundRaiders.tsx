@@ -9,32 +9,35 @@ import SoundRaidVolumeState from "../atom/SoundRaidVolume";
 import { useSound } from "../util/sound";
 import { request } from "../util/request";
 
+// Styles
+import styles from "./SettingSound.module.css";
+
 const SettingSoundRaidersComponent: React.FC = () => {
     const [raidVolume, updateRaidVolume] = useRecoilState(SoundRaidVolumeState);
     const { selectFileHandler, playFileHandler } = useSound("raid");
 
     return (
         <>
-            <h4>
+            <h3 className={styles.header}>
                 <FormattedMessage
                     id="Common.Raiders.Name"
                     defaultMessage="Raiders"
                 />
 
-                <small className="text-muted ms-3 fs-6">
+                <small className={styles.header__small}>
                     <FormattedMessage
                         id="Component.SettingSoundRaiders.Descript"
                         defaultMessage="Play selected sound per raids"
                     />
                 </small>
-            </h4>
-            <div className="row mb-0 mb-md-3">
-                <div className="mb-3 mb-md-0 col-md-2 text-center d-grid">
+            </h3>
+            <div className={styles.row}>
+                <div className={styles.row__button}>
                     <button
                         className="btn btn-success"
                         onClick={selectFileHandler()}
                     >
-                        <i className="bi bi-save me-2" />
+                        <i className="bi bi-save btn__icon" />
                         <FormattedMessage
                             id="Common.Label.SelectFile"
                             defaultMessage="Select File"
@@ -42,17 +45,17 @@ const SettingSoundRaidersComponent: React.FC = () => {
                     </button>
                 </div>
 
-                <div className="mb-3 mb-md-0 col-md-10">
-                    <label className="form-label">
+                <div className={styles.row__field}>
+                    <label className="form-field__label">
                         <FormattedMessage
                             id="Common.Label.Volume"
                             defaultMessage="Volume"
                         />
                     </label>
 
-                    <div className="d-flex align-items-center">
+                    <div className={styles.row__field__action}>
                         <button
-                            className="btn btn-link me-2"
+                            className={`btn btn-link ${styles.row__field__action__button}`}
                             onClick={playFileHandler()}
                         >
                             <i className="bi bi-play-circle" />

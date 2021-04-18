@@ -5,32 +5,42 @@ import { FormattedMessage } from "react-intl";
 // Component
 import MetaComponent from "../component/Meta";
 
+// Styles
+import styles from "./Dashboard.module.css";
+
 export const NeedSettingPage: React.FC = () => {
     return (
-        <section className="my-4">
+        <>
             <MetaComponent />
 
-            <h2 className="display-4 mb-4 py-4 text-center fw-bolder">
-                <i className="bi bi-twitch me-2" />
+            <h1 className={styles.header}>
+                <i className={`bi bi-twitch ${styles.header__icon}`} />
                 <FormattedMessage
                     id="Common.Title"
                     defaultMessage="Twitch Support Tool"
                 />
-            </h2>
+            </h1>
 
-            <div className="text-center">
-                <p className="lead">
-                    <FormattedMessage
-                        id="Page.NeedSetting.Lead"
-                        defaultMessage="Please update application setting first."
-                    />
-                </p>
+            <div className="container-fluid">
+                <section className="section">
+                    <div className={styles.need}>
+                        <p className={styles.need__lead}>
+                            <FormattedMessage
+                                id="Page.NeedSetting.Lead"
+                                defaultMessage="Please update application setting first."
+                            />
+                        </p>
 
-                <Link className="btn btn-lg btn-primary" to="/settings">
-                    Settings
-                </Link>
+                        <Link
+                            className="btn is-large is-primary"
+                            to="/settings"
+                        >
+                            Settings
+                        </Link>
+                    </div>
+                </section>
             </div>
-        </section>
+        </>
     );
 };
 

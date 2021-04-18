@@ -25,6 +25,9 @@ import { list as languageList } from "../const/languages";
 import MetaComponent from "../component/Meta";
 import ChannelTemplateRowComponent from "../component/ChannelTemplateRow";
 
+// Styles
+import styles from "./Channel.module.css";
+
 interface ChannelInterface {
     id: string;
     name: string;
@@ -156,6 +159,16 @@ const ChannelPage: React.FC = () => {
                         createdAt: new Date(),
                         updatedAt: new Date(),
                     },
+                    {
+                        _id: "2",
+                        title: "title",
+                        gameId: "1",
+                        gameName: "name",
+                        boxArtUrl: "",
+                        language: "ja",
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
                 ]
             );
             updateChannelTemplates(templates || []);
@@ -247,235 +260,260 @@ const ChannelPage: React.FC = () => {
         <>
             <MetaComponent id="Common.Channel.Name" defaultMessage="Channel" />
 
-            <h2 className="display-6 mt-4 mb-3 fw-bolder">
-                <i className="bi bi-camera-reels me-2" />
-                <FormattedMessage
-                    id="Common.Channel.Name"
-                    defaultMessage="Channel"
-                />
-            </h2>
+            <div className="page-header">
+                <div className="container-fluid">
+                    <h1 className="page-header__text">
+                        <i className="bi bi-camera-reels page-header__icon" />
+                        <FormattedMessage
+                            id="Common.Channel.Name"
+                            defaultMessage="Channel"
+                        />
+                    </h1>
+                </div>
+            </div>
 
-            <p className="lead">
-                <FormattedMessage
-                    id="Common.Channel.Description"
-                    defaultMessage="You can check/update Channel information."
-                />
-            </p>
-
-            <section className="my-4">
-                <h3>
+            <div className="container-fluid">
+                <p className="section__lead">
                     <FormattedMessage
-                        id="Page.Channel.Information.Header"
-                        defaultMessage="Channel Information"
+                        id="Common.Channel.Description"
+                        defaultMessage="You can check/update Channel information."
                     />
-                </h3>
+                </p>
 
-                {!isLoaded ? (
-                    ""
-                ) : (
-                    <form onSubmit={submitHandler}>
-                        <div className="mb-3">
-                            <label htmlFor="title" className="form-label">
-                                <FormattedMessage
-                                    id="Common.Label.Title"
-                                    defaultMessage="Title"
-                                />
-                            </label>
-                            <input
-                                type="text"
-                                name="title"
-                                id="title"
-                                className="form-control form-control-lg"
-                                value={title}
-                                onChange={(e) => updateTitle(e.target.value)}
-                            />
-                        </div>
+                <section className="section">
+                    <h2 className="section__header">
+                        <FormattedMessage
+                            id="Page.Channel.Information.Header"
+                            defaultMessage="Channel Information"
+                        />
+                    </h2>
 
-                        <div className="mb-3">
-                            <label htmlFor="gameId" className="form-label">
-                                <FormattedMessage
-                                    id="Common.Label.Category"
-                                    defaultMessage="Category"
-                                />
-                            </label>
-
-                            <div className="d-flex align-items-center mb-2">
-                                {game ? (
-                                    <figure
-                                        className="me-2 mb-0"
-                                        style={{ width: "52px" }}
-                                    >
-                                        <img
-                                            src={game.boxArtUrl
-                                                .replace("{width}", "138")
-                                                .replace("{height}", "190")}
-                                            className="img-fluid"
-                                            alt={game.name}
-                                        />
-                                    </figure>
-                                ) : (
-                                    ""
-                                )}
-                                <span>{game.name}</span>
-                            </div>
-
-                            <AsyncSelect
-                                cacheOptions={true}
-                                defaultValue={defaultGameOption}
-                                defaultGameOptions={
-                                    defaultGameOption ? [defaultGameOption] : []
-                                }
-                                value={game}
-                                getOptionLabel={(option) => option.name}
-                                getOptionValue={(option) => option.id}
-                                loadOptions={loadGameOptions}
-                                onChange={(e) => {
-                                    updateGame({
-                                        id: e.id,
-                                        name: e.name,
-                                        boxArtUrl: e.boxArtUrl,
-                                    });
-                                }}
-                                placeholder={intl.formatMessage({
-                                    id: "Common.Select.Placeholder",
-                                    defaultMessage: "Select...",
-                                })}
-                            />
-                        </div>
-
-                        <div className="mb-3">
-                            <label htmlFor="language" className="form-label">
-                                <FormattedMessage
-                                    id="Common.Label.Language"
-                                    defaultMessage="Language"
-                                />
-                            </label>
-
-                            <Select
-                                name="language"
-                                id="language"
-                                classNamePrefix="react-select"
-                                defaultValue={defaultLanguageOption}
-                                options={languageList}
-                                onChange={(e) => updateLanguage(e.value)}
-                                placeholder={intl.formatMessage({
-                                    id: "Common.Select.Placeholder",
-                                    defaultMessage: "Select...",
-                                })}
-                            />
-                        </div>
-
-                        <div className="mb-3">
-                            <label htmlFor="tags" className="form-label">
-                                <FormattedMessage
-                                    id="Common.Label.Tags"
-                                    defaultMessage="Tags"
-                                />
-                            </label>
-
-                            <div className="alert alert-warning">
-                                <FormattedMessage
-                                    id="Page.Channel.Information.TagNotice"
-                                    defaultMessage="Tags are not editable for now"
-                                />
-                            </div>
-
-                            <Select
-                                classNamePrefix="react-select"
-                                isMulti
-                                isDisabled
-                                options={tagOption}
-                                defaultValue={tags}
-                                getOptionLabel={(option) => option.name}
-                                getOptionValue={(option) => option.id}
-                                loadOptions={loadTagOptions}
-                                placeholder={intl.formatMessage({
-                                    id: "Common.Select.Placeholder",
-                                    defaultMessage: "Select...",
-                                })}
-                            />
-                        </div>
-
-                        <div className="d-flex">
-                            <button
-                                type="button"
-                                className="btn btn-success me-auto"
-                                onClick={onClickSaveTemplateHandler}
-                            >
-                                <FormattedMessage
-                                    id="Page.Channel.Information.SaveTemplate"
-                                    defaultMessage="Save to Template"
-                                />
-                            </button>
-
-                            <button type="submit" className="btn btn-primary">
-                                <FormattedMessage
-                                    id="Common.Submit"
-                                    defaultMessage="Submit"
-                                />
-                            </button>
-                        </div>
-                    </form>
-                )}
-            </section>
-
-            <section className="my-4">
-                <h3>
-                    <FormattedMessage
-                        id="Page.Channel.Template.Header"
-                        defaultMessage="Channel Template"
-                    />
-                </h3>
-
-                <div className="table-responsive">
-                    <table className="table">
-                        <colgroup>
-                            <col />
-                            <col />
-                            <col />
-                            <col width="140" />
-                            <col width="160" />
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th scope="col">
+                    {!isLoaded ? (
+                        ""
+                    ) : (
+                        <form onSubmit={submitHandler}>
+                            <div className="form-field">
+                                <label
+                                    htmlFor="title"
+                                    className="form-field__label"
+                                >
                                     <FormattedMessage
                                         id="Common.Label.Title"
                                         defaultMessage="Title"
                                     />
-                                </th>
-                                <th scope="col">
+                                </label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    id="title"
+                                    className="form-control is-large"
+                                    value={title}
+                                    onChange={(e) =>
+                                        updateTitle(e.target.value)
+                                    }
+                                />
+                            </div>
+
+                            <div className="form-field">
+                                <label
+                                    htmlFor="gameId"
+                                    className="form-field__label"
+                                >
                                     <FormattedMessage
                                         id="Common.Label.Category"
                                         defaultMessage="Category"
                                     />
-                                </th>
-                                <th scope="col">
+                                </label>
+
+                                <div className={styles.category}>
+                                    {game ? (
+                                        <figure
+                                            className={styles.category__figure}
+                                            style={{ width: "52px" }}
+                                        >
+                                            <img
+                                                src={game.boxArtUrl
+                                                    .replace("{width}", "138")
+                                                    .replace("{height}", "190")}
+                                                className="img-fluid"
+                                                alt={game.name}
+                                            />
+                                        </figure>
+                                    ) : (
+                                        ""
+                                    )}
+                                    <span>{game.name}</span>
+                                </div>
+
+                                <AsyncSelect
+                                    cacheOptions={true}
+                                    defaultValue={defaultGameOption}
+                                    defaultGameOptions={
+                                        defaultGameOption
+                                            ? [defaultGameOption]
+                                            : []
+                                    }
+                                    value={game}
+                                    getOptionLabel={(option) => option.name}
+                                    getOptionValue={(option) => option.id}
+                                    loadOptions={loadGameOptions}
+                                    onChange={(e) => {
+                                        updateGame({
+                                            id: e.id,
+                                            name: e.name,
+                                            boxArtUrl: e.boxArtUrl,
+                                        });
+                                    }}
+                                    placeholder={intl.formatMessage({
+                                        id: "Common.Select.Placeholder",
+                                        defaultMessage: "Select...",
+                                    })}
+                                />
+                            </div>
+
+                            <div className="form-field">
+                                <label
+                                    htmlFor="language"
+                                    className="form-field__label"
+                                >
                                     <FormattedMessage
                                         id="Common.Label.Language"
                                         defaultMessage="Language"
                                     />
-                                </th>
-                                <th scope="col">
-                                    <FormattedMessage
-                                        id="Common.Label.Created"
-                                        defaultMessage="Created"
-                                    />
-                                </th>
-                                <th scope="col" />
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {channelTemplates.map((channelTemplate) => (
-                                <ChannelTemplateRowComponent
-                                    key={channelTemplate._id}
-                                    channelTemplate={channelTemplate}
+                                </label>
+
+                                <Select
+                                    name="language"
+                                    id="language"
+                                    classNamePrefix="react-select"
+                                    defaultValue={defaultLanguageOption}
+                                    options={languageList}
+                                    onChange={(e) => updateLanguage(e.value)}
+                                    placeholder={intl.formatMessage({
+                                        id: "Common.Select.Placeholder",
+                                        defaultMessage: "Select...",
+                                    })}
                                 />
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </section>
+                            </div>
+
+                            <div className="form-field">
+                                <label
+                                    htmlFor="tags"
+                                    className="form-field__label"
+                                >
+                                    <FormattedMessage
+                                        id="Common.Label.Tags"
+                                        defaultMessage="Tags"
+                                    />
+                                </label>
+
+                                <div className="alert is-warning">
+                                    <FormattedMessage
+                                        id="Page.Channel.Information.TagNotice"
+                                        defaultMessage="Tags are not editable for now"
+                                    />
+                                </div>
+
+                                <Select
+                                    classNamePrefix="react-select"
+                                    isMulti
+                                    isDisabled
+                                    options={tagOption}
+                                    defaultValue={tags}
+                                    getOptionLabel={(option) => option.name}
+                                    getOptionValue={(option) => option.id}
+                                    loadOptions={loadTagOptions}
+                                    placeholder={intl.formatMessage({
+                                        id: "Common.Select.Placeholder",
+                                        defaultMessage: "Select...",
+                                    })}
+                                />
+                            </div>
+
+                            <div className="form-field__action">
+                                <button
+                                    type="button"
+                                    className="btn btn-success me-auto"
+                                    onClick={onClickSaveTemplateHandler}
+                                >
+                                    <FormattedMessage
+                                        id="Page.Channel.Information.SaveTemplate"
+                                        defaultMessage="Save to Template"
+                                    />
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    className="btn is-primary"
+                                >
+                                    <FormattedMessage
+                                        id="Common.Submit"
+                                        defaultMessage="Submit"
+                                    />
+                                </button>
+                            </div>
+                        </form>
+                    )}
+                </section>
+
+                <section className="section">
+                    <h2 className="section__header">
+                        <FormattedMessage
+                            id="Page.Channel.Template.Header"
+                            defaultMessage="Channel Template"
+                        />
+                    </h2>
+
+                    <div className="table-responsive">
+                        <table className="table">
+                            <colgroup>
+                                <col />
+                                <col />
+                                <col />
+                                <col width="140" />
+                                <col width="160" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+                                        <FormattedMessage
+                                            id="Common.Label.Title"
+                                            defaultMessage="Title"
+                                        />
+                                    </th>
+                                    <th scope="col">
+                                        <FormattedMessage
+                                            id="Common.Label.Category"
+                                            defaultMessage="Category"
+                                        />
+                                    </th>
+                                    <th scope="col">
+                                        <FormattedMessage
+                                            id="Common.Label.Language"
+                                            defaultMessage="Language"
+                                        />
+                                    </th>
+                                    <th scope="col">
+                                        <FormattedMessage
+                                            id="Common.Label.Created"
+                                            defaultMessage="Created"
+                                        />
+                                    </th>
+                                    <th scope="col" />
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {channelTemplates.map((channelTemplate) => (
+                                    <ChannelTemplateRowComponent
+                                        key={channelTemplate._id}
+                                        channelTemplate={channelTemplate}
+                                    />
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
         </>
     );
 };

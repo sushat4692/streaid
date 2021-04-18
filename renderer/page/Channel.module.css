@@ -1,0 +1,7 @@
+.category {
+    @apply flex mb-2 items-center;
+}
+
+.category__figure {
+    @apply m-0 mr-2;
+}

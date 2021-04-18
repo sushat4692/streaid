@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
+import Modal from "react-modal";
 import { useSetRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
 import TextareaAutosize from "react-textarea-autosize";
@@ -10,12 +11,15 @@ import UserMemoState, { UserMemoRowType } from "../atom/UserMemo";
 // Util
 import { request } from "../util/request";
 
+// Styles
+import styles from "./User.module.css";
+
 interface Props {
     username: string;
 }
 
 const UserComponent: React.FC<Props> = ({ username }: Props) => {
-    const modal = useRef<HTMLFormElement>(null);
+    const [isOpen, updateIsOpen] = useState<boolean>(false);
     // const [modalClass, updateModalClass] = useState<Modal>(null);
 
     const [nickname, updateNickname] = useState("");
@@ -59,6 +63,10 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
         // }
     };
 
+    const openHandler = () => {
+        updateIsOpen(true);
+    };
+
     const closeHandler = async () => {
         const usermemo = await getUserMemoInformation();
 
@@ -67,9 +75,7 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
             updateMemo(usermemo.memo);
         }
 
-        // if (modalClass) {
-        //     modalClass.toggle();
-        // }
+        updateIsOpen(false);
     };
 
     useEffect(() => {
@@ -87,126 +93,122 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
 
     return (
         <>
-            {memo.length ? (
-                <>
-                    <span
-                        className="d-inline-block"
-                        data-tip={memo ? memo : false}
-                    >
+            <span className={styles.user}>
+                {memo.length ? (
+                    <>
+                        <span data-tip={memo ? memo : false}>
+                            {nickname.length ? (
+                                <>
+                                    {nickname}
+                                    <small className={styles.user__small}>
+                                        ({username})
+                                    </small>
+                                </>
+                            ) : (
+                                username
+                            )}
+                        </span>
+                        <ReactTooltip
+                            place="right"
+                            type="dark"
+                            effect="solid"
+                            getContent={(content) => {
+                                return (
+                                    <div style={{ whiteSpace: "pre-wrap" }}>
+                                        {content}
+                                    </div>
+                                );
+                            }}
+                        />
+                    </>
+                ) : (
+                    <>
                         {nickname.length ? (
                             <>
                                 {nickname}
-                                <small className="ms-2 text-muted">
+                                <small className={styles.user__small}>
                                     ({username})
                                 </small>
                             </>
                         ) : (
                             username
                         )}
-                    </span>
-                    <ReactTooltip
-                        place="right"
-                        type="dark"
-                        effect="solid"
-                        getContent={(content) => {
-                            return (
-                                <div style={{ whiteSpace: "pre-wrap" }}>
-                                    {content}
-                                </div>
-                            );
-                        }}
-                    />
-                </>
-            ) : (
-                <>
-                    {nickname.length ? (
-                        <>
-                            {nickname}
-                            <small className="ms-2 text-muted">
-                                ({username})
-                            </small>
-                        </>
-                    ) : (
-                        username
-                    )}
-                </>
-            )}
+                    </>
+                )}
+            </span>
 
-            <button className="btn btn-link btn-sm" onClick={closeHandler}>
+            <button className={styles.user__button} onClick={openHandler}>
                 <i className="bi bi-pencil" />
             </button>
 
-            <form
-                className="modal fade"
-                tabIndex={-1}
-                onSubmit={onSubmitHandler}
-                ref={modal}
+            <Modal
+                isOpen={isOpen}
+                className={styles.modal}
+                overlayClassName={styles.overlay}
             >
-                <div className="modal-dialog">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h5 className="modal-title">{username}</h5>
-                            <button
-                                type="button"
-                                className="btn-close"
-                                aria-label="Close"
-                                onClick={closeHandler}
+                <form tabIndex={-1} onSubmit={onSubmitHandler}>
+                    <div className={styles.modal__head}>
+                        <h5 className="modal-title">{username}</h5>
+                        <button
+                            type="button"
+                            className={styles.modal__close}
+                            aria-label="Close"
+                            onClick={closeHandler}
+                        />
+                    </div>
+                    <div className={styles.modal__body}>
+                        <div className="form-field">
+                            <label className="form-field__label">
+                                <FormattedMessage
+                                    id="Common.Label.NickName"
+                                    defaultMessage="Nick name"
+                                />
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                value={nickname}
+                                onChange={(e) => {
+                                    updateNickname(e.target.value);
+                                }}
                             />
                         </div>
-                        <div className="modal-body">
-                            <div className="mb-3">
-                                <label className="form-label">
-                                    <FormattedMessage
-                                        id="Common.Label.NickName"
-                                        defaultMessage="Nick name"
-                                    />
-                                </label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    value={nickname}
-                                    onChange={(e) => {
-                                        updateNickname(e.target.value);
-                                    }}
-                                />
-                            </div>
-                            <div className="mb-3">
-                                <label className="form-label">
-                                    <FormattedMessage
-                                        id="Component.User.Memo"
-                                        defaultMessage="Memo"
-                                    />
-                                </label>
-                                <TextareaAutosize
-                                    value={memo}
-                                    className="form-control"
-                                    onChange={(e) => {
-                                        updateMemo(e.target.value);
-                                    }}
-                                />
-                            </div>
-                        </div>
-                        <div className="modal-footer">
-                            <button
-                                type="button"
-                                className="btn btn-secondary"
-                                onClick={closeHandler}
-                            >
+                        <div className="form-field">
+                            <label className="form-field__label">
                                 <FormattedMessage
-                                    id="Common.Close"
-                                    defaultMessage="Close"
+                                    id="Component.User.Memo"
+                                    defaultMessage="Memo"
                                 />
-                            </button>
-                            <button type="submit" className="btn btn-primary">
-                                <FormattedMessage
-                                    id="Common.Submit"
-                                    defaultMessage="Submit"
-                                />
-                            </button>
+                            </label>
+                            <TextareaAutosize
+                                value={memo}
+                                className="form-control"
+                                onChange={(e) => {
+                                    updateMemo(e.target.value);
+                                }}
+                            />
                         </div>
                     </div>
-                </div>
-            </form>
+                    <div className={styles.modal__foot}>
+                        <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={closeHandler}
+                        >
+                            <FormattedMessage
+                                id="Common.Close"
+                                defaultMessage="Close"
+                            />
+                        </button>
+                        <button type="submit" className="btn is-primary">
+                            <FormattedMessage
+                                id="Common.Submit"
+                                defaultMessage="Submit"
+                            />
+                        </button>
+                    </div>
+                </form>
+            </Modal>
         </>
     );
 };

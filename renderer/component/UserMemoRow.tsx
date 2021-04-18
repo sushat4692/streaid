@@ -37,16 +37,18 @@ const UserMemoRowComponent: React.FC<Props> = ({ usermemo }: Props) => {
             </td>
             <td>{moment(usermemo.createdAt).format("MMM Do, kk:mm")}</td>
             <td>
-                <ShoutOutButtonComponent
-                    className="btn btn-sm btn-success me-1"
-                    username={usermemo.username}
-                />
-                <button
-                    className="btn btn-sm btn-danger"
-                    onClick={deleteClickHandler}
-                >
-                    <i className="bi bi-trash" />
-                </button>
+                <div className="btn-group">
+                    <ShoutOutButtonComponent
+                        className="btn is-small btn-success me-1"
+                        username={usermemo.username}
+                    />
+                    <button
+                        className="btn is-small btn-danger"
+                        onClick={deleteClickHandler}
+                    >
+                        <i className="bi bi-trash" />
+                    </button>
+                </div>
             </td>
         </tr>
     );
