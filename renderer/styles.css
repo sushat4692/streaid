@@ -156,6 +156,9 @@ input, select, textarea {
 .btn.is-primary:hover {
     background: var(--color-primary--hover);
 }
+.btn.is-danger {
+    @apply bg-red-600 hover:bg-red-700 dark:bg-red-800 dark:hover:bg-red-900;
+}
 
 .btn-group {
     @apply flex;

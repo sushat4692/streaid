@@ -1,0 +1,16 @@
+.info {
+    @apply fixed inset-0 flex items-center justify-center transition-all duration-500;
+    opacity: 0;
+}
+.info.is-active {
+    opacity: 1;
+}
+.info__inner {
+    @apply w-72 bg-gray-800 p-4 rounded;
+}
+.info__figure {
+    @apply m-0 mb-4;
+}
+.info__name {
+    @apply text-center font-extrabold text-xl;
+}

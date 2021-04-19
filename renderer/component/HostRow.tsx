@@ -45,7 +45,7 @@ const HostsRowComponent: React.FC<Props> = ({ host }: Props) => {
                         username={host.username}
                     />
                     <button
-                        className="btn is-small btn-danger"
+                        className="btn is-small is-danger"
                         onClick={deleteClickHandler}
                     >
                         <i className="bi bi-trash" />

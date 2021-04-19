@@ -1,6 +1,11 @@
 module.exports = {
     purge: {
         content: [
+            "./alert/**/*.css",
+            "./alert/**/*.js",
+            "./alert/**/*.jsx",
+            "./alert/**/*.ts",
+            "./alert/**/*.tsx",
             "./renderer/**/*.css",
             "./renderer/**/*.js",
             "./renderer/**/*.jsx",

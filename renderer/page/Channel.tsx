@@ -346,6 +346,7 @@ const ChannelPage: React.FC = () => {
                                 </div>
 
                                 <AsyncSelect
+                                    classNamePrefix="react-select"
                                     cacheOptions={true}
                                     defaultValue={defaultGameOption}
                                     defaultGameOptions={

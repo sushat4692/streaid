@@ -30,7 +30,7 @@ const ConnectComonent: React.FC<Props> = ({ isBlock = false }: Props) => {
 
     return (
         <button
-            className={`btn ${isConnected ? "btn-danger" : "is-primary"} ${
+            className={`btn ${isConnected ? "is-danger" : "is-primary"} ${
                 isBlock ? "is-block" : ""
             }`}
             onClick={clickHandler}

@@ -38,7 +38,7 @@ const HeaderComponent: React.FC = () => {
                                 <NavLink
                                     className={styles.nav__list__menu__button}
                                     data-disable={!setting.isEnableBot}
-                                    activeClassName="active"
+                                    activeClassName={styles["is-active"]}
                                     to="/chatters"
                                 >
                                     <FormattedMessage
@@ -49,7 +49,7 @@ const HeaderComponent: React.FC = () => {
                                 <NavLink
                                     className={styles.nav__list__menu__button}
                                     data-disable={!setting.isEnableBot}
-                                    activeClassName="active"
+                                    activeClassName={styles["is-active"]}
                                     to="/raiders"
                                 >
                                     <FormattedMessage
@@ -60,7 +60,7 @@ const HeaderComponent: React.FC = () => {
                                 <NavLink
                                     className={styles.nav__list__menu__button}
                                     data-disable={!setting.isEnableBot}
-                                    activeClassName="active"
+                                    activeClassName={styles["is-active"]}
                                     to="/hosts"
                                 >
                                     <FormattedMessage
@@ -71,7 +71,7 @@ const HeaderComponent: React.FC = () => {
                                 <NavLink
                                     className={styles.nav__list__menu__button}
                                     data-disable={!setting.isEnableChannel}
-                                    activeClassName="active"
+                                    activeClassName={styles["is-active"]}
                                     to="/channel"
                                 >
                                     <FormattedMessage
@@ -82,7 +82,7 @@ const HeaderComponent: React.FC = () => {
                                 <NavLink
                                     className={styles.nav__list__menu__button}
                                     data-disable={!setting.isEnableBot}
-                                    activeClassName="active"
+                                    activeClassName={styles["is-active"]}
                                     to="/user_memo"
                                 >
                                     <FormattedMessage
@@ -98,7 +98,7 @@ const HeaderComponent: React.FC = () => {
                         <div className={styles.nav__side__inner}>
                             <NavLink
                                 className={`${styles.nav__list__menu__button} ${styles.nav__side__inner__button}`}
-                                activeClassName="active"
+                                activeClassName={styles["is-active"]}
                                 to="/settings"
                             >
                                 <FormattedMessage

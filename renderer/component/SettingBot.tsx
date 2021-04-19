@@ -98,7 +98,7 @@ const SettingBotComponent: React.FC = () => {
             </div>
 
             <div className="form-field__action is-end">
-                <button className="btn btn-danger" onClick={signoutHandler}>
+                <button className="btn is-danger" onClick={signoutHandler}>
                     <i className="bi bi-box-arrow-in-right btn__icon" />
                     <FormattedMessage
                         id="Common.SignOut"

@@ -25,6 +25,9 @@
 .nav__list__menu__button {
     @apply text-gray-300 hover:bg-gray-700 hover:text-white px-3 text-sm font-medium flex items-center h-10;
 }
+.nav__list__menu__button.is-active {
+    @apply bg-gray-700;
+}
 .nav__list__menu__button[data-disable="true"] {
     opacity: 0.6;
     pointer-events: none;

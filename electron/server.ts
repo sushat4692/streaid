@@ -1,7 +1,9 @@
 import http from "http";
 import fs from "fs-extra";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { join as pathJoin } from "path";
+
+let _socket: Socket;
 
 const mimeTypes = {
     html: "text/html",
@@ -14,16 +16,26 @@ const mimeTypes = {
     css: "text/css",
 };
 
-export const createServer = () => {
+const createSocketServer = () => {
     const httpServer = http.createServer();
     const io = new Server(httpServer, {
         cors: {
             origin: "http://localhost:9990",
         },
     });
-    io.on("connection", (socket) => {});
-    httpServer.listen(9999);
 
+    io.on("connection", (socket) => {
+        _socket = socket;
+    });
+
+    io.use((socket, next) => {
+        next();
+    });
+
+    httpServer.listen(9999);
+};
+
+const createHttpServer = () => {
     http.createServer((req, res) => {
         const filename = (() => {
             const filename = pathJoin(__dirname, req.url || "");
@@ -52,4 +64,17 @@ export const createServer = () => {
         const stream = fs.createReadStream(filename);
         stream.pipe(res);
     }).listen(9990);
+};
+
+export const createServer = () => {
+    createSocketServer();
+    createHttpServer();
+};
+
+export const sendSocketEmit = (mode: string, ...args) => {
+    if (!_socket) {
+        return;
+    }
+
+    _socket.emit(mode, ...args);
 };

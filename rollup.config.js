@@ -53,6 +53,8 @@ export default [
             "tmi.js",
             "nedb-promises",
             "fs-extra",
+            "http",
+            "socket.io",
         ],
     },
     {
