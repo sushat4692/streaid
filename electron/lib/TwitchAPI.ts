@@ -218,6 +218,23 @@ class TwitchAPI {
         }
     }
 
+    async getClipsByUser(User: HelixUser) {
+        try {
+            const clipList = await this.client?.helix.clips.getClipsForBroadcaster(
+                User
+            );
+
+            if (!clipList) {
+                return null;
+            }
+
+            return clipList;
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
+    }
+
     async disconnect() {
         const store = getStoreInstance();
         await session.defaultSession.clearStorageData();

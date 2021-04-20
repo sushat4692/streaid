@@ -64,7 +64,11 @@ const InfoComponent: React.FC = () => {
                 >
                     <div className={styles.info__inner}>
                         <figure className={styles.info__figure}>
-                            <img src={user.profilePictureUrl} alt="" />
+                            <img
+                                src={user.profilePictureUrl}
+                                alt={user.displayName}
+                                className={styles.info__image}
+                            />
                         </figure>
                         <p className={styles.info__name}>{user.displayName}</p>
                     </div>

@@ -63,6 +63,34 @@ export const shoutOut = async (username: string, showWindow = "") => {
                 creationDate: User.creationDate,
             });
             break;
+        case "clip": {
+            const Clips = await TwitchAPI.getClipsByUser(User);
+            if (Clips && Clips.data.length > 0) {
+                const Clip = Clips.data[0];
+                const Game = await Clip.getGame();
+
+                sendSocketEmit("clip", {
+                    id: Clip.id,
+                    url: Clip.url,
+                    embedUrl: Clip.embedUrl,
+                    broadcasterId: Clip.broadcasterId,
+                    broadcasterDisplayName: Clip.broadcasterDisplayName,
+                    creatorId: Clip.creatorId,
+                    creatorDisplayName: Clip.creatorDisplayName,
+                    videoId: Clip.videoId,
+                    gameId: Clip.gameId,
+                    gameName: Game?.name || "",
+                    gameBoxArtUrl: Game?.boxArtUrl || "",
+                    language: Clip.language,
+                    title: Clip.title,
+                    views: Clip.views,
+                    creationDate: Clip.creationDate,
+                    thumbnailUrl: Clip.thumbnailUrl,
+                });
+            }
+
+            break;
+        }
     }
 
     return replaceVariableMessage(store.get("shoutout_message"));
