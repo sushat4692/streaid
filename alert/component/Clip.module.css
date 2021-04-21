@@ -21,5 +21,5 @@
     @apply w-full h-full absolute inset-0;
 }
 .clip__name {
-    @apply text-center font-extrabold text-6xl;
+    @apply text-center font-bold text-6xl;
 }

@@ -5,6 +5,12 @@
 .info.is-active {
     opacity: 1;
 }
+.info__wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 .info__inner {
     @apply bg-gray-800 p-4 rounded rounded transition-all duration-500;
     width: 36rem;
@@ -13,6 +19,19 @@
 .info.is-active .info__inner {
     transform: translateY(0px);
 }
+.info__head {
+    @apply text-center text-7xl font-black mb-4 relative;
+    -webkit-text-fill-color: #fff;
+    -webkit-text-stroke-width: 16px;
+    -webkit-text-stroke-color: #fff;
+}
+.info__head::after {
+    @apply absolute inset-0 m-auto text-gray-800 z-10;
+    -webkit-text-fill-color: initial;
+    -webkit-text-stroke-width: initial;
+    -webkit-text-stroke-color: initial;
+    content: 'Please check the Streamer!';
+}
 .info__figure {
     @apply m-0 mb-4;
 }
@@ -20,5 +39,5 @@
     @apply w-full;
 }
 .info__name {
-    @apply text-center font-extrabold text-6xl;
+    @apply text-center font-bold text-5xl;
 }

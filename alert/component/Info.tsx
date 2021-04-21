@@ -62,15 +62,22 @@ const InfoComponent: React.FC = () => {
                         [styles["is-active"]]: isActive,
                     })}
                 >
-                    <div className={styles.info__inner}>
-                        <figure className={styles.info__figure}>
-                            <img
-                                src={user.profilePictureUrl}
-                                alt={user.displayName}
-                                className={styles.info__image}
-                            />
-                        </figure>
-                        <p className={styles.info__name}>{user.displayName}</p>
+                    <div className={styles.info__wrap}>
+                        <h2 className={styles.info__head}>
+                            Please check the Streamer!
+                        </h2>
+                        <div className={styles.info__inner}>
+                            <figure className={styles.info__figure}>
+                                <img
+                                    src={user.profilePictureUrl}
+                                    alt={user.displayName}
+                                    className={styles.info__image}
+                                />
+                            </figure>
+                            <p className={styles.info__name}>
+                                {user.displayName}
+                            </p>
+                        </div>
                     </div>
                 </div>
             ) : (

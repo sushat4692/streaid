@@ -16,7 +16,7 @@ module.exports = {
     darkMode: "media", // or 'media' or 'class'
     theme: {
         fontFamily: {
-            sans: ["sans-serif"],
+            sans: ["Noto Sans JP", "sans-serif"],
             serif: ["serif"],
         },
         extend: {},
