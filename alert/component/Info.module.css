@@ -1,14 +1,17 @@
 .info {
-    @apply fixed inset-0 flex items-center justify-center transition-all duration-500;
+    @apply fixed inset-0 flex items-center justify-center transition-all duration-500 bg-black bg-opacity-50 bg-black bg-opacity-50;
     opacity: 0;
-    transform: translateY(-10px);
 }
 .info.is-active {
     opacity: 1;
-    transform: translateY(0px);
 }
 .info__inner {
-    @apply w-72 bg-gray-800 p-4 rounded;
+    @apply bg-gray-800 p-4 rounded rounded transition-all duration-500;
+    width: 36rem;
+    transform: translateY(-10px);
+}
+.info.is-active .info__inner {
+    transform: translateY(0px);
 }
 .info__figure {
     @apply m-0 mb-4;
@@ -17,5 +20,5 @@
     @apply w-full;
 }
 .info__name {
-    @apply text-center font-extrabold text-xl;
+    @apply text-center font-extrabold text-6xl;
 }
