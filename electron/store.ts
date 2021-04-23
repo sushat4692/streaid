@@ -41,7 +41,7 @@ const schema: Store.Schema<StoreType> = {
     },
     shoutout_not_found: {
         type: "string",
-        default: `Target user "%username%" was't found, please check again.`,
+        default: `Target user "%user_id%" was't found, please check again.`,
     },
     shoutout_failed: {
         type: "string",

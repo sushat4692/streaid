@@ -57,21 +57,23 @@ const ChannelTemplateRowComponent: React.FC<Props> = ({
             <td>{getLabel(channelTemplate.language)}</td>
             <td>{moment(channelTemplate.createdAt).format("MMM Do, kk:mm")}</td>
             <td>
-                <button
-                    className="btn btn-sm btn-primary me-2"
-                    onClick={updateClickHandler}
-                >
-                    <FormattedMessage
-                        id="Common.Apply"
-                        defaultMessage="Apply"
-                    />
-                </button>
-                <button
-                    className="btn btn-sm btn-danger"
-                    onClick={deleteClickHandler}
-                >
-                    <i className="bi bi-trash"></i>
-                </button>
+                <div className="btn-group">
+                    <button
+                        className="btn is-small is-primary me-2"
+                        onClick={updateClickHandler}
+                    >
+                        <FormattedMessage
+                            id="Common.Apply"
+                            defaultMessage="Apply"
+                        />
+                    </button>
+                    <button
+                        className="btn is-small is-danger"
+                        onClick={deleteClickHandler}
+                    >
+                        <i className="bi bi-trash" />
+                    </button>
+                </div>
             </td>
         </tr>
     );

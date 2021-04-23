@@ -1,6 +1,9 @@
 import { app, BrowserWindow } from "electron";
 import path from "path";
 
+// Server
+import { createServer } from "./server";
+
 // Store
 import { getInstance as getStoreInstance } from "./store";
 
@@ -29,6 +32,7 @@ app.whenReady().then(() => {
     setMenu(locale);
 
     createWindow();
+    createServer();
 });
 
 app.on("window-all-closed", async () => {
@@ -51,3 +55,4 @@ import "./ipcMain/Chatter";
 import "./ipcMain/Raider";
 import "./ipcMain/Host";
 import "./ipcMain/Bot";
+import "./ipcMain/UserMemo";

@@ -8,153 +8,191 @@ import { useSettingState } from "../util/setting";
 // Component
 import MetaComponent from "../component/Meta";
 
+// Styles
+import styles from "./Dashboard.module.css";
+
 const DashboardPage: React.FC = () => {
     const setting = useSettingState();
 
     return (
-        <section className="my-4">
+        <>
             <MetaComponent />
 
-            <h2 className="display-4 mb-4 py-4 text-center fw-bolder">
-                <i className="bi bi-twitch me-2"></i>
+            <h1 className={styles.header}>
+                <i className={`bi bi-twitch ${styles.header__icon}`} />
                 <FormattedMessage
                     id="Common.Title"
                     defaultMessage="Twitch Support Tool"
                 />
-            </h2>
+            </h1>
 
-            <div
-                className="d-grid gap-3"
-                style={{
-                    gridTemplateColumns:
-                        "repeat(auto-fill, minmax(280px, 1fr))",
-                }}
-            >
-                <div className="card">
-                    <div className="card-body">
-                        <h5 className="card-title">
-                            <i className="bi bi-chat me-2"></i>
-                            <FormattedMessage
-                                id="Common.Chatters.Name"
-                                defaultMessage="Chatters"
-                            />
-                        </h5>
-                        <p className="card-text">
-                            <FormattedMessage
-                                id="Common.Chatters.Description"
-                                defaultMessage="Display user list that comment to target channel."
-                            />
-                        </p>
-                        <Link
-                            to="/chatters"
-                            className={
-                                setting.isEnableBot
-                                    ? "btn btn-primary stretched-link"
-                                    : "btn btn-primary disabled"
-                            }
-                        >
-                            <FormattedMessage
-                                id="View.Dashboard.CheckButton"
-                                defaultMessage="Check"
-                            />
-                        </Link>
-                    </div>
-                </div>
+            <div className="container-fluid">
+                <section className="section">
+                    <div
+                        className={styles.cards}
+                        style={{
+                            gridTemplateColumns:
+                                "repeat(auto-fill, minmax(280px, 1fr))",
+                        }}
+                    >
+                        <div className={styles.cards__item}>
+                            <h2 className={styles.cards__head}>
+                                <i
+                                    className={`bi bi-chat ${styles.cards__head__icon}`}
+                                />
+                                <FormattedMessage
+                                    id="Common.Chatters.Name"
+                                    defaultMessage="Chatters"
+                                />
+                            </h2>
+                            <p className={styles.cards__text}>
+                                <FormattedMessage
+                                    id="Common.Chatters.Description"
+                                    defaultMessage="Display user list that comment to target channel."
+                                />
+                            </p>
+                            <Link
+                                to="/chatters"
+                                className={`btn is-primary ${
+                                    setting.isEnableBot
+                                        ? "is-stretched"
+                                        : "is-disabled"
+                                }`}
+                            >
+                                <FormattedMessage
+                                    id="View.Dashboard.CheckButton"
+                                    defaultMessage="Check"
+                                />
+                            </Link>
+                        </div>
 
-                <div className="card">
-                    <div className="card-body">
-                        <h5 className="card-title">
-                            <i className="bi bi-tornado me-2"></i>
-                            <FormattedMessage
-                                id="Common.Raiders.Name"
-                                defaultMessage="Raiders"
-                            />
-                        </h5>
-                        <p className="card-text">
-                            <FormattedMessage
-                                id="Common.Raiders.Description"
-                                defaultMessage="Display user list that raided to target channel."
-                            />
-                        </p>
-                        <Link
-                            to="/raiders"
-                            className={
-                                setting.isEnableBot
-                                    ? "btn btn-primary stretched-link"
-                                    : "btn btn-primary disabled"
-                            }
-                        >
-                            <FormattedMessage
-                                id="View.Dashboard.CheckButton"
-                                defaultMessage="Check"
-                            />
-                        </Link>
-                    </div>
-                </div>
+                        <div className={styles.cards__item}>
+                            <h2 className={styles.cards__head}>
+                                <i
+                                    className={`bi bi-tornado ${styles.cards__head__icon}`}
+                                />
+                                <FormattedMessage
+                                    id="Common.Raiders.Name"
+                                    defaultMessage="Raiders"
+                                />
+                            </h2>
+                            <p className={styles.cards__text}>
+                                <FormattedMessage
+                                    id="Common.Raiders.Description"
+                                    defaultMessage="Display user list that raided to target channel."
+                                />
+                            </p>
+                            <Link
+                                to="/raiders"
+                                className={`btn is-primary ${
+                                    setting.isEnableBot
+                                        ? "is-stretched"
+                                        : "is-disabled"
+                                }`}
+                            >
+                                <FormattedMessage
+                                    id="View.Dashboard.CheckButton"
+                                    defaultMessage="Check"
+                                />
+                            </Link>
+                        </div>
 
-                <div className="card">
-                    <div className="card-body">
-                        <h5 className="card-title">
-                            <i className="bi bi-display me-2"></i>
-                            <FormattedMessage
-                                id="Common.Hosts.Name"
-                                defaultMessage="Hosts"
-                            />
-                        </h5>
-                        <p className="card-text">
-                            <FormattedMessage
-                                id="Common.Hosts.Description"
-                                defaultMessage="Display user list that hosted to target channel."
-                            />
-                        </p>
-                        <Link
-                            to="/hosts"
-                            className={
-                                setting.isEnableBot
-                                    ? "btn btn-primary stretched-link"
-                                    : "btn btn-primary disabled"
-                            }
-                        >
-                            <FormattedMessage
-                                id="View.Dashboard.CheckButton"
-                                defaultMessage="Check"
-                            />
-                        </Link>
-                    </div>
-                </div>
+                        <div className={styles.cards__item}>
+                            <h2 className={styles.cards__head}>
+                                <i
+                                    className={`bi bi-display ${styles.cards__head__icon}`}
+                                />
+                                <FormattedMessage
+                                    id="Common.Hosts.Name"
+                                    defaultMessage="Hosts"
+                                />
+                            </h2>
+                            <p className={styles.cards__text}>
+                                <FormattedMessage
+                                    id="Common.Hosts.Description"
+                                    defaultMessage="Display user list that hosted to target channel."
+                                />
+                            </p>
+                            <Link
+                                to="/hosts"
+                                className={`btn is-primary ${
+                                    setting.isEnableBot
+                                        ? "is-stretched"
+                                        : "is-disabled"
+                                }`}
+                            >
+                                <FormattedMessage
+                                    id="View.Dashboard.CheckButton"
+                                    defaultMessage="Check"
+                                />
+                            </Link>
+                        </div>
 
-                <div className="card">
-                    <div className="card-body">
-                        <h5 className="card-title">
-                            <i className="bi bi-camera-reels me-2"></i>
-                            <FormattedMessage
-                                id="Common.Channel.Name"
-                                defaultMessage="Channel"
-                            />
-                        </h5>
-                        <p className="card-text">
-                            <FormattedMessage
-                                id="Common.Channel.Description"
-                                defaultMessage="You can check/update Channel information."
-                            />
-                        </p>
-                        <Link
-                            to="/channel"
-                            className={
-                                setting.isEnableChannel
-                                    ? "btn btn-primary stretched-link"
-                                    : "btn btn-primary disabled"
-                            }
-                        >
-                            <FormattedMessage
-                                id="View.Dashboard.CheckButton"
-                                defaultMessage="Check"
-                            />
-                        </Link>
+                        <div className={styles.cards__item}>
+                            <h2 className={styles.cards__head}>
+                                <i
+                                    className={`bi bi-camera-reels ${styles.cards__head__icon}`}
+                                />
+                                <FormattedMessage
+                                    id="Common.Channel.Name"
+                                    defaultMessage="Channel"
+                                />
+                            </h2>
+                            <p className={styles.cards__text}>
+                                <FormattedMessage
+                                    id="Common.Channel.Description"
+                                    defaultMessage="You can check/update Channel information."
+                                />
+                            </p>
+                            <Link
+                                to="/channel"
+                                className={`btn is-primary ${
+                                    setting.isEnableChannel
+                                        ? "is-stretched"
+                                        : "is-disabled"
+                                }`}
+                            >
+                                <FormattedMessage
+                                    id="View.Dashboard.CheckButton"
+                                    defaultMessage="Check"
+                                />
+                            </Link>
+                        </div>
+
+                        <div className={styles.cards__item}>
+                            <h2 className={styles.cards__head}>
+                                <i
+                                    className={`bi bi-people ${styles.cards__head__icon}`}
+                                />
+                                <FormattedMessage
+                                    id="Common.UserMemo.Name"
+                                    defaultMessage="Channel"
+                                />
+                            </h2>
+                            <p className={styles.cards__text}>
+                                <FormattedMessage
+                                    id="Common.UserMemo.Description"
+                                    defaultMessage="You can store the target additional information."
+                                />
+                            </p>
+                            <Link
+                                to="/user_memo"
+                                className={`btn is-primary ${
+                                    setting.isEnableBot
+                                        ? "is-stretched"
+                                        : "is-disabled"
+                                }`}
+                            >
+                                <FormattedMessage
+                                    id="View.Dashboard.CheckButton"
+                                    defaultMessage="Check"
+                                />
+                            </Link>
+                        </div>
                     </div>
-                </div>
+                </section>
             </div>
-        </section>
+        </>
     );
 };
 

@@ -1,0 +1,11 @@
+.list {
+}
+.list__item {
+    @apply break-words;
+}
+.list__item + .list__item {
+    @apply mt-2 pt-2 border-t border-dotted border-gray-300 dark:border-gray-500;
+}
+.list__small {
+    @apply text-sm opacity-70;
+}

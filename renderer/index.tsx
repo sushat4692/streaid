@@ -1,12 +1,14 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import Modal from "react-modal";
 import { RecoilRoot } from "recoil";
 
 import App from "./App";
 
-import "bootstrap/scss/bootstrap.scss";
-import "bootstrap";
+import "./styles.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+
+Modal.setAppElement("#root");
 
 ReactDOM.render(
     <RecoilRoot>

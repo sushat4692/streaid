@@ -1,6 +1,7 @@
 import React from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
+import TextareaAutosize from "react-textarea-autosize";
 
 // Recoil
 import ShoutOutMessageState from "../atom/SettingShoutOutMessage";
@@ -10,6 +11,9 @@ import IsConnectingState from "../atom/IsConnecting";
 
 // Utils
 import { request } from "../util/request";
+
+// Style
+import styles from "./SettingShoutOutMessage.module.css";
 
 const SettingBotComponent: React.FC = () => {
     const [shoutOutMessage, updateShoutOutMessage] = useRecoilState(
@@ -49,27 +53,27 @@ const SettingBotComponent: React.FC = () => {
     };
 
     return (
-        <section className="my-4">
-            <h3>
+        <section className="section">
+            <h2 className="section__header">
                 <FormattedMessage
                     id="Component.SettingShoutOutMessage.Header"
                     defaultMessage="Shoutout Message"
                 />
-            </h3>
+            </h2>
 
-            <div className="row">
-                <form
-                    className="col-md-8 mb-3 mb-md-0"
-                    onSubmit={submitHandler}
-                >
-                    <div className="mb-3">
-                        <label htmlFor="shoutout_message" className="mb-1">
+            <div className={styles.row}>
+                <form className={styles.form} onSubmit={submitHandler}>
+                    <div className="form-field">
+                        <label
+                            htmlFor="shoutout_message"
+                            className="form-field__label"
+                        >
                             <FormattedMessage
                                 id="Component.SettingShoutOutMessage.Message"
                                 defaultMessage="ShoutOut Message Template"
                             />
                         </label>
-                        <textarea
+                        <TextareaAutosize
                             name="shoutout_message"
                             id="shoutout_message"
                             rows={3}
@@ -78,57 +82,65 @@ const SettingBotComponent: React.FC = () => {
                             onChange={(e) =>
                                 updateShoutOutMessage(e.target.value)
                             }
-                        ></textarea>
+                        />
                     </div>
 
-                    <div className="mb-3">
-                        <label htmlFor="shoutout_failed" className="mb-1">
+                    <div className="form-field">
+                        <label
+                            htmlFor="shoutout_failed"
+                            className="form-field__label"
+                        >
                             <FormattedMessage
                                 id="Component.SettingShoutOutMessage.Failed"
                                 defaultMessage="Failed Message Template"
                             />
                         </label>
-                        <textarea
+                        <TextareaAutosize
                             name="shoutout_failed"
                             id="shoutout_failed"
                             rows={3}
                             className="form-control"
                             value={shoutOutFailed}
                             onChange={(e) =>
-                                updateShoutOutNotFound(e.target.value)
+                                updateShoutOutFailed(e.target.value)
                             }
-                        ></textarea>
+                        />
                     </div>
 
-                    <div className="mb-3">
-                        <label htmlFor="shoutout_not_found" className="mb-1">
+                    <div className="form-field">
+                        <label
+                            htmlFor="shoutout_not_found"
+                            className="form-field__label"
+                        >
                             <FormattedMessage
                                 id="Component.SettingShoutOutMessage.NotFound"
                                 defaultMessage="Not Found Message Template"
                             />
                         </label>
-                        <textarea
+                        <TextareaAutosize
                             name="shoutout_not_found"
                             id="shoutout_not_found"
                             rows={3}
                             className="form-control"
                             value={shoutOutNotFound}
                             onChange={(e) =>
-                                updateShoutOutFailed(e.target.value)
+                                updateShoutOutNotFound(e.target.value)
                             }
-                        ></textarea>
+                        />
                     </div>
 
-                    <button className="btn btn-primary">
-                        <i className="bi bi-archive me-2"></i>
-                        <FormattedMessage
-                            id="Common.Submit"
-                            defaultMessage="Submit"
-                        />
-                    </button>
+                    <div className="form-field__action">
+                        <button className="btn is-primary">
+                            <i className="bi bi-archive btn__icon" />
+                            <FormattedMessage
+                                id="Common.Submit"
+                                defaultMessage="Submit"
+                            />
+                        </button>
+                    </div>
                 </form>
 
-                <div className="col-md-4">
+                <div className={styles.description}>
                     <table className="table">
                         <colgroup>
                             <col width="120" />

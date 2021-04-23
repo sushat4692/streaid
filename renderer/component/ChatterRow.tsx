@@ -9,6 +9,7 @@ import ChattersState, { ChatterRowType } from "../atom/Chatters";
 import { request } from "../util/request";
 
 // Component
+import UserComponent from "./User";
 import ShoutOutButtonComponent from "./ShoutOutButton";
 
 type Props = {
@@ -31,21 +32,24 @@ const ChatterRowComponent: React.FC<Props> = ({ chatter }: Props) => {
 
     return (
         <tr>
-            <td scope="row">{chatter.username}</td>
+            <td scope="row">
+                <UserComponent username={chatter.username} />
+            </td>
             <td>{chatter["display-name"]}</td>
             <td>{moment(chatter.createdAt).format("MMM Do, kk:mm")}</td>
             <td>
-                <ShoutOutButtonComponent
-                    className="btn btn-sm btn-success me-1"
-                    roomId={chatter["room-id"]}
-                    username={chatter.username}
-                />
-                <button
-                    className="btn btn-sm btn-danger"
-                    onClick={deleteClickHandler}
-                >
-                    <i className="bi bi-trash"></i>
-                </button>
+                <div className="btn-group">
+                    <ShoutOutButtonComponent
+                        className="btn is-small btn-success"
+                        username={chatter.username}
+                    />
+                    <button
+                        className="btn is-small is-danger"
+                        onClick={deleteClickHandler}
+                    >
+                        <i className="bi bi-trash" />
+                    </button>
+                </div>
             </td>
         </tr>
     );

@@ -1,0 +1,16 @@
+@tailwind base;
+
+:root {
+    --color-text: #333;
+    --color-primary: #8c45f7;
+    --color-primary--hover: #7d2df6;
+}
+
+/**
+ * Overwrite
+ */
+body {
+    @apply text-white;
+    background-color: rgba(0, 0, 0, 0);
+    overflow: hidden;
+}

@@ -1,0 +1,29 @@
+.header {
+    @apply flex items-center justify-center py-10 md:py-16 text-2xl md:text-4xl font-black;
+}
+.header__icon {
+    @apply mr-2 md:mr-3 text-4xl md:text-6xl;
+}
+
+.cards {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-2;
+}
+.cards__item {
+    @apply relative border border-solid border-gray-300 dark:border-gray-500 rounded p-3;
+}
+.cards__head {
+    @apply font-bold mb-1;
+}
+.cards__head__icon {
+    @apply mr-2;
+}
+.cards__text {
+    @apply mb-2;
+}
+
+.need {
+    @apply text-center;
+}
+.need__lead {
+    @apply text-lg mb-4;
+}

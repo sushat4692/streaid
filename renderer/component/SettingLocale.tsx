@@ -29,17 +29,18 @@ const SettingBotComponent: React.FC = () => {
     };
 
     return (
-        <section className="my-4">
-            <h3>
+        <section className="section">
+            <h2 className="section__header">
                 <FormattedMessage
                     id="Component.SettingLocale.Header"
                     defaultMessage="Language"
                 />
-            </h3>
+            </h2>
 
             <Select
                 name="language"
                 id="language"
+                classNamePrefix="react-select"
                 defaultValue={defaultLocale}
                 options={localeList}
                 onChange={onChangeHandler}
@@ -47,7 +48,7 @@ const SettingBotComponent: React.FC = () => {
                     id: "Common.Select.Placeholder",
                     defaultMessage: "Select...",
                 })}
-            ></Select>
+            />
         </section>
     );
 };

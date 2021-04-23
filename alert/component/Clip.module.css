@@ -1,0 +1,25 @@
+.clip {
+    @apply fixed inset-0 flex items-center justify-center transition-all duration-500 bg-black bg-opacity-50;
+    opacity: 0;
+}
+.clip.is-active {
+    opacity: 1;
+}
+.clip__inner {
+    @apply bg-gray-800 p-4 rounded transition-all duration-500;
+    width: 96rem;
+    transform: translateY(-10px);
+}
+.clip.is-active .clip__inner {
+    transform: translateY(0px);
+}
+.clip__figure {
+    @apply m-0 mb-4 relative;
+    padding-top: 56.25%;
+}
+.clip__video {
+    @apply w-full h-full absolute inset-0;
+}
+.clip__name {
+    @apply text-center font-bold text-6xl;
+}

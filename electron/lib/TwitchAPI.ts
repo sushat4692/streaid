@@ -84,93 +84,155 @@ class TwitchAPI {
     }
 
     async getUserInfo(): Promise<HelixPrivilegedUser | null> {
-        const user = await this.client?.helix.users.getMe().catch((e) => {
-            console.error(e);
-        });
+        try {
+            const user = await this.client?.helix.users.getMe().catch((e) => {
+                console.error(e);
+            });
 
-        if (!user) {
+            if (!user) {
+                return null;
+            }
+
+            return user;
+        } catch (e) {
+            console.error(e);
             return null;
         }
-
-        return user;
     }
 
     async getUserByName(username: string): Promise<HelixUser | null> {
-        const User = await this.client?.helix.users.getUserByName(username);
+        try {
+            const User = await this.client?.helix.users.getUserByName(username);
+            if (!User) {
+                return null;
+            }
 
-        if (!User) {
+            return User;
+        } catch (e) {
+            console.error(e);
             return null;
         }
-
-        return User;
     }
 
     async getUserById(id: string): Promise<HelixUser | null> {
-        const User = await this.client?.helix.users.getUserById(id);
+        try {
+            const User = await this.client?.helix.users.getUserById(id);
 
-        if (!User) {
+            if (!User) {
+                return null;
+            }
+
+            return User;
+        } catch (e) {
+            console.error(e);
             return null;
         }
-
-        return User;
     }
 
     async getChannelInfo(User: HelixUser): Promise<HelixChannel | null> {
-        const channel = await this.client?.helix.channels.getChannelInfo(User);
+        try {
+            const channel = await this.client?.helix.channels.getChannelInfo(
+                User
+            );
 
-        if (!channel) {
+            if (!channel) {
+                return null;
+            }
+
+            return channel;
+        } catch (e) {
+            console.error(e);
             return null;
         }
-
-        return channel;
     }
 
     async updateChannelInfo(User: HelixUser, data: HelixChannelUpdate) {
-        await this.client?.helix.channels.updateChannelInfo(User, data);
+        try {
+            await this.client?.helix.channels.updateChannelInfo(User, data);
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     async getChannelTags(User: HelixUser): Promise<HelixTag[]> {
-        const tags = await this.client?.helix.streams.getStreamTags(User);
+        try {
+            const tags = await this.client?.helix.streams.getStreamTags(User);
 
-        if (!tags) {
+            if (!tags) {
+                return [];
+            }
+
+            return tags;
+        } catch (e) {
+            console.error(e);
             return [];
         }
-
-        return tags;
     }
 
     async getGame(gameId: string): Promise<HelixGame | null> {
-        const game = await this.client?.helix.games.getGameById(gameId);
+        try {
+            const game = await this.client?.helix.games.getGameById(gameId);
 
-        if (!game) {
+            if (!game) {
+                return null;
+            }
+
+            return game;
+        } catch (e) {
+            console.error(e);
             return null;
         }
-
-        return game;
     }
 
     async getGameList(
         gameName: string
     ): Promise<HelixPaginatedResult<HelixGame> | null> {
-        const gameList = await this.client?.helix.search.searchCategories(
-            gameName
-        );
+        try {
+            const gameList = await this.client?.helix.search.searchCategories(
+                gameName
+            );
 
-        if (!gameList) {
+            if (!gameList) {
+                return null;
+            }
+
+            return gameList;
+        } catch (e) {
+            console.error(e);
             return null;
         }
-
-        return gameList;
     }
 
     async getTagList() {
-        const tagList = await this.client?.helix.tags.getAllStreamTags();
+        try {
+            const tagList = await this.client?.helix.tags.getAllStreamTags();
 
-        if (!tagList) {
+            if (!tagList) {
+                return null;
+            }
+
+            return tagList;
+        } catch (e) {
+            console.error(e);
             return null;
         }
+    }
 
-        return tagList;
+    async getClipsByUser(User: HelixUser) {
+        try {
+            const clipList = await this.client?.helix.clips.getClipsForBroadcaster(
+                User
+            );
+
+            if (!clipList) {
+                return null;
+            }
+
+            return clipList;
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
     }
 
     async disconnect() {

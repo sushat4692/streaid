@@ -23,6 +23,10 @@ const template: (MenuItem | MenuItemConstructorOptions)[] = [
         ],
     },
     {
+        role: "editMenu",
+        label: "編集",
+    },
+    {
         role: "help",
         label: "ヘルプ",
         submenu: [

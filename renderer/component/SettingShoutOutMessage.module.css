@@ -1,0 +1,16 @@
+.row {
+    @apply grid grid-cols-1 gap-2;
+}
+
+@media (min-width: 768px) {
+    .row {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+.form {
+    @apply md:mb-2;
+}
+
+.description {
+}
