@@ -79,6 +79,8 @@ const messages: { [key: string]: string } = {
     // Connect
     "Component.Connect.Enable": "接続",
     "Component.Connect.Disable": "切断",
+    // Setting
+    "Component.Setting.General": "一般",
     // SettingLocale
     "Component.SettingLocale.Header": "言語設定",
     // SettingBot

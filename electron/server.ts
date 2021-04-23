@@ -44,7 +44,7 @@ const createHttpServer = () => {
                 fs.existsSync(filename) &&
                 fs.statSync(filename).isDirectory()
             ) {
-                return pathJoin(filename, "index.html");
+                return pathJoin(filename, "alert.html");
             } else {
                 return filename;
             }

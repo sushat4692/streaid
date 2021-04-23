@@ -1,5 +1,6 @@
 import React from "react";
 import { FormattedMessage } from "react-intl";
+import { NavLink, Switch, Route } from "react-router-dom";
 
 // Component
 import MetaComponent from "../component/Meta";
@@ -8,7 +9,24 @@ import SettingBotComponent from "../component/SettingBot";
 import SettingShoutOutMessageComponent from "../component/SettingShoutOutMessage";
 import SettingSoundComponent from "../component/SettingSound";
 
-const SettnigPage: React.FC = () => {
+import styles from "./Setting.module.css";
+
+interface Props {
+    match: {
+        isExact: boolean;
+        params: { [key: string]: any };
+        path: string;
+        url: string;
+    };
+}
+
+const SettnigPage: React.FC<Props> = ({ match }: Props) => {
+    console.log(match);
+
+    if (!match) {
+        return <></>;
+    }
+
     return (
         <>
             <MetaComponent
@@ -28,11 +46,63 @@ const SettnigPage: React.FC = () => {
                 </div>
             </div>
 
-            <div className="container-fluid">
-                <SettingLocaleComponent />
-                <SettingBotComponent />
-                <SettingShoutOutMessageComponent />
-                <SettingSoundComponent />
+            <div className={styles.wrap}>
+                <nav className={styles.nav}>
+                    <NavLink
+                        className={styles.nav__item}
+                        activeClassName={styles["is-active"]}
+                        exact
+                        to={match.url}
+                    >
+                        <FormattedMessage
+                            id="Component.Setting.General"
+                            defaultMessage="General"
+                        />
+                    </NavLink>
+                    <NavLink
+                        className={styles.nav__item}
+                        activeClassName={styles["is-active"]}
+                        exact
+                        to={`${match.url}/shoutout`}
+                    >
+                        <FormattedMessage
+                            id="Component.SettingShoutOutMessage.Header"
+                            defaultMessage="Shoutout Message"
+                        />
+                    </NavLink>
+                    <NavLink
+                        className={styles.nav__item}
+                        activeClassName={styles["is-active"]}
+                        exact
+                        to={`${match.url}/sound`}
+                    >
+                        <FormattedMessage
+                            id="Component.SettingSound.Header"
+                            defaultMessage="Notification Sound"
+                        />
+                    </NavLink>
+                </nav>
+
+                <main className={styles.main}>
+                    <div className="container-fluid">
+                        <Switch>
+                            <Route exact path={match.url}>
+                                <SettingLocaleComponent></SettingLocaleComponent>
+                                <SettingBotComponent></SettingBotComponent>
+                            </Route>
+                            <Route
+                                exact
+                                path={match.url + `/shoutout`}
+                                component={SettingShoutOutMessageComponent}
+                            ></Route>
+                            <Route
+                                exact
+                                path={match.url + `/sound`}
+                                component={SettingSoundComponent}
+                            ></Route>
+                        </Switch>
+                    </div>
+                </main>
             </div>
         </>
     );

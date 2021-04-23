@@ -38,7 +38,7 @@ const InfoComponent: React.FC = () => {
     };
 
     useEffect(() => {
-        socket.on("clip", (info) => {
+        socket.on("clip", (info, length) => {
             console.log(info);
 
             if (timer !== null) {
@@ -58,7 +58,7 @@ const InfoComponent: React.FC = () => {
                         updateClip(null);
                         updateTimer(null);
                     }, 500);
-                }, 24500)
+                }, length * 1000 - 500)
             );
         });
     }, []);

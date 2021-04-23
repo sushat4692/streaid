@@ -89,42 +89,44 @@ const Layout: React.FC = () => {
                 <main>
                     {setting.isEnableBot ? (
                         <Switch>
-                            <Route path="/chatters">
-                                <ChattersPage />
-                            </Route>
-                            <Route path="/raiders">
-                                <RaidersPage />
-                            </Route>
-                            <Route path="/hosts">
-                                <HostsPage />
-                            </Route>
-                            <Route path="/channel">
-                                <ChannelPage />
-                            </Route>
-                            <Route path="/user_memo">
-                                <UserMemoPage />
-                            </Route>
-                            <Route path="/settings">
-                                <SettingPage />
-                            </Route>
-                            <Route path="/license">
-                                <LicensePage />
-                            </Route>
-                            <Route path="/">
-                                <DashboardPage />
-                            </Route>
+                            <Route
+                                path="/chatters"
+                                component={ChattersPage}
+                            ></Route>
+                            <Route
+                                path="/raiders"
+                                component={RaidersPage}
+                            ></Route>
+                            <Route path="/hosts" component={HostsPage}></Route>
+                            <Route
+                                path="/channel"
+                                component={ChannelPage}
+                            ></Route>
+                            <Route
+                                path="/user_memo"
+                                component={UserMemoPage}
+                            ></Route>
+                            <Route
+                                path="/settings"
+                                component={SettingPage}
+                            ></Route>
+                            <Route
+                                path="/license"
+                                component={LicensePage}
+                            ></Route>
+                            <Route path="/" component={DashboardPage}></Route>
                         </Switch>
                     ) : (
                         <Switch>
-                            <Route path="/settings">
-                                <SettingPage />
-                            </Route>
-                            <Route path="/license">
-                                <LicensePage />
-                            </Route>
-                            <Route path="/">
-                                <NeedSettingPage />
-                            </Route>
+                            <Route
+                                path="/settings"
+                                component={SettingPage}
+                            ></Route>
+                            <Route
+                                path="/license"
+                                component={LicensePage}
+                            ></Route>
+                            <Route path="/" component={NeedSettingPage}></Route>
                         </Switch>
                     )}
                 </main>

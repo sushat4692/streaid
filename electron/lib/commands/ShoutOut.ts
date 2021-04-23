@@ -49,44 +49,55 @@ export const shoutOut = async (username: string, showWindow = "") => {
     }
 
     switch (showWindow) {
-        case "info":
-            sendSocketEmit("info", {
-                id: User.id,
-                name: User.name,
-                displayName: User.displayName,
-                description: User.description,
-                type: User.type,
-                broadcasterType: User.broadcasterType,
-                profilePictureUrl: User.profilePictureUrl,
-                offlinePlaceholderUrl: User.offlinePlaceholderUrl,
-                views: User.views,
-                creationDate: User.creationDate,
-            });
+        case "info": {
+            const length = store.get("shoutout_info_length");
+            sendSocketEmit(
+                "info",
+                {
+                    id: User.id,
+                    name: User.name,
+                    displayName: User.displayName,
+                    description: User.description,
+                    type: User.type,
+                    broadcasterType: User.broadcasterType,
+                    profilePictureUrl: User.profilePictureUrl,
+                    offlinePlaceholderUrl: User.offlinePlaceholderUrl,
+                    views: User.views,
+                    creationDate: User.creationDate,
+                },
+                length
+            );
             break;
+        }
         case "clip": {
             const Clips = await TwitchAPI.getClipsByUser(User);
             if (Clips && Clips.data.length > 0) {
                 const Clip = Clips.data[0];
                 const Game = await Clip.getGame();
 
-                sendSocketEmit("clip", {
-                    id: Clip.id,
-                    url: Clip.url,
-                    embedUrl: Clip.embedUrl,
-                    broadcasterId: Clip.broadcasterId,
-                    broadcasterDisplayName: Clip.broadcasterDisplayName,
-                    creatorId: Clip.creatorId,
-                    creatorDisplayName: Clip.creatorDisplayName,
-                    videoId: Clip.videoId,
-                    gameId: Clip.gameId,
-                    gameName: Game?.name || "",
-                    gameBoxArtUrl: Game?.boxArtUrl || "",
-                    language: Clip.language,
-                    title: Clip.title,
-                    views: Clip.views,
-                    creationDate: Clip.creationDate,
-                    thumbnailUrl: Clip.thumbnailUrl,
-                });
+                const length = store.get("shoutout_clip_length");
+                sendSocketEmit(
+                    "clip",
+                    {
+                        id: Clip.id,
+                        url: Clip.url,
+                        embedUrl: Clip.embedUrl,
+                        broadcasterId: Clip.broadcasterId,
+                        broadcasterDisplayName: Clip.broadcasterDisplayName,
+                        creatorId: Clip.creatorId,
+                        creatorDisplayName: Clip.creatorDisplayName,
+                        videoId: Clip.videoId,
+                        gameId: Clip.gameId,
+                        gameName: Game?.name || "",
+                        gameBoxArtUrl: Game?.boxArtUrl || "",
+                        language: Clip.language,
+                        title: Clip.title,
+                        views: Clip.views,
+                        creationDate: Clip.creationDate,
+                        thumbnailUrl: Clip.thumbnailUrl,
+                    },
+                    length
+                );
             }
 
             break;

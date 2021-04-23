@@ -4,6 +4,8 @@
     --color-text: #333;
     --color-primary: #8c45f7;
     --color-primary--hover: #7d2df6;
+
+    --size-left-nav-width: 240px;
 }
 
 /**
@@ -28,7 +30,7 @@ input, select, textarea {
  * Container
  */
 .container-fluid {
-    @apply max-w-7xl mx-auto px-4;
+    @apply mx-auto px-4;
 }
 
 /**

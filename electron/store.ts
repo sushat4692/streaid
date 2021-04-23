@@ -12,6 +12,8 @@ export interface StoreType {
     chatter_volume: number;
     raid_volume: number;
     host_volume: number;
+    shoutout_info_length: number;
+    shoutout_clip_length: number;
 }
 const schema: Store.Schema<StoreType> = {
     "api.inited": {
@@ -58,6 +60,14 @@ const schema: Store.Schema<StoreType> = {
     host_volume: {
         type: "number",
         default: 1,
+    },
+    shoutout_info_length: {
+        type: "number",
+        default: 8,
+    },
+    shoutout_clip_length: {
+        type: "number",
+        default: 8,
     },
 };
 

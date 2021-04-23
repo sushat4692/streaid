@@ -80,6 +80,8 @@ const messages: { [key: string]: string } = {
     // Connect
     "Component.Connect.Enable": "Connect",
     "Component.Connect.Disable": "Disconnect",
+    // Setting
+    "Component.Setting.General": "General",
     // SettingLocale
     "Component.SettingLocale.Header": "Language",
     // SettingBot
