@@ -1,47 +1,19 @@
 // Library
-import { getInstance as getBotInstance } from "../Bot";
 import { getInstance as getTwichAPIInstance } from "../TwitchAPI";
 
 // Store
 import { getInstance as getStoreInstance } from "../../store";
 
-const shoutOut = async (values: {
-    postRoomId?: string;
-    postChannel?: string;
-    username: string;
-}) => {
-    const Bot = getBotInstance();
+// Socket
+import { sendSocketEmit } from "../../server";
+
+export const shoutOut = async (username: string, showWindow = "") => {
+    if (!username) {
+        return `* You need to add username: e.g. !so {username}`;
+    }
+
     const TwitchAPI = getTwichAPIInstance();
     const store = getStoreInstance();
-
-    if (!Bot.client) {
-        return;
-    }
-
-    if (!values.postRoomId && !values.postChannel) {
-        return;
-    }
-
-    const channelName = await (async () => {
-        if (values.postChannel) {
-            return values.postChannel;
-        }
-
-        if (!values.postRoomId) {
-            return null;
-        }
-
-        const User = await TwitchAPI.getUserById(values.postRoomId);
-        if (!User) {
-            return null;
-        }
-
-        return User.name;
-    })();
-
-    if (!channelName) {
-        return;
-    }
 
     const replaceVariableMessage = (
         message: string,
@@ -49,41 +21,77 @@ const shoutOut = async (values: {
         hasChannel = true
     ) => {
         return message
-            .replaceAll("%url%", `https://www.twitch.tv/${values.username}`)
+            .replaceAll("%url%", `https://www.twitch.tv/${username}`)
             .replaceAll("%username%", hasUser && User ? User.displayName : "")
-            .replaceAll("%user_id%", values.username)
+            .replaceAll("%user_id%", username)
             .replaceAll(
                 "%category%",
                 hasChannel && shoutOutChannel ? shoutOutChannel.gameName : ""
             );
     };
 
-    const User = await TwitchAPI.getUserByName(values.username);
+    const User = await TwitchAPI.getUserByName(username);
     if (!User) {
-        Bot.client.action(
-            channelName,
-            replaceVariableMessage(
-                store.get("shoutout_not_found"),
-                false,
-                false
-            )
+        return replaceVariableMessage(
+            store.get("shoutout_not_found"),
+            false,
+            false
         );
-        return;
     }
 
     const shoutOutChannel = await TwitchAPI.getChannelInfo(User);
     if (!shoutOutChannel) {
-        Bot.client.action(
-            channelName,
-            replaceVariableMessage(store.get("shoutout_failed"), true, false)
+        return replaceVariableMessage(
+            store.get("shoutout_failed"),
+            true,
+            false
         );
-        return;
     }
 
-    Bot.client.action(
-        channelName,
-        replaceVariableMessage(store.get("shoutout_message"))
-    );
-};
+    switch (showWindow) {
+        case "info":
+            sendSocketEmit("info", {
+                id: User.id,
+                name: User.name,
+                displayName: User.displayName,
+                description: User.description,
+                type: User.type,
+                broadcasterType: User.broadcasterType,
+                profilePictureUrl: User.profilePictureUrl,
+                offlinePlaceholderUrl: User.offlinePlaceholderUrl,
+                views: User.views,
+                creationDate: User.creationDate,
+            });
+            break;
+        case "clip": {
+            const Clips = await TwitchAPI.getClipsByUser(User);
+            if (Clips && Clips.data.length > 0) {
+                const Clip = Clips.data[0];
+                const Game = await Clip.getGame();
 
-export default shoutOut;
+                sendSocketEmit("clip", {
+                    id: Clip.id,
+                    url: Clip.url,
+                    embedUrl: Clip.embedUrl,
+                    broadcasterId: Clip.broadcasterId,
+                    broadcasterDisplayName: Clip.broadcasterDisplayName,
+                    creatorId: Clip.creatorId,
+                    creatorDisplayName: Clip.creatorDisplayName,
+                    videoId: Clip.videoId,
+                    gameId: Clip.gameId,
+                    gameName: Game?.name || "",
+                    gameBoxArtUrl: Game?.boxArtUrl || "",
+                    language: Clip.language,
+                    title: Clip.title,
+                    views: Clip.views,
+                    creationDate: Clip.creationDate,
+                    thumbnailUrl: Clip.thumbnailUrl,
+                });
+            }
+
+            break;
+        }
+    }
+
+    return replaceVariableMessage(store.get("shoutout_message"));
+};

@@ -43,6 +43,19 @@ export default [
                 },
             }),
         ],
+        external: [
+            "electron",
+            "electron-store",
+            "electron-is-dev",
+            "path",
+            "twitch",
+            "twitch-electron-auth-provider",
+            "tmi.js",
+            "nedb-promises",
+            "fs-extra",
+            "http",
+            "socket.io",
+        ],
     },
     {
         input: "electron/preload.ts",
@@ -76,5 +89,6 @@ export default [
                 },
             }),
         ],
+        external: ["electron"],
     },
 ];

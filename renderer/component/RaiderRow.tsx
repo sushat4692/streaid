@@ -9,13 +9,14 @@ import RaidersState, { RaiderRowType } from "../atom/Raiders";
 import { request } from "../util/request";
 
 // Component
+import UserComponent from "./User";
 import ShoutOutButtonComponent from "./ShoutOutButton";
 
 type Props = {
     raider: RaiderRowType;
 };
 
-const ChatterRowComponent: React.FC<Props> = ({ raider }: Props) => {
+const RaiderRowComponent: React.FC<Props> = ({ raider }: Props) => {
     const updateRaidersState = useSetRecoilState(RaidersState);
 
     const deleteClickHandler = async () => {
@@ -31,24 +32,27 @@ const ChatterRowComponent: React.FC<Props> = ({ raider }: Props) => {
 
     return (
         <tr>
-            <td scope="row">{raider.username}</td>
+            <td scope="row">
+                <UserComponent username={raider.username} />
+            </td>
             <td>{raider.viewers}</td>
             <td>{moment(raider.createdAt).format("MMM Do, kk:mm")}</td>
             <td>
-                <ShoutOutButtonComponent
-                    className="btn btn-sm btn-success me-1"
-                    channel={raider.channel}
-                    username={raider.username}
-                />
-                <button
-                    className="btn btn-sm btn-danger"
-                    onClick={deleteClickHandler}
-                >
-                    <i className="bi bi-trash"></i>
-                </button>
+                <div className="btn-group">
+                    <ShoutOutButtonComponent
+                        className="btn is-small btn-success me-1"
+                        username={raider.username}
+                    />
+                    <button
+                        className="btn is-small is-danger"
+                        onClick={deleteClickHandler}
+                    >
+                        <i className="bi bi-trash" />
+                    </button>
+                </div>
             </td>
         </tr>
     );
 };
 
-export default ChatterRowComponent;
+export default RaiderRowComponent;

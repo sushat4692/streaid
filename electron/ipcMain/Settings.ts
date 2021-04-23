@@ -12,6 +12,7 @@ import { getInstance as getStoreInstance } from "../store";
 // Util
 import { getWindow } from "../util/window";
 import { playSound } from "../util/Sound";
+import { setCache } from "../util/Sound";
 
 // Menu
 import { setMenu } from "../menu";
@@ -40,6 +41,7 @@ ipcMain.handle("settings:get", async () => {
     const shoutout_not_found = store.get("shoutout_not_found");
     const shoutout_failed = store.get("shoutout_failed");
     const chatter_volume = store.get("chatter_volume");
+    const chat_volume = store.get("chat_volume");
     const raid_volume = store.get("raid_volume");
     const host_volume = store.get("host_volume");
 
@@ -51,6 +53,7 @@ ipcMain.handle("settings:get", async () => {
         shoutout_not_found,
         shoutout_failed,
         chatter_volume,
+        chat_volume,
         raid_volume,
         host_volume,
     };
@@ -99,6 +102,7 @@ ipcMain.handle("setting:notification:sound", async (_, values) => {
         path.join(isDev ? "." : app.getPath("userData"), `data/${values}.mp3`),
         buffer
     );
+    setCache(values, buffer);
 
     return true;
 });

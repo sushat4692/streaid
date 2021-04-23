@@ -16,18 +16,24 @@ const SettnigPage: React.FC = () => {
                 defaultMessage="Settings"
             />
 
-            <h2 className="display-6 mt-4 mb-3 fw-bolder">
-                <i className="bi bi-gear me-2"></i>
-                <FormattedMessage
-                    id="Common.Settings.Name"
-                    defaultMessage="Settings"
-                />
-            </h2>
+            <div className="page-header">
+                <div className="container-fluid">
+                    <h1 className="page-header__text">
+                        <i className="bi bi-gear page-header__icon" />
+                        <FormattedMessage
+                            id="Common.Settings.Name"
+                            defaultMessage="Settings"
+                        />
+                    </h1>
+                </div>
+            </div>
 
-            <SettingLocaleComponent />
-            <SettingBotComponent />
-            <SettingShoutOutMessageComponent />
-            <SettingSoundComponent />
+            <div className="container-fluid">
+                <SettingLocaleComponent />
+                <SettingBotComponent />
+                <SettingShoutOutMessageComponent />
+                <SettingSoundComponent />
+            </div>
         </>
     );
 };

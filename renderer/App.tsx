@@ -73,7 +73,7 @@ const App: React.FC = () => {
         (async () => {
             updateIsConnecting(true);
 
-            const settingLocale = await request("setting:locale", {}, "ja-jp");
+            const settingLocale = await request("setting:locale", {}, "en-us");
             updateLocale(settingLocale);
 
             const isInited: boolean = await request("get:init", null, true);
