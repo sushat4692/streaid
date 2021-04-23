@@ -1,6 +1,6 @@
 {
     "name": "twitch-support-tool",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "main": "./dist/main.js",
     "description": "Streaming support tool for Twitch",
     "author": {
