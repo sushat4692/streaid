@@ -52,7 +52,7 @@ const SettingBotComponent: React.FC = () => {
             <h2 className="section__header">
                 <FormattedMessage
                     id="Component.SettingBot.Header"
-                    defaultMessage="Bot Target Channel"
+                    defaultMessage="Target Channel"
                 />
             </h2>
 

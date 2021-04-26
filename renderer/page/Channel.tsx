@@ -472,7 +472,7 @@ const ChannelPage: React.FC = () => {
                                 <col />
                                 <col />
                                 <col width="140" />
-                                <col width="160" />
+                                <col width="100" />
                             </colgroup>
                             <thead>
                                 <tr>

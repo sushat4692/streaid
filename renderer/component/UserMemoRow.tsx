@@ -35,7 +35,7 @@ const UserMemoRowComponent: React.FC<Props> = ({ usermemo }: Props) => {
             <td scope="row">
                 <UserComponent username={usermemo.username} />
             </td>
-            <td>{moment(usermemo.createdAt).format("MMM Do, kk:mm")}</td>
+            <td>{moment(usermemo.createdAt).format("M/D kk:mm")}</td>
             <td>
                 <div className="btn-group">
                     <ShoutOutButtonComponent

@@ -58,9 +58,7 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
         );
 
         updateUserMemo([...usermemos]);
-        // if (modalClass) {
-        //     modalClass.toggle();
-        // }
+        updateIsOpen(false);
     };
 
     const openHandler = () => {
@@ -79,10 +77,6 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
     };
 
     useEffect(() => {
-        // if (modal.current) {
-        //     updateModalClass(new Modal(modal.current));
-        // }
-
         getUserMemoInformation().then((usermemo) => {
             if (usermemo) {
                 updateNickname(usermemo.nickname);

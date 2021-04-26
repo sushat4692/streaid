@@ -9,11 +9,10 @@ export interface StoreType {
     shoutout_message: string;
     shoutout_not_found: string;
     shoutout_failed: string;
+    shoutout_info_length: number;
     chatter_volume: number;
     raid_volume: number;
     host_volume: number;
-    shoutout_info_length: number;
-    shoutout_clip_length: number;
 }
 const schema: Store.Schema<StoreType> = {
     "api.inited": {
@@ -49,6 +48,10 @@ const schema: Store.Schema<StoreType> = {
         type: "string",
         default: `Failed to get Channel information of "%username%" channel, please try again later.`,
     },
+    shoutout_info_length: {
+        type: "number",
+        default: 8,
+    },
     chatter_volume: {
         type: "number",
         default: 1,
@@ -60,14 +63,6 @@ const schema: Store.Schema<StoreType> = {
     host_volume: {
         type: "number",
         default: 1,
-    },
-    shoutout_info_length: {
-        type: "number",
-        default: 8,
-    },
-    shoutout_clip_length: {
-        type: "number",
-        default: 8,
     },
 };
 

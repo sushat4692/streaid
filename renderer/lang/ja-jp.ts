@@ -32,6 +32,8 @@ const messages: { [key: string]: string } = {
     "Common.Label.Created": "登録日",
     "Common.Label.ShoutOut": "シャウトアウト",
     "Common.Label.Volume": "音量",
+    "Common.Label.Command": "コマンド",
+    "Common.Label.DisplayLength": "表示時間",
     "Common.Label.SelectFile": "ファイル選択",
     "Common.Select.Placeholder": "選択してください",
     "Common.Submit": "送信",
@@ -45,6 +47,7 @@ const messages: { [key: string]: string } = {
     "Common.Variable.Username.Description": "対象ユーザー表示名",
     "Common.Variable.UserId.Description": "対象ユーザーID",
     "Common.Variable.Category.Description": "対象チャンネルカテゴリー名",
+    "Common.Unit.Second": "秒",
 
     /**
      * Views
@@ -84,7 +87,7 @@ const messages: { [key: string]: string } = {
     // SettingLocale
     "Component.SettingLocale.Header": "言語設定",
     // SettingBot
-    "Component.SettingBot.Header": "ボット対象チャンネル設定",
+    "Component.SettingBot.Header": "対象チャンネル設定",
     "Component.SettingBot.ChannelHelp":
         "※ ログインユーザーと対象チャンネルを同じにするとチャンネル情報を更新できるようになります",
     // SettingShoutOutMessage
@@ -94,6 +97,18 @@ const messages: { [key: string]: string } = {
         "シャウトアウト失敗時テンプレート",
     "Component.SettingShoutOutMessage.NotFound":
         "シャウトアウト対象不明時テンプレート",
+    // SettingShoutOutAlert
+    "Component.SettingShoutOutAlert.Header": "シャウトアウトアラート設定",
+    "Component.SettingShoutOutAlert.URL.Header": "シャウトアウトアラート設定",
+    "Component.SettingShoutOutAlert.URL.Descript":
+        "下記のURLをOBSなどの配信ソフトの「ブラウザ」のURLフィールドに貼り付けてください",
+    "Component.SettingShoutOutAlert.Length.Header": "表示時間設定",
+    "Component.SettingShoutOutAlert.Info.Header": "情報",
+    "Component.SettingShoutOutAlert.Info.Descript":
+        "シャウトアウトしたストリーマーの情報を表示します",
+    "Component.SettingShoutOutAlert.Clip.Header": "クリップ動画",
+    "Component.SettingShoutOutAlert.Clip.Descript":
+        "シャウトアウトしたストリーマーのクリップ動画を再生します",
     // SettingSound
     "Component.SettingSound.Header": "通知音設定",
     "Component.SettingSoundChats.Descript":

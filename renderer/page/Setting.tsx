@@ -7,6 +7,7 @@ import MetaComponent from "../component/Meta";
 import SettingLocaleComponent from "../component/SettingLocale";
 import SettingBotComponent from "../component/SettingBot";
 import SettingShoutOutMessageComponent from "../component/SettingShoutOutMessage";
+import SettingShoutoutAlertComponent from "../component/SettingShoutoutAlert";
 import SettingSoundComponent from "../component/SettingSound";
 
 import styles from "./Setting.module.css";
@@ -21,8 +22,6 @@ interface Props {
 }
 
 const SettnigPage: React.FC<Props> = ({ match }: Props) => {
-    console.log(match);
-
     if (!match) {
         return <></>;
     }
@@ -74,6 +73,17 @@ const SettnigPage: React.FC<Props> = ({ match }: Props) => {
                         className={styles.nav__item}
                         activeClassName={styles["is-active"]}
                         exact
+                        to={`${match.url}/shoutout_alert`}
+                    >
+                        <FormattedMessage
+                            id="Component.SettingShoutOutAlert.Header"
+                            defaultMessage="Shoutout Alert"
+                        />
+                    </NavLink>
+                    <NavLink
+                        className={styles.nav__item}
+                        activeClassName={styles["is-active"]}
+                        exact
                         to={`${match.url}/sound`}
                     >
                         <FormattedMessage
@@ -94,6 +104,11 @@ const SettnigPage: React.FC<Props> = ({ match }: Props) => {
                                 exact
                                 path={match.url + `/shoutout`}
                                 component={SettingShoutOutMessageComponent}
+                            ></Route>
+                            <Route
+                                exact
+                                path={`${match.url}/shoutout_alert`}
+                                component={SettingShoutoutAlertComponent}
                             ></Route>
                             <Route
                                 exact

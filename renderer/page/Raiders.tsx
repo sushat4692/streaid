@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { FormattedMessage } from "react-intl";
 
 // Recoil
 import RaidersState, { RaiderRowType } from "../atom/Raiders";
+import LocaleState from "../atom/Locale";
 
 // Component
 import MetaComponent from "../component/Meta";
@@ -14,6 +15,7 @@ import { request } from "../util/request";
 
 const ChattersPage: React.FC = () => {
     const [raiders, updateRaiders] = useRecoilState(RaidersState);
+    const locale = useRecoilValue(LocaleState);
 
     useEffect(() => {
         (async () => {
@@ -74,7 +76,7 @@ const ChattersPage: React.FC = () => {
                                 <col />
                                 <col width="100" />
                                 <col width="140" />
-                                <col width="160" />
+                                <col width={locale === "ja-jp" ? 180 : 160} />
                             </colgroup>
                             <thead>
                                 <tr>

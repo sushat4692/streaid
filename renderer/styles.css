@@ -111,6 +111,24 @@ input, select, textarea {
     @apply text-lg h-12 py-2 px-3;
 }
 
+.form-control-group {
+    display: flex;
+}
+.form-control-group .form-control,
+.form-control-group .btn {
+    @apply rounded-none;
+}
+.form-control-group .form-control:first-child,
+.form-control-group .btn:first-child {
+    @apply rounded-tl;
+    @apply rounded-bl;
+}
+.form-control-group .form-control:last-child,
+.form-control-group .btn:last-child {
+    @apply rounded-tr;
+    @apply rounded-br;
+}
+
 .form-range {
     @apply w-full;
 }

@@ -1,3 +1,5 @@
+import { HelixUser } from "twitch/lib";
+
 // Library
 import { getInstance as getTwichAPIInstance } from "../TwitchAPI";
 
@@ -7,7 +9,10 @@ import { getInstance as getStoreInstance } from "../../store";
 // Socket
 import { sendSocketEmit } from "../../server";
 
-export const shoutOut = async (username: string, showWindow = "") => {
+export const shoutOut = async (
+    username: string,
+    showWindow: "info" | "clip" | null = null
+) => {
     if (!username) {
         return `* You need to add username: e.g. !so {username}`;
     }
@@ -48,6 +53,17 @@ export const shoutOut = async (username: string, showWindow = "") => {
         );
     }
 
+    shoutOutAlert(User, showWindow);
+    return replaceVariableMessage(store.get("shoutout_message"));
+};
+
+export const shoutOutAlert = async (
+    User: HelixUser,
+    showWindow: "info" | "clip" | null
+) => {
+    const TwitchAPI = getTwichAPIInstance();
+    const store = getStoreInstance();
+
     switch (showWindow) {
         case "info": {
             const length = store.get("shoutout_info_length");
@@ -75,34 +91,27 @@ export const shoutOut = async (username: string, showWindow = "") => {
                 const Clip = Clips.data[0];
                 const Game = await Clip.getGame();
 
-                const length = store.get("shoutout_clip_length");
-                sendSocketEmit(
-                    "clip",
-                    {
-                        id: Clip.id,
-                        url: Clip.url,
-                        embedUrl: Clip.embedUrl,
-                        broadcasterId: Clip.broadcasterId,
-                        broadcasterDisplayName: Clip.broadcasterDisplayName,
-                        creatorId: Clip.creatorId,
-                        creatorDisplayName: Clip.creatorDisplayName,
-                        videoId: Clip.videoId,
-                        gameId: Clip.gameId,
-                        gameName: Game?.name || "",
-                        gameBoxArtUrl: Game?.boxArtUrl || "",
-                        language: Clip.language,
-                        title: Clip.title,
-                        views: Clip.views,
-                        creationDate: Clip.creationDate,
-                        thumbnailUrl: Clip.thumbnailUrl,
-                    },
-                    length
-                );
+                sendSocketEmit("clip", {
+                    id: Clip.id,
+                    url: Clip.url,
+                    embedUrl: Clip.embedUrl,
+                    broadcasterId: Clip.broadcasterId,
+                    broadcasterDisplayName: Clip.broadcasterDisplayName,
+                    creatorId: Clip.creatorId,
+                    creatorDisplayName: Clip.creatorDisplayName,
+                    videoId: Clip.videoId,
+                    gameId: Clip.gameId,
+                    gameName: Game?.name || "",
+                    gameBoxArtUrl: Game?.boxArtUrl || "",
+                    language: Clip.language,
+                    title: Clip.title,
+                    views: Clip.views,
+                    creationDate: Clip.creationDate,
+                    thumbnailUrl: Clip.thumbnailUrl,
+                });
             }
 
             break;
         }
     }
-
-    return replaceVariableMessage(store.get("shoutout_message"));
 };

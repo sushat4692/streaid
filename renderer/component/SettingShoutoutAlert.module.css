@@ -1,0 +1,13 @@
+.header {
+    @apply font-bold mb-2;
+}
+.header__small {
+    @apply ml-2 font-normal opacity-70;
+}
+
+.field {
+    @apply mt-5 pb-8 mb-4 border-b border-dotted border-gray-300 dark:border-gray-500;
+}
+.field:last-child {
+    @apply mb-0 pb-6 border-0;
+}
