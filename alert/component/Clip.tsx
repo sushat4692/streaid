@@ -50,6 +50,10 @@ const InfoComponent: React.FC = () => {
                 showInfo();
             }, 1);
         });
+
+        socket.on("clip:stop", () => {
+            videoFinished();
+        });
     }, []);
 
     return (

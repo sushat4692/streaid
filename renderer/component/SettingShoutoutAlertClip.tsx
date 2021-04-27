@@ -34,6 +34,24 @@ const SettingShoutoutAlertClip: React.FC = () => {
 
                 <CopyableFieldComponent text="!so {user_id} clip" />
             </div>
+
+            <div className="form-field">
+                <label className="form-field__label">
+                    <FormattedMessage
+                        id="Common.Label.StopCommand"
+                        defaultMessage="Stop Command"
+                    />
+                </label>
+
+                <CopyableFieldComponent text="!stop" />
+
+                <p className="form-field__help">
+                    <FormattedMessage
+                        id="Component.SettingShoutOutAlert.Clip.StopHelp"
+                        defaultMessage="You can use this command when you want to stop the clip movie"
+                    ></FormattedMessage>
+                </p>
+            </div>
         </>
     );
 };

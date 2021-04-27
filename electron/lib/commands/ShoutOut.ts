@@ -7,7 +7,7 @@ import { getInstance as getTwichAPIInstance } from "../TwitchAPI";
 import { getInstance as getStoreInstance } from "../../store";
 
 // Socket
-import { sendSocketEmit } from "../../server";
+import { useServer } from "../../server";
 
 export const shoutOut = async (
     username: string,
@@ -63,11 +63,12 @@ export const shoutOutAlert = async (
 ) => {
     const TwitchAPI = getTwichAPIInstance();
     const store = getStoreInstance();
+    const server = useServer();
 
     switch (showWindow) {
         case "info": {
             const length = store.get("shoutout_info_length");
-            sendSocketEmit(
+            server.sendSocketEmit(
                 "info",
                 {
                     id: User.id,
@@ -91,7 +92,7 @@ export const shoutOutAlert = async (
                 const Clip = Clips.data[0];
                 const Game = await Clip.getGame();
 
-                sendSocketEmit("clip", {
+                server.sendSocketEmit("clip", {
                     id: Clip.id,
                     url: Clip.url,
                     embedUrl: Clip.embedUrl,
@@ -114,4 +115,9 @@ export const shoutOutAlert = async (
             break;
         }
     }
+};
+
+export const shoutOutClipStop = () => {
+    const server = useServer();
+    server.sendSocketEmit("clip:stop");
 };

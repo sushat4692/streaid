@@ -189,16 +189,6 @@ class Bot {
     }
 
     /**
-     * Command test
-     *
-     * @command dice
-     */
-    rollDice() {
-        const sides = 6;
-        return Math.floor(Math.random() * sides) + 1;
-    }
-
-    /**
      * Called every time the bot connects to Twitch chat
      *
      * @param addr

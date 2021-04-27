@@ -33,12 +33,14 @@ const messages: { [key: string]: string } = {
     "Common.Label.ShoutOut": "シャウトアウト",
     "Common.Label.Volume": "音量",
     "Common.Label.Command": "コマンド",
+    "Common.Label.StopCommand": "停止コマンド",
     "Common.Label.DisplayLength": "表示時間",
     "Common.Label.SelectFile": "ファイル選択",
     "Common.Select.Placeholder": "選択してください",
     "Common.Submit": "送信",
     "Common.Apply": "反映",
     "Common.Close": "閉じる",
+    "Common.Copy": "コピー",
     "Common.SignIn": "ログイン",
     "Common.SignOut": "ログアウト",
     "Common.Variable.Variable": "変数名",
@@ -102,6 +104,14 @@ const messages: { [key: string]: string } = {
     "Component.SettingShoutOutAlert.URL.Header": "シャウトアウトアラート設定",
     "Component.SettingShoutOutAlert.URL.Descript":
         "下記のURLをOBSなどの配信ソフトの「ブラウザ」のURLフィールドに貼り付けてください",
+    "Component.SettingShoutOutAlert.Server.Start": "アラートサーバの起動",
+    "Component.SettingShoutOutAlert.Server.Stop": "アラートサーバの停止",
+    "Component.SettingShoutOutAlert.Port.Http.Header": "埋込",
+    "Component.SettingShoutOutAlert.Port.Http.Descript":
+        "配信ソフトに埋め込むための情報",
+    "Component.SettingShoutOutAlert.Port.Http.Label":
+        "HTTPポート設定 (OBS埋込用のURLに使用)",
+    "Component.SettingShoutOutAlert.Port.Socket.Label": "ソケットポート設定",
     "Component.SettingShoutOutAlert.Length.Header": "表示時間設定",
     "Component.SettingShoutOutAlert.Info.Header": "情報",
     "Component.SettingShoutOutAlert.Info.Descript":
@@ -109,6 +119,8 @@ const messages: { [key: string]: string } = {
     "Component.SettingShoutOutAlert.Clip.Header": "クリップ動画",
     "Component.SettingShoutOutAlert.Clip.Descript":
         "シャウトアウトしたストリーマーのクリップ動画を再生します",
+    "Component.SettingShoutOutAlert.Clip.StopHelp":
+        "再生しているクリップ動画を停止したい時に利用します",
     // SettingSound
     "Component.SettingSound.Header": "通知音設定",
     "Component.SettingSoundChats.Descript":

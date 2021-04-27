@@ -118,6 +118,9 @@ input, select, textarea {
 .form-control-group .btn {
     @apply rounded-none;
 }
+.form-control-group .btn {
+    @apply flex-shrink-0;
+}
 .form-control-group .form-control:first-child,
 .form-control-group .btn:first-child {
     @apply rounded-tl;

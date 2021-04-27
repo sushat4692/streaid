@@ -1,6 +1,7 @@
 import React from "react";
 import ReactTooltip from "react-tooltip";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { FormattedMessage } from "react-intl";
 import cn from "classnames";
 
 interface Props {
@@ -31,7 +32,7 @@ const CopyableField: React.FC<Props> = ({ text, isLarge }: Props) => {
             />
             <CopyToClipboard text={text} onCopy={() => console.log("")}>
                 <button className="btn" data-tip="Copied!">
-                    Copy
+                    <FormattedMessage id="Common.Copy" defaultMessage="Copy" />
                 </button>
             </CopyToClipboard>
         </div>

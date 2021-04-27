@@ -1,3 +1,7 @@
+.connect {
+    @apply mb-2;
+}
+
 .header {
     @apply font-bold mb-2;
 }
