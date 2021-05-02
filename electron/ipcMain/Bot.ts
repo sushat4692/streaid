@@ -23,20 +23,29 @@ ipcMain.handle("bot:disconnect", () => {
     return;
 });
 
-ipcMain.handle("bot:shoutout", async (_e, username: string) => {
-    const Bot = getBotInstance();
-    const store = getStoreInstance();
+ipcMain.handle(
+    "bot:shoutout",
+    async (
+        _e,
+        {
+            username,
+            showWindow = null,
+        }: { username: string; showWindow: string | null }
+    ) => {
+        const Bot = getBotInstance();
+        const store = getStoreInstance();
 
-    const channelName = store.get("channel");
-    if (!Bot.client || !channelName) {
+        const channelName = store.get("channel");
+        if (!Bot.client || !channelName) {
+            return;
+        }
+
+        const command = useCommand();
+        const message = await command.trigger("!so", username, showWindow);
+
+        if (message) {
+            Bot.client.action(channelName, message);
+        }
         return;
     }
-
-    const command = useCommand();
-    const message = await command.trigger("!so", username);
-
-    if (message) {
-        Bot.client.action(channelName, message);
-    }
-    return;
-});
+);

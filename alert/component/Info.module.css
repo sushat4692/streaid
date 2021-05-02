@@ -33,10 +33,11 @@
     content: 'Please check the Streamer!';
 }
 .info__figure {
-    @apply m-0 mb-4;
+    @apply m-0 mb-4 relative;
+    padding-top: 100%;
 }
 .info__image {
-    @apply w-full;
+    @apply w-full h-full absolute inset-0 object-cover;
 }
 .info__name {
     @apply text-center font-bold text-5xl;

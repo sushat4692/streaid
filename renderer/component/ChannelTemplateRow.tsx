@@ -55,7 +55,7 @@ const ChannelTemplateRowComponent: React.FC<Props> = ({
             <td scope="row">{channelTemplate.title}</td>
             <td>{channelTemplate.gameName}</td>
             <td>{getLabel(channelTemplate.language)}</td>
-            <td>{moment(channelTemplate.createdAt).format("MMM Do, kk:mm")}</td>
+            <td>{moment(channelTemplate.createdAt).format("M/D kk:mm")}</td>
             <td>
                 <div className="btn-group">
                     <button

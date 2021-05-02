@@ -31,7 +31,7 @@ const InfoComponent: React.FC = () => {
     };
 
     useEffect(() => {
-        socket.on("info", (info) => {
+        socket.on("info", (info, length) => {
             if (timer !== null) {
                 clearTimeout(timer);
             }
@@ -49,7 +49,7 @@ const InfoComponent: React.FC = () => {
                         updateUser(null);
                         updateTimer(null);
                     }, 500);
-                }, 7500)
+                }, length * 1000 - 500)
             );
         });
     }, []);

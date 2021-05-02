@@ -1,3 +1,5 @@
+import { HelixUser } from "twitch/lib";
+
 // Library
 import { getInstance as getTwichAPIInstance } from "../TwitchAPI";
 
@@ -5,9 +7,12 @@ import { getInstance as getTwichAPIInstance } from "../TwitchAPI";
 import { getInstance as getStoreInstance } from "../../store";
 
 // Socket
-import { sendSocketEmit } from "../../server";
+import { useServer } from "../../server";
 
-export const shoutOut = async (username: string, showWindow = "") => {
+export const shoutOut = async (
+    username: string,
+    showWindow: "info" | "clip" | null = null
+) => {
     if (!username) {
         return `* You need to add username: e.g. !so {username}`;
     }
@@ -48,28 +53,46 @@ export const shoutOut = async (username: string, showWindow = "") => {
         );
     }
 
+    shoutOutAlert(User, showWindow);
+    return replaceVariableMessage(store.get("shoutout_message"));
+};
+
+export const shoutOutAlert = async (
+    User: HelixUser,
+    showWindow: "info" | "clip" | null
+) => {
+    const TwitchAPI = getTwichAPIInstance();
+    const store = getStoreInstance();
+    const server = useServer();
+
     switch (showWindow) {
-        case "info":
-            sendSocketEmit("info", {
-                id: User.id,
-                name: User.name,
-                displayName: User.displayName,
-                description: User.description,
-                type: User.type,
-                broadcasterType: User.broadcasterType,
-                profilePictureUrl: User.profilePictureUrl,
-                offlinePlaceholderUrl: User.offlinePlaceholderUrl,
-                views: User.views,
-                creationDate: User.creationDate,
-            });
+        case "info": {
+            const length = store.get("shoutout_info_length");
+            server.sendSocketEmit(
+                "info",
+                {
+                    id: User.id,
+                    name: User.name,
+                    displayName: User.displayName,
+                    description: User.description,
+                    type: User.type,
+                    broadcasterType: User.broadcasterType,
+                    profilePictureUrl: User.profilePictureUrl,
+                    offlinePlaceholderUrl: User.offlinePlaceholderUrl,
+                    views: User.views,
+                    creationDate: User.creationDate,
+                },
+                length
+            );
             break;
+        }
         case "clip": {
             const Clips = await TwitchAPI.getClipsByUser(User);
             if (Clips && Clips.data.length > 0) {
                 const Clip = Clips.data[0];
                 const Game = await Clip.getGame();
 
-                sendSocketEmit("clip", {
+                server.sendSocketEmit("clip", {
                     id: Clip.id,
                     url: Clip.url,
                     embedUrl: Clip.embedUrl,
@@ -92,6 +115,9 @@ export const shoutOut = async (username: string, showWindow = "") => {
             break;
         }
     }
+};
 
-    return replaceVariableMessage(store.get("shoutout_message"));
+export const shoutOutClipStop = () => {
+    const server = useServer();
+    server.sendSocketEmit("clip:stop");
 };

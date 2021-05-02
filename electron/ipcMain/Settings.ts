@@ -40,6 +40,7 @@ ipcMain.handle("settings:get", async () => {
     const shoutout_message = store.get("shoutout_message");
     const shoutout_not_found = store.get("shoutout_not_found");
     const shoutout_failed = store.get("shoutout_failed");
+    const shoutout_info_length = store.get("shoutout_info_length");
     const chatter_volume = store.get("chatter_volume");
     const chat_volume = store.get("chat_volume");
     const raid_volume = store.get("raid_volume");
@@ -52,6 +53,7 @@ ipcMain.handle("settings:get", async () => {
         shoutout_message,
         shoutout_not_found,
         shoutout_failed,
+        shoutout_info_length,
         chatter_volume,
         chat_volume,
         raid_volume,
@@ -76,6 +78,19 @@ ipcMain.handle("setting:shoutout_message", (_, values) => {
     store.set("shoutout_failed", values.shoutout_failed);
     return values;
 });
+
+ipcMain.handle(
+    "setting:shoutout:alert:length",
+    (_, { mode, value }: { mode: string; value: number }) => {
+        const store = getStoreInstance();
+
+        switch (mode) {
+            case "info":
+                store.set("shoutout_info_length", value);
+                break;
+        }
+    }
+);
 
 ipcMain.handle("setting:notification:sound", async (_, values) => {
     const win = getWindow();

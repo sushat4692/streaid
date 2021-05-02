@@ -11,6 +11,7 @@ import SettingChannelState from "../atom/SettingChannel";
 import ShoutOutMessageState from "../atom/SettingShoutOutMessage";
 import ShoutOutNotFoundState from "../atom/SettingShoutOutNotFound";
 import ShoutOutFailedState from "../atom/SettingShoutOutFailed";
+import ShoutoutAlertInfoLength from "../atom/ShoutoutAlertInfoLength";
 import SoundChatterVolumeState from "../atom/SoundChatterVolume";
 import SoundChatVolumeState from "../atom/SoundChatVolume";
 import SoundRaidVolumeState from "../atom/SoundRaidVolume";
@@ -41,6 +42,7 @@ const Layout: React.FC = () => {
     const updateShoutOutMessage = useSetRecoilState(ShoutOutMessageState);
     const updateShoutOutNotFound = useSetRecoilState(ShoutOutNotFoundState);
     const updateShoutOutFailed = useSetRecoilState(ShoutOutFailedState);
+    const updateShoutOutInfoLength = useSetRecoilState(ShoutoutAlertInfoLength);
     const updateSoundChatterVolume = useSetRecoilState(SoundChatterVolumeState);
     const updateSoundChatVolume = useSetRecoilState(SoundChatVolumeState);
     const updateSoundRaidVolume = useSetRecoilState(SoundRaidVolumeState);
@@ -60,6 +62,7 @@ const Layout: React.FC = () => {
                     shoutout_message: "",
                     shoutout_not_found: "",
                     shoutout_failed: "",
+                    shoutout_info_length: 8,
                     chatter_volume: 1,
                     chat_volume: 1,
                     raid_volume: 1,
@@ -72,6 +75,7 @@ const Layout: React.FC = () => {
             updateShoutOutMessage(defaultValue.shoutout_message);
             updateShoutOutNotFound(defaultValue.shoutout_not_found);
             updateShoutOutFailed(defaultValue.shoutout_failed);
+            updateShoutOutInfoLength(defaultValue.shoutout_info_length);
             updateSoundChatterVolume(defaultValue.chatter_volume);
             updateSoundChatVolume(defaultValue.chat_volume);
             updateSoundRaidVolume(defaultValue.raid_volume);
@@ -89,42 +93,44 @@ const Layout: React.FC = () => {
                 <main>
                     {setting.isEnableBot ? (
                         <Switch>
-                            <Route path="/chatters">
-                                <ChattersPage />
-                            </Route>
-                            <Route path="/raiders">
-                                <RaidersPage />
-                            </Route>
-                            <Route path="/hosts">
-                                <HostsPage />
-                            </Route>
-                            <Route path="/channel">
-                                <ChannelPage />
-                            </Route>
-                            <Route path="/user_memo">
-                                <UserMemoPage />
-                            </Route>
-                            <Route path="/settings">
-                                <SettingPage />
-                            </Route>
-                            <Route path="/license">
-                                <LicensePage />
-                            </Route>
-                            <Route path="/">
-                                <DashboardPage />
-                            </Route>
+                            <Route
+                                path="/chatters"
+                                component={ChattersPage}
+                            ></Route>
+                            <Route
+                                path="/raiders"
+                                component={RaidersPage}
+                            ></Route>
+                            <Route path="/hosts" component={HostsPage}></Route>
+                            <Route
+                                path="/channel"
+                                component={ChannelPage}
+                            ></Route>
+                            <Route
+                                path="/user_memo"
+                                component={UserMemoPage}
+                            ></Route>
+                            <Route
+                                path="/settings"
+                                component={SettingPage}
+                            ></Route>
+                            <Route
+                                path="/license"
+                                component={LicensePage}
+                            ></Route>
+                            <Route path="/" component={DashboardPage}></Route>
                         </Switch>
                     ) : (
                         <Switch>
-                            <Route path="/settings">
-                                <SettingPage />
-                            </Route>
-                            <Route path="/license">
-                                <LicensePage />
-                            </Route>
-                            <Route path="/">
-                                <NeedSettingPage />
-                            </Route>
+                            <Route
+                                path="/settings"
+                                component={SettingPage}
+                            ></Route>
+                            <Route
+                                path="/license"
+                                component={LicensePage}
+                            ></Route>
+                            <Route path="/" component={NeedSettingPage}></Route>
                         </Switch>
                     )}
                 </main>

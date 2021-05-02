@@ -1,9 +1,10 @@
 import http from "http";
 import fs from "fs-extra";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { join as pathJoin } from "path";
 
-let _socket: Socket;
+// Store
+import { getInstance as getStoreInstance } from "./store";
 
 const mimeTypes = {
     html: "text/html",
@@ -16,35 +17,40 @@ const mimeTypes = {
     css: "text/css",
 };
 
+let _connected = false;
+let _socketServer: Server | null = null;
+let _httpServer: http.Server | null = null;
+
 const createSocketServer = () => {
-    const httpServer = http.createServer();
-    const io = new Server(httpServer, {
+    const store = getStoreInstance();
+    const socketPort = store.get("alert_socket_port");
+    const httpPort = store.get("alert_http_port");
+
+    _socketServer = new Server({
         cors: {
-            origin: "http://localhost:9990",
+            origin: `http://localhost:${httpPort}`,
         },
     });
 
-    io.on("connection", (socket) => {
-        _socket = socket;
-    });
-
-    io.use((socket, next) => {
-        next();
-    });
-
-    httpServer.listen(9999);
+    _socketServer.listen(socketPort);
 };
 
 const createHttpServer = () => {
-    http.createServer((req, res) => {
+    const store = getStoreInstance();
+    const httpPort = store.get("alert_http_port");
+
+    _httpServer = http.createServer((req, res) => {
         const filename = (() => {
-            const filename = pathJoin(__dirname, req.url || "");
+            const filename = pathJoin(
+                __dirname,
+                (req.url || "").split("?")[0] || ""
+            );
 
             if (
                 fs.existsSync(filename) &&
                 fs.statSync(filename).isDirectory()
             ) {
-                return pathJoin(filename, "index.html");
+                return pathJoin(filename, "alert.html");
             } else {
                 return filename;
             }
@@ -63,18 +69,54 @@ const createHttpServer = () => {
 
         const stream = fs.createReadStream(filename);
         stream.pipe(res);
-    }).listen(9990);
+
+        req.on("end", () => {
+            req.socket.end();
+        });
+    });
+
+    _httpServer.listen(httpPort);
 };
 
-export const createServer = () => {
-    createSocketServer();
-    createHttpServer();
-};
+export const useServer = () => {
+    const getConnected = () => {
+        return _connected;
+    };
 
-export const sendSocketEmit = (mode: string, ...args) => {
-    if (!_socket) {
-        return;
-    }
+    const createServer = () => {
+        if (_connected) {
+            return;
+        }
 
-    _socket.emit(mode, ...args);
+        createSocketServer();
+        createHttpServer();
+
+        _connected = true;
+    };
+
+    const closeServer = () => {
+        if (_httpServer) {
+            _httpServer.close();
+        }
+        if (_socketServer) {
+            _socketServer.close();
+        }
+
+        _connected = false;
+    };
+
+    const sendSocketEmit = (mode: string, ...args) => {
+        if (!_socketServer) {
+            return;
+        }
+
+        _socketServer.sockets.emit(mode, ...args);
+    };
+
+    return {
+        getConnected,
+        createServer,
+        closeServer,
+        sendSocketEmit,
+    };
 };

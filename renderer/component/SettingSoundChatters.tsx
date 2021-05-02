@@ -1,6 +1,7 @@
 import React from "react";
 import { useRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
+import InputRange from "react-input-range";
 
 // Recoil
 import SoundChatterVolumeState from "../atom/SoundChatterVolume";
@@ -63,17 +64,16 @@ const SettingSoundChattersComponent: React.FC = () => {
                             <i className="bi bi-play-circle" />
                         </button>
 
-                        <input
-                            type="range"
-                            className="form-range"
-                            id="chatter_volume"
-                            min={0}
-                            max={1}
+                        <InputRange
+                            minValue={0}
+                            maxValue={1}
                             step={0.01}
                             value={chatterVolume}
-                            onChange={async (e) => {
-                                const value = parseFloat(e.target.value);
-                                updateChatterVolume(value);
+                            formatLabel={(value) =>
+                                `${Math.floor(value * 100)}%`
+                            }
+                            onChange={async (value) => {
+                                updateChatterVolume(value as number);
 
                                 await request(
                                     "setting:notification:volume",

@@ -4,6 +4,8 @@
     --color-text: #333;
     --color-primary: #8c45f7;
     --color-primary--hover: #7d2df6;
+
+    --size-left-nav-width: 240px;
 }
 
 /**
@@ -28,7 +30,7 @@ input, select, textarea {
  * Container
  */
 .container-fluid {
-    @apply max-w-7xl mx-auto px-4;
+    @apply mx-auto px-4;
 }
 
 /**
@@ -80,7 +82,7 @@ input, select, textarea {
 }
 
 .table-responsive {
-    @apply max-w-full overflow-auto;
+    /* @apply max-w-full overflow-auto; */
 }
 
 /**
@@ -109,6 +111,27 @@ input, select, textarea {
     @apply text-lg h-12 py-2 px-3;
 }
 
+.form-control-group {
+    display: flex;
+}
+.form-control-group .form-control,
+.form-control-group .btn {
+    @apply rounded-none;
+}
+.form-control-group .btn {
+    @apply flex-shrink-0;
+}
+.form-control-group .form-control:first-child,
+.form-control-group .btn:first-child {
+    @apply rounded-tl;
+    @apply rounded-bl;
+}
+.form-control-group .form-control:last-child,
+.form-control-group .btn:last-child {
+    @apply rounded-tr;
+    @apply rounded-br;
+}
+
 .form-range {
     @apply w-full;
 }
@@ -131,6 +154,9 @@ input, select, textarea {
 }
 .btn__icon {
     @apply mr-1;
+}
+.btn__icon-only {
+    @apply text-xs;
 }
 
 .btn.is-large {

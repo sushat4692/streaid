@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { FormattedMessage } from "react-intl";
 
 // Recoil
 import UserMemoState, { UserMemoRowType } from "../atom/UserMemo";
+import LocaleState from "../atom/Locale";
 
 // Component
 import MetaComponent from "../component/Meta";
@@ -14,6 +15,7 @@ import { request } from "../util/request";
 
 const UserMemoPage: React.FC = () => {
     const [userMemos, updateUserMemos] = useRecoilState(UserMemoState);
+    const locale = useRecoilValue(LocaleState);
 
     useEffect(() => {
         (async () => {
@@ -77,7 +79,7 @@ const UserMemoPage: React.FC = () => {
                             <colgroup>
                                 <col />
                                 <col width="140" />
-                                <col width="160" />
+                                <col width={locale === "ja-jp" ? 180 : 160} />
                             </colgroup>
                             <thead>
                                 <tr>

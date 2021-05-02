@@ -36,7 +36,7 @@ const RaiderRowComponent: React.FC<Props> = ({ raider }: Props) => {
                 <UserComponent username={raider.username} />
             </td>
             <td>{raider.viewers}</td>
-            <td>{moment(raider.createdAt).format("MMM Do, kk:mm")}</td>
+            <td>{moment(raider.createdAt).format("M/D kk:mm")}</td>
             <td>
                 <div className="btn-group">
                     <ShoutOutButtonComponent

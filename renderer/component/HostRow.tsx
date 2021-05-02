@@ -37,7 +37,7 @@ const HostsRowComponent: React.FC<Props> = ({ host }: Props) => {
             </td>
             <td>{host.viewers}</td>
             <td>{host.autohost ? "true" : "false"}</td>
-            <td>{moment(host.createdAt).format("MMM Do, kk:mm")}</td>
+            <td>{moment(host.createdAt).format("M/D kk:mm")}</td>
             <td>
                 <div className="btn-group">
                     <ShoutOutButtonComponent
