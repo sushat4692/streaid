@@ -6,22 +6,18 @@
 }
 
 .row {
-    @apply grid mb-2 pb-2 border-b border-dotted border-gray-300 dark:border-gray-500;
-}
-@media (min-width: 768px) {
-    .row {
-        grid-template-columns: 130px auto;
-    }
+    @apply md:flex mb-2 pb-5 border-b border-dotted border-gray-300 dark:border-gray-500;
 }
 .row:last-child {
-    @apply mb-0 pb-0 border-0;
+    @apply mb-0 pb-3 border-0;
 }
 
 .row__button {
-    @apply mb-2 md:mb-0;
+    @apply mb-2 md:mr-4 md:mb-0 md:flex-shrink-0;
 }
 
 .row__field {
+    @apply flex-grow pr-4;
 }
 
 .row__field__action {
@@ -29,5 +25,5 @@
 }
 
 .row__field__action__button {
-    @apply mr-2;
+    @apply mr-4;
 }

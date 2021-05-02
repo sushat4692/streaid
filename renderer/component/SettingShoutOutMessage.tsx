@@ -15,7 +15,7 @@ import { request } from "../util/request";
 // Style
 import styles from "./SettingShoutOutMessage.module.css";
 
-const SettingBotComponent: React.FC = () => {
+const SettingShoutOutMessage: React.FC = () => {
     const [shoutOutMessage, updateShoutOutMessage] = useRecoilState(
         ShoutOutMessageState
     );
@@ -215,4 +215,4 @@ const SettingBotComponent: React.FC = () => {
     );
 };
 
-export default SettingBotComponent;
+export default SettingShoutOutMessage;

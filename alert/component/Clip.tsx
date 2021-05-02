@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import cn from "classnames";
 import socket from "../socket";
-import { TwitchClip } from "react-twitch-embed";
 
 import styles from "./Clip.module.css";
 
@@ -25,7 +24,6 @@ interface Clip {
 }
 
 const InfoComponent: React.FC = () => {
-    const [timer, updateTimer] = useState(null);
     const [clip, updateClip] = useState<Clip | null>(null);
     const [isActive, updateIsActive] = useState<boolean>(false);
 
@@ -37,29 +35,24 @@ const InfoComponent: React.FC = () => {
         updateIsActive(false);
     };
 
+    const videoFinished = () => {
+        hideInfo();
+
+        setTimeout(() => {
+            updateClip(null);
+        }, 500);
+    };
+
     useEffect(() => {
         socket.on("clip", (info) => {
-            console.log(info);
-
-            if (timer !== null) {
-                clearTimeout(timer);
-            }
-
             updateClip(info);
             setTimeout(() => {
                 showInfo();
             }, 1);
+        });
 
-            updateTimer(
-                setTimeout(() => {
-                    hideInfo();
-
-                    setTimeout(() => {
-                        updateClip(null);
-                        updateTimer(null);
-                    }, 500);
-                }, 24500)
-            );
+        socket.on("clip:stop", () => {
+            videoFinished();
         });
     }, []);
 
@@ -73,16 +66,15 @@ const InfoComponent: React.FC = () => {
                 >
                     <div className={styles.clip__inner}>
                         <figure className={styles.clip__figure}>
-                            <TwitchClip
-                                clip={clip.id}
-                                autoplay={true}
-                                muted={false}
-                                parent={["localhost"]}
+                            <video
+                                src={clip.thumbnailUrl.replace(
+                                    "-preview-480x272.jpg",
+                                    ".mp4"
+                                )}
                                 className={styles.clip__video}
-                                onEnded={() => {
-                                    console.log("finish");
-                                }}
-                            ></TwitchClip>
+                                autoPlay
+                                onEnded={videoFinished}
+                            ></video>
                         </figure>
                         <p className={styles.clip__name}>
                             {clip.broadcasterDisplayName}

@@ -9,6 +9,9 @@ export interface StoreType {
     shoutout_message: string;
     shoutout_not_found: string;
     shoutout_failed: string;
+    shoutout_info_length: number;
+    alert_http_port: number;
+    alert_socket_port: number;
     chatter_volume: number;
     raid_volume: number;
     host_volume: number;
@@ -46,6 +49,18 @@ const schema: Store.Schema<StoreType> = {
     shoutout_failed: {
         type: "string",
         default: `Failed to get Channel information of "%username%" channel, please try again later.`,
+    },
+    shoutout_info_length: {
+        type: "number",
+        default: 8,
+    },
+    alert_http_port: {
+        type: "number",
+        default: 9990,
+    },
+    alert_socket_port: {
+        type: "number",
+        default: 9999,
     },
     chatter_volume: {
         type: "number",

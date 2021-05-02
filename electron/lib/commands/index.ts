@@ -1,10 +1,11 @@
 import { rollDice } from "./Dice";
-import { shoutOut } from "./ShoutOut";
+import { shoutOut, shoutOutClipStop } from "./ShoutOut";
 
 export const useCommand = () => {
     const commands = {
         "!dice": rollDice,
         "!so": shoutOut,
+        "!stop": shoutOutClipStop,
     };
 
     const exists = (command: string) => {

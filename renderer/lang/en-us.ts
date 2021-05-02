@@ -33,11 +33,15 @@ const messages: { [key: string]: string } = {
     "Common.Label.Created": "Created",
     "Common.Label.ShoutOut": "ShoutOut",
     "Common.Label.Volume": "Volume",
+    "Common.Label.Command": "Command",
+    "Common.Label.StopCommand": "Stop Command",
+    "Common.Label.DisplayLength": "Display Time Length",
     "Common.Label.SelectFile": "Select File",
     "Common.Select.Placeholder": "Select...",
     "Common.Submit": "Submit",
     "Common.Apply": "Apply",
     "Common.Close": "Close",
+    "Common.Copy": "Copy",
     "Common.SignIn": "Signin",
     "Common.SignOut": "Signout",
     "Common.Variable.Variable": "Variable",
@@ -46,6 +50,7 @@ const messages: { [key: string]: string } = {
     "Common.Variable.Username.Description": "Target User Display Name",
     "Common.Variable.UserId.Description": "Target User ID",
     "Common.Variable.Category.Description": "Target Category/Game name",
+    "Common.Unit.Second": "s",
 
     /**
      * Views
@@ -80,10 +85,12 @@ const messages: { [key: string]: string } = {
     // Connect
     "Component.Connect.Enable": "Connect",
     "Component.Connect.Disable": "Disconnect",
+    // Setting
+    "Component.Setting.General": "General",
     // SettingLocale
     "Component.SettingLocale.Header": "Language",
     // SettingBot
-    "Component.SettingBot.Header": "Bot Target Channel",
+    "Component.SettingBot.Header": "Target Channel",
     "Component.SettingBot.ChannelHelp":
         "* If you set same channel with username, you can update channel information",
     // SettingShoutOutMessage
@@ -91,6 +98,28 @@ const messages: { [key: string]: string } = {
     "Component.SettingShoutOutMessage.Message": "ShoutOut Message Template",
     "Component.SettingShoutOutMessage.Failed": "Failed Message Template",
     "Component.SettingShoutOutMessage.NotFound": "Not Found Message Template",
+    // SettingShoutOutAlert
+    "Component.SettingShoutOutAlert.Header": "ShoutOut Alert",
+    "Component.SettingShoutOutAlert.URL.Header": "ShoutOut Alert",
+    "Component.SettingShoutOutAlert.URL.Descript":
+        'Please copy & Pase the following URL and embed "Browser" to your streaming tool (e.g. OBS)',
+    "Component.SettingShoutOutAlert.Server.Start": "Start Alert Server",
+    "Component.SettingShoutOutAlert.Server.Stop": "Stop Alert Server",
+    "Component.SettingShoutOutAlert.Port.Http.Header": "Embed",
+    "Component.SettingShoutOutAlert.Port.Http.Descript":
+        "Embed information to Streaming Tool",
+    "Component.SettingShoutOutAlert.Port.Http.Label":
+        "HTTP Port (For embed URL for OBS)",
+    "Component.SettingShoutOutAlert.Port.Socket.Label": "Socket Port",
+    "Component.SettingShoutOutAlert.Length.Header": "Display Length Setting",
+    "Component.SettingShoutOutAlert.Info.Header": "Info",
+    "Component.SettingShoutOutAlert.Info.Descript":
+        "Showing alert the streamer information",
+    "Component.SettingShoutOutAlert.Clip.Header": "Clip",
+    "Component.SettingShoutOutAlert.Clip.Descript":
+        "Showing alert the streamer's clip movie",
+    "Component.SettingShoutOutAlert.Clip.StopHelp":
+        "You can use this command when you want to stop the clip movie",
     // SettingSound
     "Component.SettingSound.Header": "Notification Sound",
     "Component.SettingSoundChats.Descript":

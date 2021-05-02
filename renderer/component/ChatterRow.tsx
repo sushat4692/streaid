@@ -1,9 +1,10 @@
 import React from "react";
-import { useSetRecoilState } from "recoil";
+import { useSetRecoilState, useRecoilValue } from "recoil";
 import moment from "moment";
 
 // Recoil
 import ChattersState, { ChatterRowType } from "../atom/Chatters";
+import LocaleState from "../atom/Locale";
 
 // Utility
 import { request } from "../util/request";
@@ -18,6 +19,7 @@ type Props = {
 
 const ChatterRowComponent: React.FC<Props> = ({ chatter }: Props) => {
     const updateChatters = useSetRecoilState(ChattersState);
+    const locale = useRecoilValue(LocaleState);
 
     const deleteClickHandler = async () => {
         const chatters = await request<
@@ -36,7 +38,7 @@ const ChatterRowComponent: React.FC<Props> = ({ chatter }: Props) => {
                 <UserComponent username={chatter.username} />
             </td>
             <td>{chatter["display-name"]}</td>
-            <td>{moment(chatter.createdAt).format("MMM Do, kk:mm")}</td>
+            <td>{moment(chatter.createdAt).format("M/D kk:mm")}</td>
             <td>
                 <div className="btn-group">
                     <ShoutOutButtonComponent
