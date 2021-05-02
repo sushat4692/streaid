@@ -18,6 +18,9 @@ const SettingShoutoutAlert: React.FC = () => {
     const [httpPort, updateHttpPort] = useState<number>(0);
     const [specifiedHttpPort, updateSpecifiedHttpPort] = useState<number>(0);
     const [socketPort, updateSocketPort] = useState<number>(0);
+    const [specifiedSocketPort, updateSpecifiedSocketPort] = useState<number>(
+        0
+    );
     const intl = useIntl();
 
     const submitHttpPort = async () => {
@@ -37,7 +40,7 @@ const SettingShoutoutAlert: React.FC = () => {
             9900
         );
 
-        updateSocketPort(port);
+        updateSpecifiedSocketPort(port);
     };
 
     const toggleAlertServer = async () => {
@@ -68,6 +71,7 @@ const SettingShoutoutAlert: React.FC = () => {
             updateHttpPort(inited.httpPort);
             updateSpecifiedHttpPort(inited.httpPort);
             updateSocketPort(inited.socketPort);
+            updateSpecifiedSocketPort(inited.socketPort);
         })();
     }, []);
 
@@ -183,7 +187,7 @@ const SettingShoutoutAlert: React.FC = () => {
                 </div>
 
                 <CopyableFieldComponent
-                    text={`http://localhost:${specifiedHttpPort}/`}
+                    text={`http://localhost:${specifiedHttpPort}/?socket=${specifiedSocketPort}`}
                     isLarge
                 ></CopyableFieldComponent>
             </section>

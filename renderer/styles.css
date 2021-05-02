@@ -82,7 +82,7 @@ input, select, textarea {
 }
 
 .table-responsive {
-    @apply max-w-full overflow-auto;
+    /* @apply max-w-full overflow-auto; */
 }
 
 /**
@@ -154,6 +154,9 @@ input, select, textarea {
 }
 .btn__icon {
     @apply mr-1;
+}
+.btn__icon-only {
+    @apply text-xs;
 }
 
 .btn.is-large {

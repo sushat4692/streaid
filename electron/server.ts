@@ -41,7 +41,10 @@ const createHttpServer = () => {
 
     _httpServer = http.createServer((req, res) => {
         const filename = (() => {
-            const filename = pathJoin(__dirname, req.url || "");
+            const filename = pathJoin(
+                __dirname,
+                (req.url || "").split("?")[0] || ""
+            );
 
             if (
                 fs.existsSync(filename) &&
