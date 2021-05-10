@@ -2,9 +2,6 @@ import React, { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-// Type
-import { ResponseSettingType } from "../../types/SettingType";
-
 // Recoil
 import SettingUsernameState from "../atom/SettingUsername";
 import SettingChannelState from "../atom/SettingChannel";
@@ -53,22 +50,18 @@ const Layout: React.FC = () => {
         (async () => {
             updateIsConnecting(true);
 
-            const defaultValue = await request<null, ResponseSettingType>(
-                "settings:get",
-                null,
-                {
-                    username: "channel",
-                    channel: "channel",
-                    shoutout_message: "",
-                    shoutout_not_found: "",
-                    shoutout_failed: "",
-                    shoutout_info_length: 8,
-                    chatter_volume: 1,
-                    chat_volume: 1,
-                    raid_volume: 1,
-                    host_volume: 1,
-                }
-            );
+            const defaultValue = await request("setting:get", null, {
+                username: "channel",
+                channel: "channel",
+                shoutout_message: "",
+                shoutout_not_found: "",
+                shoutout_failed: "",
+                shoutout_info_length: 8,
+                chatter_volume: 1,
+                chat_volume: 1,
+                raid_volume: 1,
+                host_volume: 1,
+            });
 
             updateSettingUsername(defaultValue.username);
             updateSettingChannel(defaultValue.channel);

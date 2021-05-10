@@ -10,9 +10,9 @@ import IsInitedState from "./atom/IsInited";
 import LocaleState from "./atom/Locale";
 import IsConnectedState from "./atom/IsConnected";
 import IsConnectingState from "./atom/IsConnecting";
-import RaidersState, { RaiderRowType } from "./atom/Raiders";
-import ChattersState, { ChatterRowType } from "./atom/Chatters";
-import HostsState, { HostRowType } from "./atom/Hosts";
+import RaidersState from "./atom/Raiders";
+import ChattersState from "./atom/Chatters";
+import HostsState from "./atom/Hosts";
 
 // Layout
 import LoadingComponent from "./component/Loading";
@@ -42,33 +42,28 @@ const App: React.FC = () => {
             updateIsConnected(false);
             updateIsConnecting(false);
         });
-        requestEvent<ChatterRowType[]>("bot:chatted", (_, values) => {
+        requestEvent("bot:chatted", (_, values) => {
             updateChatters([...values]);
         });
-        requestEvent<RaiderRowType[]>("bot:raided", (_, values) => {
+        requestEvent("bot:raided", (_, values) => {
             updateRaiders([...values]);
         });
-        requestEvent<HostRowType[]>("bot:hosted", (_, values) => {
+        requestEvent("bot:hosted", (_, values) => {
             updateHosts([...values]);
         });
 
-        requestEvent<{ source: Uint8Array; gain: number }>(
-            "sound:play",
-            async (_, values) => {
-                const context = new AudioContext();
+        requestEvent("sound:play", async (_, values) => {
+            const context = new AudioContext();
 
-                const gainNode = context.createGain();
-                gainNode.gain.value = values.gain;
-                gainNode.connect(context.destination);
+            const gainNode = context.createGain();
+            gainNode.gain.value = values.gain;
+            gainNode.connect(context.destination);
 
-                const source = context.createBufferSource();
-                source.buffer = await context.decodeAudioData(
-                    values.source.buffer
-                );
-                source.connect(gainNode);
-                source.start(0);
-            }
-        );
+            const source = context.createBufferSource();
+            source.buffer = await context.decodeAudioData(values.source.buffer);
+            source.connect(gainNode);
+            source.start(0);
+        });
 
         (async () => {
             updateIsConnecting(true);
@@ -76,7 +71,7 @@ const App: React.FC = () => {
             const settingLocale = await request("setting:locale", {}, "en-us");
             updateLocale(settingLocale);
 
-            const isInited: boolean = await request("get:init", null, true);
+            const isInited: boolean = await request("get:init", {}, true);
             updateIsInited(isInited);
 
             updateIsConnecting(false);

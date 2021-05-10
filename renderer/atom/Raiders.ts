@@ -1,13 +1,7 @@
 import { atom } from "recoil";
-import { Document } from "../../types/Document";
+import { RaiderType } from "../../types/Raider";
 
-export interface RaiderRowType extends Document {
-    channel: string;
-    username: string;
-    viewers: number;
-}
-
-const state = atom<RaiderRowType[]>({
+const state = atom<RaiderType[]>({
     key: "Raiders",
     default: [],
 });

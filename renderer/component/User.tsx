@@ -6,7 +6,7 @@ import TextareaAutosize from "react-textarea-autosize";
 import ReactTooltip from "react-tooltip";
 
 // Recoil
-import UserMemoState, { UserMemoRowType } from "../atom/UserMemo";
+import UserMemoState from "../atom/UserMemo";
 
 // Util
 import { request } from "../util/request";
@@ -14,9 +14,9 @@ import { request } from "../util/request";
 // Styles
 import styles from "./User.module.css";
 
-interface Props {
+type Props = {
     username: string;
-}
+};
 
 const UserComponent: React.FC<Props> = ({ username }: Props) => {
     const [isOpen, updateIsOpen] = useState<boolean>(false);
@@ -27,27 +27,20 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
     const updateUserMemo = useSetRecoilState(UserMemoState);
 
     const getUserMemoInformation = async () => {
-        return await request<string, UserMemoRowType>(
-            "usermemo:one",
-            username,
-            {
-                _id: "1",
-                username: "username",
-                nickname: "nickname",
-                memo: "memo",
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            }
-        );
+        return await request("usermemo:one", username, {
+            _id: "1",
+            username: "username",
+            nickname: "nickname",
+            memo: "memo",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
     };
 
     const onSubmitHandler = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const usermemos = await request<
-            { username: string; nickname: string; memo: string },
-            UserMemoRowType[]
-        >(
+        const usermemos = await request(
             "usermemo:store",
             {
                 username,

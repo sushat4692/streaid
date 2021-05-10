@@ -1,7 +1,7 @@
 // Util
 import { request } from "./request";
 
-export const useSound = (mode: string) => {
+export const useSound = (mode: "chatter" | "host" | "chat" | "raid") => {
     const selectFileHandler = () => {
         return async (e: React.MouseEvent) => {
             e.preventDefault();

@@ -2,8 +2,11 @@ import React from "react";
 import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
+// Types
+import { UserMemoType } from "../../types/UserMemo";
+
 // Recoil
-import UserMemoState, { UserMemoRowType } from "../atom/UserMemo";
+import UserMemoState from "../atom/UserMemo";
 
 // Utility
 import { request } from "../util/request";
@@ -13,19 +16,14 @@ import UserComponent from "./User";
 import ShoutOutButtonComponent from "./ShoutOutButton";
 
 type Props = {
-    usermemo: UserMemoRowType;
+    usermemo: UserMemoType;
 };
 
 const UserMemoRowComponent: React.FC<Props> = ({ usermemo }: Props) => {
     const updateUserMemo = useSetRecoilState(UserMemoState);
 
     const deleteClickHandler = async () => {
-        const usermemos = await request<
-            {
-                id: string;
-            },
-            UserMemoRowType[]
-        >("usermemo:delete", { id: usermemo._id }, []);
+        const usermemos = await request("usermemo:delete", usermemo._id, []);
 
         updateUserMemo([...usermemos]);
     };

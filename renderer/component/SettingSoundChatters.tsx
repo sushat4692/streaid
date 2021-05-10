@@ -79,7 +79,7 @@ const SettingSoundChattersComponent: React.FC = () => {
                                     "setting:notification:volume",
                                     {
                                         mode: "chatter_volume",
-                                        value,
+                                        value: value as number,
                                     },
                                     null
                                 );

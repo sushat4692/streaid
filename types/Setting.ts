@@ -1,4 +1,4 @@
-export type ResponseSettingType = {
+export type SettingType = {
     username: string;
     channel: string;
     shoutout_message: string;

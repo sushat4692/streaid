@@ -77,7 +77,7 @@ const SettingSoundRaidersComponent: React.FC = () => {
                                     "setting:notification:volume",
                                     {
                                         mode: "raid_volume",
-                                        value,
+                                        value: value as number,
                                     },
                                     null
                                 );

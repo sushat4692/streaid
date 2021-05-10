@@ -62,15 +62,9 @@ class TwitchAPI {
 
         this._accessToken = await this._provider
             .getAccessToken([
-                "user:read:email",
-                "user:edit:broadcast",
-                "channel_read",
-                "channel_editor",
-                "chat:read",
+                "channel:manage:broadcast",
                 "chat:edit",
-                "channel:moderate",
-                "whispers:read",
-                "whispers:edit",
+                "chat:read",
             ])
             .catch((e) => {
                 console.error(e);

@@ -1,6 +1,7 @@
 .header {
     @apply font-bold mb-2;
 }
+
 .header__small {
     @apply ml-2 font-normal opacity-70;
 }
@@ -8,6 +9,7 @@
 .row {
     @apply md:flex mb-2 pb-5 border-b border-dotted border-gray-300 dark:border-gray-500;
 }
+
 .row:last-child {
     @apply mb-0 pb-3 border-0;
 }

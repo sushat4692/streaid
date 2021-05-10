@@ -3,7 +3,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { FormattedMessage } from "react-intl";
 
 // Recoil
-import RaidersState, { RaiderRowType } from "../atom/Raiders";
+import RaidersState from "../atom/Raiders";
 import LocaleState from "../atom/Locale";
 
 // Component
@@ -19,28 +19,24 @@ const ChattersPage: React.FC = () => {
 
     useEffect(() => {
         (async () => {
-            const raiders = await request<null, RaiderRowType[]>(
-                "raider",
-                null,
-                [
-                    {
-                        _id: "1",
-                        channel: "channel",
-                        username: "username",
-                        viewers: 1,
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                    },
-                    {
-                        _id: "2",
-                        channel: "channel",
-                        username: "username",
-                        viewers: 1,
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                    },
-                ]
-            );
+            const raiders = await request("raider", null, [
+                {
+                    _id: "1",
+                    channel: "channel",
+                    username: "username",
+                    viewers: 1,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    _id: "2",
+                    channel: "channel",
+                    username: "username",
+                    viewers: 1,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+            ]);
             updateRaiders([...raiders]);
         })();
     }, []);

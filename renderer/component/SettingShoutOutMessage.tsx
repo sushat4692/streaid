@@ -32,14 +32,7 @@ const SettingShoutOutMessage: React.FC = () => {
 
         updateIsConnecting(true);
 
-        await request<
-            {
-                shoutout_message: string;
-                shoutout_not_found: string;
-                shoutout_failed: string;
-            },
-            null
-        >(
+        await request(
             "setting:shoutout_message",
             {
                 shoutout_message: shoutOutMessage,

@@ -3,7 +3,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { FormattedMessage } from "react-intl";
 
 // Recoil
-import ChattersState, { ChatterRowType } from "../atom/Chatters";
+import ChattersState from "../atom/Chatters";
 import LocaleState from "../atom/Locale";
 
 // Component
@@ -19,28 +19,24 @@ const ChattersPage: React.FC = () => {
 
     useEffect(() => {
         (async () => {
-            const chatters = await request<null, ChatterRowType[]>(
-                "chatter",
-                null,
-                [
-                    {
-                        _id: "1",
-                        "message-type": "chat",
-                        username: "username",
-                        "display-name": "displayname",
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                    },
-                    {
-                        _id: "2",
-                        "message-type": "chat",
-                        username: "username",
-                        "display-name": "displayname",
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                    },
-                ]
-            );
+            const chatters = await request("chatter", null, [
+                {
+                    _id: "1",
+                    "message-type": "chat",
+                    username: "username",
+                    "display-name": "displayname",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    _id: "2",
+                    "message-type": "chat",
+                    username: "username",
+                    "display-name": "displayname",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+            ]);
             updateChatters([...chatters]);
         })();
     }, []);

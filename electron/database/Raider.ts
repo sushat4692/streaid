@@ -1,6 +1,6 @@
 import dbFactory from "./factory";
 
-const database = dbFactory("raiders.db", true);
+const database = dbFactory("raiders.db");
 
 export type RaiderInformation = {
     channel: string;

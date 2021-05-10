@@ -7,7 +7,7 @@ ipcMain.handle("host", async () => {
     return await getHosts();
 });
 
-ipcMain.handle("host:delete", async (_, values) => {
-    await removeHost(values.id);
+ipcMain.handle("host:delete", async (_, id: string) => {
+    await removeHost(id);
     return await getHosts();
 });

@@ -1,13 +1,7 @@
 import { atom } from "recoil";
+import { TagType } from "../../types/Tag";
 
-export interface TagInterface {
-    id: string;
-    isAuto: boolean;
-    name: string;
-    description: string;
-}
-
-const state = atom<TagInterface[]>({
+const state = atom<TagType[]>({
     key: "ChannelTags",
     default: [],
 });

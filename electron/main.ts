@@ -7,6 +7,11 @@ import { getInstance as getStoreInstance } from "./store";
 // Menu
 import { setMenu } from "./menu";
 
+// Env
+import { useEnv } from "./util/Env";
+const env = useEnv();
+env.set("mode", "__build__");
+
 async function createWindow() {
     const win = new BrowserWindow({
         width: 800,
