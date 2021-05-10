@@ -6,7 +6,7 @@ import { getInstance as getStoreInstance } from "../store";
 // Library
 import { getInstance as getTwichAPIInstance } from "../lib/TwitchAPI";
 
-ipcMain.handle("channel:info", async (_, values) => {
+ipcMain.handle("channel:info", async (_, values: { username: string }) => {
     const TwitchAPI = getTwichAPIInstance();
     const store = getStoreInstance();
     const locale = store.get("locale");
@@ -42,7 +42,7 @@ ipcMain.handle("channel:info", async (_, values) => {
     };
 });
 
-ipcMain.handle("channel:game", async (_, values) => {
+ipcMain.handle("channel:game", async (_, values: { gameId: string }) => {
     const TwitchAPI = getTwichAPIInstance();
     const game = await TwitchAPI.getGame(values.gameId);
 
@@ -57,7 +57,7 @@ ipcMain.handle("channel:game", async (_, values) => {
     };
 });
 
-ipcMain.handle("channel:games", async (_, values) => {
+ipcMain.handle("channel:games", async (_, values: { gameName: string }) => {
     const TwitchAPI = getTwichAPIInstance();
     const games = await TwitchAPI.getGameList(values.gameName);
 
@@ -74,7 +74,7 @@ ipcMain.handle("channel:games", async (_, values) => {
     });
 });
 
-ipcMain.handle("channel:tags", async (_, values) => {
+ipcMain.handle("channel:tags", async (_, values: { username: string }) => {
     const TwitchAPI = getTwichAPIInstance();
     const store = getStoreInstance();
     const locale = store.get("locale");
@@ -105,17 +105,28 @@ ipcMain.handle("channel:tags", async (_, values) => {
     });
 });
 
-ipcMain.handle("channel:update", async (_, values) => {
-    const TwitchAPI = getTwichAPIInstance();
+ipcMain.handle(
+    "channel:update",
+    async (
+        _,
+        values: {
+            username: string;
+            title: string;
+            gameId: string;
+            language: string;
+        }
+    ) => {
+        const TwitchAPI = getTwichAPIInstance();
 
-    const User = await TwitchAPI.getUserByName(values.username);
-    if (!User) {
-        return [];
+        const User = await TwitchAPI.getUserByName(values.username);
+        if (!User) {
+            return;
+        }
+
+        TwitchAPI.updateChannelInfo(User, {
+            title: values.title,
+            gameId: values.gameId,
+            language: values.language,
+        });
     }
-
-    TwitchAPI.updateChannelInfo(User, {
-        title: values.title,
-        gameId: values.gameId,
-        language: values.language,
-    });
-});
+);

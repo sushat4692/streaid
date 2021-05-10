@@ -3,7 +3,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { FormattedMessage } from "react-intl";
 
 // Recoil
-import UserMemoState, { UserMemoRowType } from "../atom/UserMemo";
+import UserMemoState from "../atom/UserMemo";
 import LocaleState from "../atom/Locale";
 
 // Component
@@ -19,28 +19,24 @@ const UserMemoPage: React.FC = () => {
 
     useEffect(() => {
         (async () => {
-            const memos = await request<null, UserMemoRowType[]>(
-                "usermemo",
-                null,
-                [
-                    {
-                        _id: "1",
-                        username: "username",
-                        nickname: "nickname",
-                        memo: "memo",
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                    },
-                    {
-                        _id: "2",
-                        username: "username",
-                        nickname: "nickname",
-                        memo: "memo",
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                    },
-                ]
-            );
+            const memos = await request("usermemo", null, [
+                {
+                    _id: "1",
+                    username: "username",
+                    nickname: "nickname",
+                    memo: "memo",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    _id: "2",
+                    username: "username",
+                    nickname: "nickname",
+                    memo: "memo",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+            ]);
 
             updateUserMemos(memos);
         })();

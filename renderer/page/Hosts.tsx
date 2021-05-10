@@ -3,7 +3,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { FormattedMessage } from "react-intl";
 
 // Recoil
-import HostsState, { HostRowType } from "../atom/Hosts";
+import HostsState from "../atom/Hosts";
 import LocaleState from "../atom/Locale";
 
 // Component
@@ -19,7 +19,7 @@ const ChattersPage: React.FC = () => {
 
     useEffect(() => {
         (async () => {
-            const hosts = await request<null, HostRowType[]>("host", null, [
+            const hosts = await request("host", null, [
                 {
                     _id: "1",
                     channel: "channel",

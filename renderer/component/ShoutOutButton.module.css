@@ -1,7 +1,9 @@
 .wrap {
     @apply flex relative;
+
     margin: 0 1px;
 }
+
 .wrap button {
     @apply rounded-none !important;
 }
@@ -9,12 +11,15 @@
 .nav {
     @apply absolute top-full right-0 z-10 bg-gray-100 dark:bg-gray-900 whitespace-nowrap mt-1 rounded-sm shadow;
 }
+
 .nav:not(.is-active) {
     @apply hidden;
 }
+
 .nav__item {
     @apply block px-4 py-2 hover:bg-gray-500 hover:bg-opacity-50;
 }
+
 .nav__item + .nav__item {
     @apply border-t border-solid border-gray-300 dark:border-gray-500;
 }

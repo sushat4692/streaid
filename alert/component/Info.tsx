@@ -4,22 +4,12 @@ import socket from "../socket";
 
 import styles from "./Info.module.css";
 
-interface User {
-    id: string;
-    name: string;
-    displayName: string;
-    description: string;
-    type: string;
-    broadcasterType: string;
-    profilePictureUrl: string;
-    offlinePlaceholderUrl: string;
-    views: number;
-    creationDate: string;
-}
+// Types
+import { UserType } from "../../types/User";
 
 const InfoComponent: React.FC = () => {
     const [timer, updateTimer] = useState(null);
-    const [user, updateUser] = useState<User | null>(null);
+    const [user, updateUser] = useState<UserType | null>(null);
     const [isActive, updateIsActive] = useState<boolean>(false);
 
     const showInfo = () => {

@@ -23,7 +23,7 @@ const SettingBotComponent: React.FC = () => {
         updateIsConnecting(true);
 
         updateLocate(e.value);
-        await request<string, null>("setting:locale:update", e.value, null);
+        await request("setting:locale:update", e.value, null);
 
         updateIsConnecting(false);
     };

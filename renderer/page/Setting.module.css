@@ -5,9 +5,11 @@
 .nav {
     @apply text-sm pb-4 mb-4 border-b border-solid border-gray-300 dark:border-gray-500 md:border-0 md:mb-0 md:w-48 md:sticky md:top-10 md:flex-shrink-0;
 }
+
 .nav__item {
     @apply block py-2 px-4 bg-black dark:bg-white bg-opacity-0 hover:bg-opacity-10;
 }
+
 .nav__item.is-active {
     @apply bg-opacity-10;
 }

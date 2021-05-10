@@ -1,22 +1,20 @@
 import dbFactory from "./factory";
-import { Userstate } from "tmi.js";
+
+// Types
+import { RequestChannelTemplateType } from "../../types/ChannelTemplate";
 
 const database = dbFactory("channel_template.db");
 
-export interface ChannelTemplateType {
-    title: string;
-    gameId: string;
-    gameName: string;
-    boxArtUrl: string;
-    language: string;
-}
-
-export const pushChannelTemplate = async (userstate: Userstate) => {
-    await database.insert(userstate);
+export const pushChannelTemplate = async (
+    template: RequestChannelTemplateType
+) => {
+    await database.insert(template);
 };
 
 export const getChannelTemplate = async () => {
-    return await database.find<ChannelTemplateType>({}).sort({ createdAt: -1 });
+    return await database
+        .find<RequestChannelTemplateType>({})
+        .sort({ createdAt: -1 });
 };
 
 export const removeChannelTemplate = async (id: string) => {

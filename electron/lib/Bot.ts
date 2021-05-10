@@ -5,17 +5,52 @@ import tmi from "tmi.js";
 import { getChatters, pushChatter } from "../database/Chatter";
 import { getRaiders, pushRaider } from "../database/Raider";
 import { getHosts, pushHost } from "../database/Host";
+import { getCommands } from "../database/Command";
 
 // Store
 import { getInstance as getStoreInstance } from "../store";
 import { useCommand } from "./commands";
+import { rollDice } from "./commands/Dice";
+import { shoutOut, shoutOutClipStop } from "./commands/ShoutOut";
 
 // Util
 import { getWindow } from "../util/window";
 import { playSound } from "../util/Sound";
+import { useEnv } from "../util/Env";
 
 class Bot {
     private _client: tmi.Client | null = null;
+
+    constructor() {
+        const commandModel = useCommand();
+
+        // Default Command
+        commandModel.push("!dice", {
+            allow: "everyone",
+            handler: rollDice,
+        });
+
+        commandModel.push("!so", {
+            allow: "mod",
+            handler: shoutOut,
+        });
+
+        commandModel.push("!stop", {
+            allow: "mod",
+            handler: shoutOutClipStop,
+        });
+
+        (async () => {
+            // Custom Command
+            const commands = await getCommands();
+            commands.map((command) => {
+                commandModel.push(command.command, {
+                    allow: command.allow,
+                    handler: () => command.body,
+                });
+            });
+        })();
+    }
 
     get client() {
         return this._client;
@@ -26,10 +61,11 @@ class Bot {
      */
     connect() {
         const store = getStoreInstance();
+        const env = useEnv();
 
         // Define configuration options
         const opts: tmi.Options = {
-            options: { debug: true },
+            options: { debug: env.get("mode") !== "production" },
             connection: {
                 secure: true,
                 reconnect: true,
@@ -70,13 +106,13 @@ class Bot {
      * Called every time a message comes in
      *
      * @param channel
-     * @param userstate
+     * @param UserState
      * @param message
      * @param self
      */
     async onMessageHandler(
         channel: string,
-        userstate: tmi.ChatUserstate,
+        UserState: tmi.ChatUserstate,
         message: string,
         self: boolean
     ) {
@@ -91,28 +127,27 @@ class Bot {
         if (commandName && commandName.charAt(0) === "!") {
             const command = useCommand();
 
-            const existsCommand = command.exists(commandName);
-            if (existsCommand) {
-                const message = await command.trigger(commandName, ...messages);
+            try {
+                const message = await command
+                    .get(commandName, UserState)
+                    .run(...messages);
 
-                if (message) {
+                if (message && typeof message === "string") {
                     this.client?.action(channel, message);
                 }
-            }
 
-            if (existsCommand) {
                 console.log(`* Executed ${commandName} command`);
-            } else {
-                console.log(`* Unknown command ${commandName}`);
+            } catch (e) {
+                return;
             }
         }
 
         const win = getWindow();
 
-        if (await pushChatter(userstate)) {
+        if (await pushChatter(UserState)) {
             const notification = new Notification({
                 title: `Chatter has come`,
-                body: `Thank you for coming "${userstate["display-name"]}"`,
+                body: `Thank you for coming "${UserState["display-name"]}"`,
                 silent: true,
             });
             notification.show();

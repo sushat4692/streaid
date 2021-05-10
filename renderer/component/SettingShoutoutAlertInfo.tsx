@@ -73,7 +73,7 @@ const SettingShoutoutAlertInfo: React.FC = () => {
                             "setting:shoutout:alert:length",
                             {
                                 mode: "info",
-                                value,
+                                value: value as number,
                             },
                             null
                         );

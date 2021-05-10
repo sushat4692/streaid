@@ -3,10 +3,11 @@ import { useSetRecoilState } from "recoil";
 import moment from "moment";
 import { FormattedMessage } from "react-intl";
 
+// Types
+import { ChannelTemplateType } from "../../types/ChannelTemplate";
+
 // Recoil
-import ChannelTemplateState, {
-    ChannelTemplateRowType,
-} from "../atom/ChannelTemplate";
+import ChannelTemplateState from "../atom/ChannelTemplate";
 import ChannelTitleState from "../atom/ChannelTitle";
 import ChannelGameState from "../atom/ChannelGame";
 import ChannelLanguageState from "../atom/ChannelLanguage";
@@ -18,7 +19,7 @@ import { request } from "../util/request";
 import { getLabel } from "../const/languages";
 
 type Props = {
-    channelTemplate: ChannelTemplateRowType;
+    channelTemplate: ChannelTemplateType;
 };
 
 const ChannelTemplateRowComponent: React.FC<Props> = ({
@@ -40,12 +41,11 @@ const ChannelTemplateRowComponent: React.FC<Props> = ({
     };
 
     const deleteClickHandler = async () => {
-        const templates = await request<
-            {
-                id: string;
-            },
-            ChannelTemplateRowType[]
-        >("channel:template:delete", { id: channelTemplate._id }, []);
+        const templates = await request(
+            "channel:template:delete",
+            channelTemplate._id,
+            []
+        );
 
         updateChannelTemplate(templates);
     };

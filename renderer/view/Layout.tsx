@@ -2,9 +2,6 @@ import React, { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-// Type
-import { ResponseSettingType } from "../../types/SettingType";
-
 // Recoil
 import SettingUsernameState from "../atom/SettingUsername";
 import SettingChannelState from "../atom/SettingChannel";
@@ -27,6 +24,7 @@ import RaidersPage from "../page/Raiders";
 import HostsPage from "../page/Hosts";
 import ChannelPage from "../page/Channel";
 import UserMemoPage from "../page/UserMemo";
+import CommandPage from "../page/Command";
 import SettingPage from "../page/Setting";
 import LicensePage from "../page/License";
 
@@ -53,22 +51,18 @@ const Layout: React.FC = () => {
         (async () => {
             updateIsConnecting(true);
 
-            const defaultValue = await request<null, ResponseSettingType>(
-                "settings:get",
-                null,
-                {
-                    username: "channel",
-                    channel: "channel",
-                    shoutout_message: "",
-                    shoutout_not_found: "",
-                    shoutout_failed: "",
-                    shoutout_info_length: 8,
-                    chatter_volume: 1,
-                    chat_volume: 1,
-                    raid_volume: 1,
-                    host_volume: 1,
-                }
-            );
+            const defaultValue = await request("setting:get", null, {
+                username: "channel",
+                channel: "channel",
+                shoutout_message: "",
+                shoutout_not_found: "",
+                shoutout_failed: "",
+                shoutout_info_length: 8,
+                chatter_volume: 1,
+                chat_volume: 1,
+                raid_volume: 1,
+                host_volume: 1,
+            });
 
             updateSettingUsername(defaultValue.username);
             updateSettingChannel(defaultValue.channel);
@@ -113,6 +107,10 @@ const Layout: React.FC = () => {
                             <Route
                                 path="/settings"
                                 component={SettingPage}
+                            ></Route>
+                            <Route
+                                path="/commands"
+                                component={CommandPage}
                             ></Route>
                             <Route
                                 path="/license"

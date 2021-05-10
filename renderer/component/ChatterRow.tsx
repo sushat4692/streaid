@@ -1,10 +1,12 @@
 import React from "react";
-import { useSetRecoilState, useRecoilValue } from "recoil";
+import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
+// Types
+import { ChatterType } from "../../types/Chatter";
+
 // Recoil
-import ChattersState, { ChatterRowType } from "../atom/Chatters";
-import LocaleState from "../atom/Locale";
+import ChattersState from "../atom/Chatters";
 
 // Utility
 import { request } from "../util/request";
@@ -14,20 +16,14 @@ import UserComponent from "./User";
 import ShoutOutButtonComponent from "./ShoutOutButton";
 
 type Props = {
-    chatter: ChatterRowType;
+    chatter: ChatterType;
 };
 
 const ChatterRowComponent: React.FC<Props> = ({ chatter }: Props) => {
     const updateChatters = useSetRecoilState(ChattersState);
-    const locale = useRecoilValue(LocaleState);
 
     const deleteClickHandler = async () => {
-        const chatters = await request<
-            {
-                id: string;
-            },
-            ChatterRowType[]
-        >("chatter:delete", { id: chatter._id }, []);
+        const chatters = await request("chatter:delete", chatter._id, []);
 
         updateChatters([...chatters]);
     };

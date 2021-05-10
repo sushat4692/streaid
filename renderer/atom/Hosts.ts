@@ -1,14 +1,7 @@
 import { atom } from "recoil";
-import { Document } from "../../types/Document";
+import { HostType } from "../../types/Host";
 
-export interface HostRowType extends Document {
-    channel: string;
-    username: string;
-    viewers: number;
-    autohost: boolean;
-}
-
-const state = atom<HostRowType[]>({
+const state = atom<HostType[]>({
     key: "Hosts",
     default: [],
 });

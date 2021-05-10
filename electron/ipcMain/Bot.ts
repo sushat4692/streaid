@@ -41,9 +41,9 @@ ipcMain.handle(
         }
 
         const command = useCommand();
-        const message = await command.trigger("!so", username, showWindow);
+        const message = await command.get("!so").run(username, showWindow);
 
-        if (message) {
+        if (message && typeof message === "string") {
             Bot.client.action(channelName, message);
         }
         return;

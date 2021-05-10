@@ -9,9 +9,9 @@ import IsConnectingState from "../atom/IsConnecting";
 // Util
 import { request } from "../util/request";
 
-interface Props {
+type Props = {
     isBlock?: boolean;
-}
+};
 
 const ConnectComonent: React.FC<Props> = ({ isBlock = false }: Props) => {
     const isConnected = useRecoilValue(IsConnectedState);
@@ -22,9 +22,9 @@ const ConnectComonent: React.FC<Props> = ({ isBlock = false }: Props) => {
         updateIsConnecting(true);
 
         if (isConnected) {
-            await request("bot:disconnect", null, null);
+            await request("bot:disconnect", {}, null);
         } else {
-            await request("bot:connect", null, null);
+            await request("bot:connect", {}, null);
         }
     };
 

@@ -76,7 +76,7 @@ const SettingSoundHostsComponent: React.FC = () => {
                                     "setting:notification:volume",
                                     {
                                         mode: "host_volume",
-                                        value,
+                                        value: value as number,
                                     },
                                     null
                                 );

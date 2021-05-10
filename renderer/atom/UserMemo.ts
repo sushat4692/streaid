@@ -1,13 +1,7 @@
 import { atom } from "recoil";
-import { Document } from "../../types/Document";
+import { UserMemoType } from "../../types/UserMemo";
 
-export interface UserMemoRowType extends Document {
-    username: string;
-    nickname: string;
-    memo: string;
-}
-
-const state = atom<UserMemoRowType[]>({
+const state = atom<UserMemoType[]>({
     key: "UserMemo",
     default: [],
 });
