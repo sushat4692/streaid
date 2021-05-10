@@ -2,8 +2,11 @@ import React from "react";
 import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
+// Types
+import { RaiderType } from "../../types/Raider";
+
 // Recoil
-import RaidersState, { RaiderRowType } from "../atom/Raiders";
+import RaidersState from "../atom/Raiders";
 
 // Utility
 import { request } from "../util/request";
@@ -13,19 +16,14 @@ import UserComponent from "./User";
 import ShoutOutButtonComponent from "./ShoutOutButton";
 
 type Props = {
-    raider: RaiderRowType;
+    raider: RaiderType;
 };
 
 const RaiderRowComponent: React.FC<Props> = ({ raider }: Props) => {
     const updateRaidersState = useSetRecoilState(RaidersState);
 
     const deleteClickHandler = async () => {
-        const raiders = await request<
-            {
-                id: string;
-            },
-            RaiderRowType[]
-        >("raider:delete", { id: raider._id }, []);
+        const raiders = await request("raider:delete", raider._id, []);
 
         updateRaidersState([...raiders]);
     };

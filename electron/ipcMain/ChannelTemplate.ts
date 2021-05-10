@@ -16,7 +16,7 @@ ipcMain.handle("channel:template:push", async (_, values) => {
     return await getChannelTemplate();
 });
 
-ipcMain.handle("channel:template:delete", async (_, values) => {
-    await removeChannelTemplate(values.id);
+ipcMain.handle("channel:template:delete", async (_, id) => {
+    await removeChannelTemplate(id);
     return await getChannelTemplate();
 });

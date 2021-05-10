@@ -6,7 +6,7 @@ import TextareaAutosize from "react-textarea-autosize";
 import ReactTooltip from "react-tooltip";
 
 // Recoil
-import UserMemoState, { UserMemoRowType } from "../atom/UserMemo";
+import UserMemoState from "../atom/UserMemo";
 
 // Util
 import { request } from "../util/request";
@@ -14,9 +14,9 @@ import { request } from "../util/request";
 // Styles
 import styles from "./User.module.css";
 
-interface Props {
+type Props = {
     username: string;
-}
+};
 
 const UserComponent: React.FC<Props> = ({ username }: Props) => {
     const [isOpen, updateIsOpen] = useState<boolean>(false);
@@ -27,27 +27,20 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
     const updateUserMemo = useSetRecoilState(UserMemoState);
 
     const getUserMemoInformation = async () => {
-        return await request<string, UserMemoRowType>(
-            "usermemo:one",
-            username,
-            {
-                _id: "1",
-                username: "username",
-                nickname: "nickname",
-                memo: "memo",
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            }
-        );
+        return await request("usermemo:one", username, {
+            _id: "1",
+            username: "username",
+            nickname: "nickname",
+            memo: "memo",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        });
     };
 
     const onSubmitHandler = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const usermemos = await request<
-            { username: string; nickname: string; memo: string },
-            UserMemoRowType[]
-        >(
+        const usermemos = await request(
             "usermemo:store",
             {
                 username,
@@ -135,22 +128,18 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
                 <i className="bi bi-pencil" />
             </button>
 
-            <Modal
-                isOpen={isOpen}
-                className={styles.modal}
-                overlayClassName={styles.overlay}
-            >
+            <Modal isOpen={isOpen} className="modal" overlayClassName="overlay">
                 <form tabIndex={-1} onSubmit={onSubmitHandler}>
-                    <div className={styles.modal__head}>
+                    <div className="modal__head">
                         <h5 className="modal-title">{username}</h5>
                         <button
                             type="button"
-                            className={styles.modal__close}
+                            className="modal__close"
                             aria-label="Close"
                             onClick={closeHandler}
                         />
                     </div>
-                    <div className={styles.modal__body}>
+                    <div className="modal__body">
                         <div className="form-field">
                             <label className="form-field__label">
                                 <FormattedMessage
@@ -183,7 +172,7 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
                             />
                         </div>
                     </div>
-                    <div className={styles.modal__foot}>
+                    <div className="modal__foot">
                         <button
                             type="button"
                             className="btn btn-secondary"

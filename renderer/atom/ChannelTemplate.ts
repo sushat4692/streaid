@@ -1,16 +1,8 @@
 import { atom } from "recoil";
-import { Document } from "../../types/Document";
+import { ChannelTemplateType } from "../../types/ChannelTemplate";
 
-export interface ChannelTemplateRowType extends Document {
-    title: string;
-    gameId: string;
-    gameName: string;
-    boxArtUrl: string;
-    language: string;
-}
-
-const state = atom<ChannelTemplateRowType[]>({
-    key: "ChannelTemplateRowType",
+const state = atom<ChannelTemplateType[]>({
+    key: "ChannelTemplateRow",
     default: [],
 });
 

@@ -90,6 +90,17 @@ const HeaderComponent: React.FC = () => {
                                         defaultMessage="User memo"
                                     />
                                 </NavLink>
+                                <NavLink
+                                    className={styles.nav__list__menu__button}
+                                    data-disable={!setting.isEnableBot}
+                                    activeClassName={styles["is-active"]}
+                                    to="/commands"
+                                >
+                                    <FormattedMessage
+                                        id="Common.Command.Name"
+                                        defaultMessage="Command"
+                                    />
+                                </NavLink>
                             </div>
                         </div>
                     </div>
@@ -218,6 +229,17 @@ const HeaderComponent: React.FC = () => {
                         <FormattedMessage
                             id="Common.UserMemo.Name"
                             defaultMessage="User memo"
+                        />
+                    </NavLink>
+                    <NavLink
+                        className={styles.nav__mobile__menu__button}
+                        data-disable={!setting.isEnableBot}
+                        activeClassName="active"
+                        to="/commands"
+                    >
+                        <FormattedMessage
+                            id="Common.Commmand.Name"
+                            defaultMessage="Command"
                         />
                     </NavLink>
                     <ConnectComponent isBlock={true} />

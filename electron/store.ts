@@ -1,6 +1,6 @@
 import Store from "electron-store";
 
-export interface StoreType {
+type StoreType = {
     "api.inited": boolean;
     locale: string;
     username: string;
@@ -13,9 +13,11 @@ export interface StoreType {
     alert_http_port: number;
     alert_socket_port: number;
     chatter_volume: number;
+    chat_volume: number;
     raid_volume: number;
     host_volume: number;
-}
+};
+
 const schema: Store.Schema<StoreType> = {
     "api.inited": {
         type: "boolean",
@@ -63,6 +65,10 @@ const schema: Store.Schema<StoreType> = {
         default: 9999,
     },
     chatter_volume: {
+        type: "number",
+        default: 1,
+    },
+    chat_volume: {
         type: "number",
         default: 1,
     },

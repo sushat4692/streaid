@@ -1,12 +1,7 @@
 import { atom } from "recoil";
+import { GameType } from "../../types/Game";
 
-export interface GameInterface {
-    id: string;
-    name: string;
-    boxArtUrl: string;
-}
-
-const state = atom<GameInterface>({
+const state = atom<GameType>({
     key: "ChannelGame",
     default: {
         id: "",

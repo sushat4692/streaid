@@ -1,6 +1,6 @@
 import dbFactory from "./factory";
 
-const database = dbFactory("hosts.db", true);
+const database = dbFactory("hosts.db");
 
 export type HostInformation = {
     channel: string;

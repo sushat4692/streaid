@@ -2,8 +2,11 @@ import React from "react";
 import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
+// Types
+import { HostType } from "../../types/Host";
+
 // Recoil
-import HostsState, { HostRowType } from "../atom/Hosts";
+import HostsState from "../atom/Hosts";
 
 // Utility
 import { request } from "../util/request";
@@ -13,19 +16,14 @@ import UserComponent from "./User";
 import ShoutOutButtonComponent from "./ShoutOutButton";
 
 type Props = {
-    host: HostRowType;
+    host: HostType;
 };
 
 const HostsRowComponent: React.FC<Props> = ({ host }: Props) => {
     const updateHostsState = useSetRecoilState(HostsState);
 
     const deleteClickHandler = async () => {
-        const hosts = await request<
-            {
-                id: string;
-            },
-            HostRowType[]
-        >("host:delete", { id: host._id }, []);
+        const hosts = await request("host:delete", host._id, []);
 
         updateHostsState([...hosts]);
     };

@@ -12,14 +12,14 @@ import SettingSoundComponent from "../component/SettingSound";
 
 import styles from "./Setting.module.css";
 
-interface Props {
+type Props = {
     match: {
         isExact: boolean;
-        params: { [key: string]: any };
+        params: { [key: string]: unknown };
         path: string;
         url: string;
     };
-}
+};
 
 const SettnigPage: React.FC<Props> = ({ match }: Props) => {
     if (!match) {

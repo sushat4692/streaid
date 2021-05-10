@@ -31,8 +31,7 @@ const DashboardPage: React.FC = () => {
                     <div
                         className={styles.cards}
                         style={{
-                            gridTemplateColumns:
-                                "repeat(auto-fill, minmax(280px, 1fr))",
+                            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
                         }}
                     >
                         <div className={styles.cards__item}>
@@ -177,6 +176,37 @@ const DashboardPage: React.FC = () => {
                             </p>
                             <Link
                                 to="/user_memo"
+                                className={`btn is-primary ${
+                                    setting.isEnableBot
+                                        ? "is-stretched"
+                                        : "is-disabled"
+                                }`}
+                            >
+                                <FormattedMessage
+                                    id="View.Dashboard.CheckButton"
+                                    defaultMessage="Check"
+                                />
+                            </Link>
+                        </div>
+
+                        <div className={styles.cards__item}>
+                            <h2 className={styles.cards__head}>
+                                <i
+                                    className={`bi bi-wrench ${styles.cards__head__icon}`}
+                                />
+                                <FormattedMessage
+                                    id="Common.Command.Name"
+                                    defaultMessage="Command"
+                                />
+                            </h2>
+                            <p className={styles.cards__text}>
+                                <FormattedMessage
+                                    id="Common.Command.Description"
+                                    defaultMessage="You can manage your own channel command."
+                                />
+                            </p>
+                            <Link
+                                to="/commands"
                                 className={`btn is-primary ${
                                     setting.isEnableBot
                                         ? "is-stretched"

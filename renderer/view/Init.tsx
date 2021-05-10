@@ -27,11 +27,11 @@ const InitComponent: React.FC = () => {
 
     const updateLocaleHandler = async (e: { label: string; value: string }) => {
         updateLocate(e.value);
-        await request<string, null>("setting:locale:update", e.value, null);
+        await request("setting:locale:update", e.value, null);
     };
 
     const clickHandler = async () => {
-        await request("settings:get", null, null);
+        await request("setting:get", {}, null);
         updateIsInited(true);
     };
 

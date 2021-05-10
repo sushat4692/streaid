@@ -4,15 +4,17 @@ import Select, { OptionTypeBase } from "react-select";
 import AsyncSelect from "react-select/async";
 import { FormattedMessage, useIntl } from "react-intl";
 
+// Types
+import { TagType } from "../../types/Tag";
+import { GameType } from "../../types/Game";
+
 // Recoil
 import SettingChannelState from "../atom/SettingChannel";
 import ChannelTitleState from "../atom/ChannelTitle";
-import ChannelGameState, { GameInterface } from "../atom/ChannelGame";
+import ChannelGameState from "../atom/ChannelGame";
 import ChannelLanguageState from "../atom/ChannelLanguage";
-import ChannelTagsState, { TagInterface } from "../atom/ChannelTags";
-import ChannelTemplateState, {
-    ChannelTemplateRowType,
-} from "../atom/ChannelTemplate";
+import ChannelTagsState from "../atom/ChannelTags";
+import ChannelTemplateState from "../atom/ChannelTemplate";
 import IsConnectingState from "../atom/IsConnecting";
 
 // Utility
@@ -28,17 +30,6 @@ import ChannelTemplateRowComponent from "../component/ChannelTemplateRow";
 // Styles
 import styles from "./Channel.module.css";
 
-interface ChannelInterface {
-    id: string;
-    name: string;
-    displayName: string;
-    language: string;
-    gameId: string;
-    gameName: string;
-    title: string;
-    tags: TagInterface[];
-}
-
 const ChannelPage: React.FC = () => {
     const intl = useIntl();
 
@@ -53,23 +44,19 @@ const ChannelPage: React.FC = () => {
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
     const [isLoaded, updateIsLoaded] = useState(false);
-    const [
-        defaultGameOption,
-        updateDefaultGameOption,
-    ] = useState<GameInterface>(null);
+    const [defaultGameOption, updateDefaultGameOption] = useState<GameType>(
+        null
+    );
     const [
         defaultLanguageOption,
         updateDefaultLanguageOption,
     ] = useState<OptionTypeBase>(null);
-    const [tagOption, _updateTagOption] = useState<TagInterface[]>([]);
+    const [tagOption, _updateTagOption] = useState<TagType[]>([]);
 
     const getChannelInformation = async () => {
         updateIsConnecting(true);
 
-        const Channel = await request<
-            { username: string },
-            ChannelInterface | false
-        >(
+        const Channel = await request(
             "channel:info",
             { username: channel },
             {
@@ -88,10 +75,7 @@ const ChannelPage: React.FC = () => {
             updateTitle(Channel.title);
             updateLanguage(Channel.language);
 
-            const game = await request<
-                { gameId: string },
-                GameInterface | null
-            >(
+            const game = await request(
                 "channel:game",
                 { gameId: Channel.gameId },
                 { id: "1", name: "Game", boxArtUrl: "https://example.com" }
@@ -135,7 +119,7 @@ const ChannelPage: React.FC = () => {
             }
 
             // Get tag list
-            // const tagList = await request<{ username: string }, TagInterface[]>(
+            // const tagList = await request(
             //     "channel:tags",
             //     { username: channel },
             //     []
@@ -145,32 +129,28 @@ const ChannelPage: React.FC = () => {
 
             // Get Templates
             updateIsConnecting(true);
-            const templates = await request<null, ChannelTemplateRowType[]>(
-                "channel:template",
-                null,
-                [
-                    {
-                        _id: "1",
-                        title: "title",
-                        gameId: "1",
-                        gameName: "name",
-                        boxArtUrl: "",
-                        language: "ja",
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                    },
-                    {
-                        _id: "2",
-                        title: "title",
-                        gameId: "1",
-                        gameName: "name",
-                        boxArtUrl: "",
-                        language: "ja",
-                        createdAt: new Date(),
-                        updatedAt: new Date(),
-                    },
-                ]
-            );
+            const templates = await request("channel:template", null, [
+                {
+                    _id: "1",
+                    title: "title",
+                    gameId: "1",
+                    gameName: "name",
+                    boxArtUrl: "",
+                    language: "ja",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    _id: "2",
+                    title: "title",
+                    gameId: "1",
+                    gameName: "name",
+                    boxArtUrl: "",
+                    language: "ja",
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+            ]);
             updateChannelTemplates(templates || []);
             updateIsConnecting(false);
 
@@ -179,39 +159,25 @@ const ChannelPage: React.FC = () => {
     }, []);
 
     const loadGameOptions = (inputValue: string) =>
-        request<{ gameName: string }, GameInterface[]>(
-            "channel:games",
-            { gameName: inputValue },
-            [{ id: "1", name: "Game", boxArtUrl: "https://example.com" }]
-        );
+        request("channel:games", { gameName: inputValue }, [
+            { id: "1", name: "Game", boxArtUrl: "https://example.com" },
+        ]);
 
     const loadTagOptions = (inputValue: string) =>
-        request<{ tagName: string }, TagInterface[]>(
-            "channel:tags",
-            { tagName: inputValue },
-            [
-                {
-                    id: "1",
-                    isAuto: true,
-                    name: "Tag",
-                    description: "description",
-                },
-            ]
-        );
+        request("channel:tags", { username: inputValue }, [
+            {
+                id: "1",
+                isAuto: true,
+                name: "Tag",
+                description: "description",
+            },
+        ]);
 
     const submitHandler = async (e: React.FormEvent) => {
         e.preventDefault();
         updateIsConnecting(true);
 
-        await request<
-            {
-                username: string;
-                title: string;
-                gameId: string;
-                language: string;
-            },
-            null
-        >(
+        await request(
             "channel:update",
             {
                 username: channel,
@@ -230,16 +196,7 @@ const ChannelPage: React.FC = () => {
         e.preventDefault();
         updateIsConnecting(true);
 
-        const templates = await request<
-            {
-                title: string;
-                gameId: string;
-                gameName: string;
-                boxArtUrl: string;
-                language: string;
-            },
-            ChannelTemplateRowType[]
-        >(
+        const templates = await request(
             "channel:template:push",
             {
                 title,

@@ -4,10 +4,10 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import { FormattedMessage } from "react-intl";
 import cn from "classnames";
 
-interface Props {
+type Props = {
     text: string;
     isLarge?: boolean;
-}
+};
 
 const CopyableField: React.FC<Props> = ({ text, isLarge }: Props) => {
     return (

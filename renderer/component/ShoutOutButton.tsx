@@ -27,10 +27,7 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
         return async () => {
             updateIsConnecting(true);
 
-            await request<
-                { username: string; showWindow: string | null },
-                null
-            >("bot:shoutout", { username, showWindow }, null);
+            await request("bot:shoutout", { username, showWindow }, null);
 
             updateIsConnecting(false);
         };

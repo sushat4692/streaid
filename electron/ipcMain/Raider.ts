@@ -7,7 +7,7 @@ ipcMain.handle("raider", async () => {
     return await getRaiders();
 });
 
-ipcMain.handle("raider:delete", async (_, values) => {
-    await removeRaider(values.id);
+ipcMain.handle("raider:delete", async (_, id: string) => {
+    await removeRaider(id);
     return await getRaiders();
 });

@@ -2,12 +2,6 @@ import React, { useEffect } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
 
-// Type
-import {
-    RequestSettingType,
-    ResponseSettingType,
-} from "../../types/SettingType";
-
 // Recoil
 import SettingUsernameState from "../atom/SettingUsername";
 import SettingChannelState from "../atom/SettingChannel";
@@ -27,8 +21,8 @@ const SettingBotComponent: React.FC = () => {
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
     useEffect(() => {
-        request<RequestSettingType, ResponseSettingType>(
-            "settings:store",
+        request(
+            "setting:store",
             {
                 channel,
             },

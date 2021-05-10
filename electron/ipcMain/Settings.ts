@@ -22,13 +22,13 @@ ipcMain.handle("setting:locale", async () => {
     return store.get("locale", "en-us");
 });
 
-ipcMain.handle("setting:locale:update", async (_, values) => {
+ipcMain.handle("setting:locale:update", async (_, locale: string) => {
     const store = getStoreInstance();
-    setMenu(values);
-    return store.set("locale", values);
+    setMenu(locale);
+    return store.set("locale", locale);
 });
 
-ipcMain.handle("settings:get", async () => {
+ipcMain.handle("setting:get", async () => {
     const store = getStoreInstance();
     const TwitchAPI = getTwichAPIInstance();
     TwitchAPI.init("__twitch_api_key__");
@@ -61,7 +61,7 @@ ipcMain.handle("settings:get", async () => {
     };
 });
 
-ipcMain.handle("settings:store", (_, values) => {
+ipcMain.handle("setting:store", (_, values) => {
     const store = getStoreInstance();
     store.set("channel", values.channel);
 
@@ -87,48 +87,68 @@ ipcMain.handle(
         switch (mode) {
             case "info":
                 store.set("shoutout_info_length", value);
-                break;
+                return value;
+            default:
+                return null;
         }
     }
 );
 
-ipcMain.handle("setting:notification:sound", async (_, values) => {
-    const win = getWindow();
-    if (!win) {
-        return false;
+ipcMain.handle(
+    "setting:notification:sound",
+    async (_, mode: "chatter" | "chat" | "raid" | "host") => {
+        const win = getWindow();
+        if (!win) {
+            return false;
+        }
+
+        const file = await dialog.showOpenDialog(win, {
+            properties: ["openFile"],
+            filters: [
+                {
+                    name: "Document",
+                    extensions: ["mp3"],
+                },
+            ],
+        });
+
+        if (!file || file.canceled) {
+            return false;
+        }
+
+        const buffer = await readFile(file.filePaths[0]);
+        await writeFile(
+            path.join(
+                isDev ? "." : app.getPath("userData"),
+                `data/${mode}.mp3`
+            ),
+            buffer
+        );
+        setCache(mode, buffer);
+
+        return true;
     }
+);
 
-    const file = await dialog.showOpenDialog(win, {
-        properties: ["openFile"],
-        filters: [
-            {
-                name: "Document",
-                extensions: ["mp3"],
-            },
-        ],
-    });
-
-    if (!file || file.canceled) {
-        return false;
+ipcMain.handle(
+    "setting:notification:volume",
+    async (
+        _,
+        values: {
+            mode: "chatter_volume" | "raid_volume" | "host_volume";
+            value: number;
+        }
+    ) => {
+        const store = getStoreInstance();
+        store.set(values.mode, values.value);
+        return values.value;
     }
+);
 
-    const buffer = await readFile(file.filePaths[0]);
-    await writeFile(
-        path.join(isDev ? "." : app.getPath("userData"), `data/${values}.mp3`),
-        buffer
-    );
-    setCache(values, buffer);
-
-    return true;
-});
-
-ipcMain.handle("setting:notification:volume", async (_, values) => {
-    const store = getStoreInstance();
-    store.set(values.mode, values.value);
-    return;
-});
-
-ipcMain.handle("setting:notification:play", async (_, values) => {
-    const win = getWindow();
-    return await playSound(win, values);
-});
+ipcMain.handle(
+    "setting:notification:play",
+    async (_, mode: "chatter" | "chat" | "raid" | "host") => {
+        const win = getWindow();
+        return await playSound(win, mode);
+    }
+);
