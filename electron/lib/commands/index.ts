@@ -1,8 +1,9 @@
 import { ChatUserstate } from "tmi.js";
 import { ApplicationError } from "../../../types/ApplicationError";
+import { CommandAllowType } from "../../../types/CommandAllow";
 
 type CommandType = {
-    allow: "broadcaster" | "mod" | "vip" | "everyone";
+    allow: CommandAllowType;
     handler: (...args) => unknown;
 };
 
@@ -20,10 +21,18 @@ export class NotAllowedError extends ApplicationError {
 
 export const useCommand = () => {
     const push = (name: string, command: CommandType) => {
+        if (name[0] !== "!") {
+            name = "!" + name;
+        }
+
         commandsList[name] = command;
     };
 
     const remove = (name: string) => {
+        if (name[0] !== "!") {
+            name = "!" + name;
+        }
+
         delete commandsList[name];
     };
 

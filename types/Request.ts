@@ -7,6 +7,7 @@ import { HostType } from "./Host";
 import { SettingType } from "./Setting";
 import { UserMemoType, RequestUserMemoType } from "./UserMemo";
 import { RaiderType } from "./Raider";
+import { RequestCommandType, CommandType } from "./Command";
 
 export type ModeType =
     | "bot:connect"
@@ -44,7 +45,11 @@ export type ModeType =
     | "usermemo"
     | "usermemo:one"
     | "usermemo:store"
-    | "usermemo:delete";
+    | "usermemo:delete"
+    | "command"
+    | "command:push"
+    | "command:update"
+    | "command:delete";
 
 export type ValuesType = {
     "bot:connect": Record<string, never>;
@@ -101,6 +106,10 @@ export type ValuesType = {
     "usermemo:one": string;
     "usermemo:store": RequestUserMemoType;
     "usermemo:delete": string;
+    command: Record<string, never>;
+    "command:push": RequestCommandType;
+    "command:update": { id: string; command: RequestCommandType };
+    "command:delete": string;
 };
 
 export type ReturnsType = {
@@ -148,4 +157,8 @@ export type ReturnsType = {
     "usermemo:one": UserMemoType;
     "usermemo:store": UserMemoType[];
     "usermemo:delete": UserMemoType[];
+    command: CommandType[];
+    "command:push": CommandType[];
+    "command:update": CommandType[];
+    "command:delete": CommandType[];
 };

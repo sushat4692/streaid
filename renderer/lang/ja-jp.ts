@@ -17,6 +17,8 @@ const messages: { [key: string]: string } = {
     "Common.UserMemo.Description": "ユーザの追加情報を保存します。",
     "Common.Channel.Name": "チャンネル",
     "Common.Channel.Description": "チャンネル情報の確認・更新します。",
+    "Common.Command.Name": "コマンド",
+    "Common.Command.Description": "チャンネル独自のコマンドを設定できます。",
     "Common.Settings.Name": "設定",
     "Common.License.Name": "ライセンス",
     "Common.Label.Username": "ユーザー名",
@@ -33,6 +35,9 @@ const messages: { [key: string]: string } = {
     "Common.Label.ShoutOut": "シャウトアウト",
     "Common.Label.Volume": "音量",
     "Common.Label.Command": "コマンド",
+    "Common.Label.Priviledge": "権限",
+    "Common.Label.Body": "本文",
+    "Common.Label.Memo": "メモ",
     "Common.Label.StopCommand": "停止コマンド",
     "Common.Label.DisplayLength": "表示時間",
     "Common.Label.SelectFile": "ファイル選択",
@@ -131,6 +136,12 @@ const messages: { [key: string]: string } = {
     "Component.SettingSoundRaiders.Descript": "ホスト毎にサウンドを鳴らします",
     // User
     "Component.User.Memo": "メモ",
+    // Command
+    "Component.Command.everyone": "全員",
+    "Component.Command.vip": "VIP",
+    "Component.Command.mod": "モデレーター",
+    "Component.Command.broadcaster": "配信者のみ",
+    "Component.Command.New": "新規コマンド",
 };
 
 export default messages;

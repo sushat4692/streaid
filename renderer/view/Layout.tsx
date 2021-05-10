@@ -24,6 +24,7 @@ import RaidersPage from "../page/Raiders";
 import HostsPage from "../page/Hosts";
 import ChannelPage from "../page/Channel";
 import UserMemoPage from "../page/UserMemo";
+import CommandPage from "../page/Command";
 import SettingPage from "../page/Setting";
 import LicensePage from "../page/License";
 
@@ -106,6 +107,10 @@ const Layout: React.FC = () => {
                             <Route
                                 path="/settings"
                                 component={SettingPage}
+                            ></Route>
+                            <Route
+                                path="/commands"
+                                component={CommandPage}
                             ></Route>
                             <Route
                                 path="/license"

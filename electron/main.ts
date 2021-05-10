@@ -58,3 +58,4 @@ import "./ipcMain/Host";
 import "./ipcMain/Bot";
 import "./ipcMain/UserMemo";
 import "./ipcMain/Server";
+import "./ipcMain/Command";

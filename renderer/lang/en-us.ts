@@ -18,6 +18,8 @@ const messages: { [key: string]: string } = {
     "Common.UserMemo.Name": "User memo",
     "Common.UserMemo.Description":
         "You can store the target additional information.",
+    "Common.Command.Name": "Command",
+    "Common.Command.Description": "You can manage your own channel command.",
     "Common.Settings.Name": "Settings",
     "Common.License.Name": "License",
     "Common.Label.Username": "User name",
@@ -34,6 +36,9 @@ const messages: { [key: string]: string } = {
     "Common.Label.ShoutOut": "ShoutOut",
     "Common.Label.Volume": "Volume",
     "Common.Label.Command": "Command",
+    "Common.Label.Priviledge": "Priviledge",
+    "Common.Label.Body": "Body",
+    "Common.Label.Memo": "Memo",
     "Common.Label.StopCommand": "Stop Command",
     "Common.Label.DisplayLength": "Display Time Length",
     "Common.Label.SelectFile": "Select File",
@@ -130,6 +135,12 @@ const messages: { [key: string]: string } = {
     "Component.SettingSoundRaiders.Descript": "Play selected sound per hosts",
     // User
     "Component.User.Memo": "Memo",
+    // Command
+    "Component.Command.everyone": "Everyone",
+    "Component.Command.vip": "VIP",
+    "Component.Command.mod": "Modelator",
+    "Component.Command.broadcaster": "Broadcaster",
+    "Component.Command.New": "New Command",
 };
 
 export default messages;

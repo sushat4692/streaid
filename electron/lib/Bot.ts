@@ -5,6 +5,7 @@ import tmi from "tmi.js";
 import { getChatters, pushChatter } from "../database/Chatter";
 import { getRaiders, pushRaider } from "../database/Raider";
 import { getHosts, pushHost } from "../database/Host";
+import { getCommands } from "../database/Command";
 
 // Store
 import { getInstance as getStoreInstance } from "../store";
@@ -21,23 +22,34 @@ class Bot {
     private _client: tmi.Client | null = null;
 
     constructor() {
-        const command = useCommand();
+        const commandModel = useCommand();
 
         // Default Command
-        command.push("!dice", {
+        commandModel.push("!dice", {
             allow: "everyone",
             handler: rollDice,
         });
 
-        command.push("!so", {
+        commandModel.push("!so", {
             allow: "mod",
             handler: shoutOut,
         });
 
-        command.push("!stop", {
+        commandModel.push("!stop", {
             allow: "mod",
             handler: shoutOutClipStop,
         });
+
+        (async () => {
+            // Custom Command
+            const commands = await getCommands();
+            commands.map((command) => {
+                commandModel.push(command.command, {
+                    allow: command.allow,
+                    handler: () => command.body,
+                });
+            });
+        })();
     }
 
     get client() {

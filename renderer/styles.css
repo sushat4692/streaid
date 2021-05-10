@@ -130,25 +130,41 @@ textarea {
     display: flex;
 }
 
+.form-control-group__label {
+    @apply flex items-center justify-center px-3 border-t border-b border-solid border-gray-300 dark:border-gray-500 bg-gray-200 dark:bg-gray-600;
+}
+
 .form-control-group .form-control,
-.form-control-group .btn {
+.form-control-group .btn,
+.form-control-group .form-control-group__label {
     @apply rounded-none;
 }
 
-.form-control-group .btn {
+.form-control-group .btn,
+.form-control-group .form-control-group__label {
     @apply flex-shrink-0;
 }
 
 .form-control-group .form-control:first-child,
-.form-control-group .btn:first-child {
+.form-control-group .btn:first-child,
+.form-control-group .form-control-group__label:first-child {
     @apply rounded-tl;
     @apply rounded-bl;
 }
 
+.form-control-group .form-control-group__label:first-child {
+    @apply border-l;
+}
+
 .form-control-group .form-control:last-child,
-.form-control-group .btn:last-child {
+.form-control-group .btn:last-child,
+.form-control-group .form-control-group__label:last-child {
     @apply rounded-tr;
     @apply rounded-br;
+}
+
+.form-control-group .form-control-group__label:last-child {
+    @apply border-l;
 }
 
 .form-range {
@@ -249,4 +265,47 @@ textarea {
 
 .react-select__option--is-selected {
     @apply text-white !important;
+}
+
+/**
+ * Modal
+ */
+.overlay {
+    @apply fixed inset-0 p-4 z-40 bg-black bg-opacity-50 overflow-auto;
+}
+
+.modal {
+    @apply max-w-md mx-auto bg-white dark:bg-gray-800 rounded;
+}
+
+.modal__head {
+    @apply font-bold p-3 border-b border-solid border-gray-300 dark:border-gray-500 flex justify-between;
+}
+
+.modal__close {
+    @apply w-6 h-6 relative;
+}
+
+.modal__close::before,
+.modal__close::after {
+    content: '';
+    height: 2px;
+
+    @apply block absolute w-5 m-auto inset-0 bg-gray-800 dark:bg-white;
+}
+
+.modal__close::before {
+    transform: rotate(-45deg);
+}
+
+.modal__close::after {
+    transform: rotate(45deg);
+}
+
+.modal__body {
+    @apply p-3;
+}
+
+.modal__foot {
+    @apply p-3 border-t border-solid border-gray-300 dark:border-gray-500 flex justify-between;
 }

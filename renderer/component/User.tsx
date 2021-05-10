@@ -128,22 +128,18 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
                 <i className="bi bi-pencil" />
             </button>
 
-            <Modal
-                isOpen={isOpen}
-                className={styles.modal}
-                overlayClassName={styles.overlay}
-            >
+            <Modal isOpen={isOpen} className="modal" overlayClassName="overlay">
                 <form tabIndex={-1} onSubmit={onSubmitHandler}>
-                    <div className={styles.modal__head}>
+                    <div className="modal__head">
                         <h5 className="modal-title">{username}</h5>
                         <button
                             type="button"
-                            className={styles.modal__close}
+                            className="modal__close"
                             aria-label="Close"
                             onClick={closeHandler}
                         />
                     </div>
-                    <div className={styles.modal__body}>
+                    <div className="modal__body">
                         <div className="form-field">
                             <label className="form-field__label">
                                 <FormattedMessage
@@ -176,7 +172,7 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
                             />
                         </div>
                     </div>
-                    <div className={styles.modal__foot}>
+                    <div className="modal__foot">
                         <button
                             type="button"
                             className="btn btn-secondary"

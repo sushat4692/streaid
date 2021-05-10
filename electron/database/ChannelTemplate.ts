@@ -1,13 +1,14 @@
 import dbFactory from "./factory";
-import { Userstate } from "tmi.js";
 
 // Types
 import { RequestChannelTemplateType } from "../../types/ChannelTemplate";
 
 const database = dbFactory("channel_template.db");
 
-export const pushChannelTemplate = async (userstate: Userstate) => {
-    await database.insert(userstate);
+export const pushChannelTemplate = async (
+    template: RequestChannelTemplateType
+) => {
+    await database.insert(template);
 };
 
 export const getChannelTemplate = async () => {
