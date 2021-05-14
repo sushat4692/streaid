@@ -1,5 +1,6 @@
 import { Notification } from "electron";
 import tmi from "tmi.js";
+import { parse } from "shell-quote";
 
 // Model
 import { getChatters, pushChatter } from "../database/Chatter";
@@ -12,6 +13,7 @@ import { getInstance as getStoreInstance } from "../store";
 import { useCommand } from "./commands";
 import { rollDice } from "./commands/Dice";
 import { shoutOut, shoutOutClipStop } from "./commands/ShoutOut";
+import { deeplTranslate } from "./commands/Translate";
 
 // Util
 import { getWindow } from "../util/window";
@@ -27,17 +29,26 @@ class Bot {
         // Default Command
         commandModel.push("!dice", {
             allow: "everyone",
+            return: true,
             handler: rollDice,
         });
 
         commandModel.push("!so", {
             allow: "mod",
+            return: false,
             handler: shoutOut,
         });
 
         commandModel.push("!stop", {
             allow: "mod",
+            return: false,
             handler: shoutOutClipStop,
+        });
+
+        commandModel.push("!ts", {
+            allow: "everyone",
+            return: true,
+            handler: deeplTranslate,
         });
 
         (async () => {
@@ -46,6 +57,7 @@ class Bot {
             commands.map((command) => {
                 commandModel.push(command.command, {
                     allow: command.allow,
+                    return: false,
                     handler: () => command.body,
                 });
             });
@@ -125,12 +137,14 @@ class Bot {
 
         // Run command
         if (commandName && commandName.charAt(0) === "!") {
+            const args = parse(message).map((arg) => arg.toString());
+            args.shift();
             const command = useCommand();
 
             try {
                 const message = await command
                     .get(commandName, UserState)
-                    .run(...messages);
+                    .run(...args);
 
                 if (message && typeof message === "string") {
                     this.client?.action(channel, message);

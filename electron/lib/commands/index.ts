@@ -4,6 +4,7 @@ import { CommandAllowType } from "../../../types/CommandAllow";
 
 type CommandType = {
     allow: CommandAllowType;
+    return: boolean;
     handler: (...args) => unknown;
 };
 
@@ -77,7 +78,12 @@ export const useCommand = () => {
 
         return {
             run: async (...args) => {
-                return await commandAction.handler(...args);
+                const message = await commandAction.handler(...args);
+                const isReturn = commandAction.return && UserState;
+
+                return `${
+                    isReturn ? `@${UserState?.username} ` : ""
+                }${message}`;
             },
         };
     };

@@ -11,6 +11,7 @@ import { setMenu } from "./menu";
 import { useEnv } from "./util/Env";
 const env = useEnv();
 env.set("mode", "__build__");
+env.set("deepl_api_key", "__deepl_api_key__");
 
 async function createWindow() {
     const win = new BrowserWindow({
