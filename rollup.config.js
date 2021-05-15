@@ -49,6 +49,7 @@ export default [
             "electron",
             "electron-store",
             "electron-is-dev",
+            "node-fetch",
             "path",
             "twitch",
             "twitch-electron-auth-provider",
@@ -56,7 +57,10 @@ export default [
             "nedb-promises",
             "fs-extra",
             "http",
+            "shell-quote",
             "socket.io",
+            "sqlite",
+            "sqlite3",
         ],
     },
     {

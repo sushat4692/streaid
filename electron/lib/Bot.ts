@@ -10,10 +10,16 @@ import { getCommands } from "../database/Command";
 
 // Store
 import { getInstance as getStoreInstance } from "../store";
+
+// Commands
 import { useCommand } from "./commands";
 import { rollDice } from "./commands/Dice";
 import { shoutOut, shoutOutClipStop } from "./commands/ShoutOut";
 import { deeplTranslate } from "./commands/Translate";
+import {
+    initialize as initializeTranslate,
+    getWordMeanEnToJa,
+} from "./commands/Word";
 
 // Util
 import { getWindow } from "../util/window";
@@ -52,6 +58,13 @@ class Bot {
         });
 
         (async () => {
+            await initializeTranslate();
+            commandModel.push("!w", {
+                allow: "everyone",
+                return: true,
+                handler: getWordMeanEnToJa,
+            });
+
             // Custom Command
             const commands = await getCommands();
             commands.map((command) => {
