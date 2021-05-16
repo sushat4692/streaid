@@ -286,7 +286,6 @@ const ChannelPage: React.FC = () => {
                                     {game ? (
                                         <figure
                                             className={styles.category__figure}
-                                            style={{ width: "52px" }}
                                         >
                                             <img
                                                 src={game.boxArtUrl

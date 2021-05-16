@@ -1,18 +1,28 @@
 import fetch from "node-fetch";
 
 // Env
-import { useEnv } from "../../util/Env";
+import { getInstance as getStoreInstance } from "../../store";
 
 export const deeplTranslate = async (
     text: string,
     sourceLang = "EN",
     targetLang = "JA"
 ) => {
-    const env = useEnv();
+    const store = getStoreInstance();
     text = text.replace(/^("|')/, "").replace(/("|')$/, "");
 
-    const url = new URL("https://api-free.deepl.com/v2/translate");
-    url.searchParams.append("auth_key", env.get("deepl_api_key") as string);
+    const plan = store.get("deepl_plan") as "free" | "pro";
+    const apiUrl = (() => {
+        switch (plan) {
+            case "free":
+                return "https://api-free.deepl.com/v2/translate";
+            case "pro":
+                return "https://api.deepl.com/v2/translate";
+        }
+    })();
+
+    const url = new URL(apiUrl);
+    url.searchParams.append("auth_key", store.get("deepl_key"));
     url.searchParams.append("text", text);
     url.searchParams.append("source_lang", sourceLang);
     url.searchParams.append("target_lang", targetLang);

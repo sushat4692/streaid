@@ -18,9 +18,8 @@ const SettingShoutoutAlert: React.FC = () => {
     const [httpPort, updateHttpPort] = useState<number>(0);
     const [specifiedHttpPort, updateSpecifiedHttpPort] = useState<number>(0);
     const [socketPort, updateSocketPort] = useState<number>(0);
-    const [specifiedSocketPort, updateSpecifiedSocketPort] = useState<number>(
-        0
-    );
+    const [specifiedSocketPort, updateSpecifiedSocketPort] =
+        useState<number>(0);
     const intl = useIntl();
 
     const submitHttpPort = async () => {
@@ -151,13 +150,11 @@ const SettingShoutoutAlert: React.FC = () => {
                     >
                         {isConnected
                             ? intl.formatMessage({
-                                  id:
-                                      "Component.SettingShoutOutAlert.Server.Stop",
+                                  id: "Component.SettingShoutOutAlert.Server.Stop",
                                   defaultMessage: "Stop Alert Server",
                               })
                             : intl.formatMessage({
-                                  id:
-                                      "Component.SettingShoutOutAlert.Server.Start",
+                                  id: "Component.SettingShoutOutAlert.Server.Start",
                                   defaultMessage: "Start Alert Server",
                               })}
                     </button>
@@ -165,13 +162,13 @@ const SettingShoutoutAlert: React.FC = () => {
             </section>
 
             <section className="section">
-                <h3 className={styles.header}>
+                <h3 className="section__sub-header">
                     <FormattedMessage
                         id="Component.SettingShoutOutAlert.Port.Http.Header"
                         defaultMessage="Embed"
                     />
 
-                    <small className={styles.header__small}>
+                    <small className="section__sub-header__small">
                         <FormattedMessage
                             id="Component.SettingShoutOutAlert.Port.Http.Descript"
                             defaultMessage="Embed information to Streaming Tool"

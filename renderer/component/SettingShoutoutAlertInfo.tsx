@@ -23,13 +23,13 @@ const SettingShoutoutAlertInfo: React.FC = () => {
 
     return (
         <>
-            <h3 className={styles.header}>
+            <h3 className="section__sub-header">
                 <FormattedMessage
                     id="Component.SettingShoutOutAlert.Info.Header"
                     defaultMessage="Info"
                 />
 
-                <small className={styles.header__small}>
+                <small className="section__sub-header__small">
                     <FormattedMessage
                         id="Component.SettingShoutOutAlert.Info.Descript"
                         defaultMessage="Showing alert the streamer information"

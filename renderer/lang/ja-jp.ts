@@ -41,6 +41,8 @@ const messages: { [key: string]: string } = {
     "Common.Label.StopCommand": "停止コマンド",
     "Common.Label.DisplayLength": "表示時間",
     "Common.Label.SelectFile": "ファイル選択",
+    "Common.Label.ApiKey": "APIキー",
+    "Common.Label.Plan": "プラン",
     "Common.Select.Placeholder": "選択してください",
     "Common.Submit": "送信",
     "Common.Apply": "反映",
@@ -134,6 +136,16 @@ const messages: { [key: string]: string } = {
         "初めてチャットをされた時にサウンドを鳴らします",
     "Component.SettingSoundHosts.Descript": "レイド毎にサウンドを鳴らします",
     "Component.SettingSoundRaiders.Descript": "ホスト毎にサウンドを鳴らします",
+    // SettingTranslate
+    "Component.SettingTranslate.Header": "翻訳コマンド設定",
+    "Component.SettingTranslate.DeepL.Header": "DeepL翻訳",
+    "Component.SettingTranslate.DeepL.Descript":
+        "DeepLにユーザー登録を行い、APIキーを取得して下記入力フィールドに貼り付けると翻訳コマンドが利用できるようになります",
+    "Component.SettingTranslate.Free": "フリー",
+    "Component.SettingTranslate.Pro": "プロ",
+    "Component.SettingTranslate.Dictionary.Header": "和英辞書",
+    "Component.SettingTranslate.Dictionary.Descript":
+        "下記コマンドで英単語の意味を取得することができます",
     // User
     "Component.User.Memo": "メモ",
     // Command

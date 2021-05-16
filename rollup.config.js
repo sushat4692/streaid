@@ -17,30 +17,28 @@ export default [
         plugins: [
             pluginReplace({
                 preventAssignment: true,
+                // eslint-disable-next-line no-undef
                 __twitch_api_key__: process.env.CLIENT_ID,
+                // eslint-disable-next-line no-undef
                 __deepl_api_key__: process.env.DEEPL_API_KEY,
+                // eslint-disable-next-line no-undef
                 __build__: process.env.BUILD,
             }),
             pluginEsbuild({
-                // All options are optional
-                include: /\.[jt]sx?$/, // default, inferred from `loaders` option
-                exclude: /node_modules/, // default
-                sourceMap: false, // default
+                include: /\.[jt]sx?$/,
+                exclude: /node_modules/,
+                sourceMap: false,
+                // eslint-disable-next-line no-undef
                 minify: process.env.NODE_ENV === "production",
-                target: "es2017", // default, or 'es20XX', 'esnext'
+                target: "es2017",
                 jsxFactory: "React.createElement",
                 jsxFragment: "React.Fragment",
-                // Like @rollup/plugin-replace
                 define: {
                     __VERSION__: '"x.y.z"',
                 },
-                tsconfig: "tsconfig.json", // default
-                // Add extra loaders
+                tsconfig: "tsconfig.json",
                 loaders: {
-                    // Add .json files support
-                    // require @rollup/plugin-commonjs
                     ".json": "json",
-                    // Enable JSX in .js files too
                     ".js": "jsx",
                 },
             }),
@@ -72,25 +70,20 @@ export default [
         },
         plugins: [
             pluginEsbuild({
-                // All options are optional
-                include: /\.[jt]sx?$/, // default, inferred from `loaders` option
-                exclude: /node_modules/, // default
-                sourceMap: false, // default
+                include: /\.[jt]sx?$/,
+                exclude: /node_modules/,
+                sourceMap: false,
+                // eslint-disable-next-line no-undef
                 minify: process.env.NODE_ENV === "production",
-                target: "es2017", // default, or 'es20XX', 'esnext'
+                target: "es2017",
                 jsxFactory: "React.createElement",
                 jsxFragment: "React.Fragment",
-                // Like @rollup/plugin-replace
                 define: {
                     __VERSION__: '"x.y.z"',
                 },
-                tsconfig: "tsconfig.json", // default
-                // Add extra loaders
+                tsconfig: "tsconfig.json",
                 loaders: {
-                    // Add .json files support
-                    // require @rollup/plugin-commonjs
                     ".json": "json",
-                    // Enable JSX in .js files too
                     ".js": "jsx",
                 },
             }),

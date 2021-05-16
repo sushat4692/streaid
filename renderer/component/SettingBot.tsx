@@ -11,9 +11,6 @@ import IsConnectingState from "../atom/IsConnecting";
 // Utils
 import { request } from "../util/request";
 
-// Styles
-import styles from "./SettingBot.module.css";
-
 const SettingBotComponent: React.FC = () => {
     const username = useRecoilValue(SettingUsernameState);
     const [channel, updateChannel] = useRecoilState(SettingChannelState);
@@ -50,7 +47,7 @@ const SettingBotComponent: React.FC = () => {
                 />
             </h2>
 
-            <div className={styles.row}>
+            <div className="row is-col-2">
                 <div className="form-field">
                     <label htmlFor="username" className="form-field__label">
                         <FormattedMessage
