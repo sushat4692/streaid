@@ -81,9 +81,19 @@ export const useCommand = () => {
                 const message = await commandAction.handler(...args);
                 const isReturn = commandAction.return && UserState;
 
-                return `${
-                    isReturn ? `@${UserState?.username} ` : ""
-                }${message}`;
+                if (typeof message === "string") {
+                    return `${
+                        isReturn ? `@${UserState?.username} ` : ""
+                    }${message}`;
+                } else if (Array.isArray(message)) {
+                    return message.map((mes) => {
+                        return `${
+                            isReturn ? `@${UserState?.username} ` : ""
+                        }${mes}`;
+                    });
+                }
+
+                return "";
             },
         };
     };

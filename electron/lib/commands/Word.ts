@@ -4,6 +4,13 @@ import { open, Database } from "sqlite";
 import path from "path";
 import isDev from "electron-is-dev";
 
+import {
+    findByWordIndexedWord,
+    pushIndexedWord,
+    updateCommmand,
+} from "../../database/IndexedWord";
+import { RequestIndexedWordType } from "../../../types/IndexedWord";
+
 let database: Database<sqlite3.Database, sqlite3.Statement>;
 
 type DictionalyRow = {
@@ -39,5 +46,22 @@ export const getWordMeanEnToJa = async (word: string) => {
         return `Not found inputted word: ${word}`;
     }
 
-    return result.mean;
+    const count = await (async () => {
+        const indexed = await findByWordIndexedWord(word);
+
+        if (indexed) {
+            indexed.count += 1;
+            await updateCommmand(indexed._id, indexed);
+            return indexed.count;
+        } else {
+            const indexed: RequestIndexedWordType = {
+                word,
+                count: 1,
+            };
+            await pushIndexedWord(indexed);
+            return indexed.count;
+        }
+    })();
+
+    return `${result.mean} -- < searched this word ${count} time(s) >`;
 };

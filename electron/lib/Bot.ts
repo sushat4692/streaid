@@ -26,6 +26,8 @@ import { getWindow } from "../util/window";
 import { playSound } from "../util/Sound";
 import { useEnv } from "../util/Env";
 
+const sleep = (msec) => new Promise((resolve) => setTimeout(resolve, msec));
+
 class Bot {
     private _client: tmi.Client | null = null;
 
@@ -159,8 +161,23 @@ class Bot {
                     .get(commandName, UserState)
                     .run(...args);
 
-                if (message && typeof message === "string") {
-                    this.client?.action(channel, message);
+                if (!message) {
+                    throw new Error(
+                        `* No response from ${commandName} command`
+                    );
+                }
+
+                if (typeof message === "string") {
+                    await this.client?.action(channel, message);
+                } else if (Array.isArray(message)) {
+                    for (let i = 0; i < message.length; i += 1) {
+                        const mes = message[i];
+                        await this.client?.action(channel, mes);
+
+                        if (i < message.length - 1) {
+                            await sleep(1000);
+                        }
+                    }
                 }
 
                 console.log(`* Executed ${commandName} command`);
