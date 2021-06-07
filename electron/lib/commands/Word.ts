@@ -3,6 +3,7 @@ import sqlite3 from "sqlite3";
 import { open, Database } from "sqlite";
 import path from "path";
 import isDev from "electron-is-dev";
+import { ChatUserstate } from "tmi.js";
 
 import {
     findByWordIndexedWord,
@@ -32,7 +33,10 @@ export const initialize = async () => {
     });
 };
 
-export const getWordMeanEnToJa = async (word: string) => {
+export const getWordMeanEnToJa = async (
+    UserState: ChatUserstate,
+    word: string
+) => {
     if (!database) {
         throw new Error("Not initialized");
     }
@@ -47,7 +51,10 @@ export const getWordMeanEnToJa = async (word: string) => {
     }
 
     const count = await (async () => {
-        const indexed = await findByWordIndexedWord(word);
+        const indexed = await findByWordIndexedWord({
+            word,
+            username: UserState.username ?? "",
+        });
 
         if (indexed) {
             indexed.count += 1;
@@ -56,6 +63,7 @@ export const getWordMeanEnToJa = async (word: string) => {
         } else {
             const indexed: RequestIndexedWordType = {
                 word,
+                username: UserState.username ?? "",
                 count: 1,
             };
             await pushIndexedWord(indexed);

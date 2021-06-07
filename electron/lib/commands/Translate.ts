@@ -4,6 +4,7 @@ import fetch from "node-fetch";
 import { getInstance as getStoreInstance } from "../../store";
 
 export const deeplTranslate = async (
+    _,
     text: string,
     sourceLang = "EN",
     targetLang = "JA"

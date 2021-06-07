@@ -19,8 +19,14 @@ export const findIndexedWord = async (id: string) => {
     return await database.findOne<RequestIndexedWordType>({ _id: id });
 };
 
-export const findByWordIndexedWord = async (word: string) => {
-    return await database.findOne<RequestIndexedWordType>({ word });
+export const findByWordIndexedWord = async ({
+    word,
+    username,
+}: {
+    word: string;
+    username: string;
+}) => {
+    return await database.findOne<RequestIndexedWordType>({ word, username });
 };
 
 export const updateCommmand = async (
