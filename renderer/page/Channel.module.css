@@ -3,5 +3,7 @@
 }
 
 .category__figure {
+    width: 52px;
+
     @apply m-0 mr-2;
 }

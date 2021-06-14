@@ -19,13 +19,13 @@ const SettingSoundRaidersComponent: React.FC = () => {
 
     return (
         <>
-            <h3 className={styles.header}>
+            <h3 className="section__sub-header">
                 <FormattedMessage
                     id="Common.Raiders.Name"
                     defaultMessage="Raiders"
                 />
 
-                <small className={styles.header__small}>
+                <small className="section__sub-header__small">
                     <FormattedMessage
                         id="Component.SettingSoundRaiders.Descript"
                         defaultMessage="Play selected sound per raids"

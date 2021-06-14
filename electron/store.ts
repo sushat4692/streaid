@@ -16,6 +16,8 @@ type StoreType = {
     chat_volume: number;
     raid_volume: number;
     host_volume: number;
+    deepl_key: string;
+    deepl_plan: string;
 };
 
 const schema: Store.Schema<StoreType> = {
@@ -79,6 +81,14 @@ const schema: Store.Schema<StoreType> = {
     host_volume: {
         type: "number",
         default: 1,
+    },
+    deepl_key: {
+        type: "string",
+        default: "",
+    },
+    deepl_plan: {
+        type: "string",
+        default: "free",
     },
 };
 

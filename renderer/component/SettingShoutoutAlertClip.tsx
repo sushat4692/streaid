@@ -10,13 +10,13 @@ import styles from "./SettingShoutoutAlert.module.css";
 const SettingShoutoutAlertClip: React.FC = () => {
     return (
         <>
-            <h3 className={styles.header}>
+            <h3 className="section__sub-header">
                 <FormattedMessage
                     id="Component.SettingShoutOutAlert.Clip.Header"
                     defaultMessage="Clip"
                 />
 
-                <small className={styles.header__small}>
+                <small className="section__sub-header__small">
                     <FormattedMessage
                         id="Component.SettingShoutOutAlert.Clip.Descript"
                         defaultMessage="Showing alert the streamer's clip movie"

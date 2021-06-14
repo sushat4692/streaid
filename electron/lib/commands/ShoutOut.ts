@@ -10,6 +10,7 @@ import { getInstance as getStoreInstance } from "../../store";
 import { useServer } from "../../server";
 
 export const shoutOut = async (
+    _,
     username: string,
     showWindow: "info" | "clip" | null = null
 ) => {

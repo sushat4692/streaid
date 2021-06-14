@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 module.exports = {
     purge: {
         content: [
@@ -13,7 +14,7 @@ module.exports = {
             "./renderer/**/*.tsx",
         ],
     },
-    darkMode: "media", // or 'media' or 'class'
+    darkMode: "media",
     theme: {
         fontFamily: {
             sans: ["Noto Sans JP", "sans-serif"],

@@ -7,7 +7,8 @@ const dbFactory = (fileName, isOnMemory = false) =>
     Database.create({
         filename: path.join(
             isDev ? "." : app.getPath("userData"),
-            `data/${fileName}`
+            "data",
+            fileName
         ),
         timestampData: true,
         autoload: true,

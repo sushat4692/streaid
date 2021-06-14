@@ -42,6 +42,8 @@ const messages: { [key: string]: string } = {
     "Common.Label.StopCommand": "Stop Command",
     "Common.Label.DisplayLength": "Display Time Length",
     "Common.Label.SelectFile": "Select File",
+    "Common.Label.ApiKey": "API Key",
+    "Common.Label.Plan": "Plan",
     "Common.Select.Placeholder": "Select...",
     "Common.Submit": "Submit",
     "Common.Apply": "Apply",
@@ -133,6 +135,16 @@ const messages: { [key: string]: string } = {
         "Play selected sound per the first chat per persons",
     "Component.SettingSoundHosts.Descript": "Play selected sound per raids",
     "Component.SettingSoundRaiders.Descript": "Play selected sound per hosts",
+    // SettingTranslate
+    "Component.SettingTranslate.Header": "Translate Command",
+    "Component.SettingTranslate.DeepL.Header": "DeepL Translate",
+    "Component.SettingTranslate.Descript":
+        "You can use Translation command after copy&paste the DeepL API Key (required signup to DeepL)",
+    "Component.SettingTranslate.Free": "Free",
+    "Component.SettingTranslate.Pro": "Pro",
+    "Component.SettingTranslate.Dictionary.Header": "JP to EN Dictionary",
+    "Component.SettingTranslate.Dictionary.Descript":
+        "You can get the meaning of word from English to Japanese through the following command",
     // User
     "Component.User.Memo": "Memo",
     // Command
