@@ -87,6 +87,14 @@ const LicensePage: React.FC = () => {
                                 </li>
                             );
                         })}
+                        <li className={styles.list__item}>
+                            English-Japanese Dictionary "ejdict-hand" (Public
+                            Domain CC0) by kujirahand
+                            <br />
+                            <small className={styles.list__small}>
+                                https://github.com/kujirahand/EJDict
+                            </small>
+                        </li>
                     </ul>
                 </section>
             </div>

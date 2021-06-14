@@ -19,13 +19,13 @@ const SettingSoundChattersComponent: React.FC = () => {
 
     return (
         <>
-            <h3 className={styles.header}>
+            <h3 className="section__sub-header">
                 <FormattedMessage
                     id="Common.Chats.Name"
                     defaultMessage="Chats"
                 />
 
-                <small className={styles.header__small}>
+                <small className="section__sub-header__small">
                     <FormattedMessage
                         id="Component.SettingSoundChats.Descript"
                         defaultMessage="Play selected sound per all the chats"

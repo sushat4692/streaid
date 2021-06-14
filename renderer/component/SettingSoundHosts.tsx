@@ -19,13 +19,13 @@ const SettingSoundHostsComponent: React.FC = () => {
 
     return (
         <>
-            <h3 className={styles.header}>
+            <h3 className="section__sub-header">
                 <FormattedMessage
                     id="Common.Hosts.Name"
                     defaultMessage="Hosts"
                 />
 
-                <small className={styles.header__small}>
+                <small className="section__sub-header__small">
                     <FormattedMessage
                         id="Component.SettingSoundHosts.Descript"
                         defaultMessage="Play selected sound per hosts"

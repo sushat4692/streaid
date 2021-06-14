@@ -7,14 +7,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <!-- <meta
+    <meta
         http-equiv="Content-Security-Policy"
-        content="default-src 'self'; img-src *; style-src 'self' 'unsafe-inline'"
+        content="default-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https://static-cdn.jtvnw.net; media-src 'self' https://*.twitch.tv; connect-src http://localhost:* ws://localhost:*"
     />
     <meta
         http-equiv="X-Content-Security-Policy"
-        content="default-src 'self'; img-src *; style-src 'self' 'unsafe-inline'"
-    /> -->
+        content="default-src 'self'; font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https://static-cdn.jtvnw.net; media-src 'self' https://*.twitch.tv; connect-src http://localhost:* ws://localhost:*"
+    />
 </head>
 <body>
     <div id="root"></div>

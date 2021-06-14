@@ -1,5 +1,6 @@
 import { Notification } from "electron";
 import tmi from "tmi.js";
+import { parse } from "shell-quote";
 
 // Model
 import { getChatters, pushChatter } from "../database/Chatter";
@@ -9,14 +10,23 @@ import { getCommands } from "../database/Command";
 
 // Store
 import { getInstance as getStoreInstance } from "../store";
+
+// Commands
 import { useCommand } from "./commands";
 import { rollDice } from "./commands/Dice";
 import { shoutOut, shoutOutClipStop } from "./commands/ShoutOut";
+import { deeplTranslate } from "./commands/Translate";
+import {
+    initialize as initializeTranslate,
+    getWordMeanEnToJa,
+} from "./commands/Word";
 
 // Util
 import { getWindow } from "../util/window";
 import { playSound } from "../util/Sound";
 import { useEnv } from "../util/Env";
+
+const sleep = (msec) => new Promise((resolve) => setTimeout(resolve, msec));
 
 class Bot {
     private _client: tmi.Client | null = null;
@@ -27,25 +37,42 @@ class Bot {
         // Default Command
         commandModel.push("!dice", {
             allow: "everyone",
+            return: true,
             handler: rollDice,
         });
 
         commandModel.push("!so", {
             allow: "mod",
+            return: false,
             handler: shoutOut,
         });
 
         commandModel.push("!stop", {
             allow: "mod",
+            return: false,
             handler: shoutOutClipStop,
         });
 
+        commandModel.push("!ts", {
+            allow: "everyone",
+            return: true,
+            handler: deeplTranslate,
+        });
+
         (async () => {
+            await initializeTranslate();
+            commandModel.push("!w", {
+                allow: "everyone",
+                return: true,
+                handler: getWordMeanEnToJa,
+            });
+
             // Custom Command
             const commands = await getCommands();
             commands.map((command) => {
                 commandModel.push(command.command, {
                     allow: command.allow,
+                    return: false,
                     handler: () => command.body,
                 });
             });
@@ -125,15 +152,32 @@ class Bot {
 
         // Run command
         if (commandName && commandName.charAt(0) === "!") {
+            const args = parse(message).map((arg) => arg.toString());
+            args.shift();
             const command = useCommand();
 
             try {
                 const message = await command
                     .get(commandName, UserState)
-                    .run(...messages);
+                    .run(...args);
 
-                if (message && typeof message === "string") {
-                    this.client?.action(channel, message);
+                if (!message) {
+                    throw new Error(
+                        `* No response from ${commandName} command`
+                    );
+                }
+
+                if (typeof message === "string") {
+                    await this.client?.action(channel, message);
+                } else if (Array.isArray(message)) {
+                    for (let i = 0; i < message.length; i += 1) {
+                        const mes = message[i];
+                        await this.client?.action(channel, mes);
+
+                        if (i < message.length - 1) {
+                            await sleep(1000);
+                        }
+                    }
                 }
 
                 console.log(`* Executed ${commandName} command`);

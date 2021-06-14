@@ -9,6 +9,7 @@ import SettingBotComponent from "../component/SettingBot";
 import SettingShoutOutMessageComponent from "../component/SettingShoutOutMessage";
 import SettingShoutoutAlertComponent from "../component/SettingShoutoutAlert";
 import SettingSoundComponent from "../component/SettingSound";
+import SettingTranslateComponent from "../component/SettingTranslate";
 
 import styles from "./Setting.module.css";
 
@@ -91,6 +92,17 @@ const SettnigPage: React.FC<Props> = ({ match }: Props) => {
                             defaultMessage="Notification Sound"
                         />
                     </NavLink>
+                    <NavLink
+                        className={styles.nav__item}
+                        activeClassName={styles["is-active"]}
+                        exact
+                        to={`${match.url}/translate`}
+                    >
+                        <FormattedMessage
+                            id="Component.SettingTranslate.Header"
+                            defaultMessage="Translate"
+                        />
+                    </NavLink>
                 </nav>
 
                 <main className={styles.main}>
@@ -114,6 +126,11 @@ const SettnigPage: React.FC<Props> = ({ match }: Props) => {
                                 exact
                                 path={match.url + `/sound`}
                                 component={SettingSoundComponent}
+                            ></Route>
+                            <Route
+                                exact
+                                path={match.url + `/translate`}
+                                component={SettingTranslateComponent}
                             ></Route>
                         </Switch>
                     </div>

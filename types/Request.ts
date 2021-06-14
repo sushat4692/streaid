@@ -49,7 +49,10 @@ export type ModeType =
     | "command"
     | "command:push"
     | "command:update"
-    | "command:delete";
+    | "command:delete"
+    | "translate:deepl"
+    | "translate:deepl:apikey"
+    | "translate:deepl:plan";
 
 export type ValuesType = {
     "bot:connect": Record<string, never>;
@@ -110,6 +113,9 @@ export type ValuesType = {
     "command:push": RequestCommandType;
     "command:update": { id: string; command: RequestCommandType };
     "command:delete": string;
+    "translate:deepl": Record<string, never>;
+    "translate:deepl:apikey": string;
+    "translate:deepl:plan": "free" | "pro";
 };
 
 export type ReturnsType = {
@@ -161,4 +167,7 @@ export type ReturnsType = {
     "command:push": CommandType[];
     "command:update": CommandType[];
     "command:delete": CommandType[];
+    "translate:deepl": { apikey: string; plan: "free" | "pro" };
+    "translate:deepl:apikey": string;
+    "translate:deepl:plan": "free" | "pro";
 };

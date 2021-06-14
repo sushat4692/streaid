@@ -28,12 +28,7 @@ const DashboardPage: React.FC = () => {
 
             <div className="container-fluid">
                 <section className="section">
-                    <div
-                        className={styles.cards}
-                        style={{
-                            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                        }}
-                    >
+                    <div className={styles.cards}>
                         <div className={styles.cards__item}>
                             <h2 className={styles.cards__head}>
                                 <i

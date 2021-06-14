@@ -4,7 +4,8 @@ import { CommandAllowType } from "../../../types/CommandAllow";
 
 type CommandType = {
     allow: CommandAllowType;
-    handler: (...args) => unknown;
+    return: boolean;
+    handler: (UserState: ChatUserstate, ...args) => unknown;
 };
 
 const commandsList: {
@@ -77,7 +78,22 @@ export const useCommand = () => {
 
         return {
             run: async (...args) => {
-                return await commandAction.handler(...args);
+                const message = await commandAction.handler(UserState, ...args);
+                const isReturn = commandAction.return && UserState;
+
+                if (typeof message === "string") {
+                    return `${
+                        isReturn ? `@${UserState?.username} ` : ""
+                    }${message}`;
+                } else if (Array.isArray(message)) {
+                    return message.map((mes) => {
+                        return `${
+                            isReturn ? `@${UserState?.username} ` : ""
+                        }${mes}`;
+                    });
+                }
+
+                return "";
             },
         };
     };

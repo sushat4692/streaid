@@ -68,6 +68,33 @@ textarea {
     @apply mb-2;
 }
 
+.section__sub-header {
+    @apply font-bold mb-2;
+}
+
+.section__sub-header__small {
+    @apply ml-2 font-normal opacity-70;
+}
+
+/**
+ * Columns
+ */
+.row {
+    @apply grid gap-2;
+}
+
+.row.is-col-2 {
+    @apply grid-cols-1 md:grid-cols-2;
+}
+
+.row.is-col-3 {
+    @apply grid-cols-1 md:grid-cols-3;
+}
+
+.row.is-col-4 {
+    @apply grid-cols-1 md:grid-cols-4;
+}
+
 /**
  * Table
  */
