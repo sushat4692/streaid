@@ -20,8 +20,6 @@ export default [
                 // eslint-disable-next-line no-undef
                 __twitch_api_key__: process.env.CLIENT_ID,
                 // eslint-disable-next-line no-undef
-                __deepl_api_key__: process.env.DEEPL_API_KEY,
-                // eslint-disable-next-line no-undef
                 __build__: process.env.BUILD,
             }),
             pluginEsbuild({
