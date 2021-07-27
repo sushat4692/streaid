@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
@@ -22,11 +22,11 @@ type Props = {
 const ChatterRowComponent: React.FC<Props> = ({ chatter }: Props) => {
     const updateChatters = useSetRecoilState(ChattersState);
 
-    const deleteClickHandler = async () => {
+    const deleteClickHandler = useCallback(async () => {
         const chatters = await request("chatter:delete", chatter._id, []);
 
         updateChatters([...chatters]);
-    };
+    }, [chatter]);
 
     return (
         <tr>

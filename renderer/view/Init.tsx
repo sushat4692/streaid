@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
@@ -23,17 +23,20 @@ const InitComponent: React.FC = () => {
     const intl = useIntl();
     const [locale, updateLocate] = useRecoilState(LocaleState);
     const updateIsInited = useSetRecoilState(IsInitedState);
-    const defaultLocale = localeList.find((e) => e.value === locale);
+    const defaultLocale = useRef(localeList.find((e) => e.value === locale));
 
-    const updateLocaleHandler = async (e: { label: string; value: string }) => {
-        updateLocate(e.value);
-        await request("setting:locale:update", e.value, null);
-    };
+    const updateLocaleHandler = useCallback(
+        async (e: { label: string; value: string }) => {
+            updateLocate(e.value);
+            await request("setting:locale:update", e.value, null);
+        },
+        []
+    );
 
-    const clickHandler = async () => {
+    const clickHandler = useCallback(async () => {
         await request("setting:get", {}, null);
         updateIsInited(true);
-    };
+    }, []);
 
     return (
         <div className="container-fluid">
@@ -62,7 +65,7 @@ const InitComponent: React.FC = () => {
                                 name="language"
                                 id="language"
                                 classNamePrefix="react-select"
-                                defaultValue={defaultLocale}
+                                defaultValue={defaultLocale.current}
                                 options={localeList}
                                 onChange={updateLocaleHandler}
                                 placeholder={intl.formatMessage({

@@ -9,3 +9,7 @@
 .user__button {
     @apply inline-block ml-2;
 }
+
+.user__tooltip {
+    @apply whitespace-pre-wrap;
+}

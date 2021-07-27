@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
@@ -22,11 +22,11 @@ type Props = {
 const RaiderRowComponent: React.FC<Props> = ({ raider }: Props) => {
     const updateRaidersState = useSetRecoilState(RaidersState);
 
-    const deleteClickHandler = async () => {
+    const deleteClickHandler = useCallback(async () => {
         const raiders = await request("raider:delete", raider._id, []);
 
         updateRaidersState([...raiders]);
-    };
+    }, [raider]);
 
     return (
         <tr>

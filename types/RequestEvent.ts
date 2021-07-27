@@ -8,7 +8,8 @@ export type ModeType =
     | "bot:chatted"
     | "bot:raided"
     | "bot:hosted"
-    | "sound:play";
+    | "sound:play"
+    | "linkto";
 
 export type ValuesType = {
     "bot:connected": Record<string, never>;
@@ -17,4 +18,5 @@ export type ValuesType = {
     "bot:raided": RaiderType[];
     "bot:hosted": HostType[];
     "sound:play": { source: Uint8Array; gain: number };
+    linkto: string;
 };

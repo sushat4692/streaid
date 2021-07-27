@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useSetRecoilState } from "recoil";
 import moment from "moment";
 import { FormattedMessage } from "react-intl";
@@ -30,7 +30,7 @@ const ChannelTemplateRowComponent: React.FC<Props> = ({
     const updateChannelGame = useSetRecoilState(ChannelGameState);
     const updateChannelLanguage = useSetRecoilState(ChannelLanguageState);
 
-    const updateClickHandler = async () => {
+    const updateClickHandler = useCallback(async () => {
         updateChannelTitle(channelTemplate.title);
         updateChannelGame({
             id: channelTemplate.gameId,
@@ -38,9 +38,9 @@ const ChannelTemplateRowComponent: React.FC<Props> = ({
             boxArtUrl: channelTemplate.boxArtUrl,
         });
         updateChannelLanguage(channelTemplate.language);
-    };
+    }, [channelTemplate]);
 
-    const deleteClickHandler = async () => {
+    const deleteClickHandler = useCallback(async () => {
         const templates = await request(
             "channel:template:delete",
             channelTemplate._id,
@@ -48,7 +48,7 @@ const ChannelTemplateRowComponent: React.FC<Props> = ({
         );
 
         updateChannelTemplate(templates);
-    };
+    }, [channelTemplate]);
 
     return (
         <tr>

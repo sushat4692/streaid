@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
@@ -17,16 +17,19 @@ const SettingBotComponent: React.FC = () => {
     const intl = useIntl();
     const [locale, updateLocate] = useRecoilState(LocaleState);
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
-    const defaultLocale = localeList.find((e) => e.value === locale);
+    const defaultLocale = useRef(localeList.find((e) => e.value === locale));
 
-    const onChangeHandler = async (e: { label: string; value: string }) => {
-        updateIsConnecting(true);
+    const onChangeHandler = useCallback(
+        async (e: { label: string; value: string }) => {
+            updateIsConnecting(true);
 
-        updateLocate(e.value);
-        await request("setting:locale:update", e.value, null);
+            updateLocate(e.value);
+            await request("setting:locale:update", e.value, null);
 
-        updateIsConnecting(false);
-    };
+            updateIsConnecting(false);
+        },
+        []
+    );
 
     return (
         <section className="section">
@@ -41,7 +44,7 @@ const SettingBotComponent: React.FC = () => {
                 name="language"
                 id="language"
                 classNamePrefix="react-select"
-                defaultValue={defaultLocale}
+                defaultValue={defaultLocale.current}
                 options={localeList}
                 onChange={onChangeHandler}
                 placeholder={intl.formatMessage({

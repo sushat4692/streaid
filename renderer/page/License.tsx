@@ -1,4 +1,5 @@
-import React from "react";
+/* eslint-disable react/no-unescaped-entities */
+import React, { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 
 // Component
@@ -11,9 +12,11 @@ import licenses from "../const/licenses";
 import styles from "./License.module.css";
 
 const LicensePage: React.FC = () => {
-    const displayLicenses = licenses.filter((license) => {
-        return !license.name.match(/^@types\//);
-    });
+    const displayLicenses = useRef(
+        licenses.filter((license) => {
+            return !license.name.match(/^@types\//);
+        })
+    );
 
     return (
         <>
@@ -70,7 +73,7 @@ const LicensePage: React.FC = () => {
                     </h2>
 
                     <ul className={styles.list}>
-                        {displayLicenses.map((license) => {
+                        {displayLicenses.current.map((license) => {
                             return (
                                 <li
                                     className={styles.list__item}

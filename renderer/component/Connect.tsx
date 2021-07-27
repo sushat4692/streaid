@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useIntl } from "react-intl";
 
@@ -18,7 +18,7 @@ const ConnectComonent: React.FC<Props> = ({ isBlock = false }: Props) => {
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
     const intl = useIntl();
 
-    const clickHandler = async () => {
+    const clickHandler = useCallback(async () => {
         updateIsConnecting(true);
 
         if (isConnected) {
@@ -26,7 +26,7 @@ const ConnectComonent: React.FC<Props> = ({ isBlock = false }: Props) => {
         } else {
             await request("bot:connect", {}, null);
         }
-    };
+    }, [isConnected]);
 
     return (
         <button

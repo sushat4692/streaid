@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import cn from "classnames";
 
@@ -22,7 +22,7 @@ const SettingShoutoutAlert: React.FC = () => {
         useState<number>(0);
     const intl = useIntl();
 
-    const submitHttpPort = async () => {
+    const submitHttpPort = useCallback(async () => {
         const port = await request(
             "server:port:update",
             { mode: "http", value: httpPort },
@@ -30,9 +30,9 @@ const SettingShoutoutAlert: React.FC = () => {
         );
 
         updateSpecifiedHttpPort(port);
-    };
+    }, [httpPort]);
 
-    const submitSocketPort = async () => {
+    const submitSocketPort = useCallback(async () => {
         const port = await request(
             "server:port:update",
             { mode: "socket", value: socketPort },
@@ -40,9 +40,9 @@ const SettingShoutoutAlert: React.FC = () => {
         );
 
         updateSpecifiedSocketPort(port);
-    };
+    }, [socketPort]);
 
-    const toggleAlertServer = async () => {
+    const toggleAlertServer = useCallback(async () => {
         const newConnected = await (async () => {
             if (isConnected) {
                 return await request("server:close", {}, false);
@@ -52,7 +52,7 @@ const SettingShoutoutAlert: React.FC = () => {
         })();
 
         updateIsConnected(newConnected);
-    };
+    }, [isConnected]);
 
     useEffect(() => {
         (async () => {

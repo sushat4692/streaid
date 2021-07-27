@@ -1,8 +1,9 @@
 // Util
+import { useCallback } from "react";
 import { request } from "./request";
 
 export const useSound = (mode: "chatter" | "host" | "chat" | "raid") => {
-    const selectFileHandler = () => {
+    const selectFileHandler = useCallback(() => {
         return async (e: React.MouseEvent) => {
             e.preventDefault();
 
@@ -10,9 +11,9 @@ export const useSound = (mode: "chatter" | "host" | "chat" | "raid") => {
                 window.alert("Saved!");
             }
         };
-    };
+    }, [mode]);
 
-    const playFileHandler = () => {
+    const playFileHandler = useCallback(() => {
         return async (e: React.MouseEvent) => {
             e.preventDefault();
 
@@ -20,7 +21,7 @@ export const useSound = (mode: "chatter" | "host" | "chat" | "raid") => {
                 window.alert("Sound file is not defined!");
             }
         };
-    };
+    }, [mode]);
 
     return {
         selectFileHandler,

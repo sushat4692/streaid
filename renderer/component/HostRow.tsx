@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
@@ -22,11 +22,11 @@ type Props = {
 const HostsRowComponent: React.FC<Props> = ({ host }: Props) => {
     const updateHostsState = useSetRecoilState(HostsState);
 
-    const deleteClickHandler = async () => {
+    const deleteClickHandler = useCallback(async () => {
         const hosts = await request("host:delete", host._id, []);
 
         updateHostsState([...hosts]);
-    };
+    }, [host]);
 
     return (
         <tr>
