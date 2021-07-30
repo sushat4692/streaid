@@ -214,9 +214,8 @@ class TwitchAPI {
 
     async getClipsByUser(User: HelixUser) {
         try {
-            const clipList = await this.client?.helix.clips.getClipsForBroadcaster(
-                User
-            );
+            const clipList =
+                await this.client?.helix.clips.getClipsForBroadcaster(User);
 
             if (!clipList) {
                 return null;

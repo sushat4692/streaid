@@ -19,7 +19,7 @@ const HeaderComponent: React.FC = () => {
     const history = useHistory();
 
     useEffect(() => {
-        requestEvent<string>("linkto", (_, values) => {
+        requestEvent("linkto", (_, values) => {
             history.push(values);
         });
     }, []);

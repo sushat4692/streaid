@@ -4,9 +4,6 @@ import { FormattedMessage } from "react-intl";
 // Components
 import CopyableFieldComponent from "./CopyableField";
 
-// Styles
-import styles from "./SettingShoutoutAlert.module.css";
-
 const SettingShoutoutAlertClip: React.FC = () => {
     return (
         <>

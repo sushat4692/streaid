@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
@@ -12,8 +12,8 @@ import HostsState from "../atom/Hosts";
 import { request } from "../util/request";
 
 // Component
-import UserComponent from "./User";
-import ShoutOutButtonComponent from "./ShoutOutButton";
+// import UserComponent from "./User";
+// import ShoutOutButtonComponent from "./ShoutOutButton";
 
 type Props = {
     host: HostType;
@@ -22,26 +22,27 @@ type Props = {
 const HostsRowComponent: React.FC<Props> = ({ host }: Props) => {
     const updateHostsState = useSetRecoilState(HostsState);
 
-    const deleteClickHandler = async () => {
+    const deleteClickHandler = useCallback(async () => {
         const hosts = await request("host:delete", host._id, []);
 
         updateHostsState([...hosts]);
-    };
+    }, [host]);
 
     return (
         <tr>
             <td scope="row">
-                <UserComponent username={host.username} />
+                {/* <UserComponent username={host.username} /> */}
+                {host.username}
             </td>
             <td>{host.viewers}</td>
             <td>{host.autohost ? "true" : "false"}</td>
             <td>{moment(host.createdAt).format("M/D kk:mm")}</td>
             <td>
                 <div className="btn-group">
-                    <ShoutOutButtonComponent
+                    {/* <ShoutOutButtonComponent
                         className="btn is-small btn-success me-1"
                         username={host.username}
-                    />
+                    /> */}
                     <button
                         className="btn is-small is-danger"
                         onClick={deleteClickHandler}

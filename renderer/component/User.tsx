@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Modal from "react-modal";
 import { useSetRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
@@ -26,7 +26,7 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
     const [memo, updateMemo] = useState("");
     const updateUserMemo = useSetRecoilState(UserMemoState);
 
-    const getUserMemoInformation = async () => {
+    const getUserMemoInformation = useCallback(async () => {
         return await request("usermemo:one", username, {
             _id: "1",
             username: "username",
@@ -35,30 +35,33 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
             createdAt: new Date(),
             updatedAt: new Date(),
         });
-    };
+    }, [username]);
 
-    const onSubmitHandler = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const onSubmitHandler = useCallback(
+        async (e: React.FormEvent) => {
+            e.preventDefault();
 
-        const usermemos = await request(
-            "usermemo:store",
-            {
-                username,
-                nickname,
-                memo,
-            },
-            []
-        );
+            const usermemos = await request(
+                "usermemo:store",
+                {
+                    username,
+                    nickname,
+                    memo,
+                },
+                []
+            );
 
-        updateUserMemo([...usermemos]);
-        updateIsOpen(false);
-    };
+            updateUserMemo([...usermemos]);
+            updateIsOpen(false);
+        },
+        [username, nickname, memo]
+    );
 
-    const openHandler = () => {
+    const openHandler = useCallback(() => {
         updateIsOpen(true);
-    };
+    }, []);
 
-    const closeHandler = async () => {
+    const closeHandler = useCallback(async () => {
         const usermemo = await getUserMemoInformation();
 
         if (usermemo) {
@@ -67,7 +70,7 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
         }
 
         updateIsOpen(false);
-    };
+    }, []);
 
     useEffect(() => {
         getUserMemoInformation().then((usermemo) => {
@@ -101,7 +104,7 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
                             effect="solid"
                             getContent={(content) => {
                                 return (
-                                    <div style={{ whiteSpace: "pre-wrap" }}>
+                                    <div style={styles.user__tooltip}>
                                         {content}
                                     </div>
                                 );

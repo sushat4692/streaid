@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import Modal from "react-modal";
 import { useSetRecoilState } from "recoil";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -16,7 +16,7 @@ import { request } from "../util/request";
 
 const CommandFormComponent: React.FC = () => {
     const intl = useIntl();
-    const allowOptions = [
+    const allowOptions = useRef([
         {
             value: "everyone",
             label: intl.formatMessage({ id: `Component.Command.everyone` }),
@@ -35,7 +35,7 @@ const CommandFormComponent: React.FC = () => {
                 id: `Component.Command.broadcaster`,
             }),
         },
-    ];
+    ]);
 
     const [isOpen, updateIsOpen] = useState<boolean>(false);
     const [inputCommand, updateInputCommand] = useState<string>("");
@@ -45,73 +45,76 @@ const CommandFormComponent: React.FC = () => {
 
     const updateCommands = useSetRecoilState(CommandsState);
 
-    const openHandler = () => {
+    const openHandler = useCallback(() => {
         updateInputCommand("");
         updateInputBody("");
         updateInputMemo("");
         updateInputAllow(null);
 
         updateIsOpen(true);
-    };
+    }, []);
 
-    const closeHandler = () => {
+    const closeHandler = useCallback(() => {
         updateIsOpen(false);
-    };
+    }, []);
 
-    const onSubmitHandler = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const onSubmitHandler = useCallback(
+        async (e: React.FormEvent) => {
+            e.preventDefault();
 
-        const commands = await request(
-            "command:push",
-            {
-                command: inputCommand,
-                body: inputBody,
-                memo: inputMemo,
-                allow: inputAllow,
-            },
-            [
+            const commands = await request(
+                "command:push",
                 {
-                    _id: "1",
-                    command: "Command1",
-                    body: "Command body Test",
-                    memo: "Command memo",
-                    allow: "broadcaster",
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
+                    command: inputCommand,
+                    body: inputBody,
+                    memo: inputMemo,
+                    allow: inputAllow,
                 },
-                {
-                    _id: "2",
-                    command: "Command2",
-                    body: "Command body Test",
-                    memo: "Command memo",
-                    allow: "mod",
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                },
-                {
-                    _id: "3",
-                    command: "Command3",
-                    body: "Command body Test",
-                    memo: "Command memo",
-                    allow: "vip",
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                },
-                {
-                    _id: "4",
-                    command: "Command4",
-                    body: "Command body Test",
-                    memo: "Command memo",
-                    allow: "everyone",
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                },
-            ]
-        );
+                [
+                    {
+                        _id: "1",
+                        command: "Command1",
+                        body: "Command body Test",
+                        memo: "Command memo",
+                        allow: "broadcaster",
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                    {
+                        _id: "2",
+                        command: "Command2",
+                        body: "Command body Test",
+                        memo: "Command memo",
+                        allow: "mod",
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                    {
+                        _id: "3",
+                        command: "Command3",
+                        body: "Command body Test",
+                        memo: "Command memo",
+                        allow: "vip",
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                    {
+                        _id: "4",
+                        command: "Command4",
+                        body: "Command body Test",
+                        memo: "Command memo",
+                        allow: "everyone",
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                    },
+                ]
+            );
 
-        updateCommands([...commands]);
-        updateIsOpen(false);
-    };
+            updateCommands([...commands]);
+            updateIsOpen(false);
+        },
+        [inputCommand, inputBody, inputMemo, inputAllow]
+    );
 
     return (
         <>
@@ -204,7 +207,7 @@ const CommandFormComponent: React.FC = () => {
 
                             <Select
                                 classNamePrefix="react-select"
-                                options={allowOptions}
+                                options={allowOptions.current}
                                 onChange={(e) =>
                                     updateInputAllow(
                                         e.value as CommandAllowType

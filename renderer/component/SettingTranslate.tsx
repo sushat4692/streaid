@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useSetRecoilState } from "recoil";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
@@ -21,7 +21,7 @@ const SettingTranslateComponent: React.FC = () => {
         useState<{ value: "free" | "pro"; label: string }>(null);
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
-    const options: { value: "free" | "pro"; label: string }[] = [
+    const options = useRef<{ value: "free" | "pro"; label: string }[]>([
         {
             value: "free",
             label: intl.formatMessage({
@@ -32,23 +32,27 @@ const SettingTranslateComponent: React.FC = () => {
             value: "pro",
             label: intl.formatMessage({ id: "Component.SettingTranslate.Pro" }),
         },
-    ];
+    ]);
 
-    const inputChangeHandler = async (apiKey: string) => {
+    const inputChangeHandler = useCallback(async (apiKey: string) => {
         await request("translate:deepl:apikey", apiKey, "key");
         updateApiKey(apiKey);
-    };
+    }, []);
 
-    const onSelectChangeHandler = async (e: {
-        label: string;
-        value: string;
-    }) => {
-        updateIsConnecting(true);
+    const onSelectChangeHandler = useCallback(
+        async (e: { label: string; value: string }) => {
+            updateIsConnecting(true);
 
-        await request("translate:deepl:plan", e.value as "free" | "pro", null);
+            await request(
+                "translate:deepl:plan",
+                e.value as "free" | "pro",
+                null
+            );
 
-        updateIsConnecting(false);
-    };
+            updateIsConnecting(false);
+        },
+        []
+    );
 
     useEffect(() => {
         (async () => {
@@ -58,7 +62,9 @@ const SettingTranslateComponent: React.FC = () => {
                 { apikey: "key", plan: "free" }
             );
             updateApiKey(apikey);
-            updateDefaultPlan(options.find((option) => option.value === plan));
+            updateDefaultPlan(
+                options.current.find((option) => option.value === plan)
+            );
 
             updateIsInited(true);
         })();
@@ -110,7 +116,7 @@ const SettingTranslateComponent: React.FC = () => {
                                 id="language"
                                 classNamePrefix="react-select"
                                 defaultValue={defaultPlan}
-                                options={options}
+                                options={options.current}
                                 onChange={onSelectChangeHandler}
                                 placeholder={intl.formatMessage({
                                     id: "Common.Select.Placeholder",

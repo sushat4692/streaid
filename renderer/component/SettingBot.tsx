@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
 
@@ -27,7 +27,7 @@ const SettingBotComponent: React.FC = () => {
         );
     }, [username, channel]);
 
-    const signoutHandler = async (e: React.FormEvent) => {
+    const signoutHandler = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
 
         updateIsConnecting(true);
@@ -36,7 +36,7 @@ const SettingBotComponent: React.FC = () => {
 
         updateIsInited(false);
         updateIsConnecting(false);
-    };
+    }, []);
 
     return (
         <section className="section">

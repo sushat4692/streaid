@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
 import TextareaAutosize from "react-textarea-autosize";
@@ -16,34 +16,35 @@ import { request } from "../util/request";
 import styles from "./SettingShoutOutMessage.module.css";
 
 const SettingShoutOutMessage: React.FC = () => {
-    const [shoutOutMessage, updateShoutOutMessage] = useRecoilState(
-        ShoutOutMessageState
-    );
+    const [shoutOutMessage, updateShoutOutMessage] =
+        useRecoilState(ShoutOutMessageState);
     const [shoutOutNotFound, updateShoutOutNotFound] = useRecoilState(
         ShoutOutNotFoundState
     );
-    const [shoutOutFailed, updateShoutOutFailed] = useRecoilState(
-        ShoutOutFailedState
-    );
+    const [shoutOutFailed, updateShoutOutFailed] =
+        useRecoilState(ShoutOutFailedState);
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
-    const submitHandler = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const submitHandler = useCallback(
+        async (e: React.FormEvent) => {
+            e.preventDefault();
 
-        updateIsConnecting(true);
+            updateIsConnecting(true);
 
-        await request(
-            "setting:shoutout_message",
-            {
-                shoutout_message: shoutOutMessage,
-                shoutout_not_found: shoutOutNotFound,
-                shoutout_failed: shoutOutFailed,
-            },
-            null
-        );
+            await request(
+                "setting:shoutout_message",
+                {
+                    shoutout_message: shoutOutMessage,
+                    shoutout_not_found: shoutOutNotFound,
+                    shoutout_failed: shoutOutFailed,
+                },
+                null
+            );
 
-        updateIsConnecting(false);
-    };
+            updateIsConnecting(false);
+        },
+        [shoutOutMessage, shoutOutNotFound, shoutOutFailed]
+    );
 
     return (
         <section className="section">
