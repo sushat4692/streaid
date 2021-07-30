@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import Select, { OptionTypeBase } from "react-select";
 import AsyncSelect from "react-select/async";
@@ -38,22 +38,18 @@ const ChannelPage: React.FC = () => {
     const [game, updateGame] = useRecoilState(ChannelGameState);
     const [language, updateLanguage] = useRecoilState(ChannelLanguageState);
     const [tags, updateTags] = useRecoilState(ChannelTagsState);
-    const [channelTemplates, updateChannelTemplates] = useRecoilState(
-        ChannelTemplateState
-    );
+    const [channelTemplates, updateChannelTemplates] =
+        useRecoilState(ChannelTemplateState);
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
     const [isLoaded, updateIsLoaded] = useState(false);
-    const [defaultGameOption, updateDefaultGameOption] = useState<GameType>(
-        null
-    );
-    const [
-        defaultLanguageOption,
-        updateDefaultLanguageOption,
-    ] = useState<OptionTypeBase>(null);
+    const [defaultGameOption, updateDefaultGameOption] =
+        useState<GameType>(null);
+    const [defaultLanguageOption, updateDefaultLanguageOption] =
+        useState<OptionTypeBase>(null);
     const [tagOption, _updateTagOption] = useState<TagType[]>([]);
 
-    const getChannelInformation = async () => {
+    const getChannelInformation = useCallback(async () => {
         updateIsConnecting(true);
 
         const Channel = await request(
@@ -99,7 +95,7 @@ const ChannelPage: React.FC = () => {
         updateIsConnecting(false);
 
         return Channel;
-    };
+    }, [channel]);
 
     useEffect(() => {
         (async () => {
@@ -158,60 +154,72 @@ const ChannelPage: React.FC = () => {
         })();
     }, []);
 
-    const loadGameOptions = (inputValue: string) =>
-        request("channel:games", { gameName: inputValue }, [
-            { id: "1", name: "Game", boxArtUrl: "https://example.com" },
-        ]);
+    const loadGameOptions = useCallback(
+        (inputValue: string) =>
+            request("channel:games", { gameName: inputValue }, [
+                { id: "1", name: "Game", boxArtUrl: "https://example.com" },
+            ]),
+        []
+    );
 
-    const loadTagOptions = (inputValue: string) =>
-        request("channel:tags", { username: inputValue }, [
-            {
-                id: "1",
-                isAuto: true,
-                name: "Tag",
-                description: "description",
-            },
-        ]);
+    const loadTagOptions = useCallback(
+        (inputValue: string) =>
+            request("channel:tags", { username: inputValue }, [
+                {
+                    id: "1",
+                    isAuto: true,
+                    name: "Tag",
+                    description: "description",
+                },
+            ]),
+        []
+    );
 
-    const submitHandler = async (e: React.FormEvent) => {
-        e.preventDefault();
-        updateIsConnecting(true);
+    const submitHandler = useCallback(
+        async (e: React.FormEvent) => {
+            e.preventDefault();
+            updateIsConnecting(true);
 
-        await request(
-            "channel:update",
-            {
-                username: channel,
-                title,
-                gameId: game.id,
-                language,
-            },
-            null
-        );
+            await request(
+                "channel:update",
+                {
+                    username: channel,
+                    title,
+                    gameId: game.id,
+                    language,
+                },
+                null
+            );
 
-        updateIsConnecting(false);
-        await getChannelInformation();
-    };
+            updateIsConnecting(false);
+            await getChannelInformation();
+        },
+        [channel, title, game, language]
+    );
 
-    const onClickSaveTemplateHandler = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        updateIsConnecting(true);
+    const onClickSaveTemplateHandler = useCallback(
+        async (e: React.MouseEvent) => {
+            e.preventDefault();
+            updateIsConnecting(true);
 
-        const templates = await request(
-            "channel:template:push",
-            {
-                title,
-                gameId: game.id,
-                gameName: game.name,
-                boxArtUrl: game.boxArtUrl,
-                language,
-            },
-            []
-        );
+            const templates = await request(
+                "channel:template:push",
+                {
+                    title,
+                    gameId: game.id,
+                    gameName: game.name,
+                    boxArtUrl: game.boxArtUrl,
+                    language,
+                },
+                []
+            );
 
-        updateChannelTemplates(templates || []);
+            updateChannelTemplates(templates || []);
 
-        updateIsConnecting(false);
-    };
+            updateIsConnecting(false);
+        },
+        [title, game, language]
+    );
 
     return (
         <>

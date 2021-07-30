@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
 import cn from "classnames";
@@ -23,19 +23,23 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
     const [isShowNav, updateIsShowNav] = useState(false);
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
-    const clickHandler = (showWindow: string | null = null) => {
-        return async () => {
-            updateIsConnecting(true);
+    const clickHandler = useCallback(
+        (showWindow: string | null = null) => {
+            return async () => {
+                updateIsConnecting(true);
 
-            await request("bot:shoutout", { username, showWindow }, null);
+                await request("bot:shoutout", { username, showWindow }, null);
 
-            updateIsConnecting(false);
-        };
-    };
+                updateIsConnecting(false);
+                updateIsShowNav(false);
+            };
+        },
+        [username]
+    );
 
-    const toggleNavHandler = () => {
-        updateIsShowNav(!isShowNav);
-    };
+    const toggleNavHandler = useCallback(() => {
+        updateIsShowNav((prev) => !prev);
+    }, []);
 
     return (
         <>

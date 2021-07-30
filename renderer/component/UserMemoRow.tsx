@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useSetRecoilState } from "recoil";
 import moment from "moment";
 
@@ -22,11 +22,11 @@ type Props = {
 const UserMemoRowComponent: React.FC<Props> = ({ usermemo }: Props) => {
     const updateUserMemo = useSetRecoilState(UserMemoState);
 
-    const deleteClickHandler = async () => {
+    const deleteClickHandler = useCallback(async () => {
         const usermemos = await request("usermemo:delete", usermemo._id, []);
 
         updateUserMemo([...usermemos]);
-    };
+    }, [usermemo]);
 
     return (
         <tr>

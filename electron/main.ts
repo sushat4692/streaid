@@ -12,8 +12,6 @@ import { useEnv } from "./util/Env";
 const env = useEnv();
 env.set("mode", "__build__");
 
-import { getIndexedWords, updateCommmand } from "./database/IndexedWord";
-
 async function createWindow() {
     const win = new BrowserWindow({
         width: 800,
@@ -36,14 +34,6 @@ app.whenReady().then(() => {
     setMenu(locale);
 
     createWindow();
-
-    (async () => {
-        const words = await getIndexedWords();
-        words.map((word) => {
-            word.username = "sushat4692";
-            updateCommmand(word._id, word);
-        });
-    })();
 });
 
 app.on("window-all-closed", async () => {
