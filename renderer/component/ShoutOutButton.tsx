@@ -31,13 +31,14 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
                 await request("bot:shoutout", { username, showWindow }, null);
 
                 updateIsConnecting(false);
+                updateIsShowNav(false);
             };
         },
         [username]
     );
 
     const toggleNavHandler = useCallback(() => {
-        updateIsShowNav(!isShowNav);
+        updateIsShowNav((prev) => !prev);
     }, []);
 
     return (

@@ -12,8 +12,8 @@ import HostsState from "../atom/Hosts";
 import { request } from "../util/request";
 
 // Component
-import UserComponent from "./User";
-import ShoutOutButtonComponent from "./ShoutOutButton";
+// import UserComponent from "./User";
+// import ShoutOutButtonComponent from "./ShoutOutButton";
 
 type Props = {
     host: HostType;
@@ -31,17 +31,18 @@ const HostsRowComponent: React.FC<Props> = ({ host }: Props) => {
     return (
         <tr>
             <td scope="row">
-                <UserComponent username={host.username} />
+                {/* <UserComponent username={host.username} /> */}
+                {host.username}
             </td>
             <td>{host.viewers}</td>
             <td>{host.autohost ? "true" : "false"}</td>
             <td>{moment(host.createdAt).format("M/D kk:mm")}</td>
             <td>
                 <div className="btn-group">
-                    <ShoutOutButtonComponent
+                    {/* <ShoutOutButtonComponent
                         className="btn is-small btn-success me-1"
                         username={host.username}
-                    />
+                    /> */}
                     <button
                         className="btn is-small is-danger"
                         onClick={deleteClickHandler}
