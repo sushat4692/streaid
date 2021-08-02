@@ -1,0 +1,15 @@
+.section {
+    @apply mb-3;
+}
+
+.section__head {
+    @apply font-bold mb-1;
+}
+
+.list {
+    @apply ml-5;
+}
+
+.list__item {
+    @apply list-disc;
+}
