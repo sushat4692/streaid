@@ -21,6 +21,8 @@ export default [
                 __twitch_api_key__: process.env.CLIENT_ID,
                 // eslint-disable-next-line no-undef
                 __build__: process.env.BUILD,
+                // eslint-disable-next-line no-undef
+                __version__: process.env.npm_package_version,
             }),
             pluginEsbuild({
                 include: /\.[jt]sx?$/,

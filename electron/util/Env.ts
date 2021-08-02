@@ -8,7 +8,7 @@ export const useEnv = () => {
         return values[key];
     };
 
-    const set = (key: string, value: string) => {
+    const set = (key: string, value: unknown) => {
         values[key] = value;
     };
 

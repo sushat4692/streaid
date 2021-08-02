@@ -1,6 +1,7 @@
 import { ChatterType } from "./Chatter";
 import { HostType } from "./Host";
 import { RaiderType } from "./Raider";
+import { Version } from "./Version";
 
 export type ModeType =
     | "bot:connected"
@@ -9,7 +10,8 @@ export type ModeType =
     | "bot:raided"
     | "bot:hosted"
     | "sound:play"
-    | "linkto";
+    | "linkto"
+    | "versions";
 
 export type ValuesType = {
     "bot:connected": Record<string, never>;
@@ -19,4 +21,5 @@ export type ValuesType = {
     "bot:hosted": HostType[];
     "sound:play": { source: Uint8Array; gain: number };
     linkto: string;
+    versions: Version;
 };

@@ -11,6 +11,7 @@ export default defineConfig({
             input: {
                 main: resolve(__dirname, "index.html"),
                 alert: resolve(__dirname, "alert.html"),
+                version: resolve(__dirname, "version.html"),
             },
         },
     },
