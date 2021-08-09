@@ -52,7 +52,9 @@ export type ModeType =
     | "command:delete"
     | "translate:deepl"
     | "translate:deepl:apikey"
-    | "translate:deepl:plan";
+    | "translate:deepl:plan"
+    | "translate:discord"
+    | "translate:discord:webhook";
 
 export type ValuesType = {
     "bot:connect": Record<string, never>;
@@ -116,6 +118,8 @@ export type ValuesType = {
     "translate:deepl": Record<string, never>;
     "translate:deepl:apikey": string;
     "translate:deepl:plan": "free" | "pro";
+    "translate:discord": Record<string, never>;
+    "translate:discord:webhook": string;
 };
 
 export type ReturnsType = {
@@ -170,4 +174,6 @@ export type ReturnsType = {
     "translate:deepl": { apikey: string; plan: "free" | "pro" };
     "translate:deepl:apikey": string;
     "translate:deepl:plan": "free" | "pro";
+    "translate:discord": { webhook: string };
+    "translate:discord:webhook": string;
 };
