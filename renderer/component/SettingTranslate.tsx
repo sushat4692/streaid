@@ -19,6 +19,7 @@ const SettingTranslateComponent: React.FC = () => {
     const [apiKey, updateApiKey] = useState("");
     const [defaultPlan, updateDefaultPlan] =
         useState<{ value: "free" | "pro"; label: string }>(null);
+    const [webhookUrl, updateWebhookUrl] = useState("");
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
     const options = useRef<{ value: "free" | "pro"; label: string }[]>([
@@ -34,7 +35,7 @@ const SettingTranslateComponent: React.FC = () => {
         },
     ]);
 
-    const inputChangeHandler = useCallback(async (apiKey: string) => {
+    const apiKeyInputChangeHandler = useCallback(async (apiKey: string) => {
         await request("translate:deepl:apikey", apiKey, "key");
         updateApiKey(apiKey);
     }, []);
@@ -54,6 +55,14 @@ const SettingTranslateComponent: React.FC = () => {
         []
     );
 
+    const webhookUrlInputChangeHandler = useCallback(
+        async (webhook: string) => {
+            await request("translate:discord:webhook", webhook, "key");
+            updateWebhookUrl(webhook);
+        },
+        []
+    );
+
     useEffect(() => {
         (async () => {
             const { apikey, plan } = await request(
@@ -65,6 +74,13 @@ const SettingTranslateComponent: React.FC = () => {
             updateDefaultPlan(
                 options.current.find((option) => option.value === plan)
             );
+
+            const { webhook } = await request(
+                "translate:discord",
+                {},
+                { webhook: "url" }
+            );
+            updateWebhookUrl(webhook);
 
             updateIsInited(true);
         })();
@@ -100,7 +116,9 @@ const SettingTranslateComponent: React.FC = () => {
                             type="text"
                             className="form-control"
                             value={apiKey}
-                            onChange={(e) => inputChangeHandler(e.target.value)}
+                            onChange={(e) =>
+                                apiKeyInputChangeHandler(e.target.value)
+                            }
                         />
                     </div>
                     <div className="form-field">
@@ -154,6 +172,28 @@ const SettingTranslateComponent: React.FC = () => {
                         id="Component.SettingTranslate.Dictionary.Descript"
                         defaultMessage="You can get the meaning of word from English to Japanese through the following command"
                     />
+                </div>
+
+                <div className="form-field">
+                    <label className="form-field__label">
+                        Discord Webhook URL <small>(Not required)</small>
+                    </label>
+
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={webhookUrl}
+                        onChange={(e) =>
+                            webhookUrlInputChangeHandler(e.target.value)
+                        }
+                    />
+
+                    <small className="form-field__help">
+                        <FormattedMessage
+                            id="Component.SettingTranslate.Dictionary.Webhook.Help"
+                            defaultMessage="* Automatically post your consulted word and the meaning to specific Discord channel"
+                        />
+                    </small>
                 </div>
 
                 <div className="form-field">

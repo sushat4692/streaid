@@ -11,6 +11,10 @@ import {
     updateCommmand,
 } from "../../database/IndexedWord";
 import { RequestIndexedWordType } from "../../../types/IndexedWord";
+import axios, { AxiosError } from "axios";
+
+// Store
+import { getInstance as getStoreInstance } from "../../store";
 
 let database: Database<sqlite3.Database, sqlite3.Statement>;
 
@@ -70,6 +74,32 @@ export const getWordMeanEnToJa = async (
             return indexed.count;
         }
     })();
+
+    const data = {
+        embeds: [
+            {
+                color:
+                    count <= 1
+                        ? parseInt("408558", 16)
+                        : count >= 3
+                        ? parseInt("CB444A", 16)
+                        : parseInt("F6C344", 16),
+                title: word,
+                description: result.mean,
+                footer: {
+                    text: `searched this word ${count} time(s)`,
+                },
+            },
+        ],
+    };
+
+    const store = getStoreInstance();
+    const url = store.get("discord_webhook", "");
+    if (url) {
+        axios.post(url, data).catch((e: AxiosError) => {
+            console.log(e);
+        });
+    }
 
     return `${result.mean} -- < searched this word ${count} time(s) >`;
 };

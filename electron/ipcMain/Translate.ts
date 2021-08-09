@@ -20,3 +20,15 @@ ipcMain.handle("translate:deepl:plan", async (_, key: "free" | "pro") => {
     const store = getStoreInstance();
     return store.set("deepl_plan", key);
 });
+
+ipcMain.handle("translate:discord", async () => {
+    const store = getStoreInstance();
+    return {
+        webhook: store.get("discord_webhook"),
+    };
+});
+
+ipcMain.handle("translate:discord:webhook", async (_, url: string) => {
+    const store = getStoreInstance();
+    return store.set("discord_webhook", url);
+});

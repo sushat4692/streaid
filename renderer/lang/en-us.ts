@@ -145,6 +145,8 @@ const messages: { [key: string]: string } = {
     "Component.SettingTranslate.Dictionary.Header": "JP to EN Dictionary",
     "Component.SettingTranslate.Dictionary.Descript":
         "You can get the meaning of word from English to Japanese through the following command",
+    "Component.SettingTranslate.Dictionary.Webhook.Help":
+        "* Automatically post your consulted word and the meaning to specific Discord channel",
     // User
     "Component.User.Memo": "Memo",
     // Command

@@ -146,6 +146,8 @@ const messages: { [key: string]: string } = {
     "Component.SettingTranslate.Dictionary.Header": "和英辞書",
     "Component.SettingTranslate.Dictionary.Descript":
         "下記コマンドで英単語の意味を取得することができます",
+    "Component.SettingTranslate.Dictionary.Webhook.Help":
+        "※索引した単語と訳を指定したDiscordチャンネルに自動的に投稿します",
     // User
     "Component.User.Memo": "メモ",
     // Command
