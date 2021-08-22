@@ -1,6 +1,6 @@
 {
     "name": "twitch-support-tool",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "main": "./dist/main.js",
     "description": "Streaming support tool for Twitch",
     "author": {
@@ -109,6 +109,9 @@
         },
         "files": [
             "dist/**/*"
+        ],
+        "extraResources": [
+            "dict"
         ],
         "dmg": {
             "contents": [
