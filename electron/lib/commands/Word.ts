@@ -28,7 +28,7 @@ type DictionalyRow = {
 export const initialize = async () => {
     database = await open({
         filename: path.join(
-            isDev ? "." : app.getPath("userData"),
+            isDev ? "." : process.resourcesPath,
             "dict",
             "ejdict.sqlite3"
         ),
