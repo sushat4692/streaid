@@ -5,6 +5,7 @@ const database = dbFactory("raiders.db");
 export type RaiderInformation = {
     channel: string;
     username: string;
+    displayname: string;
     viewers: number;
 };
 
