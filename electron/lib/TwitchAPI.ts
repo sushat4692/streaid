@@ -1,6 +1,5 @@
 import { session } from "electron";
 import {
-    AccessToken,
     ApiClient,
     HelixPaginatedResult,
     HelixPrivilegedUser,
@@ -8,13 +7,14 @@ import {
     HelixChannel,
     HelixGame,
     HelixTag,
-} from "twitch";
-import { ElectronAuthProvider } from "twitch-electron-auth-provider";
+} from "@twurple/api";
+import { AccessToken } from "@twurple/auth";
+import { ElectronAuthProvider } from "@twurple/auth-electron";
 import isDev from "electron-is-dev";
 
 // Store
 import { getInstance as getStoreInstance } from "../store";
-import { HelixChannelUpdate } from "twitch/lib/API/Helix/Channel/HelixChannelApi";
+import { HelixChannelUpdate } from "@twurple/api/lib/api/helix/channel/HelixChannelApi";
 
 class TwitchAPI {
     _clientId = "";
@@ -79,7 +79,7 @@ class TwitchAPI {
 
     async getUserInfo(): Promise<HelixPrivilegedUser | null> {
         try {
-            const user = await this.client?.helix.users.getMe().catch((e) => {
+            const user = await this.client?.users.getMe().catch((e) => {
                 console.error(e);
             });
 
@@ -96,7 +96,7 @@ class TwitchAPI {
 
     async getUserByName(username: string): Promise<HelixUser | null> {
         try {
-            const User = await this.client?.helix.users.getUserByName(username);
+            const User = await this.client?.users.getUserByName(username);
             if (!User) {
                 return null;
             }
@@ -110,7 +110,7 @@ class TwitchAPI {
 
     async getUserById(id: string): Promise<HelixUser | null> {
         try {
-            const User = await this.client?.helix.users.getUserById(id);
+            const User = await this.client?.users.getUserById(id);
 
             if (!User) {
                 return null;
@@ -125,9 +125,7 @@ class TwitchAPI {
 
     async getChannelInfo(User: HelixUser): Promise<HelixChannel | null> {
         try {
-            const channel = await this.client?.helix.channels.getChannelInfo(
-                User
-            );
+            const channel = await this.client?.channels.getChannelInfo(User);
 
             if (!channel) {
                 return null;
@@ -142,7 +140,7 @@ class TwitchAPI {
 
     async updateChannelInfo(User: HelixUser, data: HelixChannelUpdate) {
         try {
-            await this.client?.helix.channels.updateChannelInfo(User, data);
+            await this.client?.channels.updateChannelInfo(User, data);
         } catch (e) {
             console.error(e);
         }
@@ -150,7 +148,7 @@ class TwitchAPI {
 
     async getChannelTags(User: HelixUser): Promise<HelixTag[]> {
         try {
-            const tags = await this.client?.helix.streams.getStreamTags(User);
+            const tags = await this.client?.streams.getStreamTags(User);
 
             if (!tags) {
                 return [];
@@ -165,7 +163,7 @@ class TwitchAPI {
 
     async getGame(gameId: string): Promise<HelixGame | null> {
         try {
-            const game = await this.client?.helix.games.getGameById(gameId);
+            const game = await this.client?.games.getGameById(gameId);
 
             if (!game) {
                 return null;
@@ -182,7 +180,7 @@ class TwitchAPI {
         gameName: string
     ): Promise<HelixPaginatedResult<HelixGame> | null> {
         try {
-            const gameList = await this.client?.helix.search.searchCategories(
+            const gameList = await this.client?.search.searchCategories(
                 gameName
             );
 
@@ -199,7 +197,7 @@ class TwitchAPI {
 
     async getTagList() {
         try {
-            const tagList = await this.client?.helix.tags.getAllStreamTags();
+            const tagList = await this.client?.tags.getAllStreamTags();
 
             if (!tagList) {
                 return null;
@@ -214,8 +212,9 @@ class TwitchAPI {
 
     async getClipsByUser(User: HelixUser) {
         try {
-            const clipList =
-                await this.client?.helix.clips.getClipsForBroadcaster(User);
+            const clipList = await this.client?.clips.getClipsForBroadcaster(
+                User
+            );
 
             if (!clipList) {
                 return null;

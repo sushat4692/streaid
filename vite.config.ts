@@ -18,6 +18,9 @@ export default defineConfig({
 
     optimizeDeps: {
         exclude: [
+            "@twurple/api",
+            "@twurple/auth",
+            "@twurple/auth-electron",
             "dotenv",
             "electron-is-dev",
             "electron-store",
@@ -26,9 +29,6 @@ export default defineConfig({
             "node-fetch",
             "tmi.js",
             "tslib",
-            "twitch",
-            "twitch-auth",
-            "twitch-electron-auth-provider",
             "fs",
             "electron-store",
             "path",
