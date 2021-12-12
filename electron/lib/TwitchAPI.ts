@@ -13,7 +13,6 @@ import { ElectronAuthProvider } from "@twurple/auth-electron";
 import isDev from "electron-is-dev";
 
 // Store
-import { getInstance as getStoreInstance } from "../store";
 import { HelixChannelUpdate } from "@twurple/api/lib/api/helix/channel/HelixChannelApi";
 
 class TwitchAPI {
@@ -228,9 +227,7 @@ class TwitchAPI {
     }
 
     async disconnect() {
-        const store = getStoreInstance();
         await session.defaultSession.clearStorageData();
-        store.clear();
     }
 }
 

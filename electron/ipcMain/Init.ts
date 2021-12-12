@@ -19,6 +19,10 @@ ipcMain.handle("signout", async () => {
 
     await Bot.disconnect();
     await TwitchAPI.disconnect();
+
+    // Initialize Twitch user information
+    store.delete("username");
+    store.delete("password");
     store.set("api.inited", false);
 
     return;
