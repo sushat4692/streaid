@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell } from "electron";
 import path from "path";
 import axios from "axios";
+import https from "https";
 import compareVersions from "compare-versions";
 
 // Store
@@ -31,7 +32,11 @@ async function createWindow() {
     // win.webContents.openDevTools();
 
     const result = await axios
-        .get("https://twitch-support-tool-docs.vercel.app/version.json")
+        .get("https://twitch-support-tool-docs.vercel.app/version.json", {
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: false,
+            }),
+        })
         .catch((e) => {
             console.log(e);
         });

@@ -105,7 +105,7 @@ class Bot {
         };
 
         // Create a client with our options
-        this._client = tmi.client(opts);
+        this._client = new tmi.client(opts);
 
         // Register our event handlers (defined below)
         this._client.on("message", this.onMessageHandler.bind(this));
@@ -212,17 +212,23 @@ class Bot {
      * @param username
      * @param viewers
      */
-    async onRaidedHandler(channel: string, username: string, viewers: number) {
+    async onRaidedHandler(
+        channel: string,
+        username: string,
+        displayname: string,
+        viewers: number
+    ) {
         pushRaider({
             channel,
             username,
+            displayname,
             viewers,
         });
 
         const win = getWindow();
         const notification = new Notification({
             title: `${viewers} Raider has come`,
-            body: `Thank you for raiding "${username}"`,
+            body: `Thank you for raiding "${displayname}"`,
             silent: true,
         });
         notification.show();

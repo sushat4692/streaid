@@ -24,6 +24,7 @@ const ChattersPage: React.FC = () => {
                     _id: "1",
                     channel: "channel",
                     username: "username",
+                    displayname: "username",
                     viewers: 1,
                     createdAt: new Date(),
                     updatedAt: new Date(),
@@ -32,6 +33,7 @@ const ChattersPage: React.FC = () => {
                     _id: "2",
                     channel: "channel",
                     username: "username",
+                    displayname: "username",
                     viewers: 1,
                     createdAt: new Date(),
                     updatedAt: new Date(),
@@ -70,6 +72,7 @@ const ChattersPage: React.FC = () => {
                         <table className="table">
                             <colgroup>
                                 <col />
+                                <col />
                                 <col width="100" />
                                 <col width="140" />
                                 <col width="30" />
@@ -86,6 +89,12 @@ const ChattersPage: React.FC = () => {
                                         <FormattedMessage
                                             id="Common.Label.NickName"
                                             defaultMessage="Nick name"
+                                        />
+                                    </th>
+                                    <th scope="col">
+                                        <FormattedMessage
+                                            id="Common.Label.Displayname"
+                                            defaultMessage="Displayname"
                                         />
                                     </th>
                                     <th scope="col">

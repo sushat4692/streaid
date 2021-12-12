@@ -12,8 +12,8 @@ import RaidersState from "../atom/Raiders";
 import { request } from "../util/request";
 
 // Component
-// import UserComponent from "./User";
-// import ShoutOutButtonComponent from "./ShoutOutButton";
+import UserComponent from "./User";
+import ShoutOutButtonComponent from "./ShoutOutButton";
 
 type Props = {
     raider: RaiderType;
@@ -31,17 +31,17 @@ const RaiderRowComponent: React.FC<Props> = ({ raider }: Props) => {
     return (
         <tr>
             <td scope="row">
-                {/* <UserComponent username={raider.username} /> */}
-                {raider.username}
+                <UserComponent username={raider.username} />
             </td>
+            <td>{raider.displayname}</td>
             <td>{raider.viewers}</td>
             <td>{moment(raider.createdAt).format("M/D kk:mm")}</td>
             <td>
                 <div className="btn-group">
-                    {/* <ShoutOutButtonComponent
+                    <ShoutOutButtonComponent
                         className="btn is-small btn-success me-1"
                         username={raider.username}
-                    /> */}
+                    />
                     <button
                         className="btn is-small is-danger"
                         onClick={deleteClickHandler}

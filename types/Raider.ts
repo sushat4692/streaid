@@ -3,6 +3,7 @@ import { DocumentExtends } from "./Document";
 export type RequestRaiderType = {
     channel: string;
     username: string;
+    displayname: string;
     viewers: number;
 };
 
