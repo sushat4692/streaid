@@ -1,0 +1,17 @@
+diff --git a/node_modules/tmi.js/lib/client.js b/node_modules/tmi.js/lib/client.js
+index f5f2f73..24279a5 100755
+--- a/node_modules/tmi.js/lib/client.js
++++ b/node_modules/tmi.js/lib/client.js
+@@ -757,9 +757,10 @@ client.prototype.handleMessage = function handleMessage(message) {
+ 
+ 					// Handle raid
+ 					case 'raid': {
+-						const username = tags['msg-param-displayName'] || tags['msg-param-login'];
++						const username = tags['msg-param-login'];
++						const displayname = tags['msg-param-displayName'] || tags['msg-param-login'];
+ 						const viewers = +tags['msg-param-viewerCount'];
+-						this.emit('raided', channel, username, viewers, tags);
++						this.emit('raided', channel, username, displayname, viewers, tags);
+ 						break;
+ 					}
+ 					// Handle ritual
