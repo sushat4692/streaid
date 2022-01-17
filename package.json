@@ -22,7 +22,8 @@
         "electron": "electron ./dist/main.js",
         "lint": "eslint --ext .ts,tsx alert/** electron/** renderer/** version/**",
         "lint:fix": "eslint --fix --ext .ts,tsx alert/** electron/** renderer/** version/**",
-        "make:license": "ts-node ./cmd/license.ts"
+        "make:license": "ts-node ./cmd/license.ts",
+        "make:jp-dict": "japanese-db sqlite -s ./sourceFolder -d ./dict"
     },
     "dependencies": {
         "@popperjs/core": "^2.10.2",
@@ -35,6 +36,7 @@
         "compare-versions": "^3.6.0",
         "dotenv": "^10.0.0",
         "fs-extra": "^10.0.0",
+        "japanese-db": "^0.19.3",
         "moment": "^2.29.1",
         "nedb-promises": "^5.0.2",
         "node-fetch": "^2.6.6",
