@@ -1,0 +1,13 @@
+diff --git a/node_modules/@types/tmi.js/index.d.ts b/node_modules/@types/tmi.js/index.d.ts
+index 3549661..f34e24f 100755
+--- a/node_modules/@types/tmi.js/index.d.ts
++++ b/node_modules/@types/tmi.js/index.d.ts
+@@ -79,7 +79,7 @@ export interface Events {
+     pong(latency: number): void;
+     primepaidupgrade(channel: string, username: string, methods: SubMethods, userstate: PrimeUpgradeUserstate): void;
+     r9kbeta(channel: string, enabled: boolean): void;
+-    raided(channel: string, username: string, viewers: number): void;
++    raided(channel: string, username: string, displayname: string, viewers: number): void;
+     "raw_message": (messageCloned: { [property: string]: any }, message: { [property: string]: any }) => void;
+     reconnect(): void;
+     // additional string literals for autocomplete

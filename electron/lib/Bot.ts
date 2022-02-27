@@ -17,9 +17,13 @@ import { rollDice } from "./commands/Dice";
 import { shoutOut, shoutOutClipStop } from "./commands/ShoutOut";
 import { deeplTranslate } from "./commands/Translate";
 import {
-    initialize as initializeTranslate,
+    initialize as initializeWordMeanEnToJa,
     getWordMeanEnToJa,
-} from "./commands/Word";
+} from "./commands/EnglishDictionary";
+import {
+    initialize as initializeWordMeanJaToEn,
+    getWordMeanJaToEn,
+} from "./commands/JapaneseDictionary";
 
 // Util
 import { getWindow } from "../util/window";
@@ -60,11 +64,18 @@ class Bot {
         });
 
         (async () => {
-            await initializeTranslate();
-            commandModel.push("!w", {
+            await initializeWordMeanEnToJa();
+            commandModel.push("!e2j", {
                 allow: "everyone",
                 return: true,
                 handler: getWordMeanEnToJa,
+            });
+
+            await initializeWordMeanJaToEn();
+            commandModel.push("!j2e", {
+                allow: "everyone",
+                return: true,
+                handler: getWordMeanJaToEn,
             });
 
             // Custom Command
