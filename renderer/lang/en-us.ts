@@ -142,10 +142,15 @@ const messages: { [key: string]: string } = {
         "You can use Translation command after copy&paste the DeepL API Key (required signup to DeepL)",
     "Component.SettingTranslate.Free": "Free",
     "Component.SettingTranslate.Pro": "Pro",
-    "Component.SettingTranslate.Dictionary.Header": "JP to EN Dictionary",
-    "Component.SettingTranslate.Dictionary.Descript":
+    "Component.SettingTranslate.E2JDictionary.Header": "EN to JP Dictionary",
+    "Component.SettingTranslate.E2JDictionary.Descript":
         "You can get the meaning of word from English to Japanese through the following command",
-    "Component.SettingTranslate.Dictionary.Webhook.Help":
+    "Component.SettingTranslate.E2JDictionary.Webhook.Help":
+        "* Automatically post your consulted word and the meaning to specific Discord channel",
+    "Component.SettingTranslate.J2EDictionary.Header": "JP to EN Dictionary",
+    "Component.SettingTranslate.J2EDictionary.Descript":
+        "You can get the meaning of word from Japanese to English through the following command",
+    "Component.SettingTranslate.J2EDictionary.Webhook.Help":
         "* Automatically post your consulted word and the meaning to specific Discord channel",
     // User
     "Component.User.Memo": "Memo",

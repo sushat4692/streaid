@@ -6,6 +6,10 @@ import { useIntl } from "react-intl";
 import IsConnectedState from "../atom/IsConnected";
 import IsConnectingState from "../atom/IsConnecting";
 
+// Component
+import Button from "../../component/Button";
+import ButtonIcon from "../../component/ButtonIcon";
+
 // Util
 import { request } from "../util/request";
 
@@ -29,13 +33,12 @@ const ConnectComonent: React.FC<Props> = ({ isBlock = false }: Props) => {
     }, [isConnected]);
 
     return (
-        <button
-            className={`btn ${isConnected ? "is-danger" : "is-primary"} ${
-                isBlock ? "is-block" : ""
-            }`}
+        <Button
+            color={isConnected ? "danger" : "primary"}
+            block={isBlock}
             onClick={clickHandler}
         >
-            <i className="bi bi-link-45deg btn__icon" />
+            <ButtonIcon icon="link-45deg" />
             {isConnected
                 ? intl.formatMessage({
                       id: "Component.Connect.Disable",
@@ -45,7 +48,7 @@ const ConnectComonent: React.FC<Props> = ({ isBlock = false }: Props) => {
                       id: "Component.Connect.Enable",
                       defaultMessage: "Connect",
                   })}
-        </button>
+        </Button>
     );
 };
 

@@ -7,8 +7,18 @@ import UserMemoState from "../atom/UserMemo";
 import LocaleState from "../atom/Locale";
 
 // Component
-import MetaComponent from "../component/Meta";
-import UserMemoRowComponent from "../component/UserMemoRow";
+import Meta from "../component/Meta";
+import UserMemoRow from "../component/UserMemoRow";
+import Container from "../../component/Container";
+import Section from "../../component/Section";
+import SectionLead from "../../component/SectionLead";
+import PageHeader from "../../component/PageHeader";
+import TableResponsive from "../component/TableResponsive";
+import Table from "../component/Table";
+import TableThead from "../component/TableThead";
+import TableRow from "../component/TableRow";
+import TableHead from "../component/TableHead";
+import TableTbody from "../component/TableTbody";
 
 // Util
 import { request } from "../util/request";
@@ -44,42 +54,31 @@ const UserMemoPage: React.FC = () => {
 
     return (
         <>
-            <MetaComponent
-                id="Common.UserMemo.Name"
-                defaultMessage="User memo"
-            />
+            <Meta id="Common.UserMemo.Name" defaultMessage="User memo" />
 
-            <div className="page-header">
-                <div className="container-fluid">
-                    <h1 className="page-header__text">
-                        <i className="bi bi-people page-header__icon" />
-                        <FormattedMessage
-                            id="Common.UserMemo.Name"
-                            defaultMessage="User memo"
-                        />
-                    </h1>
-                </div>
-            </div>
+            <PageHeader icon="people">
+                <FormattedMessage
+                    id="Common.UserMemo.Name"
+                    defaultMessage="User memo"
+                />
+            </PageHeader>
 
-            <div className="container-fluid">
-                <section className="section">
-                    <p className="section__lead">
+            <Container>
+                <Section>
+                    <SectionLead>
                         <FormattedMessage
                             id="Common.UserMemo.Description"
                             defaultMessage="You can store the target additional information."
                         />
-                    </p>
+                    </SectionLead>
 
-                    <div className="table-responsive">
-                        <table className="table">
-                            <colgroup>
-                                <col />
-                                <col width="140" />
-                                <col width={locale === "ja-jp" ? 180 : 160} />
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th scope="col">
+                    <TableResponsive>
+                        <Table
+                            cols={[null, 140, locale === "ja-jp" ? 180 : 160]}
+                        >
+                            <TableThead>
+                                <TableRow>
+                                    <TableHead scope="col">
                                         <FormattedMessage
                                             id="Common.Label.Username"
                                             defaultMessage="Username"
@@ -89,30 +88,30 @@ const UserMemoPage: React.FC = () => {
                                             id="Common.Label.NickName"
                                             defaultMessage="Nick name"
                                         />
-                                    </th>
-                                    <th scope="col">
+                                    </TableHead>
+                                    <TableHead scope="col">
                                         <FormattedMessage
                                             id="Common.Label.Created"
                                             defaultMessage="Created"
                                         />
-                                    </th>
-                                    <th scope="col" />
-                                </tr>
-                            </thead>
-                            <tbody>
+                                    </TableHead>
+                                    <TableHead scope="col" />
+                                </TableRow>
+                            </TableThead>
+                            <TableTbody>
                                 {userMemos.map((usermemo) => {
                                     return (
-                                        <UserMemoRowComponent
+                                        <UserMemoRow
                                             usermemo={usermemo}
                                             key={usermemo._id}
                                         />
                                     );
                                 })}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-            </div>
+                            </TableTbody>
+                        </Table>
+                    </TableResponsive>
+                </Section>
+            </Container>
         </>
     );
 };

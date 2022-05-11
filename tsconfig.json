@@ -4,6 +4,7 @@
     "module": "commonjs",
     "strict": true,
     "jsx": "preserve",
+    "jsxImportSource": "@emotion/react",
     "importHelpers": true,
     "moduleResolution": "node",
     "esModuleInterop": true,

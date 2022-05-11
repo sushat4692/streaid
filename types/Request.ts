@@ -53,8 +53,10 @@ export type ModeType =
     | "translate:deepl"
     | "translate:deepl:apikey"
     | "translate:deepl:plan"
-    | "translate:discord"
-    | "translate:discord:webhook";
+    | "translate:e2j:discord"
+    | "translate:e2j:discord:webhook"
+    | "translate:j2e:discord"
+    | "translate:j2e:discord:webhook";
 
 export type ValuesType = {
     "bot:connect": Record<string, never>;
@@ -118,8 +120,10 @@ export type ValuesType = {
     "translate:deepl": Record<string, never>;
     "translate:deepl:apikey": string;
     "translate:deepl:plan": "free" | "pro";
-    "translate:discord": Record<string, never>;
-    "translate:discord:webhook": string;
+    "translate:e2j:discord": Record<string, never>;
+    "translate:e2j:discord:webhook": string;
+    "translate:j2e:discord": Record<string, never>;
+    "translate:j2e:discord:webhook": string;
 };
 
 export type ReturnsType = {
@@ -174,6 +178,8 @@ export type ReturnsType = {
     "translate:deepl": { apikey: string; plan: "free" | "pro" };
     "translate:deepl:apikey": string;
     "translate:deepl:plan": "free" | "pro";
-    "translate:discord": { webhook: string };
-    "translate:discord:webhook": string;
+    "translate:e2j:discord": { webhook: string };
+    "translate:e2j:discord:webhook": string;
+    "translate:j2e:discord": { webhook: string };
+    "translate:j2e:discord:webhook": string;
 };

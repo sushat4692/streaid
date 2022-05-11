@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import axios from "axios";
 
 // Env
 import { getInstance as getStoreInstance } from "../../store";
@@ -28,7 +28,7 @@ export const deeplTranslate = async (
     url.searchParams.append("source_lang", sourceLang);
     url.searchParams.append("target_lang", targetLang);
 
-    const result = await fetch(url).catch((e) => {
+    const result = await axios(url.toString()).catch((e) => {
         console.error(e);
     });
 
@@ -37,10 +37,10 @@ export const deeplTranslate = async (
     }
 
     if (result.status >= 400) {
-        console.error("Error", await result.text());
+        console.error("Error", await result.statusText);
         return;
     }
 
-    const json = await result.json();
+    const json = await result.data;
     return json.translations[0].text;
 };

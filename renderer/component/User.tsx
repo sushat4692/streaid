@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import Modal from "react-modal";
 import { useSetRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
-import TextareaAutosize from "react-textarea-autosize";
 import ReactTooltip from "react-tooltip";
+import tw from "twin.macro";
 
 // Recoil
 import UserMemoState from "../atom/UserMemo";
@@ -11,8 +10,21 @@ import UserMemoState from "../atom/UserMemo";
 // Util
 import { request } from "../util/request";
 
-// Styles
-import styles from "./User.module.css";
+// Components
+import Modal from "./Modal";
+import ModalHead from "./ModalHead";
+import ModalBody from "./ModalBody";
+import ModalFoot from "./ModalFoot";
+import FormField from "./FormField";
+import FormFieldLabel from "./FormFieldLabel";
+import FormInputText from "./FormInputText";
+import FormTextareaAutosize from "./FormTextareaAutosize";
+import Button from "../../component/Button";
+import Icon from "../../component/Icon";
+const User = tw.span`inline-block`;
+const UserSmall = tw.small`inline-block text-sm ml-1 opacity-50`;
+const UserButton = tw.button`inline-block ml-2`;
+const UserTooltip = tw.button`whitespace-pre-wrap`;
 
 type Props = {
     username: string;
@@ -83,16 +95,14 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
 
     return (
         <>
-            <span className={styles.user}>
+            <User>
                 {memo.length ? (
                     <>
                         <span data-tip={memo ? memo : false}>
                             {nickname.length ? (
                                 <>
                                     {nickname}
-                                    <small className={styles.user__small}>
-                                        ({username})
-                                    </small>
+                                    <UserSmall>({username})</UserSmall>
                                 </>
                             ) : (
                                 username
@@ -103,11 +113,7 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
                             type="dark"
                             effect="solid"
                             getContent={(content) => {
-                                return (
-                                    <div style={styles.user__tooltip}>
-                                        {content}
-                                    </div>
-                                );
+                                return <UserTooltip>{content}</UserTooltip>;
                             }}
                         />
                     </>
@@ -116,83 +122,69 @@ const UserComponent: React.FC<Props> = ({ username }: Props) => {
                         {nickname.length ? (
                             <>
                                 {nickname}
-                                <small className={styles.user__small}>
-                                    ({username})
-                                </small>
+                                <UserSmall>({username})</UserSmall>
                             </>
                         ) : (
                             username
                         )}
                     </>
                 )}
-            </span>
+            </User>
 
-            <button className={styles.user__button} onClick={openHandler}>
-                <i className="bi bi-pencil" />
-            </button>
+            <UserButton onClick={openHandler}>
+                <Icon icon="pencil" />
+            </UserButton>
 
-            <Modal isOpen={isOpen} className="modal" overlayClassName="overlay">
+            <Modal isOpen={isOpen}>
                 <form tabIndex={-1} onSubmit={onSubmitHandler}>
-                    <div className="modal__head">
-                        <h5 className="modal-title">{username}</h5>
-                        <button
-                            type="button"
-                            className="modal__close"
-                            aria-label="Close"
-                            onClick={closeHandler}
-                        />
-                    </div>
-                    <div className="modal__body">
-                        <div className="form-field">
-                            <label className="form-field__label">
+                    <ModalHead onClose={closeHandler}>
+                        <h5>{username}</h5>
+                    </ModalHead>
+                    <ModalBody>
+                        <FormField>
+                            <FormFieldLabel>
                                 <FormattedMessage
                                     id="Common.Label.NickName"
                                     defaultMessage="Nick name"
                                 />
-                            </label>
-                            <input
+                            </FormFieldLabel>
+                            <FormInputText
                                 type="text"
-                                className="form-control"
                                 value={nickname}
                                 onChange={(e) => {
                                     updateNickname(e.target.value);
                                 }}
                             />
-                        </div>
-                        <div className="form-field">
-                            <label className="form-field__label">
+                        </FormField>
+                        <FormField>
+                            <FormFieldLabel>
                                 <FormattedMessage
                                     id="Component.User.Memo"
                                     defaultMessage="Memo"
                                 />
-                            </label>
-                            <TextareaAutosize
+                            </FormFieldLabel>
+                            <FormTextareaAutosize
                                 value={memo}
-                                className="form-control"
                                 onChange={(e) => {
                                     updateMemo(e.target.value);
                                 }}
                             />
-                        </div>
-                    </div>
-                    <div className="modal__foot">
-                        <button
-                            type="button"
-                            className="btn btn-secondary"
-                            onClick={closeHandler}
-                        >
+                        </FormField>
+                    </ModalBody>
+                    <ModalFoot>
+                        <Button type="button" onClick={closeHandler}>
                             <FormattedMessage
                                 id="Common.Close"
                                 defaultMessage="Close"
                             />
-                        </button>
-                        <button type="submit" className="btn is-primary">
+                        </Button>
+                        <Button type="submit" color="primary">
                             <FormattedMessage
                                 id="Common.Submit"
                                 defaultMessage="Submit"
                             />
-                        </button>
-                    </div>
+                        </Button>
+                    </ModalFoot>
                 </form>
             </Modal>
         </>

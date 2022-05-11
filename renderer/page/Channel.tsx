@@ -1,12 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import Select, { OptionTypeBase } from "react-select";
+import Select, { PropsValue } from "react-select";
 import AsyncSelect from "react-select/async";
 import { FormattedMessage, useIntl } from "react-intl";
+import tw from "twin.macro";
+import styled from "@emotion/styled";
 
 // Types
 import { TagType } from "../../types/Tag";
 import { GameType } from "../../types/Game";
+import { DefaultSelectType } from "../../types/DefaultSelect";
 
 // Recoil
 import SettingChannelState from "../atom/SettingChannel";
@@ -22,13 +25,33 @@ import { request } from "../util/request";
 
 // Const
 import { list as languageList } from "../const/languages";
+import { selectStyles } from "../const/selectStyles";
+const gameStyle = selectStyles<GameType, false>();
+const languageStyle = selectStyles<DefaultSelectType, false>();
+const tagStyle = selectStyles<TagType, true>();
 
 // Components
-import MetaComponent from "../component/Meta";
-import ChannelTemplateRowComponent from "../component/ChannelTemplateRow";
-
-// Styles
-import styles from "./Channel.module.css";
+import Meta from "../component/Meta";
+import ChannelTemplateRow from "../component/ChannelTemplateRow";
+import PageHeader from "../../component/PageHeader";
+import Container from "../../component/Container";
+import Alert from "../../component/Alert";
+import Button from "../../component/Button";
+import Section from "../../component/Section";
+import SectionLead from "../../component/SectionLead";
+import SectionHeader from "../../component/SectionHeader";
+import FormField from "../component/FormField";
+import FormFieldLabel from "../component/FormFieldLabel";
+import FormInputText from "../component/FormInputText";
+import FormFieldAction from "../component/FormFieldAction";
+import TableResponsive from "../component/TableResponsive";
+import Table from "../component/Table";
+import TableThead from "../component/TableThead";
+import TableRow from "../component/TableRow";
+import TableHead from "../component/TableHead";
+import TableTbody from "../component/TableTbody";
+const Category = tw.div`flex mb-2 items-center`;
+const CategoryFigure = styled.figure([{ width: 52 }, tw`m-0 mr-2`]);
 
 const ChannelPage: React.FC = () => {
     const intl = useIntl();
@@ -44,9 +67,9 @@ const ChannelPage: React.FC = () => {
 
     const [isLoaded, updateIsLoaded] = useState(false);
     const [defaultGameOption, updateDefaultGameOption] =
-        useState<GameType>(null);
+        useState<PropsValue<GameType>>(null);
     const [defaultLanguageOption, updateDefaultLanguageOption] =
-        useState<OptionTypeBase>(null);
+        useState<PropsValue<DefaultSelectType>>(null);
     const [tagOption, _updateTagOption] = useState<TagType[]>([]);
 
     const getChannelInformation = useCallback(async () => {
@@ -162,18 +185,18 @@ const ChannelPage: React.FC = () => {
         []
     );
 
-    const loadTagOptions = useCallback(
-        (inputValue: string) =>
-            request("channel:tags", { username: inputValue }, [
-                {
-                    id: "1",
-                    isAuto: true,
-                    name: "Tag",
-                    description: "description",
-                },
-            ]),
-        []
-    );
+    // const loadTagOptions = useCallback(
+    //     (inputValue: string) =>
+    //         request("channel:tags", { username: inputValue }, [
+    //             {
+    //                 id: "1",
+    //                 isAuto: true,
+    //                 name: "Tag",
+    //                 description: "description",
+    //             },
+    //         ]),
+    //     []
+    // );
 
     const submitHandler = useCallback(
         async (e: React.FormEvent) => {
@@ -223,101 +246,82 @@ const ChannelPage: React.FC = () => {
 
     return (
         <>
-            <MetaComponent id="Common.Channel.Name" defaultMessage="Channel" />
+            <Meta id="Common.Channel.Name" defaultMessage="Channel" />
 
-            <div className="page-header">
-                <div className="container-fluid">
-                    <h1 className="page-header__text">
-                        <i className="bi bi-camera-reels page-header__icon" />
-                        <FormattedMessage
-                            id="Common.Channel.Name"
-                            defaultMessage="Channel"
-                        />
-                    </h1>
-                </div>
-            </div>
+            <PageHeader icon="camera-reels">
+                <FormattedMessage
+                    id="Common.Channel.Name"
+                    defaultMessage="Channel"
+                />
+            </PageHeader>
 
-            <div className="container-fluid">
-                <p className="section__lead">
+            <Container>
+                <SectionLead>
                     <FormattedMessage
                         id="Common.Channel.Description"
                         defaultMessage="You can check/update Channel information."
                     />
-                </p>
+                </SectionLead>
 
-                <section className="section">
-                    <h2 className="section__header">
+                <Section>
+                    <SectionHeader>
                         <FormattedMessage
                             id="Page.Channel.Information.Header"
                             defaultMessage="Channel Information"
                         />
-                    </h2>
+                    </SectionHeader>
 
                     {!isLoaded ? (
                         ""
                     ) : (
                         <form onSubmit={submitHandler}>
-                            <div className="form-field">
-                                <label
-                                    htmlFor="title"
-                                    className="form-field__label"
-                                >
+                            <FormField>
+                                <FormFieldLabel htmlFor="title">
                                     <FormattedMessage
                                         id="Common.Label.Title"
                                         defaultMessage="Title"
                                     />
-                                </label>
-                                <input
+                                </FormFieldLabel>
+                                <FormInputText
+                                    large
                                     type="text"
                                     name="title"
                                     id="title"
-                                    className="form-control is-large"
                                     value={title}
                                     onChange={(e) =>
                                         updateTitle(e.target.value)
                                     }
                                 />
-                            </div>
+                            </FormField>
 
-                            <div className="form-field">
-                                <label
-                                    htmlFor="gameId"
-                                    className="form-field__label"
-                                >
+                            <FormField>
+                                <FormFieldLabel htmlFor="gameId">
                                     <FormattedMessage
                                         id="Common.Label.Category"
                                         defaultMessage="Category"
                                     />
-                                </label>
+                                </FormFieldLabel>
 
-                                <div className={styles.category}>
+                                <Category>
                                     {game ? (
-                                        <figure
-                                            className={styles.category__figure}
-                                        >
+                                        <CategoryFigure>
                                             <img
                                                 src={game.boxArtUrl
                                                     .replace("{width}", "138")
                                                     .replace("{height}", "190")}
-                                                className="img-fluid"
                                                 alt={game.name}
                                             />
-                                        </figure>
+                                        </CategoryFigure>
                                     ) : (
                                         ""
                                     )}
                                     <span>{game.name}</span>
-                                </div>
+                                </Category>
 
                                 <AsyncSelect
-                                    classNamePrefix="react-select"
+                                    styles={gameStyle}
                                     cacheOptions={true}
                                     defaultValue={defaultGameOption}
-                                    defaultGameOptions={
-                                        defaultGameOption
-                                            ? [defaultGameOption]
-                                            : []
-                                    }
                                     value={game}
                                     getOptionLabel={(option) => option.name}
                                     getOptionValue={(option) => option.id}
@@ -334,23 +338,20 @@ const ChannelPage: React.FC = () => {
                                         defaultMessage: "Select...",
                                     })}
                                 />
-                            </div>
+                            </FormField>
 
-                            <div className="form-field">
-                                <label
-                                    htmlFor="language"
-                                    className="form-field__label"
-                                >
+                            <FormField>
+                                <FormFieldLabel htmlFor="language">
                                     <FormattedMessage
                                         id="Common.Label.Language"
                                         defaultMessage="Language"
                                     />
-                                </label>
+                                </FormFieldLabel>
 
                                 <Select
+                                    styles={languageStyle}
                                     name="language"
                                     id="language"
-                                    classNamePrefix="react-select"
                                     defaultValue={defaultLanguageOption}
                                     options={languageList}
                                     onChange={(e) => updateLanguage(e.value)}
@@ -359,126 +360,112 @@ const ChannelPage: React.FC = () => {
                                         defaultMessage: "Select...",
                                     })}
                                 />
-                            </div>
+                            </FormField>
 
-                            <div className="form-field">
-                                <label
-                                    htmlFor="tags"
-                                    className="form-field__label"
-                                >
+                            <FormField>
+                                <FormFieldLabel htmlFor="tags">
                                     <FormattedMessage
                                         id="Common.Label.Tags"
                                         defaultMessage="Tags"
                                     />
-                                </label>
+                                </FormFieldLabel>
 
-                                <div className="alert is-warning">
+                                <Alert color="warning">
                                     <FormattedMessage
                                         id="Page.Channel.Information.TagNotice"
                                         defaultMessage="Tags are not editable for now"
                                     />
-                                </div>
+                                </Alert>
 
                                 <Select
-                                    classNamePrefix="react-select"
+                                    styles={tagStyle}
                                     isMulti
                                     isDisabled
                                     options={tagOption}
                                     defaultValue={tags}
                                     getOptionLabel={(option) => option.name}
                                     getOptionValue={(option) => option.id}
-                                    loadOptions={loadTagOptions}
+                                    // loadOptions={loadTagOptions}
                                     placeholder={intl.formatMessage({
                                         id: "Common.Select.Placeholder",
                                         defaultMessage: "Select...",
                                     })}
                                 />
-                            </div>
+                            </FormField>
 
-                            <div className="form-field__action">
-                                <button
+                            <FormFieldAction>
+                                <Button
                                     type="button"
-                                    className="btn btn-success me-auto"
                                     onClick={onClickSaveTemplateHandler}
                                 >
                                     <FormattedMessage
                                         id="Page.Channel.Information.SaveTemplate"
                                         defaultMessage="Save to Template"
                                     />
-                                </button>
+                                </Button>
 
-                                <button
-                                    type="submit"
-                                    className="btn is-primary"
-                                >
+                                <Button type="submit" color="primary">
                                     <FormattedMessage
                                         id="Common.Submit"
                                         defaultMessage="Submit"
                                     />
-                                </button>
-                            </div>
+                                </Button>
+                            </FormFieldAction>
                         </form>
                     )}
-                </section>
+                </Section>
 
-                <section className="section">
-                    <h2 className="section__header">
+                <Section>
+                    <SectionHeader>
                         <FormattedMessage
                             id="Page.Channel.Template.Header"
                             defaultMessage="Channel Template"
                         />
-                    </h2>
+                    </SectionHeader>
 
-                    <div className="table-responsive">
-                        <table className="table">
-                            <colgroup>
-                                <col />
-                                <col />
-                                <col />
-                                <col width="140" />
-                                <col width="100" />
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th scope="col">
+                    <TableResponsive>
+                        <Table cols={[null, null, null, 140, 100]}>
+                            <TableThead>
+                                <TableRow>
+                                    <TableHead scope="col">
                                         <FormattedMessage
                                             id="Common.Label.Title"
                                             defaultMessage="Title"
                                         />
-                                    </th>
-                                    <th scope="col">
+                                    </TableHead>
+                                    <TableHead scope="col">
                                         <FormattedMessage
                                             id="Common.Label.Category"
                                             defaultMessage="Category"
                                         />
-                                    </th>
-                                    <th scope="col">
+                                    </TableHead>
+                                    <TableHead scope="col">
                                         <FormattedMessage
                                             id="Common.Label.Language"
                                             defaultMessage="Language"
                                         />
-                                    </th>
-                                    <th scope="col">
+                                    </TableHead>
+                                    <TableHead scope="col">
                                         <FormattedMessage
                                             id="Common.Label.Created"
                                             defaultMessage="Created"
                                         />
-                                    </th>
-                                    <th scope="col" />
-                                </tr>
-                            </thead>
-                            <tbody>
+                                    </TableHead>
+                                    <TableHead scope="col" />
+                                </TableRow>
+                            </TableThead>
+                            <TableTbody>
                                 {channelTemplates.map((channelTemplate) => (
-                                    <ChannelTemplateRowComponent
+                                    <ChannelTemplateRow
                                         key={channelTemplate._id}
                                         channelTemplate={channelTemplate}
                                     />
                                 ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-            </div>
+                            </TableTbody>
+                        </Table>
+                    </TableResponsive>
+                </Section>
+            </Container>
         </>
     );
 };

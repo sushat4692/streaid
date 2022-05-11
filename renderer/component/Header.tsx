@@ -1,149 +1,174 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, useHistory } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
-// import { Collapse } from "bootstrap";
-
-// Component
-import ConnectComponent from "./Connect";
+import styled from "@emotion/styled";
+import tw from "twin.macro";
 
 // Utils
 import { requestEvent } from "../util/request";
 import { useSettingState } from "../util/setting";
 
-// Styles
-import styles from "./Header.module.css";
+// Component
+import ConnectComponent from "./Connect";
+import Container from "../../component/Container";
+import Icon from "../../component/Icon";
+const Nav = tw.header`bg-gray-800 dark:bg-gray-900 fixed w-full z-30`;
+const NavInner = tw.div`flex items-center justify-between h-16 md:h-10`;
+const NavList = tw.div`flex items-center`;
+const NavListBrand = tw(NavLink)`text-white text-2xl flex-shrink-0`;
+const NavListMenu = tw.div`hidden md:block`;
+const NavListMenuInner = tw.div`ml-2 flex items-baseline`;
+const NavListMenuButton = styled(NavLink)<{ disabled?: boolean }>(
+    ({ disabled }) => [
+        tw`text-gray-300 hover:bg-gray-700 hover:text-white px-3 text-sm font-medium flex items-center h-10`,
+        disabled ? { opacity: 0.6, pointerEvents: "none" } : null,
+        { [`&.active`]: tw`bg-gray-700` },
+    ]
+);
+const NavSide = tw.div`hidden md:block`;
+const NavSideInner = styled.div([
+    tw`ml-4 flex items-center`,
+    { [`${NavListMenuButton}`]: tw`md:mr-2` },
+]);
+const NavBurger = tw.div`-mr-2 flex md:hidden`;
+const NavBurgerButton = tw.button`bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white`;
+const NavBurgerButtonLabel = tw.span`sr-only`;
+const NavBurgerButtonIcon = styled.svg<{ visible: boolean }>(({ visible }) => [
+    tw`h-6 w-6 hidden`,
+    visible ? tw`block` : null,
+]);
+const NavMobile = styled.div<{ visible: boolean }>(({ visible }) => [
+    tw`hidden md:hidden!`,
+    visible ? tw`block` : null,
+]);
+const NavMobileMenu = tw.div`px-2 pt-2 pb-3 space-y-1 sm:px-3`;
+const NavMobileMenuButton = styled(NavLink)<{ disabled: boolean }>(
+    ({ disabled }) => [
+        tw`text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium`,
+        disabled ? { opacity: 0.6, pointerEvents: "none" } : null,
+        { [`&.active`]: tw`bg-gray-700` },
+    ]
+);
 
 const HeaderComponent: React.FC = () => {
     const [isSPNavView, updateIsSPNavView] = useState(false);
     const setting = useSettingState();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     useEffect(() => {
         requestEvent("linkto", (_, values) => {
-            history.push(values);
+            navigate(values);
         });
     }, []);
 
     return (
-        <header className={styles.nav}>
-            <div className="container-fluid">
-                <div className={styles.nav__inner}>
-                    <div className={styles.nav__list}>
-                        <NavLink className={styles.nav__list__brand} to="/">
-                            <i className="bi bi-twitch" />
-                        </NavLink>
+        <Nav>
+            <Container>
+                <NavInner>
+                    <NavList>
+                        <NavListBrand to="/">
+                            <Icon icon="twitch" />
+                        </NavListBrand>
 
-                        <div className={styles.nav__list__menu}>
-                            <div className={styles.nav__list__menu__inner}>
-                                <NavLink
-                                    className={styles.nav__list__menu__button}
-                                    data-disable={!setting.isEnableBot}
-                                    activeClassName={styles["is-active"]}
-                                    to="/chatters"
+                        <NavListMenu>
+                            <NavListMenuInner>
+                                <NavListMenuButton
+                                    end
+                                    disabled={!setting.isEnableBot}
+                                    to="chatters"
                                 >
                                     <FormattedMessage
                                         id="Common.Chatters.Name"
                                         defaultMessage="Chatters"
                                     />
-                                </NavLink>
-                                <NavLink
-                                    className={styles.nav__list__menu__button}
-                                    data-disable={!setting.isEnableBot}
-                                    activeClassName={styles["is-active"]}
+                                </NavListMenuButton>
+                                <NavListMenuButton
+                                    end
+                                    disabled={!setting.isEnableBot}
                                     to="/raiders"
                                 >
                                     <FormattedMessage
                                         id="Common.Raiders.Name"
                                         defaultMessage="Raiders"
                                     />
-                                </NavLink>
-                                <NavLink
-                                    className={styles.nav__list__menu__button}
-                                    data-disable={!setting.isEnableBot}
-                                    activeClassName={styles["is-active"]}
+                                </NavListMenuButton>
+                                <NavListMenuButton
+                                    end
+                                    disabled={!setting.isEnableBot}
                                     to="/hosts"
                                 >
                                     <FormattedMessage
                                         id="Common.Hosts.Name"
                                         defaultMessage="Hosts"
                                     />
-                                </NavLink>
-                                <NavLink
-                                    className={styles.nav__list__menu__button}
-                                    data-disable={!setting.isEnableChannel}
-                                    activeClassName={styles["is-active"]}
+                                </NavListMenuButton>
+                                <NavListMenuButton
+                                    end
+                                    disabled={!setting.isEnableChannel}
                                     to="/channel"
                                 >
                                     <FormattedMessage
                                         id="Common.Channel.Name"
                                         defaultMessage="Channel"
                                     />
-                                </NavLink>
-                                <NavLink
-                                    className={styles.nav__list__menu__button}
-                                    data-disable={!setting.isEnableBot}
-                                    activeClassName={styles["is-active"]}
+                                </NavListMenuButton>
+                                <NavListMenuButton
+                                    end
+                                    disabled={!setting.isEnableBot}
                                     to="/user_memo"
                                 >
                                     <FormattedMessage
                                         id="Common.UserMemo.Name"
                                         defaultMessage="User memo"
                                     />
-                                </NavLink>
-                                <NavLink
-                                    className={styles.nav__list__menu__button}
-                                    data-disable={!setting.isEnableBot}
-                                    activeClassName={styles["is-active"]}
+                                </NavListMenuButton>
+                                <NavListMenuButton
+                                    end
+                                    disabled={!setting.isEnableBot}
                                     to="/commands"
                                 >
                                     <FormattedMessage
                                         id="Common.Command.Name"
                                         defaultMessage="Command"
                                     />
-                                </NavLink>
-                            </div>
-                        </div>
-                    </div>
+                                </NavListMenuButton>
+                            </NavListMenuInner>
+                        </NavListMenu>
+                    </NavList>
 
-                    <div className={styles.nav__side}>
-                        <div className={styles.nav__side__inner}>
-                            <NavLink
-                                className={`${styles.nav__list__menu__button} ${styles.nav__side__inner__button}`}
-                                activeClassName={styles["is-active"]}
-                                to="/settings"
-                            >
+                    <NavSide>
+                        <NavSideInner>
+                            <NavListMenuButton to="/settings">
                                 <FormattedMessage
                                     id="Common.Settings.Name"
                                     defaultMessage="Settings"
                                 />
-                            </NavLink>
+                            </NavListMenuButton>
 
                             <ConnectComponent />
-                        </div>
-                    </div>
+                        </NavSideInner>
+                    </NavSide>
 
-                    <div className={styles.nav__burger}>
-                        <button
+                    <NavBurger>
+                        <NavBurgerButton
                             type="button"
-                            className={styles.nav__burger__button}
                             aria-controls="mobile-menu"
                             aria-expanded="false"
                             onClick={() => {
                                 updateIsSPNavView(!isSPNavView);
                             }}
                         >
-                            <span className={styles.nav__burger__button__label}>
+                            <NavBurgerButtonLabel>
                                 Open main menu
-                            </span>
+                            </NavBurgerButtonLabel>
 
-                            <svg
-                                className={styles.nav__burger__button__icon}
+                            <NavBurgerButtonIcon
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
                                 aria-hidden="true"
-                                data-visible={!isSPNavView}
+                                visible={!isSPNavView}
                             >
                                 <path
                                     strokeLinecap="round"
@@ -151,16 +176,15 @@ const HeaderComponent: React.FC = () => {
                                     strokeWidth="2"
                                     d="M4 6h16M4 12h16M4 18h16"
                                 />
-                            </svg>
+                            </NavBurgerButtonIcon>
 
-                            <svg
-                                className={styles.nav__burger__button__icon}
+                            <NavBurgerButtonIcon
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
                                 aria-hidden="true"
-                                data-visible={isSPNavView}
+                                visible={isSPNavView}
                             >
                                 <path
                                     strokeLinecap="round"
@@ -168,84 +192,72 @@ const HeaderComponent: React.FC = () => {
                                     strokeWidth="2"
                                     d="M6 18L18 6M6 6l12 12"
                                 />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
+                            </NavBurgerButtonIcon>
+                        </NavBurgerButton>
+                    </NavBurger>
+                </NavInner>
+            </Container>
 
-            <div className={styles.nav__mobile} data-visible={isSPNavView}>
-                <div className={styles.nav__mobile__menu}>
-                    <NavLink
-                        className={styles.nav__mobile__menu__button}
-                        data-disable={!setting.isEnableBot}
-                        activeClassName="active"
-                        to="/chatters"
+            <NavMobile visible={isSPNavView}>
+                <NavMobileMenu>
+                    <NavMobileMenuButton
+                        disabled={!setting.isEnableBot}
+                        to="chatters"
                     >
                         <FormattedMessage
                             id="Common.Chatters.Name"
                             defaultMessage="Chatters"
                         />
-                    </NavLink>
-                    <NavLink
-                        className={styles.nav__mobile__menu__button}
-                        data-disable={!setting.isEnableBot}
-                        activeClassName="active"
+                    </NavMobileMenuButton>
+                    <NavMobileMenuButton
+                        disabled={!setting.isEnableBot}
                         to="/raiders"
                     >
                         <FormattedMessage
                             id="Common.Raiders.Name"
                             defaultMessage="Raiders"
                         />
-                    </NavLink>
-                    <NavLink
-                        className={styles.nav__mobile__menu__button}
-                        data-disable={!setting.isEnableBot}
-                        activeClassName="active"
+                    </NavMobileMenuButton>
+                    <NavMobileMenuButton
+                        disabled={!setting.isEnableBot}
                         to="/hosts"
                     >
                         <FormattedMessage
                             id="Common.Hosts.Name"
                             defaultMessage="Hosts"
                         />
-                    </NavLink>
-                    <NavLink
-                        className={styles.nav__mobile__menu__button}
-                        data-disable={!setting.isEnableChannel}
-                        activeClassName="active"
+                    </NavMobileMenuButton>
+                    <NavMobileMenuButton
+                        disabled={!setting.isEnableChannel}
                         to="/channel"
                     >
                         <FormattedMessage
                             id="Common.Channel.Name"
                             defaultMessage="Channel"
                         />
-                    </NavLink>
-                    <NavLink
-                        className={styles.nav__mobile__menu__button}
-                        data-disable={!setting.isEnableBot}
-                        activeClassName="active"
+                    </NavMobileMenuButton>
+                    <NavMobileMenuButton
+                        disabled={!setting.isEnableBot}
                         to="/user_memo"
                     >
                         <FormattedMessage
                             id="Common.UserMemo.Name"
                             defaultMessage="User memo"
                         />
-                    </NavLink>
-                    <NavLink
-                        className={styles.nav__mobile__menu__button}
-                        data-disable={!setting.isEnableBot}
-                        activeClassName="active"
+                    </NavMobileMenuButton>
+                    <NavMobileMenuButton
+                        disabled={!setting.isEnableBot}
                         to="/commands"
                     >
                         <FormattedMessage
                             id="Common.Commmand.Name"
                             defaultMessage="Command"
                         />
-                    </NavLink>
+                    </NavMobileMenuButton>
                     <ConnectComponent isBlock={true} />
-                </div>
-            </div>
-        </header>
+                </NavMobileMenu>
+            </NavMobile>
+        </Nav>
     );
 };
 

@@ -1,7 +1,8 @@
 import React, { useCallback } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
-import TextareaAutosize from "react-textarea-autosize";
+import tw from "twin.macro";
+import styled from "@emotion/styled";
 
 // Recoil
 import ShoutOutMessageState from "../atom/SettingShoutOutMessage";
@@ -12,8 +13,27 @@ import IsConnectingState from "../atom/IsConnecting";
 // Utils
 import { request } from "../util/request";
 
-// Style
-import styles from "./SettingShoutOutMessage.module.css";
+// Components
+import Section from "../../component/Section";
+import SectionHeader from "../../component/SectionHeader";
+import FormField from "./FormField";
+import FormFieldLabel from "./FormFieldLabel";
+import FormFieldAction from "./FormFieldAction";
+import FormTextareaAutosize from "./FormTextareaAutosize";
+import Button from "../../component/Button";
+import ButtonIcon from "../../component/ButtonIcon";
+import Table from "./Table";
+import TableThead from "./TableThead";
+import TableTbody from "./TableTbody";
+import TableRow from "./TableRow";
+import TableHead from "./TableHead";
+import TableData from "./TableData";
+const Row = styled.div(() => [
+    tw`grid grid-cols-1 gap-4`,
+    { [`@media (min-width: 768px)`]: { gridTemplateColumns: `2fr 1fr` } },
+]);
+const Form = tw.form`md:mb-2`;
+const Description = tw.div``;
 
 const SettingShoutOutMessage: React.FC = () => {
     const [shoutOutMessage, updateShoutOutMessage] =
@@ -47,165 +67,149 @@ const SettingShoutOutMessage: React.FC = () => {
     );
 
     return (
-        <section className="section">
-            <h2 className="section__header">
+        <Section>
+            <SectionHeader>
                 <FormattedMessage
                     id="Component.SettingShoutOutMessage.Header"
                     defaultMessage="Shoutout Message"
                 />
-            </h2>
+            </SectionHeader>
 
-            <div className={styles.row}>
-                <form className={styles.form} onSubmit={submitHandler}>
-                    <div className="form-field">
-                        <label
-                            htmlFor="shoutout_message"
-                            className="form-field__label"
-                        >
+            <Row>
+                <Form onSubmit={submitHandler}>
+                    <FormField>
+                        <FormFieldLabel htmlFor="shoutout_message">
                             <FormattedMessage
                                 id="Component.SettingShoutOutMessage.Message"
                                 defaultMessage="ShoutOut Message Template"
                             />
-                        </label>
-                        <TextareaAutosize
+                        </FormFieldLabel>
+                        <FormTextareaAutosize
                             name="shoutout_message"
                             id="shoutout_message"
                             rows={3}
-                            className="form-control"
                             value={shoutOutMessage}
                             onChange={(e) =>
                                 updateShoutOutMessage(e.target.value)
                             }
                         />
-                    </div>
+                    </FormField>
 
-                    <div className="form-field">
-                        <label
-                            htmlFor="shoutout_failed"
-                            className="form-field__label"
-                        >
+                    <FormField>
+                        <FormFieldLabel htmlFor="shoutout_failed">
                             <FormattedMessage
                                 id="Component.SettingShoutOutMessage.Failed"
                                 defaultMessage="Failed Message Template"
                             />
-                        </label>
-                        <TextareaAutosize
+                        </FormFieldLabel>
+                        <FormTextareaAutosize
                             name="shoutout_failed"
                             id="shoutout_failed"
                             rows={3}
-                            className="form-control"
                             value={shoutOutFailed}
                             onChange={(e) =>
                                 updateShoutOutFailed(e.target.value)
                             }
                         />
-                    </div>
+                    </FormField>
 
-                    <div className="form-field">
-                        <label
-                            htmlFor="shoutout_not_found"
-                            className="form-field__label"
-                        >
+                    <FormField>
+                        <FormFieldLabel htmlFor="shoutout_not_found">
                             <FormattedMessage
                                 id="Component.SettingShoutOutMessage.NotFound"
                                 defaultMessage="Not Found Message Template"
                             />
-                        </label>
-                        <TextareaAutosize
+                        </FormFieldLabel>
+                        <FormTextareaAutosize
                             name="shoutout_not_found"
                             id="shoutout_not_found"
                             rows={3}
-                            className="form-control"
                             value={shoutOutNotFound}
                             onChange={(e) =>
                                 updateShoutOutNotFound(e.target.value)
                             }
                         />
-                    </div>
+                    </FormField>
 
-                    <div className="form-field__action">
-                        <button className="btn is-primary">
-                            <i className="bi bi-archive btn__icon" />
+                    <FormFieldAction>
+                        <Button color="primary">
+                            <ButtonIcon icon="archive" />
                             <FormattedMessage
                                 id="Common.Submit"
                                 defaultMessage="Submit"
                             />
-                        </button>
-                    </div>
-                </form>
+                        </Button>
+                    </FormFieldAction>
+                </Form>
 
-                <div className={styles.description}>
-                    <table className="table">
-                        <colgroup>
-                            <col width="120" />
-                            <col />
-                        </colgroup>
-                        <thead>
-                            <tr>
-                                <th scope="col">
+                <Description>
+                    <Table cols={[120, null]}>
+                        <TableThead>
+                            <TableRow>
+                                <TableHead scope="col">
                                     <FormattedMessage
                                         id="Common.Variable.Variable"
                                         defaultMessage="Variable"
                                     />
-                                </th>
-                                <th scope="col">
+                                </TableHead>
+                                <TableHead scope="col">
                                     <FormattedMessage
                                         id="Common.Variable.Description"
                                         defaultMessage="Description"
                                     />
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td scope="row">
+                                </TableHead>
+                            </TableRow>
+                        </TableThead>
+                        <TableTbody>
+                            <TableRow>
+                                <TableData scope="row">
                                     <code>%url%</code>
-                                </td>
-                                <td>
+                                </TableData>
+                                <TableData>
                                     <FormattedMessage
                                         id="Common.Variable.Url.Description"
                                         defaultMessage="Target Channel URL"
                                     />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td scope="row">
+                                </TableData>
+                            </TableRow>
+                            <TableRow>
+                                <TableData scope="row">
                                     <code>%username%</code>
-                                </td>
-                                <td>
+                                </TableData>
+                                <TableData>
                                     <FormattedMessage
                                         id="Common.Variable.Username.Description"
                                         defaultMessage="Target User Display Name"
                                     />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td scope="row">
+                                </TableData>
+                            </TableRow>
+                            <TableRow>
+                                <TableData scope="row">
                                     <code>%user_id%</code>
-                                </td>
-                                <td>
+                                </TableData>
+                                <TableData>
                                     <FormattedMessage
                                         id="Common.Variable.UserId.Description"
                                         defaultMessage="Target User ID"
                                     />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td scope="row">
+                                </TableData>
+                            </TableRow>
+                            <TableRow>
+                                <TableData scope="row">
                                     <code>%category%</code>
-                                </td>
-                                <td>
+                                </TableData>
+                                <TableData>
                                     <FormattedMessage
                                         id="Common.Variable.Category.Description"
                                         defaultMessage="Target Category/Game name"
                                     />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
+                                </TableData>
+                            </TableRow>
+                        </TableTbody>
+                    </Table>
+                </Description>
+            </Row>
+        </Section>
     );
 };
 

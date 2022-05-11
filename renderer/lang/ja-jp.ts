@@ -143,10 +143,15 @@ const messages: { [key: string]: string } = {
         "DeepLにユーザー登録を行い、APIキーを取得して下記入力フィールドに貼り付けると翻訳コマンドが利用できるようになります",
     "Component.SettingTranslate.Free": "フリー",
     "Component.SettingTranslate.Pro": "プロ",
-    "Component.SettingTranslate.Dictionary.Header": "和英辞書",
-    "Component.SettingTranslate.Dictionary.Descript":
+    "Component.SettingTranslate.E2JDictionary.Header": "英和辞書",
+    "Component.SettingTranslate.E2JDictionary.Descript":
         "下記コマンドで英単語の意味を取得することができます",
-    "Component.SettingTranslate.Dictionary.Webhook.Help":
+    "Component.SettingTranslate.E2JDictionary.Webhook.Help":
+        "※索引した単語と訳を指定したDiscordチャンネルに自動的に投稿します",
+    "Component.SettingTranslate.J2EDictionary.Header": "和英辞書",
+    "Component.SettingTranslate.J2EDictionary.Descript":
+        "下記コマンドで日本語の単語の英語の意味を取得することができます",
+    "Component.SettingTranslate.J2EDictionary.Webhook.Help":
         "※索引した単語と訳を指定したDiscordチャンネルに自動的に投稿します",
     // User
     "Component.User.Memo": "メモ",

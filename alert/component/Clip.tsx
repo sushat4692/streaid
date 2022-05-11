@@ -1,11 +1,27 @@
 import React, { useEffect, useState } from "react";
-import cn from "classnames";
 import socket from "../socket";
-
-import styles from "./Clip.module.css";
+import tw from "twin.macro";
+import styled from "@emotion/styled";
 
 // Types
 import { ClipType } from "../../types/Clip";
+
+// Component
+const ClipInner = styled.div(() => [
+    tw`bg-gray-800 p-4 rounded transition-all duration-500`,
+    { width: `96rem`, transform: `translateY(-10px)` },
+]);
+const Clip = styled.div<{ active: boolean }>(({ active }) => [
+    tw`fixed inset-0 flex items-center justify-center transition-all duration-500 bg-black bg-opacity-50`,
+    active ? tw`opacity-100` : tw`opacity-0`,
+    active ? { [`${ClipInner}`]: { transform: `translateY(0)` } } : null,
+]);
+const ClipFigure = styled.figure([
+    tw`m-0 mb-4 relative`,
+    { paddingTop: `56.25%` },
+]);
+const ClipVideo = tw.video`w-full h-full absolute inset-0`;
+const ClipName = tw.p`text-center font-bold text-6xl`;
 
 const InfoComponent: React.FC = () => {
     const [clip, updateClip] = useState<ClipType | null>(null);
@@ -43,28 +59,21 @@ const InfoComponent: React.FC = () => {
     return (
         <>
             {clip ? (
-                <div
-                    className={cn(styles.clip, {
-                        [styles["is-active"]]: isActive,
-                    })}
-                >
-                    <div className={styles.clip__inner}>
-                        <figure className={styles.clip__figure}>
-                            <video
+                <Clip active={isActive}>
+                    <ClipInner>
+                        <ClipFigure>
+                            <ClipVideo
                                 src={clip.thumbnailUrl.replace(
                                     "-preview-480x272.jpg",
                                     ".mp4"
                                 )}
-                                className={styles.clip__video}
                                 autoPlay
                                 onEnded={videoFinished}
-                            ></video>
-                        </figure>
-                        <p className={styles.clip__name}>
-                            {clip.broadcasterDisplayName}
-                        </p>
-                    </div>
-                </div>
+                            ></ClipVideo>
+                        </ClipFigure>
+                        <ClipName>{clip.broadcasterDisplayName}</ClipName>
+                    </ClipInner>
+                </Clip>
             ) : (
                 ""
             )}

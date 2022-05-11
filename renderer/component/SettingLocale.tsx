@@ -7,11 +7,22 @@ import Select from "react-select";
 import LocaleState from "../atom/Locale";
 import IsConnectingState from "../atom/IsConnecting";
 
+// Types
+import { DefaultSelectType } from "../../types/DefaultSelect";
+
+// Const
+import { selectStyles } from "../const/selectStyles";
+const languageStyle = selectStyles<DefaultSelectType, false>();
+
 // Utils
 import { request } from "../util/request";
 
 // Const
 import { list as localeList } from "../const/locales";
+
+// Components
+import Section from "../../component/Section";
+import SectionHeader from "../../component/SectionHeader";
 
 const SettingBotComponent: React.FC = () => {
     const intl = useIntl();
@@ -32,18 +43,18 @@ const SettingBotComponent: React.FC = () => {
     );
 
     return (
-        <section className="section">
-            <h2 className="section__header">
+        <Section>
+            <SectionHeader>
                 <FormattedMessage
                     id="Component.SettingLocale.Header"
                     defaultMessage="Language"
                 />
-            </h2>
+            </SectionHeader>
 
             <Select
                 name="language"
                 id="language"
-                classNamePrefix="react-select"
+                styles={languageStyle}
                 defaultValue={defaultLocale.current}
                 options={localeList}
                 onChange={onChangeHandler}
@@ -52,7 +63,7 @@ const SettingBotComponent: React.FC = () => {
                     defaultMessage: "Select...",
                 })}
             />
-        </section>
+        </Section>
     );
 };
 

@@ -4,18 +4,26 @@ import { FormattedMessage } from "react-intl";
 
 // Recoil
 import HostsState from "../atom/Hosts";
-// import LocaleState from "../atom/Locale";
 
 // Component
 import MetaComponent from "../component/Meta";
-import HostRowComponent from "../component/HostRow";
+import HostRow from "../component/HostRow";
+import Container from "../../component/Container";
+import Section from "../../component/Section";
+import SectionLead from "../../component/SectionLead";
+import PageHeader from "../../component/PageHeader";
+import TableResponsive from "../component/TableResponsive";
+import Table from "../component/Table";
+import TableThead from "../component/TableThead";
+import TableRow from "../component/TableRow";
+import TableHead from "../component/TableHead";
+import TableTbody from "../component/TableTbody";
 
 // Util
 import { request } from "../util/request";
 
 const ChattersPage: React.FC = () => {
     const [hosts, updateHosts] = useRecoilState(HostsState);
-    // const locale = useRecoilValue(LocaleState);
 
     useEffect(() => {
         (async () => {
@@ -47,39 +55,27 @@ const ChattersPage: React.FC = () => {
         <>
             <MetaComponent id="Common.Hosts.Name" defaultMessage="Hosts" />
 
-            <div className="page-header">
-                <div className="container-fluid">
-                    <h1 className="page-header__text">
-                        <i className="bi bi-display page-header__icon" />
-                        <FormattedMessage
-                            id="Common.Hosts.Name"
-                            defaultMessage="Hosts"
-                        />
-                    </h1>
-                </div>
-            </div>
+            <PageHeader icon="display">
+                <FormattedMessage
+                    id="Common.Hosts.Name"
+                    defaultMessage="Hosts"
+                />
+            </PageHeader>
 
-            <div className="container-fluid">
-                <section className="section">
-                    <p className="section__lead">
+            <Container>
+                <Section>
+                    <SectionLead>
                         <FormattedMessage
                             id="Common.Hosts.Description"
                             defaultMessage="Display user list that hosted to target channel."
                         />
-                    </p>
-                    <div className="table-responsive">
-                        <table className="table">
-                            <colgroup>
-                                <col />
-                                <col width="100" />
-                                <col width="100" />
-                                <col width="140" />
-                                <col width="30" />
-                                {/* <col width={locale === "ja-jp" ? 180 : 160} /> */}
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th scope="col">
+                    </SectionLead>
+
+                    <TableResponsive>
+                        <Table cols={[null, 100, 100, 140, 30]}>
+                            <TableThead>
+                                <TableRow>
+                                    <TableHead scope="col">
                                         <FormattedMessage
                                             id="Common.Label.Username"
                                             defaultMessage="Username"
@@ -89,42 +85,39 @@ const ChattersPage: React.FC = () => {
                                             id="Common.Label.NickName"
                                             defaultMessage="Nick name"
                                         />
-                                    </th>
-                                    <th scope="col">
+                                    </TableHead>
+                                    <TableHead scope="col">
                                         <FormattedMessage
                                             id="Common.Label.Viewers"
                                             defaultMessage="Viewers"
                                         />
-                                    </th>
-                                    <th scope="col">
+                                    </TableHead>
+                                    <TableHead scope="col">
                                         <FormattedMessage
                                             id="Common.Label.Autoloaded"
                                             defaultMessage="Autoloaded"
                                         />
-                                    </th>
-                                    <th scope="col">
+                                    </TableHead>
+                                    <TableHead scope="col">
                                         <FormattedMessage
                                             id="Common.Label.Created"
                                             defaultMessage="Created"
                                         />
-                                    </th>
-                                    <th scope="col" />
-                                </tr>
-                            </thead>
-                            <tbody>
+                                    </TableHead>
+                                    <TableHead scope="col" />
+                                </TableRow>
+                            </TableThead>
+                            <TableTbody>
                                 {hosts.map((host) => {
                                     return (
-                                        <HostRowComponent
-                                            host={host}
-                                            key={host._id}
-                                        />
+                                        <HostRow host={host} key={host._id} />
                                     );
                                 })}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-            </div>
+                            </TableTbody>
+                        </Table>
+                    </TableResponsive>
+                </Section>
+            </Container>
         </>
     );
 };

@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
+import tw from "twin.macro";
 
 // Type
 import { VersionHistory } from "../../types/VersionHistory";
 
-// Style
-import styles from "./HistoryRow.module.css";
+// Component
+import Section from "../../component/Section";
+import SectionHeader from "../../component/SectionHeader";
+const List = tw.ul`ml-5`;
+const ListItem = tw.li`list-disc`;
 
 type Props = {
     history: VersionHistory;
@@ -27,18 +31,14 @@ const HistoryRowComponent = ({ history, locale }: Props) => {
     }, [locale]);
 
     return (
-        <section className={styles.section}>
-            <h2 className={styles.section__head}>v{history.version}</h2>
-            <ul className={styles.list}>
+        <Section>
+            <SectionHeader>v{history.version}</SectionHeader>
+            <List>
                 {messages.map((message, i) => {
-                    return (
-                        <li key={i} className={styles.list__item}>
-                            {message}
-                        </li>
-                    );
+                    return <ListItem key={i}>{message}</ListItem>;
                 })}
-            </ul>
-        </section>
+            </List>
+        </Section>
     );
 };
 

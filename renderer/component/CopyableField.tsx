@@ -2,7 +2,11 @@ import React from "react";
 import ReactTooltip from "react-tooltip";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { FormattedMessage } from "react-intl";
-import cn from "classnames";
+
+// Components
+import FormGroup from "./FormGroup";
+import FormInputText from "./FormInputText";
+import Button from "../../component/Button";
 
 type Props = {
     text: string;
@@ -11,16 +15,8 @@ type Props = {
 
 const CopyableField: React.FC<Props> = ({ text, isLarge }: Props) => {
     return (
-        <div className="form-control-group">
-            <input
-                type="text"
-                value={text}
-                readOnly
-                className={cn({
-                    "form-control": true,
-                    "is-large": isLarge,
-                })}
-            />
+        <FormGroup>
+            <FormInputText type="text" value={text} readOnly large={isLarge} />
 
             <ReactTooltip
                 place="top"
@@ -31,11 +27,11 @@ const CopyableField: React.FC<Props> = ({ text, isLarge }: Props) => {
                 isCapture
             />
             <CopyToClipboard text={text} onCopy={() => console.log("")}>
-                <button className="btn" data-tip="Copied!">
+                <Button data-tip="Copied!">
                     <FormattedMessage id="Common.Copy" defaultMessage="Copy" />
-                </button>
+                </Button>
             </CopyToClipboard>
-        </div>
+        </FormGroup>
     );
 };
 

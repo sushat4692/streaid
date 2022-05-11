@@ -1,19 +1,21 @@
 import React from "react";
 import { useRecoilState } from "recoil";
 import { FormattedMessage, useIntl } from "react-intl";
-import InputRange from "react-input-range";
 
 // Components
 import CopyableFieldComponent from "./CopyableField";
+import SectionBox from "../../component/SectionBox";
+import SectionSubHeader from "../../component/SectionSubHeader";
+import SectionSubHeaderSmall from "../../component/SectionSubHeaderSmall";
+import FormField from "./FormField";
+import FormFieldLabel from "./FormFieldLabel";
+import FormInputRange from "./FormInputRange";
 
 // Recoil
 import ShoutoutAlertInfoLength from "../atom/ShoutoutAlertInfoLength";
 
 // Util
 import { request } from "../util/request";
-
-// Styles
-import styles from "./SettingShoutoutAlert.module.css";
 
 const SettingShoutoutAlertInfo: React.FC = () => {
     const [infoLength, updateInfoLength] = useRecoilState(
@@ -23,63 +25,65 @@ const SettingShoutoutAlertInfo: React.FC = () => {
 
     return (
         <>
-            <h3 className="section__sub-header">
+            <SectionSubHeader>
                 <FormattedMessage
                     id="Component.SettingShoutOutAlert.Info.Header"
                     defaultMessage="Info"
                 />
 
-                <small className="section__sub-header__small">
+                <SectionSubHeaderSmall>
                     <FormattedMessage
                         id="Component.SettingShoutOutAlert.Info.Descript"
                         defaultMessage="Showing alert the streamer information"
                     />
-                </small>
-            </h3>
+                </SectionSubHeaderSmall>
+            </SectionSubHeader>
 
-            <div className="form-field">
-                <label className="form-field__label">
+            <FormField>
+                <FormFieldLabel>
                     <FormattedMessage
                         id="Common.Label.Command"
                         defaultMessage="Command"
                     />
-                </label>
+                </FormFieldLabel>
 
                 <CopyableFieldComponent text="!so {user_id} info" />
-            </div>
+            </FormField>
 
-            <label className="form-field__label">
-                <FormattedMessage
-                    id="Common.Label.DisplayLength"
-                    defaultMessage="Display Time Length"
-                />
-            </label>
+            <FormField>
+                <FormFieldLabel>
+                    <FormattedMessage
+                        id="Common.Label.DisplayLength"
+                        defaultMessage="Display Time Length"
+                    />
+                </FormFieldLabel>
 
-            <div className={styles.field}>
-                <InputRange
-                    maxValue={60}
-                    minValue={0}
-                    value={infoLength}
-                    formatLabel={(value) =>
-                        `${value}${intl.formatMessage({
-                            id: "Common.Unit.Second",
-                            defaultMessage: "s",
-                        })}`
-                    }
-                    onChange={async (value) => {
-                        updateInfoLength(value as number);
+                <SectionBox>
+                    <FormInputRange
+                        min={0}
+                        max={60}
+                        value={infoLength}
+                        formatLabel={(value) =>
+                            `${value}${intl.formatMessage({
+                                id: "Common.Unit.Second",
+                                defaultMessage: "s",
+                            })}`
+                        }
+                        onChange={async (value) => {
+                            updateInfoLength(value);
 
-                        await request(
-                            "setting:shoutout:alert:length",
-                            {
-                                mode: "info",
-                                value: value as number,
-                            },
-                            null
-                        );
-                    }}
-                ></InputRange>
-            </div>
+                            await request(
+                                "setting:shoutout:alert:length",
+                                {
+                                    mode: "info",
+                                    value: value,
+                                },
+                                null
+                            );
+                        }}
+                    />
+                </SectionBox>
+            </FormField>
         </>
     );
 };

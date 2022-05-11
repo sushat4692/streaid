@@ -78,9 +78,7 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", async () => {
-    if (process.platform !== "darwin") {
-        app.quit();
-    }
+    app.quit();
 });
 
 app.on("activate", () => {
