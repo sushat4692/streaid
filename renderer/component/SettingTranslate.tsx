@@ -3,14 +3,29 @@ import { useSetRecoilState } from "recoil";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
 
+// Type
+import { DefaultSelectType } from "../../types/DefaultSelect";
+
+// Const
+import { selectStyles } from "../const/selectStyles";
+const planStyle = selectStyles<DefaultSelectType, false>();
+
 // Recoil
 import IsConnectingState from "../atom/IsConnecting";
 
-// Components
-import CopyableFieldComponent from "./CopyableField";
-
 // Utils
 import { request } from "../util/request";
+
+// Components
+import CopyableFieldComponent from "./CopyableField";
+import Alert from "../../component/Alert";
+import Row from "./Row";
+import Section from "../../component/Section";
+import SectionHeader from "../../component/SectionHeader";
+import FormField from "./FormField";
+import FormFieldLabel from "./FormFieldLabel";
+import FormFieldHelp from "./FormFieldHelp";
+import FormInputText from "./FormInputText";
 
 const SettingTranslateComponent: React.FC = () => {
     const intl = useIntl();
@@ -19,7 +34,8 @@ const SettingTranslateComponent: React.FC = () => {
     const [apiKey, updateApiKey] = useState("");
     const [defaultPlan, updateDefaultPlan] =
         useState<{ value: "free" | "pro"; label: string }>(null);
-    const [webhookUrl, updateWebhookUrl] = useState("");
+    const [e2jWebhookUrl, updateE2jWebhookUrl] = useState("");
+    const [j2eWebhookUrl, updateJ2eWebhookUrl] = useState("");
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
 
     const options = useRef<{ value: "free" | "pro"; label: string }[]>([
@@ -55,10 +71,17 @@ const SettingTranslateComponent: React.FC = () => {
         []
     );
 
-    const webhookUrlInputChangeHandler = useCallback(
+    const e2jWebhookUrlInputChangeHandler = useCallback(
         async (webhook: string) => {
-            await request("translate:discord:webhook", webhook, "key");
-            updateWebhookUrl(webhook);
+            await request("translate:e2j:discord:webhook", webhook, "key");
+            updateE2jWebhookUrl(webhook);
+        },
+        []
+    );
+    const j2eWebhookUrlInputChangeHandler = useCallback(
+        async (webhook: string) => {
+            await request("translate:j2e:discord:webhook", webhook, "key");
+            updateJ2eWebhookUrl(webhook);
         },
         []
     );
@@ -75,12 +98,19 @@ const SettingTranslateComponent: React.FC = () => {
                 options.current.find((option) => option.value === plan)
             );
 
-            const { webhook } = await request(
-                "translate:discord",
+            const e2jResult = await request(
+                "translate:e2j:discord",
                 {},
                 { webhook: "url" }
             );
-            updateWebhookUrl(webhook);
+            updateE2jWebhookUrl(e2jResult.webhook);
+
+            const j2eResult = await request(
+                "translate:j2e:discord",
+                {},
+                { webhook: "url" }
+            );
+            updateJ2eWebhookUrl(j2eResult.webhook);
 
             updateIsInited(true);
         })();
@@ -88,51 +118,50 @@ const SettingTranslateComponent: React.FC = () => {
 
     return (
         <>
-            <section className="section">
-                <h2 className="section__header">
+            <Section>
+                <SectionHeader>
                     <FormattedMessage
                         id="Component.SettingTranslate.DeepL.Header"
                         defaultMessage="DeepL Translate"
                     />
-                </h2>
+                </SectionHeader>
 
-                <div className="alert">
+                <Alert>
                     <FormattedMessage
                         id="Component.SettingTranslate.DeepL.Descript"
                         defaultMessage="You can use Translation command after copy&paste the DeepL API Key (required signup to DeepL)"
                     />
-                </div>
+                </Alert>
 
-                <div className="row is-col-2">
-                    <div className="form-field">
-                        <label className="form-field__label">
+                <Row col={2}>
+                    <FormField>
+                        <FormFieldLabel>
                             <FormattedMessage
                                 id="Common.Label.ApiKey"
                                 defaultMessage="API Key"
                             />
-                        </label>
+                        </FormFieldLabel>
 
-                        <input
+                        <FormInputText
                             type="text"
-                            className="form-control"
                             value={apiKey}
                             onChange={(e) =>
                                 apiKeyInputChangeHandler(e.target.value)
                             }
                         />
-                    </div>
-                    <div className="form-field">
-                        <label className="form-field__label">
+                    </FormField>
+                    <FormField>
+                        <FormFieldLabel>
                             <FormattedMessage
                                 id="Common.Label.Plan"
                                 defaultMessage="Plan"
                             />
-                        </label>
+                        </FormFieldLabel>
                         {isInited ? (
                             <Select
-                                name="language"
-                                id="language"
-                                classNamePrefix="react-select"
+                                name="plan"
+                                id="plan"
+                                styles={planStyle}
                                 defaultValue={defaultPlan}
                                 options={options.current}
                                 onChange={onSelectChangeHandler}
@@ -144,69 +173,116 @@ const SettingTranslateComponent: React.FC = () => {
                         ) : (
                             ""
                         )}
-                    </div>
-                </div>
+                    </FormField>
+                </Row>
 
-                <div className="form-field">
-                    <label className="form-field__label">
+                <FormField>
+                    <FormFieldLabel>
                         <FormattedMessage
                             id="Common.Label.Command"
                             defaultMessage="Command"
                         />
-                    </label>
+                    </FormFieldLabel>
 
                     <CopyableFieldComponent text='!ts "{sentence}"' />
-                </div>
-            </section>
+                </FormField>
+            </Section>
 
-            <section className="section">
-                <h2 className="section__header">
+            <Section>
+                <SectionHeader>
                     <FormattedMessage
-                        id="Component.SettingTranslate.Dictionary.Header"
-                        defaultMessage="JP to EN Dictionary"
+                        id="Component.SettingTranslate.E2JDictionary.Header"
+                        defaultMessage="EN to JP Dictionary"
                     />
-                </h2>
+                </SectionHeader>
 
-                <div className="alert">
+                <Alert>
                     <FormattedMessage
-                        id="Component.SettingTranslate.Dictionary.Descript"
+                        id="Component.SettingTranslate.E2JDictionary.Descript"
                         defaultMessage="You can get the meaning of word from English to Japanese through the following command"
                     />
-                </div>
+                </Alert>
 
-                <div className="form-field">
-                    <label className="form-field__label">
+                <FormField>
+                    <FormFieldLabel>
                         Discord Webhook URL <small>(Not required)</small>
-                    </label>
+                    </FormFieldLabel>
 
-                    <input
+                    <FormInputText
                         type="text"
-                        className="form-control"
-                        value={webhookUrl}
+                        value={e2jWebhookUrl}
                         onChange={(e) =>
-                            webhookUrlInputChangeHandler(e.target.value)
+                            e2jWebhookUrlInputChangeHandler(e.target.value)
                         }
                     />
 
-                    <small className="form-field__help">
+                    <FormFieldHelp>
                         <FormattedMessage
-                            id="Component.SettingTranslate.Dictionary.Webhook.Help"
+                            id="Component.SettingTranslate.E2JDictionary.Webhook.Help"
                             defaultMessage="* Automatically post your consulted word and the meaning to specific Discord channel"
                         />
-                    </small>
-                </div>
+                    </FormFieldHelp>
+                </FormField>
 
-                <div className="form-field">
-                    <label className="form-field__label">
+                <FormField>
+                    <FormFieldLabel>
                         <FormattedMessage
                             id="Common.Label.Command"
                             defaultMessage="Command"
                         />
-                    </label>
+                    </FormFieldLabel>
 
-                    <CopyableFieldComponent text="!w {word}" />
-                </div>
-            </section>
+                    <CopyableFieldComponent text="!e2j {word}" />
+                </FormField>
+            </Section>
+
+            <Section>
+                <SectionHeader>
+                    <FormattedMessage
+                        id="Component.SettingTranslate.J2EDictionary.Header"
+                        defaultMessage="JP to EN Dictionary"
+                    />
+                </SectionHeader>
+
+                <Alert>
+                    <FormattedMessage
+                        id="Component.SettingTranslate.J2EDictionary.Descript"
+                        defaultMessage="You can get the meaning of word from English to Japanese through the following command"
+                    />
+                </Alert>
+
+                <FormField>
+                    <FormFieldLabel>
+                        Discord Webhook URL <small>(Not required)</small>
+                    </FormFieldLabel>
+
+                    <FormInputText
+                        type="text"
+                        value={j2eWebhookUrl}
+                        onChange={(e) =>
+                            j2eWebhookUrlInputChangeHandler(e.target.value)
+                        }
+                    />
+
+                    <FormFieldHelp>
+                        <FormattedMessage
+                            id="Component.SettingTranslate.J2EDictionary.Webhook.Help"
+                            defaultMessage="* Automatically post your consulted word and the meaning to specific Discord channel"
+                        />
+                    </FormFieldHelp>
+                </FormField>
+
+                <FormField>
+                    <FormFieldLabel>
+                        <FormattedMessage
+                            id="Common.Label.Command"
+                            defaultMessage="Command"
+                        />
+                    </FormFieldLabel>
+
+                    <CopyableFieldComponent text="!j2e {word}" />
+                </FormField>
+            </Section>
         </>
     );
 };

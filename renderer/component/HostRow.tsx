@@ -12,8 +12,11 @@ import HostsState from "../atom/Hosts";
 import { request } from "../util/request";
 
 // Component
-// import UserComponent from "./User";
-// import ShoutOutButtonComponent from "./ShoutOutButton";
+import TableRow from "./TableRow";
+import TableData from "./TableData";
+import ButtonGroup from "../../component/ButtonGroup";
+import Button from "../../component/Button";
+import Icon from "../../component/Icon";
 
 type Props = {
     host: HostType;
@@ -29,29 +32,23 @@ const HostsRowComponent: React.FC<Props> = ({ host }: Props) => {
     }, [host]);
 
     return (
-        <tr>
-            <td scope="row">
-                {/* <UserComponent username={host.username} /> */}
-                {host.username}
-            </td>
-            <td>{host.viewers}</td>
-            <td>{host.autohost ? "true" : "false"}</td>
-            <td>{moment(host.createdAt).format("M/D kk:mm")}</td>
-            <td>
-                <div className="btn-group">
-                    {/* <ShoutOutButtonComponent
-                        className="btn is-small btn-success me-1"
-                        username={host.username}
-                    /> */}
-                    <button
-                        className="btn is-small is-danger"
+        <TableRow>
+            <TableData scope="row">{host.username}</TableData>
+            <TableData>{host.viewers}</TableData>
+            <TableData>{host.autohost ? "true" : "false"}</TableData>
+            <TableData>{moment(host.createdAt).format("M/D kk:mm")}</TableData>
+            <TableData>
+                <ButtonGroup>
+                    <Button
+                        size="small"
+                        color="danger"
                         onClick={deleteClickHandler}
                     >
-                        <i className="bi bi-trash" />
-                    </button>
-                </div>
-            </td>
-        </tr>
+                        <Icon icon="trash" />
+                    </Button>
+                </ButtonGroup>
+            </TableData>
+        </TableRow>
     );
 };
 

@@ -13,7 +13,12 @@ import { request } from "../util/request";
 
 // Component
 import UserComponent from "./User";
-import ShoutOutButtonComponent from "./ShoutOutButton";
+import ShoutOutButton from "./ShoutOutButton";
+import TableRow from "./TableRow";
+import TableData from "./TableData";
+import ButtonGroup from "../../component/ButtonGroup";
+import Button from "../../component/Button";
+import Icon from "../../component/Icon";
 
 type Props = {
     chatter: ChatterType;
@@ -29,27 +34,27 @@ const ChatterRowComponent: React.FC<Props> = ({ chatter }: Props) => {
     }, [chatter]);
 
     return (
-        <tr>
-            <td scope="row">
+        <TableRow>
+            <TableData scope="row">
                 <UserComponent username={chatter.username} />
-            </td>
-            <td>{chatter["display-name"]}</td>
-            <td>{moment(chatter.createdAt).format("M/D kk:mm")}</td>
-            <td>
-                <div className="btn-group">
-                    <ShoutOutButtonComponent
-                        className="btn is-small btn-success"
-                        username={chatter.username}
-                    />
-                    <button
-                        className="btn is-small is-danger"
+            </TableData>
+            <TableData>{chatter["display-name"]}</TableData>
+            <TableData>
+                {moment(chatter.createdAt).format("M/D kk:mm")}
+            </TableData>
+            <TableData>
+                <ButtonGroup>
+                    <ShoutOutButton size="small" username={chatter.username} />
+                    <Button
+                        size="small"
+                        color="danger"
                         onClick={deleteClickHandler}
                     >
-                        <i className="bi bi-trash" />
-                    </button>
-                </div>
-            </td>
-        </tr>
+                        <Icon icon="trash" />
+                    </Button>
+                </ButtonGroup>
+            </TableData>
+        </TableRow>
     );
 };
 

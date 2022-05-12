@@ -1,10 +1,21 @@
 import { defineConfig } from "vite";
-import reactRefresh from "@vitejs/plugin-react-refresh";
+import react from "@vitejs/plugin-react";
+import macrosPlugin from "vite-plugin-babel-macros";
 import { resolve } from "path";
 
 export default defineConfig({
     base: "./",
-    plugins: [reactRefresh()],
+    plugins: [
+        // reactRefresh(),
+        // twstyled(),
+        macrosPlugin(),
+        react({
+            // jsxImportSource: "@emotion/react",
+            babel: {
+                plugins: ["@emotion/babel-plugin"],
+            },
+        }),
+    ],
 
     build: {
         rollupOptions: {

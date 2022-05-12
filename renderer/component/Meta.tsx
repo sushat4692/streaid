@@ -16,7 +16,7 @@ const MetaComponent: React.FC<Props> = ({ id, defaultMessage }: Props) => {
                 id ? intl.formatMessage({ id, defaultMessage }) + " - " : ""
             }${intl.formatMessage({
                 id: "Common.Title",
-                defaultMessage: "Twitch Support Tool",
+                defaultMessage: "Streaid",
             })}`}</title>
         </Helmet>
     );

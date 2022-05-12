@@ -1,0 +1,21 @@
+@tailwind base;
+
+:root {
+    --color-text: #333;
+    --color-primary: #8c45f7;
+    --color-primary--hover: #7d2df6;
+    --size-left-nav-width: 240px;
+}
+
+/**
+ * Overwrite
+ */
+body {
+    @apply bg-white dark:bg-gray-800 text-gray-800 dark:text-white;
+}
+
+input,
+select,
+textarea {
+    @apply text-black;
+}

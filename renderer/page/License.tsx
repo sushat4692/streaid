@@ -1,15 +1,27 @@
 /* eslint-disable react/no-unescaped-entities */
 import React, { useRef } from "react";
 import { FormattedMessage } from "react-intl";
+import tw from "twin.macro";
+import styled from "@emotion/styled";
 
 // Component
-import MetaComponent from "../component/Meta";
+import Meta from "../component/Meta";
+import PageHeader from "../../component/PageHeader";
+import Container from "../../component/Container";
+import Section from "../../component/Section";
+import SectionHeader from "../../component/SectionHeader";
+import SectionDesc from "../../component/SectionDesc";
+const List = tw.ul``;
+const ListItem = styled.li([
+    tw`break-words`,
+    {
+        [`& + &`]: tw`mt-2 pt-2 border-t border-dotted border-gray-300 dark:border-gray-500`,
+    },
+]);
+const ListSmall = tw.small`text-sm opacity-70`;
 
 // Const
 import licenses from "../const/licenses";
-
-// Styles
-import styles from "./License.module.css";
 
 const LicensePage: React.FC = () => {
     const displayLicenses = useRef(
@@ -20,87 +32,86 @@ const LicensePage: React.FC = () => {
 
     return (
         <>
-            <MetaComponent id="Common.License.Name" defaultMessage="License" />
+            <Meta id="Common.License.Name" defaultMessage="License" />
 
-            <div className="page-header">
-                <div className="container-fluid">
-                    <h1 className="page-header__text">
-                        <i className="bi bi-book page-header__icon" />
-                        <FormattedMessage
-                            id="Common.License.Name"
-                            defaultMessage="License"
-                        />
-                    </h1>
-                </div>
-            </div>
+            <PageHeader icon="book">
+                <FormattedMessage
+                    id="Common.License.Name"
+                    defaultMessage="License"
+                />
+            </PageHeader>
 
-            <div className="container-fluid">
-                <section className="section">
-                    <h2 className="section__header">MIT License</h2>
+            <Container>
+                <Section>
+                    <SectionHeader>MIT License</SectionHeader>
 
-                    <p className="section__desc">
+                    <SectionDesc>
                         Copyright (c) 2021 SUSH (Satoshi Ukai)
-                    </p>
+                    </SectionDesc>
 
-                    <p className="section__desc">
+                    <SectionDesc>
                         <FormattedMessage
                             id="Page.License.MIT1"
                             defaultMessage='Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:'
                         />
-                    </p>
+                    </SectionDesc>
 
-                    <p className="section__desc">
+                    <SectionDesc>
                         <FormattedMessage
                             id="Page.License.MIT2"
                             defaultMessage="The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software."
                         />
-                    </p>
+                    </SectionDesc>
 
-                    <p className="section__desc">
+                    <SectionDesc>
                         <FormattedMessage
                             id="Page.License.MIT3"
                             defaultMessage='THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'
                         />
-                    </p>
-                </section>
+                    </SectionDesc>
+                </Section>
 
-                <section className="section">
-                    <h2 className="section__header">
+                <Section>
+                    <SectionHeader>
                         <FormattedMessage
                             id="Page.License.ThankYou"
                             defaultMessage="Thank you for developers of dependency libraries"
                         />
-                    </h2>
+                    </SectionHeader>
 
-                    <ul className={styles.list}>
+                    <List>
                         {displayLicenses.current.map((license) => {
                             return (
-                                <li
-                                    className={styles.list__item}
-                                    key={license.name}
-                                >
+                                <ListItem key={license.name}>
                                     {license.name} ({license.licenseType})
                                     {license.author
                                         ? ` by ${license.author}`
                                         : ""}
                                     <br />
-                                    <small className={styles.list__small}>
-                                        {license.link}
-                                    </small>
-                                </li>
+                                    <ListSmall>{license.link}</ListSmall>
+                                </ListItem>
                             );
                         })}
-                        <li className={styles.list__item}>
+                        <ListItem>
                             English-Japanese Dictionary "ejdict-hand" (Public
                             Domain CC0) by kujirahand
                             <br />
-                            <small className={styles.list__small}>
+                            <ListSmall>
                                 https://github.com/kujirahand/EJDict
-                            </small>
-                        </li>
-                    </ul>
-                </section>
-            </div>
+                            </ListSmall>
+                        </ListItem>
+                        <ListItem>
+                            Japanese DB is a utility for generating a Japanese
+                            dictionary SQLite database from open-source
+                            materials. (MPL-2.0) by Ezzat Chamudi
+                            <br />
+                            <ListSmall>
+                                https://github.com/echamudi/japanese-toolkit
+                            </ListSmall>
+                        </ListItem>
+                    </List>
+                </Section>
+            </Container>
         </>
     );
 };

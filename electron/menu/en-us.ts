@@ -33,16 +33,14 @@ const template: (MenuItem | MenuItemConstructorOptions)[] = [
             {
                 label: "Learn More",
                 click: async () => {
-                    await shell.openExternal(
-                        "https://twitch-support-tool-docs.vercel.app"
-                    );
+                    await shell.openExternal("https://streaid.vercel.app");
                 },
             },
             {
                 label: "Issue report",
                 click: async () => {
                     await shell.openExternal(
-                        "https://github.com/sushat4692/twitch-support-tool/issues"
+                        "https://github.com/sushat4692/streaid/issues"
                     );
                 },
             },

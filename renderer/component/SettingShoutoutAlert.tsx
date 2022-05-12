@@ -1,17 +1,25 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import cn from "classnames";
+import tw from "twin.macro";
 
 // Components
-import SettingShoutoutAlertInfoComponent from "./SettingShoutoutAlertInfo";
-import SettingShoutoutAlertClipComponent from "./SettingShoutoutAlertClip";
+import SettingShoutoutAlertInfo from "./SettingShoutoutAlertInfo";
+import SettingShoutoutAlertClip from "./SettingShoutoutAlertClip";
 import CopyableFieldComponent from "./CopyableField";
+import Section from "../../component/Section";
+import SectionHeader from "../../component/SectionHeader";
+import SectionSubHeader from "../../component/SectionSubHeader";
+import SectionSubHeaderSmall from "../../component/SectionSubHeaderSmall";
+import FormField from "./FormField";
+import FormFieldLabel from "./FormFieldLabel";
+import FormGroup from "./FormGroup";
+import FormInputText from "./FormInputText";
+import Button from "../../component/Button";
+import Alert from "../../component/Alert";
+const Connect = tw.div`mb-2`;
 
 // Utils
 import { request } from "../util/request";
-
-// Styles
-import styles from "./SettingShoutoutAlert.module.css";
 
 const SettingShoutoutAlert: React.FC = () => {
     const [isConnected, updateIsConnected] = useState(false);
@@ -76,76 +84,70 @@ const SettingShoutoutAlert: React.FC = () => {
 
     return (
         <>
-            <section className="section">
-                <h2 className="section__header">
+            <Section>
+                <SectionHeader>
                     <FormattedMessage
                         id="Component.SettingShoutOutAlert.URL.Header"
                         defaultMessage="Shoutout Alert"
                     />
-                </h2>
+                </SectionHeader>
 
-                <div className="form-field">
-                    <label className="form-field__label">
+                <FormField>
+                    <FormFieldLabel>
                         <FormattedMessage
                             id="Component.SettingShoutOutAlert.Port.Http.Label"
                             defaultMessage="HTTP Port (For embed URL for OBS)"
                         />
-                    </label>
+                    </FormFieldLabel>
 
-                    <div className="form-control-group">
-                        <input
+                    <FormGroup>
+                        <FormInputText
                             type="text"
-                            className="form-control"
                             value={httpPort}
                             onChange={(e) =>
                                 updateHttpPort(parseInt(e.target.value, 10))
                             }
                         />
 
-                        <button className="btn" onClick={submitHttpPort}>
+                        <Button onClick={submitHttpPort}>
                             <FormattedMessage
                                 id="Common.Apply"
                                 defaultMessage="Apply"
                             />
-                        </button>
-                    </div>
-                </div>
+                        </Button>
+                    </FormGroup>
+                </FormField>
 
-                <div className="form-field">
-                    <label className="form-field__label">
+                <FormField>
+                    <FormFieldLabel>
                         <FormattedMessage
                             id="Component.SettingShoutOutAlert.Port.Socket.Label"
                             defaultMessage="Socket Port"
                         />
-                    </label>
+                    </FormFieldLabel>
 
-                    <div className="form-control-group">
-                        <input
+                    <FormGroup>
+                        <FormInputText
                             type="text"
-                            className="form-control"
                             value={socketPort}
                             onChange={(e) =>
                                 updateSocketPort(parseInt(e.target.value, 10))
                             }
                         />
 
-                        <button className="btn" onClick={submitSocketPort}>
+                        <Button onClick={submitSocketPort}>
                             <FormattedMessage
                                 id="Common.Apply"
                                 defaultMessage="Apply"
                             />
-                        </button>
-                    </div>
-                </div>
+                        </Button>
+                    </FormGroup>
+                </FormField>
 
-                <div className={styles.connect}>
-                    <button
-                        className={cn({
-                            btn: true,
-                            "is-large": true,
-                            "is-primary": !isConnected,
-                            "is-danger": isConnected,
-                        })}
+                <Connect>
+                    <Button
+                        size="large"
+                        color={isConnected ? "danger" : "primary"}
                         onClick={toggleAlertServer}
                     >
                         {isConnected
@@ -157,42 +159,42 @@ const SettingShoutoutAlert: React.FC = () => {
                                   id: "Component.SettingShoutOutAlert.Server.Start",
                                   defaultMessage: "Start Alert Server",
                               })}
-                    </button>
-                </div>
-            </section>
+                    </Button>
+                </Connect>
+            </Section>
 
-            <section className="section">
-                <h3 className="section__sub-header">
+            <Section>
+                <SectionSubHeader>
                     <FormattedMessage
                         id="Component.SettingShoutOutAlert.Port.Http.Header"
                         defaultMessage="Embed"
                     />
 
-                    <small className="section__sub-header__small">
+                    <SectionSubHeaderSmall>
                         <FormattedMessage
                             id="Component.SettingShoutOutAlert.Port.Http.Descript"
                             defaultMessage="Embed information to Streaming Tool"
                         />
-                    </small>
-                </h3>
+                    </SectionSubHeaderSmall>
+                </SectionSubHeader>
 
-                <div className="alert">
+                <Alert>
                     <FormattedMessage
                         id="Component.SettingShoutOutAlert.URL.Descript"
                         defaultMessage='Please copy & Pase the following URL and embed "Browser" to your streaming tool (e.g. OBS)'
                     />
-                </div>
+                </Alert>
 
                 <CopyableFieldComponent
                     text={`http://localhost:${specifiedHttpPort}/?socket=${specifiedSocketPort}`}
                     isLarge
                 ></CopyableFieldComponent>
-            </section>
+            </Section>
 
-            <section className="section">
-                <SettingShoutoutAlertInfoComponent></SettingShoutoutAlertInfoComponent>
-                <SettingShoutoutAlertClipComponent></SettingShoutoutAlertClipComponent>
-            </section>
+            <Section>
+                <SettingShoutoutAlertInfo></SettingShoutoutAlertInfo>
+                <SettingShoutoutAlertClip></SettingShoutoutAlertClip>
+            </Section>
         </>
     );
 };

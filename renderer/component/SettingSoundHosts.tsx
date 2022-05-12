@@ -1,7 +1,6 @@
 import React from "react";
 import { useRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
-import InputRange from "react-input-range";
 
 // Recoil
 import SoundHostVolumeState from "../atom/SoundHostVolume";
@@ -10,8 +9,18 @@ import SoundHostVolumeState from "../atom/SoundHostVolume";
 import { useSound } from "../util/sound";
 import { request } from "../util/request";
 
-// Styles
-import styles from "./SettingSound.module.css";
+// Components
+import FormInputRange from "./FormInputRange";
+import SectionSubHeader from "../../component/SectionSubHeader";
+import SectionSubHeaderSmall from "../../component/SectionSubHeaderSmall";
+import SettingRow from "./SettingRow";
+import SettingRowButton from "./SettingRowButton";
+import SettingRowField from "./SettingRowField";
+import SettingRowFieldAction from "./SettingRowFieldAction";
+import SettingRowFieldActionButton from "./SettingRowFieldActionButton";
+import FormFieldLabel from "./FormFieldLabel";
+import Button from "../../component/Button";
+import ButtonIcon from "../../component/ButtonIcon";
 
 const SettingSoundHostsComponent: React.FC = () => {
     const [hostVolume, updateHostVolume] = useRecoilState(SoundHostVolumeState);
@@ -19,72 +28,69 @@ const SettingSoundHostsComponent: React.FC = () => {
 
     return (
         <>
-            <h3 className="section__sub-header">
+            <SectionSubHeader>
                 <FormattedMessage
                     id="Common.Hosts.Name"
                     defaultMessage="Hosts"
                 />
 
-                <small className="section__sub-header__small">
+                <SectionSubHeaderSmall>
                     <FormattedMessage
                         id="Component.SettingSoundHosts.Descript"
                         defaultMessage="Play selected sound per hosts"
                     />
-                </small>
-            </h3>
-            <div className={styles.row}>
-                <div className={styles.row__button}>
-                    <button
-                        className="btn btn-success"
-                        onClick={selectFileHandler()}
-                    >
-                        <i className="bi bi-save me-2" />
+                </SectionSubHeaderSmall>
+            </SectionSubHeader>
+            <SettingRow>
+                <SettingRowButton>
+                    <Button onClick={selectFileHandler()}>
+                        <ButtonIcon icon="save" />
                         <FormattedMessage
                             id="Common.Label.SelectFile"
                             defaultMessage="Select File"
                         />
-                    </button>
-                </div>
+                    </Button>
+                </SettingRowButton>
 
-                <div className={styles.row__field}>
-                    <label className="form-field__label">
+                <SettingRowField>
+                    <FormFieldLabel>
                         <FormattedMessage
                             id="Common.Label.Volume"
                             defaultMessage="Volume"
                         />
-                    </label>
+                    </FormFieldLabel>
 
-                    <div className={styles.row__field__action}>
-                        <button
-                            className={`btn btn-link ${styles.row__field__action__button}`}
+                    <SettingRowFieldAction>
+                        <SettingRowFieldActionButton
                             onClick={playFileHandler()}
                         >
-                            <i className="bi bi-play-circle" />
-                        </button>
-                        <InputRange
-                            minValue={0}
-                            maxValue={1}
+                            <ButtonIcon icon="play-circle" only />
+                        </SettingRowFieldActionButton>
+
+                        <FormInputRange
+                            min={0}
+                            max={1}
                             step={0.01}
                             value={hostVolume}
                             formatLabel={(value) =>
                                 `${Math.floor(value * 100)}%`
                             }
                             onChange={async (value) => {
-                                updateHostVolume(value as number);
+                                updateHostVolume(value);
 
                                 await request(
                                     "setting:notification:volume",
                                     {
                                         mode: "host_volume",
-                                        value: value as number,
+                                        value: value,
                                     },
                                     null
                                 );
                             }}
                         />
-                    </div>
-                </div>
-            </div>
+                    </SettingRowFieldAction>
+                </SettingRowField>
+            </SettingRow>
         </>
     );
 };

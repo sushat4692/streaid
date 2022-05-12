@@ -1,20 +1,40 @@
 import React, { useCallback, useRef, useState } from "react";
-import Modal from "react-modal";
 import { useSetRecoilState } from "recoil";
 import { FormattedMessage, useIntl } from "react-intl";
-import TextareaAutosize from "react-textarea-autosize";
 import moment from "moment";
 import Select from "react-select";
 
 // Types
 import { CommandType } from "../../types/Command";
 import { CommandAllowType } from "../../types/CommandAllow";
+import { DefaultSelectType } from "../../types/DefaultSelect";
+
+// Const
+import { selectStyles } from "../const/selectStyles";
+const commandStyle = selectStyles<DefaultSelectType, false>();
 
 // Recoil
 import CommandsState from "../atom/Commands";
 
 // Utility
 import { request } from "../util/request";
+
+// Components
+import TableRow from "./TableRow";
+import TableData from "./TableData";
+import ButtonGroup from "../../component/ButtonGroup";
+import Button from "../../component/Button";
+import Modal from "./Modal";
+import ModalHead from "./ModalHead";
+import ModalBody from "./ModalBody";
+import ModalFoot from "./ModalFoot";
+import FormField from "./FormField";
+import FormFieldLabel from "./FormFieldLabel";
+import FormTextareaAutosize from "./FormTextareaAutosize";
+import FormGroup from "./FormGroup";
+import FormGroupLabel from "./FormGroupLabel";
+import FormInputText from "./FormInputText";
+import Icon from "../../component/Icon";
 
 type Props = {
     command: CommandType;
@@ -135,107 +155,95 @@ const CommandRowComponent: React.FC<Props> = ({ command }: Props) => {
     );
 
     return (
-        <tr>
-            <td>!{command.command}</td>
-            <td>
+        <TableRow>
+            <TableData>!{command.command}</TableData>
+            <TableData>
                 <FormattedMessage id={`Component.Command.${command.allow}`} />
-            </td>
-            <td>{moment(command.createdAt).format("M/D kk:mm")}</td>
-            <td>
-                <div className="btn-group">
-                    <button className="btn is-small" onClick={openHandler}>
-                        <i className="bi bi-pencil" />
-                    </button>
+            </TableData>
+            <TableData>
+                {moment(command.createdAt).format("M/D kk:mm")}
+            </TableData>
+            <TableData>
+                <ButtonGroup>
+                    <Button size="small" onClick={openHandler}>
+                        <Icon icon="pencil" />
+                    </Button>
 
-                    <button
-                        className="btn is-small is-danger"
+                    <Button
+                        size="small"
+                        color="danger"
                         onClick={deleteClickHandler}
                     >
-                        <i className="bi bi-trash" />
-                    </button>
-                </div>
+                        <Icon icon="trash" />
+                    </Button>
+                </ButtonGroup>
 
-                <Modal
-                    isOpen={isOpen}
-                    className="modal"
-                    overlayClassName="overlay"
-                >
+                <Modal isOpen={isOpen}>
                     <form tabIndex={-1} onSubmit={onSubmitHandler}>
-                        <div className="modal__head">
-                            <h5 className="modal-title">{command.command}</h5>
-                            <button
-                                type="button"
-                                className="modal__close"
-                                aria-label="Close"
-                                onClick={closeHandler}
-                            />
-                        </div>
-                        <div className="modal__body">
-                            <div className="form-field">
-                                <label className="form-field__label">
+                        <ModalHead onClose={closeHandler}>
+                            <h5>{command.command}</h5>
+                        </ModalHead>
+                        <ModalBody>
+                            <FormField>
+                                <FormFieldLabel>
                                     <FormattedMessage
                                         id="Common.Label.Command"
                                         defaultMessage="Command"
                                     />
-                                </label>
+                                </FormFieldLabel>
 
-                                <div className="form-control-group">
-                                    <span className="form-control-group__label">
-                                        !
-                                    </span>
-                                    <input
+                                <FormGroup>
+                                    <FormGroupLabel>!</FormGroupLabel>
+                                    <FormInputText
                                         type="text"
-                                        className="form-control"
                                         value={inputCommand}
                                         onChange={(e) => {
                                             updateInputCommand(e.target.value);
                                         }}
                                     />
-                                </div>
-                            </div>
+                                </FormGroup>
+                            </FormField>
 
-                            <div className="form-field">
-                                <label className="form-field__label">
+                            <FormField>
+                                <FormFieldLabel>
                                     <FormattedMessage
                                         id="Common.Label.Body"
                                         defaultMessage="Body"
                                     />
-                                </label>
-                                <TextareaAutosize
-                                    className="form-control"
+                                </FormFieldLabel>
+                                <FormTextareaAutosize
                                     value={inputBody}
                                     onChange={(e) => {
                                         updateInputBody(e.target.value);
                                     }}
                                 />
-                            </div>
+                            </FormField>
 
-                            <div className="form-field">
-                                <label className="form-field__label">
+                            <FormField>
+                                <FormFieldLabel>
                                     <FormattedMessage
                                         id="Common.Label.Memo"
                                         defaultMessage="Memo"
                                     />
-                                </label>
-                                <TextareaAutosize
-                                    className="form-control"
+                                </FormFieldLabel>
+                                <FormTextareaAutosize
                                     value={inputMemo}
                                     onChange={(e) => {
                                         updateInputMemo(e.target.value);
                                     }}
                                 />
-                            </div>
+                            </FormField>
 
-                            <div className="form-field">
-                                <label className="form-field__label">
+                            <FormField>
+                                <FormFieldLabel>
                                     <FormattedMessage
                                         id="Common.Label.Priviledge"
                                         defaultMessage="Priviledge"
                                     />
-                                </label>
+                                </FormFieldLabel>
 
                                 <Select
-                                    classNamePrefix="react-select"
+                                    styles={commandStyle}
                                     defaultValue={defaultLocale.current}
                                     options={allowOptions.current}
                                     onChange={(e) =>
@@ -248,30 +256,26 @@ const CommandRowComponent: React.FC<Props> = ({ command }: Props) => {
                                         defaultMessage: "Select...",
                                     })}
                                 ></Select>
-                            </div>
-                        </div>
-                        <div className="modal__foot">
-                            <button
-                                type="button"
-                                className="btn btn-secondary"
-                                onClick={closeHandler}
-                            >
+                            </FormField>
+                        </ModalBody>
+                        <ModalFoot>
+                            <Button type="button" onClick={closeHandler}>
                                 <FormattedMessage
                                     id="Common.Close"
                                     defaultMessage="Close"
                                 />
-                            </button>
-                            <button type="submit" className="btn is-primary">
+                            </Button>
+                            <Button color="primary" type="submit">
                                 <FormattedMessage
                                     id="Common.Submit"
                                     defaultMessage="Submit"
                                 />
-                            </button>
-                        </div>
+                            </Button>
+                        </ModalFoot>
                     </form>
                 </Modal>
-            </td>
-        </tr>
+            </TableData>
+        </TableRow>
     );
 };
 

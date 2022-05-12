@@ -12,6 +12,13 @@ import ChannelTitleState from "../atom/ChannelTitle";
 import ChannelGameState from "../atom/ChannelGame";
 import ChannelLanguageState from "../atom/ChannelLanguage";
 
+// Components
+import TableRow from "./TableRow";
+import TableData from "./TableData";
+import ButtonGroup from "../../component/ButtonGroup";
+import Button from "../../component/Button";
+import Icon from "../../component/Icon";
+
 // Utility
 import { request } from "../util/request";
 
@@ -51,31 +58,31 @@ const ChannelTemplateRowComponent: React.FC<Props> = ({
     }, [channelTemplate]);
 
     return (
-        <tr>
-            <td scope="row">{channelTemplate.title}</td>
-            <td>{channelTemplate.gameName}</td>
-            <td>{getLabel(channelTemplate.language)}</td>
-            <td>{moment(channelTemplate.createdAt).format("M/D kk:mm")}</td>
-            <td>
-                <div className="btn-group">
-                    <button
-                        className="btn is-small is-primary me-2"
+        <TableRow>
+            <TableData scope="row">{channelTemplate.title}</TableData>
+            <TableData>{channelTemplate.gameName}</TableData>
+            <TableData>{getLabel(channelTemplate.language)}</TableData>
+            <TableData>
+                {moment(channelTemplate.createdAt).format("M/D kk:mm")}
+            </TableData>
+            <TableData>
+                <ButtonGroup>
+                    <Button
+                        size="small"
+                        color="primary"
                         onClick={updateClickHandler}
                     >
                         <FormattedMessage
                             id="Common.Apply"
                             defaultMessage="Apply"
                         />
-                    </button>
-                    <button
-                        className="btn is-small is-danger"
-                        onClick={deleteClickHandler}
-                    >
-                        <i className="bi bi-trash" />
-                    </button>
-                </div>
-            </td>
-        </tr>
+                    </Button>
+                    <Button size="small" onClick={deleteClickHandler}>
+                        <Icon icon="trash" />
+                    </Button>
+                </ButtonGroup>
+            </TableData>
+        </TableRow>
     );
 };
 

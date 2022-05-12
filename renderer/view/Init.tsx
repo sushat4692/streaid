@@ -2,22 +2,37 @@ import React, { useCallback, useRef } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
+import tw from "twin.macro";
+import styled from "@emotion/styled";
+
+// Types
+import { DefaultSelectType } from "../../types/DefaultSelect";
+
+// Const
+import { selectStyles } from "../const/selectStyles";
+const localeStyle = selectStyles<DefaultSelectType, false>();
 
 // Recoil
 import LocaleState from "../atom/Locale";
 import IsInitedState from "../atom/IsInited";
 
 // Component
-import MetaComponent from "../component/Meta";
+import Meta from "../component/Meta";
+import Container from "../../component/Container";
+import Button from "../../component/Button";
+import Icon from "../../component/Icon";
+const Wrapper = tw.section`min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8`;
+const Title = tw.h1`font-bold text-2xl md:text-5xl py-4 mb-4 text-center`;
+const TitleIcon = styled(Icon)(tw`mr-2 text-4xl md:text-7xl`);
+const Form = tw.div`w-full max-w-xs mx-auto`;
+const FormLabel = tw.h2`font-extrabold text-xl md:text-3xl mb-4 text-center`;
+const FormSelect = tw.div`mb-6`;
 
 // Utils
 import { request } from "../util/request";
 
 // Const
 import { list as localeList } from "../const/locales";
-
-// Style
-import styles from "./Init.module.css";
 
 const InitComponent: React.FC = () => {
     const intl = useIntl();
@@ -39,32 +54,32 @@ const InitComponent: React.FC = () => {
     }, []);
 
     return (
-        <div className="container-fluid">
-            <MetaComponent />
+        <Container>
+            <Meta />
 
-            <section className={styles.wrap}>
+            <Wrapper>
                 <div>
-                    <h2 className={styles.title}>
-                        <i className={`bi bi-twitch ${styles.title__icon}`} />
+                    <Title>
+                        <TitleIcon icon={`twitch`} />
                         <FormattedMessage
                             id="Common.Title"
-                            defaultMessage="Twitch Support Tool"
+                            defaultMessage="Streaid"
                         />
-                    </h2>
+                    </Title>
 
-                    <div className={styles.form}>
-                        <h2 className={styles.form__label}>
+                    <Form>
+                        <FormLabel>
                             <FormattedMessage
                                 id="View.Init.Header"
                                 defaultMessage="Signin to Twitch"
                             />
-                        </h2>
+                        </FormLabel>
 
-                        <div className={styles.form__select}>
+                        <FormSelect>
                             <Select
-                                name="language"
-                                id="language"
-                                classNamePrefix="react-select"
+                                name="locale"
+                                id="locale"
+                                styles={localeStyle}
                                 defaultValue={defaultLocale.current}
                                 options={localeList}
                                 onChange={updateLocaleHandler}
@@ -73,21 +88,23 @@ const InitComponent: React.FC = () => {
                                     defaultMessage: "Select...",
                                 })}
                             />
-                        </div>
+                        </FormSelect>
 
-                        <button
-                            className="btn is-block is-large is-primary"
+                        <Button
+                            block
+                            size="large"
+                            color="primary"
                             onClick={clickHandler}
                         >
                             <FormattedMessage
                                 id="Common.SignIn"
                                 defaultMessage="Signin"
                             />
-                        </button>
-                    </div>
+                        </Button>
+                    </Form>
                 </div>
-            </section>
-        </div>
+            </Wrapper>
+        </Container>
     );
 };
 
