@@ -8,7 +8,17 @@ import LocaleState from "../atom/Locale";
 
 // Component
 import MetaComponent from "../component/Meta";
-import ChatterRowComponent from "../component/ChatterRow";
+import ChatterRow from "../component/ChatterRow";
+import Container from "../../component/Container";
+import Section from "../../component/Section";
+import SectionLead from "../../component/SectionLead";
+import PageHeader from "../../component/PageHeader";
+import TableResponsive from "../component/TableResponsive";
+import Table from "../component/Table";
+import TableThead from "../component/TableThead";
+import TableRow from "../component/TableRow";
+import TableHead from "../component/TableHead";
+import TableTbody from "../component/TableTbody";
 
 // Util
 import { request } from "../util/request";
@@ -48,38 +58,34 @@ const ChattersPage: React.FC = () => {
                 defaultMessage="Chatters"
             />
 
-            <div className="page-header">
-                <div className="container-fluid">
-                    <h1 className="page-header__text">
-                        <i className="bi bi-chat page-header__icon" />
-                        <FormattedMessage
-                            id="Common.Chatters.Name"
-                            defaultMessage="Chatters"
-                        />
-                    </h1>
-                </div>
-            </div>
+            <PageHeader icon="chat">
+                <FormattedMessage
+                    id="Common.Chatters.Name"
+                    defaultMessage="Chatters"
+                />
+            </PageHeader>
 
-            <div className="container-fluid">
-                <section className="section">
-                    <p className="section__lead">
+            <Container>
+                <Section>
+                    <SectionLead>
                         <FormattedMessage
                             id="Common.Chatters.Description"
                             defaultMessage="Display user list that comment to target channel."
                         />
-                    </p>
+                    </SectionLead>
 
-                    <div className="table-responsive">
-                        <table className="table">
-                            <colgroup>
-                                <col />
-                                <col />
-                                <col width="140" />
-                                <col width={locale === "ja-jp" ? 180 : 160} />
-                            </colgroup>
-                            <thead>
-                                <tr>
-                                    <th scope="col">
+                    <TableResponsive>
+                        <Table
+                            cols={[
+                                null,
+                                null,
+                                140,
+                                locale === "ja-jp" ? 180 : 160,
+                            ]}
+                        >
+                            <TableThead>
+                                <TableRow>
+                                    <TableHead scope="col">
                                         <FormattedMessage
                                             id="Common.Label.Username"
                                             defaultMessage="Username"
@@ -89,36 +95,36 @@ const ChattersPage: React.FC = () => {
                                             id="Common.Label.NickName"
                                             defaultMessage="Nick name"
                                         />
-                                    </th>
-                                    <th scope="col">
+                                    </TableHead>
+                                    <TableHead scope="col">
                                         <FormattedMessage
                                             id="Common.Label.Displayname"
                                             defaultMessage="Displayname"
                                         />
-                                    </th>
-                                    <th scope="col">
+                                    </TableHead>
+                                    <TableHead scope="col">
                                         <FormattedMessage
                                             id="Common.Label.Created"
                                             defaultMessage="Created"
                                         />
-                                    </th>
-                                    <th scope="col" />
-                                </tr>
-                            </thead>
-                            <tbody>
+                                    </TableHead>
+                                    <TableHead scope="col" />
+                                </TableRow>
+                            </TableThead>
+                            <TableTbody>
                                 {chatters.map((chatter) => {
                                     return (
-                                        <ChatterRowComponent
+                                        <ChatterRow
                                             chatter={chatter}
                                             key={chatter._id}
                                         />
                                     );
                                 })}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-            </div>
+                            </TableTbody>
+                        </Table>
+                    </TableResponsive>
+                </Section>
+            </Container>
         </>
     );
 };

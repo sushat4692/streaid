@@ -11,6 +11,18 @@ import IsConnectingState from "../atom/IsConnecting";
 // Utils
 import { request } from "../util/request";
 
+// Components
+import Section from "../../component/Section";
+import SectionHeader from "../../component/SectionHeader";
+import Row from "./Row";
+import FormField from "./FormField";
+import FormFieldLabel from "./FormFieldLabel";
+import FormInputText from "./FormInputText";
+import FormFieldHelp from "./FormFieldHelp";
+import FormFieldAction from "./FormFieldAction";
+import Button from "../../component/Button";
+import ButtonIcon from "../../component/ButtonIcon";
+
 const SettingBotComponent: React.FC = () => {
     const username = useRecoilValue(SettingUsernameState);
     const [channel, updateChannel] = useRecoilState(SettingChannelState);
@@ -39,65 +51,63 @@ const SettingBotComponent: React.FC = () => {
     }, []);
 
     return (
-        <section className="section">
-            <h2 className="section__header">
+        <Section>
+            <SectionHeader>
                 <FormattedMessage
                     id="Component.SettingBot.Header"
                     defaultMessage="Target Channel"
                 />
-            </h2>
+            </SectionHeader>
 
-            <div className="row is-col-2">
-                <div className="form-field">
-                    <label htmlFor="username" className="form-field__label">
+            <Row col={2}>
+                <FormField>
+                    <FormFieldLabel htmlFor="username">
                         <FormattedMessage
                             id="Common.Label.Username"
                             defaultMessage="Username"
                         />
-                    </label>
-                    <input
+                    </FormFieldLabel>
+                    <FormInputText
                         type="text"
                         name="username"
                         id="username"
-                        className="form-control"
                         value={username}
                         readOnly
                     />
-                </div>
-                <div className="form-field">
-                    <label htmlFor="channel" className="form-field__label">
+                </FormField>
+                <FormField>
+                    <FormFieldLabel htmlFor="channel">
                         <FormattedMessage
                             id="Common.Label.Channel"
                             defaultMessage="Channel"
                         />
-                    </label>
-                    <input
+                    </FormFieldLabel>
+                    <FormInputText
                         type="text"
                         name="channel"
                         id="channel"
-                        className="form-control"
                         value={channel}
                         onChange={(e) => updateChannel(e.target.value)}
                     />
-                    <p className="form-field__help">
+                    <FormFieldHelp>
                         <FormattedMessage
                             id="Component.SettingBot.ChannelHelp"
                             defaultMessage="* If you set same channel with username, you can update channel information"
                         />
-                    </p>
-                </div>
-            </div>
+                    </FormFieldHelp>
+                </FormField>
+            </Row>
 
-            <div className="form-field__action is-end">
-                <button className="btn is-danger" onClick={signoutHandler}>
-                    <i className="bi bi-box-arrow-in-right btn__icon" />
+            <FormFieldAction isEnd={true}>
+                <Button color="danger" onClick={signoutHandler}>
+                    <ButtonIcon icon="box-arrow-in-right" />
                     <FormattedMessage
                         id="Common.SignOut"
                         defaultMessage="Signout"
                     />
-                </button>
-            </div>
-        </section>
+                </Button>
+            </FormFieldAction>
+        </Section>
     );
 };
 

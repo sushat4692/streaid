@@ -13,7 +13,12 @@ import { request } from "../util/request";
 
 // Component
 import UserComponent from "./User";
-import ShoutOutButtonComponent from "./ShoutOutButton";
+import ShoutOutButton from "./ShoutOutButton";
+import TableRow from "./TableRow";
+import TableData from "./TableData";
+import ButtonGroup from "../../component/ButtonGroup";
+import Button from "../../component/Button";
+import ButtonIcon from "../../component/ButtonIcon";
 
 type Props = {
     usermemo: UserMemoType;
@@ -29,26 +34,26 @@ const UserMemoRowComponent: React.FC<Props> = ({ usermemo }: Props) => {
     }, [usermemo]);
 
     return (
-        <tr>
-            <td scope="row">
+        <TableRow>
+            <TableData scope="row">
                 <UserComponent username={usermemo.username} />
-            </td>
-            <td>{moment(usermemo.createdAt).format("M/D kk:mm")}</td>
-            <td>
-                <div className="btn-group">
-                    <ShoutOutButtonComponent
-                        className="btn is-small btn-success me-1"
-                        username={usermemo.username}
-                    />
-                    <button
-                        className="btn is-small is-danger"
+            </TableData>
+            <TableData>
+                {moment(usermemo.createdAt).format("M/D kk:mm")}
+            </TableData>
+            <TableData>
+                <ButtonGroup>
+                    <ShoutOutButton size="small" username={usermemo.username} />
+                    <Button
+                        size="small"
+                        color="danger"
                         onClick={deleteClickHandler}
                     >
-                        <i className="bi bi-trash" />
-                    </button>
-                </div>
-            </td>
-        </tr>
+                        <ButtonIcon icon="trash" only />
+                    </Button>
+                </ButtonGroup>
+            </TableData>
+        </TableRow>
     );
 };
 

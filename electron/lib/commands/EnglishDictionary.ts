@@ -1,4 +1,3 @@
-import { app } from "electron";
 import sqlite3 from "sqlite3";
 import { open, Database } from "sqlite";
 import path from "path";

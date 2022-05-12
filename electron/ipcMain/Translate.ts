@@ -21,14 +21,26 @@ ipcMain.handle("translate:deepl:plan", async (_, key: "free" | "pro") => {
     return store.set("deepl_plan", key);
 });
 
-ipcMain.handle("translate:discord", async () => {
+ipcMain.handle("translate:e2j:discord", async () => {
     const store = getStoreInstance();
     return {
         webhook: store.get("discord_webhook"),
     };
 });
 
-ipcMain.handle("translate:discord:webhook", async (_, url: string) => {
+ipcMain.handle("translate:e2j:discord:webhook", async (_, url: string) => {
     const store = getStoreInstance();
     return store.set("discord_webhook", url);
+});
+
+ipcMain.handle("translate:j2e:discord", async () => {
+    const store = getStoreInstance();
+    return {
+        webhook: store.get("discord_webhook_j2e"),
+    };
+});
+
+ipcMain.handle("translate:j2e:discord:webhook", async (_, url: string) => {
+    const store = getStoreInstance();
+    return store.set("discord_webhook_j2e", url);
 });

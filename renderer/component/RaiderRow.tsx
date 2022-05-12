@@ -13,7 +13,12 @@ import { request } from "../util/request";
 
 // Component
 import UserComponent from "./User";
-import ShoutOutButtonComponent from "./ShoutOutButton";
+import ShoutOutButton from "./ShoutOutButton";
+import TableRow from "./TableRow";
+import TableData from "./TableData";
+import ButtonGroup from "../../component/ButtonGroup";
+import Button from "../../component/Button";
+import Icon from "../../component/Icon";
 
 type Props = {
     raider: RaiderType;
@@ -29,28 +34,28 @@ const RaiderRowComponent: React.FC<Props> = ({ raider }: Props) => {
     }, [raider]);
 
     return (
-        <tr>
-            <td scope="row">
+        <TableRow>
+            <TableData scope="row">
                 <UserComponent username={raider.username} />
-            </td>
-            <td>{raider.displayname}</td>
-            <td>{raider.viewers}</td>
-            <td>{moment(raider.createdAt).format("M/D kk:mm")}</td>
-            <td>
-                <div className="btn-group">
-                    <ShoutOutButtonComponent
-                        className="btn is-small btn-success me-1"
-                        username={raider.username}
-                    />
-                    <button
-                        className="btn is-small is-danger"
+            </TableData>
+            <TableData>{raider.displayname}</TableData>
+            <TableData>{raider.viewers}</TableData>
+            <TableData>
+                {moment(raider.createdAt).format("M/D kk:mm")}
+            </TableData>
+            <TableData>
+                <ButtonGroup>
+                    <ShoutOutButton size="small" username={raider.username} />
+                    <Button
+                        size="small"
+                        color="danger"
                         onClick={deleteClickHandler}
                     >
-                        <i className="bi bi-trash" />
-                    </button>
-                </div>
-            </td>
-        </tr>
+                        <Icon icon="trash" />
+                    </Button>
+                </ButtonGroup>
+            </TableData>
+        </TableRow>
     );
 };
 

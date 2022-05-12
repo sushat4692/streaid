@@ -3,52 +3,57 @@ import { FormattedMessage } from "react-intl";
 
 // Components
 import CopyableFieldComponent from "./CopyableField";
+import SectionSubHeader from "../../component/SectionSubHeader";
+import SectionSubHeaderSmall from "../../component/SectionSubHeaderSmall";
+import FormField from "./FormField";
+import FormFieldLabel from "./FormFieldLabel";
+import FormFieldHelp from "./FormFieldHelp";
 
 const SettingShoutoutAlertClip: React.FC = () => {
     return (
         <>
-            <h3 className="section__sub-header">
+            <SectionSubHeader>
                 <FormattedMessage
                     id="Component.SettingShoutOutAlert.Clip.Header"
                     defaultMessage="Clip"
                 />
 
-                <small className="section__sub-header__small">
+                <SectionSubHeaderSmall>
                     <FormattedMessage
                         id="Component.SettingShoutOutAlert.Clip.Descript"
                         defaultMessage="Showing alert the streamer's clip movie"
                     />
-                </small>
-            </h3>
+                </SectionSubHeaderSmall>
+            </SectionSubHeader>
 
-            <div className="form-field">
-                <label className="form-field__label">
+            <FormField>
+                <FormFieldLabel>
                     <FormattedMessage
                         id="Common.Label.Command"
                         defaultMessage="Command"
                     />
-                </label>
+                </FormFieldLabel>
 
                 <CopyableFieldComponent text="!so {user_id} clip" />
-            </div>
+            </FormField>
 
-            <div className="form-field">
-                <label className="form-field__label">
+            <FormField>
+                <FormFieldLabel>
                     <FormattedMessage
                         id="Common.Label.StopCommand"
                         defaultMessage="Stop Command"
                     />
-                </label>
+                </FormFieldLabel>
 
                 <CopyableFieldComponent text="!stop" />
 
-                <p className="form-field__help">
+                <FormFieldHelp>
                     <FormattedMessage
                         id="Component.SettingShoutOutAlert.Clip.StopHelp"
                         defaultMessage="You can use this command when you want to stop the clip movie"
                     ></FormattedMessage>
-                </p>
-            </div>
+                </FormFieldHelp>
+            </FormField>
         </>
     );
 };

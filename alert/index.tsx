@@ -5,6 +5,8 @@ import socket from "./socket";
 import App from "./App";
 
 import "./styles.css";
+
+// Bootstrap Icon
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 socket.connect();

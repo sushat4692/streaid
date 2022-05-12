@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import tw from "twin.macro";
 
 // Recoil
 import SettingUsernameState from "../atom/SettingUsername";
@@ -27,6 +28,7 @@ import UserMemoPage from "../page/UserMemo";
 import CommandPage from "../page/Command";
 import SettingPage from "../page/Setting";
 import LicensePage from "../page/License";
+const Wrapper = tw.div`pt-16 md:pt-10 pb-6`;
 
 // Utils
 import { request } from "../util/request";
@@ -83,56 +85,59 @@ const Layout: React.FC = () => {
         <Router>
             <HeaderComponent />
 
-            <div className="has-header">
+            <Wrapper>
                 <main>
                     {setting.isEnableBot ? (
-                        <Switch>
+                        <Routes>
                             <Route
-                                path="/chatters"
-                                component={ChattersPage}
+                                path="chatters"
+                                element={<ChattersPage />}
                             ></Route>
                             <Route
-                                path="/raiders"
-                                component={RaidersPage}
+                                path="raiders"
+                                element={<RaidersPage />}
                             ></Route>
-                            <Route path="/hosts" component={HostsPage}></Route>
+                            <Route path="hosts" element={<HostsPage />}></Route>
                             <Route
-                                path="/channel"
-                                component={ChannelPage}
-                            ></Route>
-                            <Route
-                                path="/user_memo"
-                                component={UserMemoPage}
+                                path="channel"
+                                element={<ChannelPage />}
                             ></Route>
                             <Route
-                                path="/settings"
-                                component={SettingPage}
+                                path="user_memo"
+                                element={<UserMemoPage />}
                             ></Route>
                             <Route
-                                path="/commands"
-                                component={CommandPage}
+                                path="commands"
+                                element={<CommandPage />}
+                            ></Route>
+                            <Route
+                                path="settings/*"
+                                element={<SettingPage />}
                             ></Route>
                             <Route
                                 path="/license"
-                                component={LicensePage}
+                                element={<LicensePage />}
                             ></Route>
-                            <Route path="/" component={DashboardPage}></Route>
-                        </Switch>
+                            <Route path="*" element={<DashboardPage />}></Route>
+                        </Routes>
                     ) : (
-                        <Switch>
+                        <Routes>
                             <Route
-                                path="/settings"
-                                component={SettingPage}
+                                path="settings/*"
+                                element={<SettingPage />}
                             ></Route>
                             <Route
                                 path="/license"
-                                component={LicensePage}
+                                element={<LicensePage />}
                             ></Route>
-                            <Route path="/" component={NeedSettingPage}></Route>
-                        </Switch>
+                            <Route
+                                path="*"
+                                element={<NeedSettingPage />}
+                            ></Route>
+                        </Routes>
                     )}
                 </main>
-            </div>
+            </Wrapper>
         </Router>
     );
 };

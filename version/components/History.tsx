@@ -5,7 +5,11 @@ import { FormattedMessage } from "react-intl";
 import { VersionHistory } from "../../types/VersionHistory";
 
 // Components
-import HistoryRowComponent from "./HistoryRow";
+import HistoryRow from "./HistoryRow";
+import Container from "../../component/Container";
+import PageHeader from "../../component/PageHeader";
+import Button from "../../component/Button";
+const Anchor = Button.withComponent("a");
 
 type Props = {
     history: VersionHistory[];
@@ -16,43 +20,40 @@ type Props = {
 const HistoryComponent = ({ history, latest, locale }: Props) => {
     return (
         <>
-            <div className="page-header">
-                <div className="container-fluid">
-                    <div className="page-header__action">
-                        <h1 className="page-header__text">
-                            <FormattedMessage
-                                id="History.Head"
-                                defaultMessage="New version available"
-                            ></FormattedMessage>{" "}
-                            ( v{latest} )
-                        </h1>
+            <PageHeader
+                action={
+                    <Anchor
+                        size="small"
+                        color="primary"
+                        href="https://github.com/sushat4692/streaid/releases/latest"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        <FormattedMessage
+                            id="History.Button"
+                            defaultMessage="Download"
+                        ></FormattedMessage>
+                    </Anchor>
+                }
+            >
+                <FormattedMessage
+                    id="History.Head"
+                    defaultMessage="New version available"
+                ></FormattedMessage>{" "}
+                ( v{latest} )
+            </PageHeader>
 
-                        <a
-                            href="https://github.com/sushat4692/twitch-support-tool/releases/latest"
-                            target="_blank"
-                            className="btn is-primary is-small"
-                            rel="noreferrer"
-                        >
-                            <FormattedMessage
-                                id="History.Button"
-                                defaultMessage="Download"
-                            ></FormattedMessage>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div className="container-fluid">
+            <Container>
                 {history.map((h, i) => {
                     return (
-                        <HistoryRowComponent
+                        <HistoryRow
                             key={i}
                             history={h}
                             locale={locale}
-                        ></HistoryRowComponent>
+                        ></HistoryRow>
                     );
                 })}
-            </div>
+            </Container>
         </>
     );
 };

@@ -96,31 +96,31 @@ export const getWordMeanJaToEn = async (
         }
     })();
 
-    // const data = {
-    //     embeds: [
-    //         {
-    //             color:
-    //                 count <= 1
-    //                     ? parseInt("408558", 16)
-    //                     : count >= 3
-    //                     ? parseInt("CB444A", 16)
-    //                     : parseInt("F6C344", 16),
-    //             title: word,
-    //             description: result.meaning,
-    //             footer: {
-    //                 text: `searched this word ${count} time(s)`,
-    //             },
-    //         },
-    //     ],
-    // };
+    const data = {
+        embeds: [
+            {
+                color:
+                    count <= 1
+                        ? parseInt("408558", 16)
+                        : count >= 3
+                        ? parseInt("CB444A", 16)
+                        : parseInt("F6C344", 16),
+                title: word,
+                description: result.meaning,
+                footer: {
+                    text: `searched this word ${count} time(s)`,
+                },
+            },
+        ],
+    };
 
-    // const store = getStoreInstance();
-    // const url = store.get("discord_webhook", "");
-    // if (url) {
-    //     axios.post(url, data).catch((e: AxiosError) => {
-    //         console.log(e);
-    //     });
-    // }
+    const store = getStoreInstance();
+    const url = store.get("discord_webhook_j2e", "");
+    if (url) {
+        axios.post(url, data).catch((e: AxiosError) => {
+            console.log(e);
+        });
+    }
 
     return `${result.meaning} -- < searched this word ${count} time(s) >`;
 };

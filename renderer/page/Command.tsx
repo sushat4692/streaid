@@ -1,14 +1,26 @@
 import React, { useEffect } from "react";
 import { useRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
+import styled from "@emotion/styled";
 
 // Recoil
 import CommandsState from "../atom/Commands";
 
 // Component
-import MetaComponent from "../component/Meta";
-import CommandRowComponent from "../component/CommandRow";
-import CommandFormComponent from "../component/CommandForm";
+import Meta from "../component/Meta";
+import CommandRow from "../component/CommandRow";
+import CommandForm from "../component/CommandForm";
+import Container from "../../component/Container";
+import Section from "../../component/Section";
+import SectionLead from "../../component/SectionLead";
+import PageHeader from "../../component/PageHeader";
+import TableResponsive from "../component/TableResponsive";
+import Table from "../component/Table";
+import TableThead from "../component/TableThead";
+import TableRow from "../component/TableRow";
+import TableHead from "../component/TableHead";
+import TableTbody from "../component/TableTbody";
+const CommandFormWrap = styled.div({ marginBottom: 10 });
 
 // Util
 import { request } from "../util/request";
@@ -63,80 +75,68 @@ const CommandPage: React.FC = () => {
 
     return (
         <>
-            <MetaComponent id="Common.Command.Name" defaultMessage="Command" />
+            <Meta id="Common.Command.Name" defaultMessage="Command" />
 
-            <div className="page-header">
-                <div className="container-fluid">
-                    <h1 className="page-header__text">
-                        <i className="bi bi-wrench page-header__icon" />
-                        <FormattedMessage
-                            id="Common.Command.Name"
-                            defaultMessage="Command"
-                        />
-                    </h1>
-                </div>
-            </div>
+            <PageHeader icon="wrench">
+                <FormattedMessage
+                    id="Common.Command.Name"
+                    defaultMessage="Command"
+                />
+            </PageHeader>
 
-            <div className="container-fluid">
-                <section className="section">
-                    <p className="section__lead">
+            <Container>
+                <Section>
+                    <SectionLead>
                         <FormattedMessage
                             id="Common.Command.Description"
                             defaultMessage="You can manage your own channel command."
                         />
-                    </p>
+                    </SectionLead>
 
-                    <div style={{ marginBottom: "10px" }}>
-                        <CommandFormComponent />
-                    </div>
-                </section>
+                    <CommandFormWrap>
+                        <CommandForm />
+                    </CommandFormWrap>
+                </Section>
 
-                <div className="table-responsive">
-                    <table className="table">
-                        <colgroup>
-                            <col />
-                            <col width="140" />
-                            <col width="140" />
-                            <col width="80" />
-                        </colgroup>
-
-                        <thead>
-                            <tr>
-                                <th scope="col">
+                <TableResponsive>
+                    <Table cols={[null, 140, 140, 80]}>
+                        <TableThead>
+                            <TableRow>
+                                <TableHead scope="col">
                                     <FormattedMessage
                                         id="Common.Label.Command"
                                         defaultMessage="Command"
                                     />
-                                </th>
-                                <th scope="col">
+                                </TableHead>
+                                <TableHead scope="col">
                                     <FormattedMessage
                                         id="Common.Label.Priviledge"
                                         defaultMessage="Priviledge"
                                     />
-                                </th>
-                                <th scope="col">
+                                </TableHead>
+                                <TableHead scope="col">
                                     <FormattedMessage
                                         id="Common.Label.Created"
                                         defaultMessage="Created"
                                     />
-                                </th>
-                                <th scope="col" />
-                            </tr>
-                        </thead>
+                                </TableHead>
+                                <TableHead scope="col" />
+                            </TableRow>
+                        </TableThead>
 
-                        <tbody>
+                        <TableTbody>
                             {commands.map((command) => {
                                 return (
-                                    <CommandRowComponent
+                                    <CommandRow
                                         command={command}
                                         key={command._id}
                                     />
                                 );
                             })}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                        </TableTbody>
+                    </Table>
+                </TableResponsive>
+            </Container>
         </>
     );
 };

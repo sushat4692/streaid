@@ -1,18 +1,34 @@
 import React, { useState, useRef, useCallback } from "react";
-import Modal from "react-modal";
 import { useSetRecoilState } from "recoil";
 import { FormattedMessage, useIntl } from "react-intl";
-import TextareaAutosize from "react-textarea-autosize";
 import Select from "react-select";
 
 // Types
 import { CommandAllowType } from "../../types/CommandAllow";
+import { DefaultSelectType } from "../../types/DefaultSelect";
+
+// Const
+import { selectStyles } from "../const/selectStyles";
+const commandStyle = selectStyles<DefaultSelectType, false>();
 
 // Recoil
 import CommandsState from "../atom/Commands";
 
 // Utility
 import { request } from "../util/request";
+
+// Components
+import Button from "../../component/Button";
+import Modal from "./Modal";
+import ModalHead from "./ModalHead";
+import ModalBody from "./ModalBody";
+import ModalFoot from "./ModalFoot";
+import FormField from "./FormField";
+import FormFieldLabel from "./FormFieldLabel";
+import FormTextareaAutosize from "./FormTextareaAutosize";
+import FormGroup from "./FormGroup";
+import FormGroupLabel from "./FormGroupLabel";
+import FormInputText from "./FormInputText";
 
 const CommandFormComponent: React.FC = () => {
     const intl = useIntl();
@@ -118,95 +134,84 @@ const CommandFormComponent: React.FC = () => {
 
     return (
         <>
-            <button className="btn is-primary" onClick={openHandler}>
+            <Button color="primary" onClick={openHandler}>
                 <FormattedMessage
                     id="Component.Command.New"
                     defaultMessage="New Command"
                 />
-            </button>
+            </Button>
 
-            <Modal isOpen={isOpen} className="modal" overlayClassName="overlay">
+            <Modal isOpen={isOpen}>
                 <form tabIndex={-1} onSubmit={onSubmitHandler}>
-                    <div className="modal__head">
-                        <h5 className="modal-title">
+                    <ModalHead onClose={closeHandler}>
+                        <h5>
                             <FormattedMessage
                                 id="Component.Command.New"
                                 defaultMessage="New Command"
                             />
                         </h5>
-                        <button
-                            type="button"
-                            className="modal__close"
-                            aria-label="Close"
-                            onClick={closeHandler}
-                        />
-                    </div>
-                    <div className="modal__body">
-                        <div className="form-field">
-                            <label className="form-field__label">
+                    </ModalHead>
+                    <ModalBody>
+                        <FormField>
+                            <FormFieldLabel>
                                 <FormattedMessage
                                     id="Common.Label.Command"
                                     defaultMessage="Command"
                                 />
-                            </label>
+                            </FormFieldLabel>
 
-                            <div className="form-control-group">
-                                <span className="form-control-group__label">
-                                    !
-                                </span>
-                                <input
+                            <FormGroup>
+                                <FormGroupLabel>!</FormGroupLabel>
+                                <FormInputText
                                     type="text"
-                                    className="form-control"
                                     value={inputCommand}
                                     onChange={(e) => {
                                         updateInputCommand(e.target.value);
                                     }}
                                 />
-                            </div>
-                        </div>
+                            </FormGroup>
+                        </FormField>
 
-                        <div className="form-field">
-                            <label className="form-field__label">
+                        <FormField>
+                            <FormFieldLabel>
                                 <FormattedMessage
                                     id="Common.Label.Body"
                                     defaultMessage="Body"
                                 />
-                            </label>
-                            <TextareaAutosize
-                                className="form-control"
+                            </FormFieldLabel>
+                            <FormTextareaAutosize
                                 value={inputBody}
                                 onChange={(e) => {
                                     updateInputBody(e.target.value);
                                 }}
                             />
-                        </div>
+                        </FormField>
 
-                        <div className="form-field">
-                            <label className="form-field__label">
+                        <FormField>
+                            <FormFieldLabel>
                                 <FormattedMessage
                                     id="Common.Label.Memo"
                                     defaultMessage="Memo"
                                 />
-                            </label>
-                            <TextareaAutosize
-                                className="form-control"
+                            </FormFieldLabel>
+                            <FormTextareaAutosize
                                 value={inputMemo}
                                 onChange={(e) => {
                                     updateInputMemo(e.target.value);
                                 }}
                             />
-                        </div>
+                        </FormField>
 
-                        <div className="form-field">
-                            <label className="form-field__label">
+                        <FormField>
+                            <FormFieldLabel>
                                 <FormattedMessage
                                     id="Common.Label.Priviledge"
                                     defaultMessage="Priviledge"
                                 />
-                            </label>
+                            </FormFieldLabel>
 
                             <Select
-                                classNamePrefix="react-select"
+                                styles={commandStyle}
                                 options={allowOptions.current}
                                 onChange={(e) =>
                                     updateInputAllow(
@@ -218,26 +223,22 @@ const CommandFormComponent: React.FC = () => {
                                     defaultMessage: "Select...",
                                 })}
                             ></Select>
-                        </div>
-                    </div>
-                    <div className="modal__foot">
-                        <button
-                            type="button"
-                            className="btn btn-secondary"
-                            onClick={closeHandler}
-                        >
+                        </FormField>
+                    </ModalBody>
+                    <ModalFoot>
+                        <Button type="button" onClick={closeHandler}>
                             <FormattedMessage
                                 id="Common.Close"
                                 defaultMessage="Close"
                             />
-                        </button>
-                        <button type="submit" className="btn is-primary">
+                        </Button>
+                        <Button color="primary" type="submit">
                             <FormattedMessage
                                 id="Common.Submit"
                                 defaultMessage="Submit"
                             />
-                        </button>
-                    </div>
+                        </Button>
+                    </ModalFoot>
                 </form>
             </Modal>
         </>

@@ -1,141 +1,105 @@
 import React from "react";
 import { FormattedMessage } from "react-intl";
-import { NavLink, Switch, Route } from "react-router-dom";
+import { NavLink, Routes, Route } from "react-router-dom";
+import tw from "twin.macro";
+import styled from "@emotion/styled";
 
 // Component
-import MetaComponent from "../component/Meta";
-import SettingLocaleComponent from "../component/SettingLocale";
-import SettingBotComponent from "../component/SettingBot";
-import SettingShoutOutMessageComponent from "../component/SettingShoutOutMessage";
-import SettingShoutoutAlertComponent from "../component/SettingShoutoutAlert";
-import SettingSoundComponent from "../component/SettingSound";
-import SettingTranslateComponent from "../component/SettingTranslate";
+import Meta from "../component/Meta";
+import SettingLocale from "../component/SettingLocale";
+import SettingBot from "../component/SettingBot";
+import SettingShoutOutMessage from "../component/SettingShoutOutMessage";
+import SettingShoutoutAlert from "../component/SettingShoutoutAlert";
+import SettingSound from "../component/SettingSound";
+import SettingTranslate from "../component/SettingTranslate";
+import PageHeader from "../../component/PageHeader";
+import Container from "../../component/Container";
+const Wrapper = tw.div`md:flex md:items-start`;
+const Nav = tw.nav`text-sm pb-4 mb-4 border-b border-solid border-gray-300 dark:border-gray-500 md:border-0 md:mb-0 md:w-48 md:sticky md:top-10 md:flex-shrink-0`;
+const Main = tw.main`md:flex-grow`;
+const NavItem = styled(NavLink)(() => [
+    tw`block py-2 px-4 bg-black dark:bg-white bg-opacity-0 dark:bg-opacity-0 hover:bg-opacity-10`,
+    { [`&.active`]: tw`bg-opacity-10` },
+]);
 
-import styles from "./Setting.module.css";
-
-type Props = {
-    match: {
-        isExact: boolean;
-        params: { [key: string]: unknown };
-        path: string;
-        url: string;
-    };
-};
-
-const SettnigPage: React.FC<Props> = ({ match }: Props) => {
-    if (!match) {
-        return <></>;
-    }
-
+const SettnigPage: React.FC = () => {
     return (
         <>
-            <MetaComponent
-                id="Common.Settings.Name"
-                defaultMessage="Settings"
-            />
+            <Meta id="Common.Settings.Name" defaultMessage="Settings" />
 
-            <div className="page-header">
-                <div className="container-fluid">
-                    <h1 className="page-header__text">
-                        <i className="bi bi-gear page-header__icon" />
-                        <FormattedMessage
-                            id="Common.Settings.Name"
-                            defaultMessage="Settings"
-                        />
-                    </h1>
-                </div>
-            </div>
+            <PageHeader icon="gear">
+                <FormattedMessage
+                    id="Common.Settings.Name"
+                    defaultMessage="Settings"
+                />
+            </PageHeader>
 
-            <div className={styles.wrap}>
-                <nav className={styles.nav}>
-                    <NavLink
-                        className={styles.nav__item}
-                        activeClassName={styles["is-active"]}
-                        exact
-                        to={match.url}
-                    >
+            <Wrapper>
+                <Nav>
+                    <NavItem end to={`.`}>
                         <FormattedMessage
                             id="Component.Setting.General"
                             defaultMessage="General"
                         />
-                    </NavLink>
-                    <NavLink
-                        className={styles.nav__item}
-                        activeClassName={styles["is-active"]}
-                        exact
-                        to={`${match.url}/shoutout`}
-                    >
+                    </NavItem>
+                    <NavItem end to={`/settings/shoutout`}>
                         <FormattedMessage
                             id="Component.SettingShoutOutMessage.Header"
                             defaultMessage="Shoutout Message"
                         />
-                    </NavLink>
-                    <NavLink
-                        className={styles.nav__item}
-                        activeClassName={styles["is-active"]}
-                        exact
-                        to={`${match.url}/shoutout_alert`}
-                    >
+                    </NavItem>
+                    <NavItem end to={`/settings/shoutout_alert`}>
                         <FormattedMessage
                             id="Component.SettingShoutOutAlert.Header"
                             defaultMessage="Shoutout Alert"
                         />
-                    </NavLink>
-                    <NavLink
-                        className={styles.nav__item}
-                        activeClassName={styles["is-active"]}
-                        exact
-                        to={`${match.url}/sound`}
-                    >
+                    </NavItem>
+                    <NavItem end to={`/settings/sound`}>
                         <FormattedMessage
                             id="Component.SettingSound.Header"
                             defaultMessage="Notification Sound"
                         />
-                    </NavLink>
-                    <NavLink
-                        className={styles.nav__item}
-                        activeClassName={styles["is-active"]}
-                        exact
-                        to={`${match.url}/translate`}
-                    >
+                    </NavItem>
+                    <NavItem end to={`/settings/translate`}>
                         <FormattedMessage
                             id="Component.SettingTranslate.Header"
                             defaultMessage="Translate"
                         />
-                    </NavLink>
-                </nav>
+                    </NavItem>
+                </Nav>
 
-                <main className={styles.main}>
-                    <div className="container-fluid">
-                        <Switch>
-                            <Route exact path={match.url}>
-                                <SettingLocaleComponent></SettingLocaleComponent>
-                                <SettingBotComponent></SettingBotComponent>
-                            </Route>
+                <Main>
+                    <Container>
+                        <Routes>
                             <Route
-                                exact
-                                path={match.url + `/shoutout`}
-                                component={SettingShoutOutMessageComponent}
+                                path={`shoutout`}
+                                element={<SettingShoutOutMessage />}
                             ></Route>
                             <Route
-                                exact
-                                path={`${match.url}/shoutout_alert`}
-                                component={SettingShoutoutAlertComponent}
+                                path={`shoutout_alert`}
+                                element={<SettingShoutoutAlert />}
                             ></Route>
                             <Route
-                                exact
-                                path={match.url + `/sound`}
-                                component={SettingSoundComponent}
+                                path={`sound`}
+                                element={<SettingSound />}
                             ></Route>
                             <Route
-                                exact
-                                path={match.url + `/translate`}
-                                component={SettingTranslateComponent}
+                                path={`translate`}
+                                element={<SettingTranslate />}
                             ></Route>
-                        </Switch>
-                    </div>
-                </main>
-            </div>
+                            <Route
+                                path={`/`}
+                                element={
+                                    <>
+                                        <SettingLocale></SettingLocale>
+                                        <SettingBot></SettingBot>
+                                    </>
+                                }
+                            ></Route>
+                        </Routes>
+                    </Container>
+                </Main>
+            </Wrapper>
         </>
     );
 };

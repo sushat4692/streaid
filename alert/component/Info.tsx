@@ -1,11 +1,42 @@
 import React, { useEffect, useState } from "react";
-import cn from "classnames";
 import socket from "../socket";
-
-import styles from "./Info.module.css";
+import tw from "twin.macro";
+import styled from "@emotion/styled";
 
 // Types
 import { UserType } from "../../types/User";
+
+// Component
+const InfoInner = styled.div(() => [
+    tw`bg-gray-800 p-4 rounded transition-all duration-500`,
+    { width: `36rem`, transform: `translateY(-10px)` },
+]);
+const Info = styled.div<{ active: boolean }>(({ active }) => [
+    tw`fixed inset-0 flex items-center justify-center transition-all duration-500 bg-black bg-opacity-50`,
+    active ? tw`opacity-100` : tw`opacity-0`,
+    active ? { [`${InfoInner}`]: { transform: `translateY(0)` } } : null,
+]);
+const InfoWrap = tw.div`flex flex-col items-center justify-center`;
+const InfoHead = styled.h2([
+    tw`text-center text-7xl font-black mb-4 relative`,
+    {
+        WebkitTextFillColor: `#fff`,
+        WebkitTextStrokeWidth: `16px`,
+        WebkitTextStrokeColor: `#fff`,
+        "&::after": [
+            tw`absolute inset-0 m-auto text-gray-800 z-10`,
+            {
+                WebkitTextFillColor: "initial",
+                WebkitTextStrokeWidth: "initial",
+                WebkitTextStrokeColor: "initial",
+                content: "'Please check the Streamer!'",
+            },
+        ],
+    },
+]);
+const InfoFigure = tw.figure`m-0 mb-4 relative pt-[100%]`;
+const InfoImage = tw.img`w-full h-full absolute inset-0 object-cover`;
+const InfoName = tw.p`text-center font-bold text-5xl`;
 
 const InfoComponent: React.FC = () => {
     const [timer, updateTimer] = useState(null);
@@ -47,29 +78,20 @@ const InfoComponent: React.FC = () => {
     return (
         <>
             {user ? (
-                <div
-                    className={cn(styles.info, {
-                        [styles["is-active"]]: isActive,
-                    })}
-                >
-                    <div className={styles.info__wrap}>
-                        <h2 className={styles.info__head}>
-                            Please check the Streamer!
-                        </h2>
-                        <div className={styles.info__inner}>
-                            <figure className={styles.info__figure}>
-                                <img
+                <Info active={isActive}>
+                    <InfoWrap>
+                        <InfoHead>Please check the Streamer!</InfoHead>
+                        <InfoInner>
+                            <InfoFigure>
+                                <InfoImage
                                     src={user.profilePictureUrl}
                                     alt={user.displayName}
-                                    className={styles.info__image}
                                 />
-                            </figure>
-                            <p className={styles.info__name}>
-                                {user.displayName}
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                            </InfoFigure>
+                            <InfoName>{user.displayName}</InfoName>
+                        </InfoInner>
+                    </InfoWrap>
+                </Info>
             ) : (
                 ""
             )}

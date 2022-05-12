@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { FormattedMessage } from "react-intl";
-import cn from "classnames";
+import tw from "twin.macro";
+import styled from "@emotion/styled";
 
 // Recoil
 import IsConnectingState from "../atom/IsConnecting";
@@ -9,16 +10,43 @@ import IsConnectingState from "../atom/IsConnecting";
 // Util
 import { request } from "../util/request";
 
+// Component
+import Button from "../../component/Button";
+import ButtonIcon from "../../component/ButtonIcon";
+
 type Props = {
     username: string;
-    className?: string;
+    size?: "small" | "large";
+    block?: boolean;
+    disabled?: boolean;
+    color?: "primary" | "danger";
 };
 
-import styles from "./ShoutOutButton.module.css";
+const Wrap = styled.div([
+    tw`flex relative`,
+    {
+        marginLeft: 1,
+        marginRight: 1,
+        [`& button`]: tw`rounded-none!`,
+    },
+]);
+const Nav = styled.div<{ isShowNav: boolean }>(({ isShowNav }) => [
+    tw`absolute top-full right-0 z-10 bg-gray-100 dark:bg-gray-900 whitespace-nowrap mt-1 rounded-sm shadow`,
+    !isShowNav ? tw`hidden` : null,
+]);
+const NavItem = styled.button([
+    tw`block px-4 py-2 hover:bg-gray-500 hover:bg-opacity-50`,
+    {
+        [`& + &`]: tw`border-t border-solid border-gray-300 dark:border-gray-500`,
+    },
+]);
 
 const ShoutOutButtonComponent: React.FC<Props> = ({
     username,
-    className,
+    size,
+    block,
+    disabled,
+    color,
 }: Props) => {
     const [isShowNav, updateIsShowNav] = useState(false);
     const updateIsConnecting = useSetRecoilState(IsConnectingState);
@@ -43,44 +71,35 @@ const ShoutOutButtonComponent: React.FC<Props> = ({
 
     return (
         <>
-            <button
-                className={className || "btn btn-success"}
+            <Button
+                size={size}
+                block={block}
+                disabled={disabled}
+                color={color}
                 onClick={clickHandler()}
             >
-                <i className="bi bi-speaker btn__icon" />
+                <ButtonIcon icon="speaker" />
                 <FormattedMessage
                     id="Common.Label.ShoutOut"
                     defaultMessage="ShoutOut"
                 />
-            </button>
-            <div className={styles.wrap}>
-                <button
-                    className={className || "btn btn-success"}
+            </Button>
+            <Wrap>
+                <Button
+                    size={size}
+                    block={block}
+                    disabled={disabled}
+                    color={color}
                     onClick={toggleNavHandler}
                 >
-                    <i className="bi bi-caret-down-fill btn__icon-only"></i>
-                </button>
+                    <ButtonIcon icon="caret-down-fill" only />
+                </Button>
 
-                <div
-                    className={cn({
-                        [styles.nav]: true,
-                        [styles["is-active"]]: isShowNav,
-                    })}
-                >
-                    <button
-                        className={styles.nav__item}
-                        onClick={clickHandler("info")}
-                    >
-                        Show Info
-                    </button>
-                    <button
-                        className={styles.nav__item}
-                        onClick={clickHandler("clip")}
-                    >
-                        Show Clip
-                    </button>
-                </div>
-            </div>
+                <Nav isShowNav={isShowNav}>
+                    <NavItem onClick={clickHandler("info")}>Show Info</NavItem>
+                    <NavItem onClick={clickHandler("clip")}>Show Clip</NavItem>
+                </Nav>
+            </Wrap>
         </>
     );
 };

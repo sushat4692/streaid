@@ -19,6 +19,7 @@ type StoreType = {
     deepl_key: string;
     deepl_plan: string;
     discord_webhook: string;
+    discord_webhook_j2e: string;
 };
 
 const schema: Store.Schema<StoreType> = {
@@ -92,6 +93,10 @@ const schema: Store.Schema<StoreType> = {
         default: "free",
     },
     discord_webhook: {
+        type: "string",
+        default: "",
+    },
+    discord_webhook_j2e: {
         type: "string",
         default: "",
     },
