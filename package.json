@@ -1,6 +1,6 @@
 {
     "name": "streaid",
-    "version": "0.3.2",
+    "version": "0.4.0",
     "main": "./dist/main.js",
     "description": "Aiding your streaming",
     "author": {
@@ -16,7 +16,7 @@
         "build": "npm run build:vite && npm run build:electron",
         "build:vite": "vite build",
         "build:electron": "rollup -c --environment BUILD:production",
-        "pack": "npm run build && npm run pack:mac && npm run pack:win",
+        "pack": "npm run build && npm run pack:mac && npm run pack:mac-arm && npm run pack:win",
         "pack:mac": "electron-builder --mac --x64",
         "pack:mac-arm": "electron-builder --mac --arm64",
         "pack:win": "electron-builder --win --x64",

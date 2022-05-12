@@ -2275,7 +2275,7 @@ export default [
         author: "Kat Marchán",
         link: "https://github.com/npm/ssri",
     },
-    { name: "streaid@0.3.2", licenseType: "MIT*", author: "SUSH" },
+    { name: "streaid@0.4.0", licenseType: "MIT*", author: "SUSH" },
     {
         name: "string-width@4.2.3",
         licenseType: "MIT",
