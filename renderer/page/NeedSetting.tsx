@@ -8,7 +8,6 @@ import Container from "../../component/Container";
 import Section from "../../component/Section";
 import ButtonLink from "../../component/ButtonLink";
 import DashboardHeadline from "../component/DashboardHeadline";
-import DashboardHeadlineIcon from "../component/DashboardHeadlineIcon";
 
 const Need = tw.div`text-center`;
 const NeedLead = tw.div`text-lg mb-4`;
@@ -18,12 +17,8 @@ export const NeedSettingPage: React.FC = () => {
         <>
             <MetaComponent />
 
-            <DashboardHeadline>
-                <DashboardHeadlineIcon icon={`twitch`} />
-                <FormattedMessage
-                    id="Common.Title"
-                    defaultMessage="Twitch Support Tool"
-                />
+            <DashboardHeadline secondary="Aiding your streaming">
+                <FormattedMessage id="Common.Title" defaultMessage="Streaid" />
             </DashboardHeadline>
 
             <Container>

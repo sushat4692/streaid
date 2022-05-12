@@ -32,7 +32,7 @@ async function createWindow() {
     // win.webContents.openDevTools();
 
     const result = await axios
-        .get("https://twitch-support-tool-docs.vercel.app/version.json", {
+        .get("https://streaid.vercel.app/version.json", {
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false,
             }),

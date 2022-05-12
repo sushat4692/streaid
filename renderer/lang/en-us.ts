@@ -2,7 +2,8 @@ const messages: { [key: string]: string } = {
     /**
      * Common
      */
-    "Common.Title": "Twitch Support Tool",
+    "Common.Title": "Streaid",
+    "Common.Dashboard.Name": "Dashboard",
     "Common.Chats.Name": "Chats",
     "Common.Chatters.Name": "Chatters",
     "Common.Chatters.Description":

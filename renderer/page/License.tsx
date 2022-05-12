@@ -100,6 +100,15 @@ const LicensePage: React.FC = () => {
                                 https://github.com/kujirahand/EJDict
                             </ListSmall>
                         </ListItem>
+                        <ListItem>
+                            Japanese DB is a utility for generating a Japanese
+                            dictionary SQLite database from open-source
+                            materials. (MPL-2.0) by Ezzat Chamudi
+                            <br />
+                            <ListSmall>
+                                https://github.com/echamudi/japanese-toolkit
+                            </ListSmall>
+                        </ListItem>
                     </List>
                 </Section>
             </Container>

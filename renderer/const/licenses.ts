@@ -12,25 +12,25 @@ export default [
         link: "https://github.com/babel/babel",
     },
     {
-        name: "@babel/compat-data@7.17.7",
+        name: "@babel/compat-data@7.17.10",
         licenseType: "MIT",
         author: "The Babel Team",
         link: "https://github.com/babel/babel",
     },
     {
-        name: "@babel/core@7.17.8",
+        name: "@babel/core@7.17.10",
         licenseType: "MIT",
         author: "The Babel Team",
         link: "https://github.com/babel/babel",
     },
     {
-        name: "@babel/generator@7.17.7",
+        name: "@babel/generator@7.17.10",
         licenseType: "MIT",
         author: "The Babel Team",
         link: "https://github.com/babel/babel",
     },
     {
-        name: "@babel/helper-compilation-targets@7.17.7",
+        name: "@babel/helper-compilation-targets@7.17.10",
         licenseType: "MIT",
         author: "The Babel Team",
         link: "https://github.com/babel/babel",
@@ -42,13 +42,7 @@ export default [
         link: "https://github.com/babel/babel",
     },
     {
-        name: "@babel/helper-function-name@7.16.7",
-        licenseType: "MIT",
-        author: "The Babel Team",
-        link: "https://github.com/babel/babel",
-    },
-    {
-        name: "@babel/helper-get-function-arity@7.16.7",
+        name: "@babel/helper-function-name@7.17.9",
         licenseType: "MIT",
         author: "The Babel Team",
         link: "https://github.com/babel/babel",
@@ -102,7 +96,7 @@ export default [
         link: "https://github.com/babel/babel",
     },
     {
-        name: "@babel/helpers@7.17.8",
+        name: "@babel/helpers@7.17.9",
         licenseType: "MIT",
         author: "The Babel Team",
         link: "https://github.com/babel/babel",
@@ -114,7 +108,7 @@ export default [
         link: "https://github.com/babel/babel",
     },
     {
-        name: "@babel/parser@7.17.8",
+        name: "@babel/parser@7.17.10",
         licenseType: "MIT",
         author: "The Babel Team",
         link: "https://github.com/babel/babel",
@@ -138,13 +132,13 @@ export default [
         link: "https://github.com/babel/babel",
     },
     {
-        name: "@babel/traverse@7.17.3",
+        name: "@babel/traverse@7.17.10",
         licenseType: "MIT",
         author: "The Babel Team",
         link: "https://github.com/babel/babel",
     },
     {
-        name: "@babel/types@7.17.0",
+        name: "@babel/types@7.17.10",
         licenseType: "MIT",
         author: "The Babel Team",
         link: "https://github.com/babel/babel",
@@ -179,7 +173,7 @@ export default [
         link: "https://github.com/d-fischer/qs",
     },
     {
-        name: "@d-fischer/rate-limiter@0.4.5",
+        name: "@d-fischer/rate-limiter@0.5.0",
         licenseType: "MIT",
         author: "Daniel Fischer",
         link: "https://github.com/d-fischer/rate-limiter",
@@ -197,7 +191,7 @@ export default [
         link: "https://github.com/electron/get",
     },
     {
-        name: "@emotion/babel-plugin@11.7.2",
+        name: "@emotion/babel-plugin@11.9.2",
         licenseType: "MIT",
         author: "Kye Hohenberger",
         link: "https://github.com/emotion-js/emotion/tree/main/packages/babel-plugin",
@@ -223,13 +217,13 @@ export default [
         link: "https://github.com/emotion-js/emotion/tree/master/packages/memoize",
     },
     {
-        name: "@emotion/react@11.8.2",
+        name: "@emotion/react@11.9.0",
         licenseType: "MIT",
         author: "Emotion Contributors",
         link: "https://github.com/emotion-js/emotion/tree/main/packages/react",
     },
     {
-        name: "@emotion/serialize@1.0.2",
+        name: "@emotion/serialize@1.0.3",
         licenseType: "MIT",
         link: "https://github.com/emotion-js/emotion/tree/main/packages/serialize",
     },
@@ -259,7 +253,7 @@ export default [
         link: "https://github.com/emotion-js/emotion/tree/master/packages/weak-memoize",
     },
     {
-        name: "@formatjs/ecma402-abstract@1.11.3",
+        name: "@formatjs/ecma402-abstract@1.11.4",
         licenseType: "MIT",
         author: "Long Ho",
         link: "https://github.com/formatjs/formatjs",
@@ -271,44 +265,62 @@ export default [
         link: "https://github.com/formatjs/formatjs",
     },
     {
-        name: "@formatjs/icu-messageformat-parser@2.0.18",
+        name: "@formatjs/icu-messageformat-parser@2.1.0",
         licenseType: "MIT",
         link: "https://github.com/formatjs/formatjs",
     },
     {
-        name: "@formatjs/icu-skeleton-parser@1.3.5",
+        name: "@formatjs/icu-skeleton-parser@1.3.6",
         licenseType: "MIT",
         link: "https://github.com/formatjs/formatjs",
     },
     {
-        name: "@formatjs/intl-displaynames@5.4.2",
+        name: "@formatjs/intl-displaynames@5.4.3",
         licenseType: "MIT",
         author: "Linjie Ding",
         link: "https://github.com/formatjs/formatjs",
     },
     {
-        name: "@formatjs/intl-listformat@6.5.2",
+        name: "@formatjs/intl-listformat@6.5.3",
         licenseType: "MIT",
         author: "Long Ho",
         link: "https://github.com/formatjs/formatjs",
     },
     {
-        name: "@formatjs/intl-localematcher@0.2.24",
+        name: "@formatjs/intl-localematcher@0.2.25",
         licenseType: "MIT",
         author: "Long Ho",
         link: "https://github.com/formatjs/formatjs",
     },
     {
-        name: "@formatjs/intl@2.1.0",
+        name: "@formatjs/intl@2.2.1",
         licenseType: "MIT",
         author: "Long Ho",
         link: "https://github.com/formatjs/formatjs",
+    },
+    {
+        name: "@gar/promisify@1.1.3",
+        licenseType: "MIT",
+        author: "Gar",
+        link: "https://github.com/wraithgar/gar-promisify",
+    },
+    {
+        name: "@jridgewell/gen-mapping@0.1.1",
+        licenseType: "MIT",
+        author: "Justin Ridgewell",
+        link: "https://github.com/jridgewell/gen-mapping",
     },
     {
         name: "@jridgewell/resolve-uri@3.0.5",
         licenseType: "MIT",
         author: "Justin Ridgewell",
         link: "https://github.com/jridgewell/resolve-uri",
+    },
+    {
+        name: "@jridgewell/set-array@1.1.1",
+        licenseType: "MIT",
+        author: "Justin Ridgewell",
+        link: "https://github.com/jridgewell/set-array",
     },
     {
         name: "@jridgewell/sourcemap-codec@1.4.11",
@@ -328,8 +340,14 @@ export default [
         author: "Dane Springmeyer",
         link: "https://github.com/mapbox/node-pre-gyp",
     },
+    { name: "@npmcli/fs@1.1.1", licenseType: "ISC", author: "GitHub Inc." },
     {
-        name: "@popperjs/core@2.11.4",
+        name: "@npmcli/move-file@1.1.2",
+        licenseType: "MIT",
+        link: "https://github.com/npm/move-file",
+    },
+    {
+        name: "@popperjs/core@2.11.5",
         licenseType: "MIT",
         author: "Federico Zivolo",
         link: "https://github.com/popperjs/popper-core",
@@ -353,13 +371,7 @@ export default [
         link: "https://github.com/sindresorhus/is",
     },
     {
-        name: "@socket.io/base64-arraybuffer@1.0.2",
-        licenseType: "MIT",
-        author: "Niklas von Hertzen",
-        link: "https://github.com/socketio/base64-arraybuffer",
-    },
-    {
-        name: "@socket.io/component-emitter@3.0.0",
+        name: "@socket.io/component-emitter@3.1.0",
         licenseType: "MIT",
         link: "https://github.com/socketio/emitter",
     },
@@ -370,31 +382,37 @@ export default [
         link: "https://github.com/szmarczak/http-timer",
     },
     {
-        name: "@twurple/api-call@5.0.18",
+        name: "@tootallnate/once@1.1.2",
+        licenseType: "MIT",
+        author: "Nathan Rajlich",
+        link: "https://github.com/TooTallNate/once",
+    },
+    {
+        name: "@twurple/api-call@5.1.6",
         licenseType: "MIT",
         author: "Daniel Fischer",
         link: "https://github.com/twurple/twurple",
     },
     {
-        name: "@twurple/api@5.0.18",
+        name: "@twurple/api@5.1.6",
         licenseType: "MIT",
         author: "Daniel Fischer",
         link: "https://github.com/twurple/twurple",
     },
     {
-        name: "@twurple/auth-electron@5.0.18",
+        name: "@twurple/auth-electron@5.1.6",
         licenseType: "MIT",
         author: "Daniel Fischer",
         link: "https://github.com/twurple/twurple",
     },
     {
-        name: "@twurple/auth@5.0.18",
+        name: "@twurple/auth@5.1.6",
         licenseType: "MIT",
         author: "Daniel Fischer",
         link: "https://github.com/twurple/twurple",
     },
     {
-        name: "@twurple/common@5.0.18",
+        name: "@twurple/common@5.1.6",
         licenseType: "MIT",
         author: "Daniel Fischer",
         link: "https://github.com/twurple/twurple",
@@ -425,7 +443,7 @@ export default [
         link: "https://github.com/DefinitelyTyped/DefinitelyTyped",
     },
     {
-        name: "@types/node@12.20.46",
+        name: "@types/node@12.20.51",
         licenseType: "MIT",
         link: "https://github.com/DefinitelyTyped/DefinitelyTyped",
     },
@@ -435,7 +453,12 @@ export default [
         link: "https://github.com/DefinitelyTyped/DefinitelyTyped",
     },
     {
-        name: "@types/node@17.0.21",
+        name: "@types/node@16.11.34",
+        licenseType: "MIT",
+        link: "https://github.com/DefinitelyTyped/DefinitelyTyped",
+    },
+    {
+        name: "@types/node@17.0.32",
         licenseType: "MIT",
         link: "https://github.com/DefinitelyTyped/DefinitelyTyped",
     },
@@ -455,7 +478,7 @@ export default [
         link: "https://github.com/DefinitelyTyped/DefinitelyTyped",
     },
     {
-        name: "@types/react@17.0.41",
+        name: "@types/react@17.0.45",
         licenseType: "MIT",
         link: "https://github.com/DefinitelyTyped/DefinitelyTyped",
     },
@@ -482,28 +505,28 @@ export default [
         link: "https://github.com/TooTallNate/node-agent-base",
     },
     {
+        name: "agentkeepalive@4.2.1",
+        licenseType: "MIT",
+        author: "fengmk2",
+        link: "https://github.com/node-modules/agentkeepalive",
+    },
+    {
+        name: "aggregate-error@3.1.0",
+        licenseType: "MIT",
+        author: "Sindre Sorhus",
+        link: "https://github.com/sindresorhus/aggregate-error",
+    },
+    {
         name: "ajv-formats@2.1.1",
         licenseType: "MIT",
         author: "Evgeny Poberezkin",
         link: "https://github.com/ajv-validator/ajv-formats",
     },
     {
-        name: "ajv@6.12.6",
-        licenseType: "MIT",
-        author: "Evgeny Poberezkin",
-        link: "https://github.com/ajv-validator/ajv",
-    },
-    {
         name: "ajv@8.10.0",
         licenseType: "MIT",
         author: "Evgeny Poberezkin",
         link: "https://github.com/ajv-validator/ajv",
-    },
-    {
-        name: "ansi-regex@2.1.1",
-        licenseType: "MIT",
-        author: "Sindre Sorhus",
-        link: "https://github.com/chalk/ansi-regex",
     },
     {
         name: "ansi-regex@5.0.1",
@@ -524,13 +547,13 @@ export default [
         link: "https://github.com/iarna/aproba",
     },
     {
-        name: "are-we-there-yet@1.1.7",
+        name: "are-we-there-yet@2.0.0",
         licenseType: "ISC",
-        author: "Rebecca Turner",
-        link: "https://github.com/iarna/are-we-there-yet",
+        author: "GitHub Inc.",
+        link: "https://github.com/npm/are-we-there-yet",
     },
     {
-        name: "are-we-there-yet@2.0.0",
+        name: "are-we-there-yet@3.0.0",
         licenseType: "ISC",
         author: "GitHub Inc.",
         link: "https://github.com/npm/are-we-there-yet",
@@ -540,18 +563,6 @@ export default [
         licenseType: "MIT",
         author: "Jordan Harband",
         link: "https://github.com/es-shims/Array.prototype.map",
-    },
-    {
-        name: "asn1@0.2.6",
-        licenseType: "MIT",
-        author: "Joyent",
-        link: "https://github.com/joyent/node-asn1",
-    },
-    {
-        name: "assert-plus@1.0.0",
-        licenseType: "MIT",
-        author: "Mark Cavage",
-        link: "https://github.com/mcavage/node-assert-plus",
     },
     {
         name: "async@0.2.10",
@@ -572,19 +583,7 @@ export default [
         link: "https://github.com/fabiospampinato/atomically",
     },
     {
-        name: "aws-sign2@0.7.0",
-        licenseType: "Apache-2.0",
-        author: "Mikeal Rogers",
-        link: "https://github.com/mikeal/aws-sign",
-    },
-    {
-        name: "aws4@1.11.0",
-        licenseType: "MIT",
-        author: "Michael Hart",
-        link: "https://github.com/mhart/aws4",
-    },
-    {
-        name: "axios@0.26.1",
+        name: "axios@0.27.2",
         licenseType: "MIT",
         author: "Matt Zabriskie",
         link: "https://github.com/axios/axios",
@@ -594,11 +593,6 @@ export default [
         licenseType: "MIT",
         author: "Kent C. Dodds",
         link: "https://github.com/kentcdodds/babel-plugin-macros",
-    },
-    {
-        name: "backo2@1.0.2",
-        licenseType: "MIT",
-        link: "https://github.com/mokesmokes/backo",
     },
     {
         name: "balanced-match@1.0.2",
@@ -611,23 +605,6 @@ export default [
         licenseType: "MIT",
         author: "Kristian Faeldt",
         link: "https://github.com/faeldt/base64id",
-    },
-    {
-        name: "bcrypt-pbkdf@1.0.2",
-        licenseType: "BSD-3-Clause",
-        link: "https://github.com/joyent/node-bcrypt-pbkdf",
-    },
-    {
-        name: "bindings@1.5.0",
-        licenseType: "MIT",
-        author: "Nathan Rajlich",
-        link: "https://github.com/TooTallNate/node-bindings",
-    },
-    {
-        name: "block-stream@0.0.9",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/isaacs/block-stream",
     },
     {
         name: "boolean@3.2.0",
@@ -647,7 +624,7 @@ export default [
         link: "https://github.com/juliangruber/brace-expansion",
     },
     {
-        name: "browserslist@4.20.2",
+        name: "browserslist@4.20.3",
         licenseType: "MIT",
         author: "Andrey Sitnik",
         link: "https://github.com/browserslist/browserslist",
@@ -662,6 +639,11 @@ export default [
         name: "buffer-from@1.1.2",
         licenseType: "MIT",
         link: "https://github.com/LinusU/buffer-from",
+    },
+    {
+        name: "cacache@15.3.0",
+        licenseType: "ISC",
+        link: "https://github.com/npm/cacache",
     },
     {
         name: "cacheable-request@6.1.0",
@@ -682,27 +664,15 @@ export default [
         link: "https://github.com/sindresorhus/callsites",
     },
     {
-        name: "caniuse-lite@1.0.30001319",
+        name: "caniuse-lite@1.0.30001339",
         licenseType: "CC-BY-4.0",
         author: "Ben Briggs",
         link: "https://github.com/browserslist/caniuse-lite",
     },
     {
-        name: "caseless@0.12.0",
-        licenseType: "Apache-2.0",
-        author: "Mikeal Rogers",
-        link: "https://github.com/mikeal/caseless",
-    },
-    {
         name: "chalk@2.4.2",
         licenseType: "MIT",
         link: "https://github.com/chalk/chalk",
-    },
-    {
-        name: "chownr@1.1.4",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/isaacs/chownr",
     },
     {
         name: "chownr@2.0.0",
@@ -717,16 +687,16 @@ export default [
         link: "https://github.com/JedWatson/classnames",
     },
     {
+        name: "clean-stack@2.2.0",
+        licenseType: "MIT",
+        author: "Sindre Sorhus",
+        link: "https://github.com/sindresorhus/clean-stack",
+    },
+    {
         name: "clone-response@1.0.2",
         licenseType: "MIT",
         author: "Luke Childs",
         link: "https://github.com/lukechilds/clone-response",
-    },
-    {
-        name: "code-point-at@1.1.0",
-        licenseType: "MIT",
-        author: "Sindre Sorhus",
-        link: "https://github.com/sindresorhus/code-point-at",
     },
     {
         name: "color-convert@1.9.3",
@@ -751,12 +721,6 @@ export default [
         licenseType: "MIT",
         author: "Felix Geisendörfer",
         link: "https://github.com/felixge/node-combined-stream",
-    },
-    {
-        name: "commander@5.1.0",
-        licenseType: "MIT",
-        author: "TJ Holowaychuk",
-        link: "https://github.com/tj/commander.js",
     },
     {
         name: "compare-versions@4.1.3",
@@ -818,12 +782,6 @@ export default [
         link: "https://github.com/sudodoki/copy-to-clipboard",
     },
     {
-        name: "core-util-is@1.0.2",
-        licenseType: "MIT",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/isaacs/core-util-is",
-    },
-    {
         name: "core-util-is@1.0.3",
         licenseType: "MIT",
         author: "Isaac Z. Schlueter",
@@ -848,12 +806,6 @@ export default [
         link: "https://github.com/frenic/csstype",
     },
     {
-        name: "dashdash@1.14.1",
-        licenseType: "MIT",
-        author: "Trent Mick",
-        link: "https://github.com/trentm/node-dashdash",
-    },
-    {
         name: "debounce-fn@4.0.0",
         licenseType: "MIT",
         author: "Sindre Sorhus",
@@ -861,12 +813,6 @@ export default [
     },
     {
         name: "debug@2.6.9",
-        licenseType: "MIT",
-        author: "TJ Holowaychuk",
-        link: "https://github.com/visionmedia/debug",
-    },
-    {
-        name: "debug@3.2.7",
         licenseType: "MIT",
         author: "TJ Holowaychuk",
         link: "https://github.com/visionmedia/debug",
@@ -881,12 +827,6 @@ export default [
         name: "decompress-response@3.3.0",
         licenseType: "MIT",
         link: "https://github.com/sindresorhus/decompress-response",
-    },
-    {
-        name: "deep-extend@0.6.0",
-        licenseType: "MIT",
-        author: "Viacheslav Lotsmanov",
-        link: "https://github.com/unclechu/node-deep-extend",
     },
     {
         name: "defer-to-connect@1.1.3",
@@ -912,10 +852,10 @@ export default [
         link: "https://github.com/visionmedia/node-delegates",
     },
     {
-        name: "detect-libc@1.0.3",
-        licenseType: "Apache-2.0",
-        author: "Lovell Fuller",
-        link: "https://github.com/lovell/detect-libc",
+        name: "depd@1.1.2",
+        licenseType: "MIT",
+        author: "Douglas Christopher Wilson",
+        link: "https://github.com/dougwilson/nodejs-depd",
     },
     {
         name: "detect-libc@2.0.1",
@@ -942,7 +882,7 @@ export default [
         link: "https://github.com/sindresorhus/dot-prop",
     },
     {
-        name: "dotenv@16.0.0",
+        name: "dotenv@16.0.1",
         licenseType: "BSD-2-Clause",
         link: "https://github.com/motdotla/dotenv",
     },
@@ -951,12 +891,6 @@ export default [
         licenseType: "BSD-3-Clause",
         author: "Conrad Pankoff",
         link: "https://github.com/floatdrop/duplexer3",
-    },
-    {
-        name: "ecc-jsbn@0.1.2",
-        licenseType: "MIT",
-        author: "Jeremie Miller",
-        link: "https://github.com/quartzjer/ecc-jsbn",
     },
     {
         name: "electron-is-dev@2.0.0",
@@ -971,13 +905,13 @@ export default [
         link: "https://github.com/sindresorhus/electron-store",
     },
     {
-        name: "electron-to-chromium@1.4.88",
+        name: "electron-to-chromium@1.4.137",
         licenseType: "ISC",
         author: "Kilian Valkhof",
         link: "https://github.com/kilian/electron-to-chromium",
     },
     {
-        name: "electron@17.1.2",
+        name: "electron@18.2.2",
         licenseType: "MIT",
         author: "Electron Community",
         link: "https://github.com/electron/electron",
@@ -1006,17 +940,17 @@ export default [
         link: "https://github.com/mafintosh/end-of-stream",
     },
     {
-        name: "engine.io-client@6.1.1",
+        name: "engine.io-client@6.2.2",
         licenseType: "MIT",
         link: "https://github.com/socketio/engine.io-client",
     },
     {
-        name: "engine.io-parser@5.0.3",
+        name: "engine.io-parser@5.0.4",
         licenseType: "MIT",
         link: "https://github.com/socketio/engine.io-parser",
     },
     {
-        name: "engine.io@6.1.3",
+        name: "engine.io@6.2.0",
         licenseType: "MIT",
         author: "Guillermo Rauch",
         link: "https://github.com/socketio/engine.io",
@@ -1026,6 +960,12 @@ export default [
         licenseType: "MIT",
         author: "Sindre Sorhus",
         link: "https://github.com/sindresorhus/env-paths",
+    },
+    {
+        name: "err-code@2.0.3",
+        licenseType: "MIT",
+        author: "IndigoUnited",
+        link: "https://github.com/IndigoUnited/js-err-code",
     },
     {
         name: "error-ex@1.3.2",
@@ -1087,21 +1027,10 @@ export default [
         link: "https://github.com/JedWatson/exenv",
     },
     {
-        name: "extend@3.0.2",
-        licenseType: "MIT",
-        author: "Stefan Thomas",
-        link: "https://github.com/justmoon/node-extend",
-    },
-    {
         name: "extract-zip@1.7.0",
         licenseType: "BSD-2-Clause",
         author: "max ogden",
         link: "https://github.com/maxogden/extract-zip",
-    },
-    {
-        name: "extsprintf@1.3.0",
-        licenseType: "MIT",
-        link: "https://github.com/davepacheco/node-extsprintf",
     },
     {
         name: "fast-deep-equal@3.1.3",
@@ -1110,22 +1039,10 @@ export default [
         link: "https://github.com/epoberezkin/fast-deep-equal",
     },
     {
-        name: "fast-json-stable-stringify@2.1.0",
-        licenseType: "MIT",
-        author: "James Halliday",
-        link: "https://github.com/epoberezkin/fast-json-stable-stringify",
-    },
-    {
         name: "fd-slicer@1.1.0",
         licenseType: "MIT",
         author: "Andrew Kelley",
         link: "https://github.com/andrewrk/node-fd-slicer",
-    },
-    {
-        name: "file-uri-to-path@1.0.0",
-        licenseType: "MIT",
-        author: "Nathan Rajlich",
-        link: "https://github.com/TooTallNate/file-uri-to-path",
     },
     {
         name: "find-root@1.1.0",
@@ -1146,25 +1063,19 @@ export default [
         link: "https://github.com/follow-redirects/follow-redirects",
     },
     {
-        name: "forever-agent@0.6.1",
-        licenseType: "Apache-2.0",
-        author: "Mikeal Rogers",
-        link: "https://github.com/mikeal/forever-agent",
-    },
-    {
-        name: "form-data@2.3.3",
-        licenseType: "MIT",
-        author: "Felix Geisendörfer",
-        link: "https://github.com/form-data/form-data",
-    },
-    {
         name: "form-data@3.0.1",
         licenseType: "MIT",
         author: "Felix Geisendörfer",
         link: "https://github.com/form-data/form-data",
     },
     {
-        name: "fs-extra@10.0.1",
+        name: "form-data@4.0.0",
+        licenseType: "MIT",
+        author: "Felix Geisendörfer",
+        link: "https://github.com/form-data/form-data",
+    },
+    {
+        name: "fs-extra@10.1.0",
         licenseType: "MIT",
         author: "JP Richardson",
         link: "https://github.com/jprichardson/node-fs-extra",
@@ -1174,12 +1085,6 @@ export default [
         licenseType: "MIT",
         author: "JP Richardson",
         link: "https://github.com/jprichardson/node-fs-extra",
-    },
-    {
-        name: "fs-minipass@1.2.7",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/npm/fs-minipass",
     },
     {
         name: "fs-minipass@2.1.0",
@@ -1194,34 +1099,22 @@ export default [
         link: "https://github.com/isaacs/fs.realpath",
     },
     {
-        name: "fstream@1.0.12",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/npm/fstream",
-    },
-    {
         name: "function-bind@1.1.1",
         licenseType: "MIT",
         author: "Raynos",
         link: "https://github.com/Raynos/function-bind",
     },
     {
-        name: "furigana@0.19.3",
-        licenseType: "MPL-2.0",
-        author: "Ezzat Chamudi",
-        link: "git+https://echamudi@github.com/echamudi/japanese-toolkit",
-    },
-    {
-        name: "gauge@2.7.4",
-        licenseType: "ISC",
-        author: "Rebecca Turner",
-        link: "https://github.com/iarna/gauge",
-    },
-    {
         name: "gauge@3.0.2",
         licenseType: "ISC",
         author: "Rebecca Turner",
         link: "https://github.com/iarna/gauge",
+    },
+    {
+        name: "gauge@4.0.4",
+        licenseType: "ISC",
+        author: "GitHub Inc.",
+        link: "https://github.com/npm/gauge",
     },
     {
         name: "gensync@1.0.0-beta.2",
@@ -1252,12 +1145,6 @@ export default [
         licenseType: "MIT",
         author: "Jordan Harband",
         link: "https://github.com/inspect-js/get-symbol-description",
-    },
-    {
-        name: "getpass@0.1.7",
-        licenseType: "MIT",
-        author: "Alex Wilson",
-        link: "https://github.com/arekinath/node-getpass",
     },
     {
         name: "glob@7.2.0",
@@ -1306,28 +1193,10 @@ export default [
         link: "https://github.com/mattbierner/hamt_plus",
     },
     {
-        name: "har-schema@2.0.0",
-        licenseType: "ISC",
-        author: "Ahmad Nassri",
-        link: "https://github.com/ahmadnassri/har-schema",
-    },
-    {
-        name: "har-validator@5.1.5",
-        licenseType: "MIT",
-        author: "Ahmad Nassri",
-        link: "https://github.com/ahmadnassri/node-har-validator",
-    },
-    {
         name: "has-bigints@1.0.1",
         licenseType: "MIT",
         author: "Jordan Harband",
         link: "https://github.com/ljharb/has-bigints",
-    },
-    {
-        name: "has-cors@1.1.0",
-        licenseType: "MIT",
-        author: "Nathan Rajlich",
-        link: "https://github.com/component/has-cors",
     },
     {
         name: "has-flag@3.0.0",
@@ -1366,21 +1235,6 @@ export default [
         link: "https://github.com/remix-run/history",
     },
     {
-        name: "hoek@4.2.1",
-        licenseType: "BSD-3-Clause",
-        link: "https://github.com/hapijs/hoek",
-    },
-    {
-        name: "hoek@5.0.4",
-        licenseType: "BSD-3-Clause",
-        link: "https://github.com/hapijs/hoek",
-    },
-    {
-        name: "hoek@6.1.3",
-        licenseType: "BSD-3-Clause",
-        link: "https://github.com/hapijs/hoek",
-    },
-    {
         name: "hoist-non-react-statics@3.3.2",
         licenseType: "BSD-3-Clause",
         author: "Michael Ridgway",
@@ -1393,10 +1247,10 @@ export default [
         link: "https://github.com/kornelski/http-cache-semantics",
     },
     {
-        name: "http-signature@1.2.0",
+        name: "http-proxy-agent@4.0.1",
         licenseType: "MIT",
-        author: "Joyent, Inc",
-        link: "https://github.com/joyent/node-http-signature",
+        author: "Nathan Rajlich",
+        link: "https://github.com/TooTallNate/node-http-proxy-agent",
     },
     {
         name: "https-proxy-agent@5.0.0",
@@ -1405,22 +1259,16 @@ export default [
         link: "https://github.com/TooTallNate/node-https-proxy-agent",
     },
     {
-        name: "iconv-lite@0.4.24",
+        name: "humanize-ms@1.2.1",
         licenseType: "MIT",
-        author: "Alexander Shtuchkin",
-        link: "https://github.com/ashtuchkin/iconv-lite",
+        author: "dead-horse",
+        link: "https://github.com/node-modules/humanize-ms",
     },
     {
         name: "iconv-lite@0.6.3",
         licenseType: "MIT",
         author: "Alexander Shtuchkin",
         link: "https://github.com/ashtuchkin/iconv-lite",
-    },
-    {
-        name: "ignore-walk@3.0.4",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/isaacs/ignore-walk",
     },
     {
         name: "immediate@3.0.6",
@@ -1432,6 +1280,24 @@ export default [
         licenseType: "MIT",
         author: "Sindre Sorhus",
         link: "https://github.com/sindresorhus/import-fresh",
+    },
+    {
+        name: "imurmurhash@0.1.4",
+        licenseType: "MIT",
+        author: "Jens Taylor",
+        link: "https://github.com/jensyt/imurmurhash-js",
+    },
+    {
+        name: "indent-string@4.0.0",
+        licenseType: "MIT",
+        author: "Sindre Sorhus",
+        link: "https://github.com/sindresorhus/indent-string",
+    },
+    {
+        name: "infer-owner@1.0.4",
+        licenseType: "ISC",
+        author: "Isaac Z. Schlueter",
+        link: "https://github.com/npm/infer-owner",
     },
     {
         name: "inflight@1.0.6",
@@ -1457,10 +1323,16 @@ export default [
         link: "https://github.com/ljharb/internal-slot",
     },
     {
-        name: "intl-messageformat@9.11.4",
+        name: "intl-messageformat@9.13.0",
         licenseType: "BSD-3-Clause",
         author: "Eric Ferraiuolo",
         link: "https://github.com/formatjs/formatjs",
+    },
+    {
+        name: "ip@1.1.8",
+        licenseType: "MIT",
+        author: "Fedor Indutny",
+        link: "https://github.com/indutny/node-ip",
     },
     {
         name: "is-arguments@1.1.1",
@@ -1505,16 +1377,16 @@ export default [
         link: "https://github.com/inspect-js/is-date-object",
     },
     {
-        name: "is-fullwidth-code-point@1.0.0",
+        name: "is-fullwidth-code-point@3.0.0",
         licenseType: "MIT",
         author: "Sindre Sorhus",
         link: "https://github.com/sindresorhus/is-fullwidth-code-point",
     },
     {
-        name: "is-fullwidth-code-point@3.0.0",
+        name: "is-lambda@1.0.1",
         licenseType: "MIT",
-        author: "Sindre Sorhus",
-        link: "https://github.com/sindresorhus/is-fullwidth-code-point",
+        author: "Thomas Watson Steen",
+        link: "https://github.com/watson/is-lambda",
     },
     {
         name: "is-map@2.0.2",
@@ -1571,12 +1443,6 @@ export default [
         link: "https://github.com/inspect-js/is-symbol",
     },
     {
-        name: "is-typedarray@1.0.0",
-        licenseType: "MIT",
-        author: "Hugh Kennedy",
-        link: "https://github.com/hughsk/is-typedarray",
-    },
-    {
         name: "is-weakref@1.0.2",
         licenseType: "MIT",
         author: "Jordan Harband",
@@ -1595,21 +1461,10 @@ export default [
         link: "https://github.com/juliangruber/isarray",
     },
     {
-        name: "isemail@3.2.0",
-        licenseType: "BSD-3-Clause",
-        link: "https://github.com/hapijs/isemail",
-    },
-    {
         name: "isexe@2.0.0",
         licenseType: "ISC",
         author: "Isaac Z. Schlueter",
         link: "https://github.com/isaacs/isexe",
-    },
-    {
-        name: "isstream@0.1.2",
-        licenseType: "MIT",
-        author: "Rod Vagg",
-        link: "https://github.com/rvagg/isstream",
     },
     {
         name: "iterate-iterator@1.0.2",
@@ -1624,27 +1479,10 @@ export default [
         link: "https://github.com/ljharb/iterate-value",
     },
     {
-        name: "japanese-db@0.19.3",
-        licenseType: "MPL-2.0",
-        author: "Ezzat Chamudi",
-        link: "git+https://echamudi@github.com/echamudi/japanese-toolkit",
-    },
-    {
-        name: "joi@13.7.0",
-        licenseType: "BSD-3-Clause",
-        link: "https://github.com/hapijs/joi",
-    },
-    {
         name: "js-tokens@4.0.0",
         licenseType: "MIT",
         author: "Simon Lydell",
         link: "https://github.com/lydell/js-tokens",
-    },
-    {
-        name: "jsbn@0.1.1",
-        licenseType: "MIT",
-        author: "Tom Wu",
-        link: "https://github.com/andyperlitch/jsbn",
     },
     {
         name: "jsesc@2.5.2",
@@ -1665,12 +1503,6 @@ export default [
         link: "https://github.com/npm/json-parse-even-better-errors",
     },
     {
-        name: "json-schema-traverse@0.4.1",
-        licenseType: "MIT",
-        author: "Evgeny Poberezkin",
-        link: "https://github.com/epoberezkin/json-schema-traverse",
-    },
-    {
         name: "json-schema-traverse@1.0.0",
         licenseType: "MIT",
         author: "Evgeny Poberezkin",
@@ -1682,19 +1514,13 @@ export default [
         link: "https://github.com/typeslick/json-schema-typed",
     },
     {
-        name: "json-schema@0.4.0",
-        licenseType: "(AFL-2.1 OR BSD-3-Clause)",
-        author: "Kris Zyp",
-        link: "https://github.com/kriszyp/json-schema",
-    },
-    {
         name: "json-stringify-safe@5.0.1",
         licenseType: "ISC",
         author: "Isaac Z. Schlueter",
         link: "https://github.com/isaacs/json-stringify-safe",
     },
     {
-        name: "json5@2.2.0",
+        name: "json5@2.2.1",
         licenseType: "MIT",
         author: "Aseem Kishore",
         link: "https://github.com/json5/json5",
@@ -1712,17 +1538,6 @@ export default [
         link: "https://github.com/jprichardson/node-jsonfile",
     },
     {
-        name: "jsprim@1.4.2",
-        licenseType: "MIT",
-        link: "https://github.com/joyent/node-jsprim",
-    },
-    {
-        name: "kanji@0.19.3",
-        licenseType: "MPL-2.0",
-        author: "Ezzat Chamudi",
-        link: "git+https://echamudi@github.com/echamudi/japanese-toolkit",
-    },
-    {
         name: "keyv@3.1.0",
         licenseType: "MIT",
         author: "Luke Childs",
@@ -1733,12 +1548,6 @@ export default [
         licenseType: "MIT",
         author: "Luke Edwards",
         link: "https://github.com/lukeed/klona",
-    },
-    {
-        name: "kyarakuta@0.19.3",
-        licenseType: "MPL-2.0",
-        author: "Ezzat Chamudi",
-        link: "git+https://echamudi@github.com/echamudi/japanese-toolkit",
     },
     {
         name: "lie@3.1.1",
@@ -1800,6 +1609,12 @@ export default [
         link: "https://github.com/sindresorhus/make-dir",
     },
     {
+        name: "make-fetch-happen@9.1.0",
+        licenseType: "ISC",
+        author: "Kat Marchán",
+        link: "https://github.com/npm/make-fetch-happen",
+    },
+    {
         name: "matcher@3.0.0",
         licenseType: "MIT",
         author: "Sindre Sorhus",
@@ -1846,28 +1661,43 @@ export default [
         link: "https://github.com/isaacs/minimatch",
     },
     {
-        name: "minimist@1.2.5",
+        name: "minimist@1.2.6",
         licenseType: "MIT",
         author: "James Halliday",
         link: "https://github.com/substack/minimist",
     },
     {
-        name: "minipass@2.9.0",
+        name: "minipass-collect@1.0.2",
         licenseType: "ISC",
         author: "Isaac Z. Schlueter",
-        link: "https://github.com/isaacs/minipass",
+    },
+    {
+        name: "minipass-fetch@1.4.1",
+        licenseType: "MIT",
+        link: "https://github.com/npm/minipass-fetch",
+    },
+    {
+        name: "minipass-flush@1.0.5",
+        licenseType: "ISC",
+        author: "Isaac Z. Schlueter",
+        link: "https://github.com/isaacs/minipass-flush",
+    },
+    {
+        name: "minipass-pipeline@1.2.4",
+        licenseType: "ISC",
+        author: "Isaac Z. Schlueter",
+    },
+    {
+        name: "minipass-sized@1.0.3",
+        licenseType: "ISC",
+        author: "Isaac Z. Schlueter",
+        link: "https://github.com/isaacs/minipass-sized",
     },
     {
         name: "minipass@3.1.6",
         licenseType: "ISC",
         author: "Isaac Z. Schlueter",
         link: "https://github.com/isaacs/minipass",
-    },
-    {
-        name: "minizlib@1.3.3",
-        licenseType: "MIT",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/isaacs/minizlib",
     },
     {
         name: "minizlib@2.1.2",
@@ -1887,7 +1717,7 @@ export default [
         link: "https://github.com/isaacs/node-mkdirp",
     },
     {
-        name: "moment@2.29.1",
+        name: "moment@2.29.3",
         licenseType: "MIT",
         author: "Iskren Ivov Chernev",
         link: "https://github.com/moment/moment",
@@ -1903,21 +1733,10 @@ export default [
         link: "https://github.com/zeit/ms",
     },
     {
-        name: "nan@2.15.0",
-        licenseType: "MIT",
-        link: "https://github.com/nodejs/nan",
-    },
-    {
         name: "nedb-promises@6.0.3",
         licenseType: "ISC",
         author: "Kristóf Baján",
         link: "https://github.com/bajankristof/nedb-promises",
-    },
-    {
-        name: "needle@2.9.1",
-        licenseType: "MIT",
-        author: "Tomás Pollak",
-        link: "https://github.com/tomas/needle",
     },
     {
         name: "negotiator@0.6.3",
@@ -1925,15 +1744,9 @@ export default [
         link: "https://github.com/jshttp/negotiator",
     },
     {
-        name: "node-addon-api@3.2.1",
+        name: "node-addon-api@4.3.0",
         licenseType: "MIT",
         link: "https://github.com/nodejs/node-addon-api",
-    },
-    {
-        name: "node-expat@2.4.0",
-        licenseType: "MIT",
-        author: "Astro",
-        link: "https://github.com/astro/node-expat",
     },
     {
         name: "node-fetch@2.6.7",
@@ -1942,34 +1755,16 @@ export default [
         link: "https://github.com/bitinn/node-fetch",
     },
     {
-        name: "node-gyp@3.8.0",
+        name: "node-gyp@8.4.1",
         licenseType: "MIT",
         author: "Nathan Rajlich",
         link: "https://github.com/nodejs/node-gyp",
     },
     {
-        name: "node-pre-gyp@0.11.0",
-        licenseType: "BSD-3-Clause",
-        author: "Dane Springmeyer",
-        link: "https://github.com/mapbox/node-pre-gyp",
-    },
-    {
-        name: "node-releases@2.0.2",
+        name: "node-releases@2.0.4",
         licenseType: "MIT",
         author: "Sergey Rubanov",
         link: "https://github.com/chicoxyzzy/node-releases",
-    },
-    {
-        name: "nopt@3.0.6",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/npm/nopt",
-    },
-    {
-        name: "nopt@4.0.3",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/npm/nopt",
     },
     {
         name: "nopt@5.0.0",
@@ -1984,34 +1779,10 @@ export default [
         link: "https://github.com/sindresorhus/normalize-url",
     },
     {
-        name: "npm-bundled@1.1.2",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/npm/npm-bundled",
-    },
-    {
         name: "npm-conf@1.1.3",
         licenseType: "MIT",
         author: "Kevin Martensson",
         link: "https://github.com/kevva/npm-conf",
-    },
-    {
-        name: "npm-normalize-package-bin@1.0.1",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/npm/npm-normalize-package-bin",
-    },
-    {
-        name: "npm-packlist@1.4.8",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/npm/npm-packlist",
-    },
-    {
-        name: "npmlog@4.1.2",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/npm/npmlog",
     },
     {
         name: "npmlog@5.0.1",
@@ -2020,16 +1791,10 @@ export default [
         link: "https://github.com/npm/npmlog",
     },
     {
-        name: "number-is-nan@1.0.1",
-        licenseType: "MIT",
-        author: "Sindre Sorhus",
-        link: "https://github.com/sindresorhus/number-is-nan",
-    },
-    {
-        name: "oauth-sign@0.9.0",
-        licenseType: "Apache-2.0",
-        author: "Mikeal Rogers",
-        link: "https://github.com/mikeal/oauth-sign",
+        name: "npmlog@6.0.2",
+        licenseType: "ISC",
+        author: "GitHub Inc.",
+        link: "https://github.com/npm/npmlog",
     },
     {
         name: "object-assign@4.1.1",
@@ -2068,24 +1833,6 @@ export default [
         link: "https://github.com/sindresorhus/onetime",
     },
     {
-        name: "os-homedir@1.0.2",
-        licenseType: "MIT",
-        author: "Sindre Sorhus",
-        link: "https://github.com/sindresorhus/os-homedir",
-    },
-    {
-        name: "os-tmpdir@1.0.2",
-        licenseType: "MIT",
-        author: "Sindre Sorhus",
-        link: "https://github.com/sindresorhus/os-tmpdir",
-    },
-    {
-        name: "osenv@0.1.5",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/npm/osenv",
-    },
-    {
         name: "p-cancelable@1.1.0",
         licenseType: "MIT",
         author: "Sindre Sorhus",
@@ -2104,16 +1851,16 @@ export default [
         link: "https://github.com/sindresorhus/p-locate",
     },
     {
+        name: "p-map@4.0.0",
+        licenseType: "MIT",
+        author: "Sindre Sorhus",
+        link: "https://github.com/sindresorhus/p-map",
+    },
+    {
         name: "p-try@2.2.0",
         licenseType: "MIT",
         author: "Sindre Sorhus",
         link: "https://github.com/sindresorhus/p-try",
-    },
-    {
-        name: "papaparse@5.3.1",
-        licenseType: "MIT",
-        author: "Matthew Holt",
-        link: "https://github.com/mholt/PapaParse",
     },
     {
         name: "parent-module@1.0.1",
@@ -2126,18 +1873,6 @@ export default [
         licenseType: "MIT",
         author: "Sindre Sorhus",
         link: "https://github.com/sindresorhus/parse-json",
-    },
-    {
-        name: "parseqs@0.0.6",
-        licenseType: "MIT",
-        author: "Gal Koren",
-        link: "https://github.com/get/querystring",
-    },
-    {
-        name: "parseuri@0.0.6",
-        licenseType: "MIT",
-        author: "Gal Koren",
-        link: "https://github.com/get/parseuri",
     },
     {
         name: "path-exists@3.0.0",
@@ -2168,12 +1903,6 @@ export default [
         licenseType: "MIT",
         author: "Andrew Kelley",
         link: "https://github.com/andrewrk/node-pend",
-    },
-    {
-        name: "performance-now@2.1.0",
-        licenseType: "MIT",
-        author: "Braveg1rl",
-        link: "https://github.com/braveg1rl/performance-now",
     },
     {
         name: "picocolors@1.0.0",
@@ -2211,6 +1940,18 @@ export default [
         link: "https://github.com/visionmedia/node-progress",
     },
     {
+        name: "promise-inflight@1.0.1",
+        licenseType: "ISC",
+        author: "Rebecca Turner",
+        link: "https://github.com/iarna/promise-inflight",
+    },
+    {
+        name: "promise-retry@2.0.1",
+        licenseType: "MIT",
+        author: "IndigoUnited",
+        link: "https://github.com/IndigoUnited/node-promise-retry",
+    },
+    {
         name: "prop-types@15.8.1",
         licenseType: "MIT",
         link: "https://github.com/facebook/prop-types",
@@ -2220,12 +1961,6 @@ export default [
         licenseType: "ISC",
         author: "Isaac Z. Schlueter",
         link: "https://github.com/isaacs/proto-list",
-    },
-    {
-        name: "psl@1.8.0",
-        licenseType: "MIT",
-        author: "Lupo Montero",
-        link: "https://github.com/lupomontero/psl",
     },
     {
         name: "pump@3.0.0",
@@ -2240,18 +1975,7 @@ export default [
         link: "https://github.com/bestiejs/punycode.js",
     },
     {
-        name: "qs@6.5.3",
-        licenseType: "BSD-3-Clause",
-        link: "https://github.com/ljharb/qs",
-    },
-    {
-        name: "rc@1.2.8",
-        licenseType: "(BSD-2-Clause OR MIT OR Apache-2.0)",
-        author: "Dominic Tarr",
-        link: "https://github.com/dominictarr/rc",
-    },
-    {
-        name: "react-copy-to-clipboard@5.0.4",
+        name: "react-copy-to-clipboard@5.1.0",
         licenseType: "MIT",
         author: "Nik Butenko",
         link: "https://github.com/nkbt/react-copy-to-clipboard",
@@ -2274,7 +1998,7 @@ export default [
         link: "https://github.com/nfl/react-helmet",
     },
     {
-        name: "react-intl@5.24.7",
+        name: "react-intl@5.25.1",
         licenseType: "BSD-3-Clause",
         author: "Eric Ferraiuolo",
         link: "https://github.com/formatjs/formatjs",
@@ -2290,7 +2014,7 @@ export default [
         link: "https://github.com/reactjs/react-lifecycles-compat",
     },
     {
-        name: "react-modal@3.14.4",
+        name: "react-modal@3.15.1",
         licenseType: "MIT",
         link: "https://github.com/reactjs/react-modal",
     },
@@ -2301,19 +2025,19 @@ export default [
         link: "https://github.com/tajo/react-range",
     },
     {
-        name: "react-router-dom@6.2.2",
+        name: "react-router-dom@6.3.0",
         licenseType: "MIT",
         author: "Remix Software",
         link: "https://github.com/remix-run/react-router",
     },
     {
-        name: "react-router@6.2.2",
+        name: "react-router@6.3.0",
         licenseType: "MIT",
         author: "Remix Software",
         link: "https://github.com/remix-run/react-router",
     },
     {
-        name: "react-select@5.2.2",
+        name: "react-select@5.3.2",
         licenseType: "MIT",
         author: "Jed Watson",
         link: "https://github.com/JedWatson/react-select/tree/master/packages/react-select",
@@ -2357,7 +2081,7 @@ export default [
         link: "https://github.com/nodejs/readable-stream",
     },
     {
-        name: "recoil@0.6.1",
+        name: "recoil@0.7.2",
         licenseType: "MIT",
         link: "https://github.com/facebookexperimental/Recoil",
     },
@@ -2366,12 +2090,6 @@ export default [
         licenseType: "MIT",
         author: "Ben Newman",
         link: "https://github.com/facebook/regenerator/tree/master/packages/runtime",
-    },
-    {
-        name: "request@2.88.2",
-        licenseType: "Apache-2.0",
-        author: "Mikeal Rogers",
-        link: "https://github.com/request/request",
     },
     {
         name: "require-from-string@2.0.2",
@@ -2398,10 +2116,10 @@ export default [
         link: "https://github.com/lukechilds/responselike",
     },
     {
-        name: "rimraf@2.7.1",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/isaacs/rimraf",
+        name: "retry@0.12.0",
+        licenseType: "MIT",
+        author: "Tim Koschützki",
+        link: "https://github.com/tim-kos/node-retry",
     },
     {
         name: "rimraf@3.0.2",
@@ -2422,22 +2140,10 @@ export default [
         link: "https://github.com/feross/safe-buffer",
     },
     {
-        name: "safe-buffer@5.2.1",
-        licenseType: "MIT",
-        author: "Feross Aboukhadijeh",
-        link: "https://github.com/feross/safe-buffer",
-    },
-    {
         name: "safer-buffer@2.1.2",
         licenseType: "MIT",
         author: "Nikita Skovoroda",
         link: "https://github.com/ChALkeR/safer-buffer",
-    },
-    {
-        name: "sax@1.2.4",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/isaacs/sax-js",
     },
     {
         name: "scheduler@0.20.2",
@@ -2451,16 +2157,6 @@ export default [
         link: "https://github.com/substack/semver-compare",
     },
     {
-        name: "semver@5.3.0",
-        licenseType: "ISC",
-        link: "https://github.com/npm/node-semver",
-    },
-    {
-        name: "semver@5.7.1",
-        licenseType: "ISC",
-        link: "https://github.com/npm/node-semver",
-    },
-    {
         name: "semver@6.3.0",
         licenseType: "ISC",
         link: "https://github.com/npm/node-semver",
@@ -2468,6 +2164,12 @@ export default [
     {
         name: "semver@7.3.5",
         licenseType: "ISC",
+        link: "https://github.com/npm/node-semver",
+    },
+    {
+        name: "semver@7.3.7",
+        licenseType: "ISC",
+        author: "GitHub Inc.",
         link: "https://github.com/npm/node-semver",
     },
     {
@@ -2501,12 +2203,18 @@ export default [
         link: "https://github.com/tapjs/signal-exit",
     },
     {
-        name: "socket.io-adapter@2.3.3",
+        name: "smart-buffer@4.2.0",
+        licenseType: "MIT",
+        author: "Josh Glazebrook",
+        link: "https://github.com/JoshGlazebrook/smart-buffer",
+    },
+    {
+        name: "socket.io-adapter@2.4.0",
         licenseType: "MIT",
         link: "https://github.com/socketio/socket.io-adapter",
     },
     {
-        name: "socket.io-client@4.4.1",
+        name: "socket.io-client@4.5.0",
         licenseType: "MIT",
         link: "https://github.com/socketio/socket.io-client",
     },
@@ -2516,14 +2224,26 @@ export default [
         link: "https://github.com/socketio/socket.io-parser",
     },
     {
-        name: "socket.io-parser@4.1.2",
+        name: "socket.io-parser@4.2.0",
         licenseType: "MIT",
         link: "https://github.com/socketio/socket.io-parser",
     },
     {
-        name: "socket.io@4.4.1",
+        name: "socket.io@4.5.0",
         licenseType: "MIT",
         link: "https://github.com/socketio/socket.io",
+    },
+    {
+        name: "socks-proxy-agent@6.2.0",
+        licenseType: "MIT",
+        author: "Nathan Rajlich",
+        link: "https://github.com/TooTallNate/node-socks-proxy-agent",
+    },
+    {
+        name: "socks@2.6.2",
+        licenseType: "MIT",
+        author: "Josh Glazebrook",
+        link: "https://github.com/JoshGlazebrook/socks",
     },
     {
         name: "source-map@0.5.7",
@@ -2538,35 +2258,24 @@ export default [
         link: "https://github.com/alexei/sprintf.js",
     },
     {
-        name: "sqlite3@4.2.0",
+        name: "sqlite3@5.0.8",
         licenseType: "BSD-3-Clause",
-        author: "MapBox",
-        link: "https://github.com/mapbox/node-sqlite3",
+        author: "Mapbox",
+        link: "https://github.com/TryGhost/node-sqlite3",
     },
     {
-        name: "sqlite3@5.0.2",
-        licenseType: "BSD-3-Clause",
-        author: "MapBox",
-        link: "https://github.com/mapbox/node-sqlite3",
-    },
-    {
-        name: "sqlite@4.0.25",
+        name: "sqlite@4.1.1",
         licenseType: "MIT",
         author: "Kriasoft",
         link: "https://github.com/kriasoft/node-sqlite",
     },
     {
-        name: "sshpk@1.17.0",
-        licenseType: "MIT",
-        author: "Joyent, Inc",
-        link: "https://github.com/joyent/node-sshpk",
+        name: "ssri@8.0.1",
+        licenseType: "ISC",
+        author: "Kat Marchán",
+        link: "https://github.com/npm/ssri",
     },
-    {
-        name: "string-width@1.0.2",
-        licenseType: "MIT",
-        author: "Sindre Sorhus",
-        link: "https://github.com/sindresorhus/string-width",
-    },
+    { name: "streaid@0.3.2", licenseType: "MIT*", author: "SUSH" },
     {
         name: "string-width@4.2.3",
         licenseType: "MIT",
@@ -2591,22 +2300,10 @@ export default [
         link: "https://github.com/nodejs/string_decoder",
     },
     {
-        name: "strip-ansi@3.0.1",
-        licenseType: "MIT",
-        author: "Sindre Sorhus",
-        link: "https://github.com/chalk/strip-ansi",
-    },
-    {
         name: "strip-ansi@6.0.1",
         licenseType: "MIT",
         author: "Sindre Sorhus",
         link: "https://github.com/chalk/strip-ansi",
-    },
-    {
-        name: "strip-json-comments@2.0.1",
-        licenseType: "MIT",
-        author: "Sindre Sorhus",
-        link: "https://github.com/sindresorhus/strip-json-comments",
     },
     {
         name: "stylis@4.0.13",
@@ -2631,18 +2328,6 @@ export default [
         licenseType: "MIT",
         author: "Jordan Harband",
         link: "https://github.com/inspect-js/node-supports-preserve-symlinks-flag",
-    },
-    {
-        name: "tar@2.2.2",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/isaacs/node-tar",
-    },
-    {
-        name: "tar@4.4.19",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/npm/node-tar",
     },
     {
         name: "tar@6.1.11",
@@ -2675,17 +2360,6 @@ export default [
         link: "https://github.com/sudodoki/toggle-selection",
     },
     {
-        name: "topo@3.0.3",
-        licenseType: "BSD-3-Clause",
-        link: "https://github.com/hapijs/topo",
-    },
-    {
-        name: "tough-cookie@2.5.0",
-        licenseType: "BSD-3-Clause",
-        author: "Jeremy Stashewsky",
-        link: "https://github.com/salesforce/tough-cookie",
-    },
-    {
         name: "tr46@0.0.3",
         licenseType: "MIT",
         author: "Sebastian Mayr",
@@ -2698,24 +2372,11 @@ export default [
         link: "https://github.com/Microsoft/tslib",
     },
     {
-        name: "tunnel-agent@0.6.0",
-        licenseType: "Apache-2.0",
-        author: "Mikeal Rogers",
-        link: "https://github.com/mikeal/tunnel-agent",
-    },
-    {
         name: "tunnel@0.0.6",
         licenseType: "MIT",
         author: "Koichi Kobayashi",
         link: "https://github.com/koichik/node-tunnel",
     },
-    {
-        name: "tweetnacl@0.14.5",
-        licenseType: "Unlicense",
-        author: "TweetNaCl-js contributors",
-        link: "https://github.com/dchest/tweetnacl-js",
-    },
-    { name: "twitch-support-tool@0.3.2", licenseType: "MIT*", author: "SUSH" },
     {
         name: "type-fest@0.13.1",
         licenseType: "(MIT OR CC0-1.0)",
@@ -2735,7 +2396,7 @@ export default [
         link: "https://github.com/substack/typedarray",
     },
     {
-        name: "typescript@4.6.2",
+        name: "typescript@4.6.4",
         licenseType: "Apache-2.0",
         author: "Microsoft Corp.",
         link: "https://github.com/Microsoft/TypeScript",
@@ -2745,6 +2406,18 @@ export default [
         licenseType: "MIT",
         author: "Jordan Harband",
         link: "https://github.com/ljharb/unbox-primitive",
+    },
+    {
+        name: "unique-filename@1.1.1",
+        licenseType: "ISC",
+        author: "Rebecca Turner",
+        link: "https://github.com/iarna/unique-filename",
+    },
+    {
+        name: "unique-slug@2.0.2",
+        licenseType: "ISC",
+        author: "Rebecca Turner",
+        link: "https://github.com/iarna/unique-slug",
     },
     {
         name: "universalify@0.1.2",
@@ -2792,11 +2465,6 @@ export default [
         link: "https://github.com/TooTallNate/util-deprecate",
     },
     {
-        name: "uuid@3.4.0",
-        licenseType: "MIT",
-        link: "https://github.com/uuidjs/uuid",
-    },
-    {
         name: "uuid@7.0.3",
         licenseType: "MIT",
         link: "https://github.com/uuidjs/uuid",
@@ -2806,11 +2474,6 @@ export default [
         licenseType: "MIT",
         author: "Douglas Christopher Wilson",
         link: "https://github.com/jshttp/vary",
-    },
-    {
-        name: "verror@1.10.0",
-        licenseType: "MIT",
-        link: "https://github.com/davepacheco/node-verror",
     },
     {
         name: "warning@4.0.3",
@@ -2837,7 +2500,7 @@ export default [
         link: "https://github.com/inspect-js/which-boxed-primitive",
     },
     {
-        name: "which@1.3.1",
+        name: "which@2.0.2",
         licenseType: "ISC",
         author: "Isaac Z. Schlueter",
         link: "https://github.com/isaacs/node-which",
@@ -2861,21 +2524,10 @@ export default [
         link: "https://github.com/websockets/ws",
     },
     {
-        name: "xml2json@0.12.0",
-        licenseType: "MIT",
-        link: "https://github.com/buglabs/node-xml2json",
-    },
-    {
         name: "xmlhttprequest-ssl@2.0.0",
         licenseType: "MIT",
         author: "Michael de Wit",
         link: "https://github.com/mjwwit/node-XMLHttpRequest",
-    },
-    {
-        name: "yallist@3.1.1",
-        licenseType: "ISC",
-        author: "Isaac Z. Schlueter",
-        link: "https://github.com/isaacs/yallist",
     },
     {
         name: "yallist@4.0.0",
@@ -2894,11 +2546,5 @@ export default [
         licenseType: "MIT",
         author: "Josh Wolfe",
         link: "https://github.com/thejoshwolfe/yauzl",
-    },
-    {
-        name: "yeast@0.1.2",
-        licenseType: "MIT",
-        author: "Arnout Kazemier",
-        link: "https://github.com/unshiftio/yeast",
     },
 ];

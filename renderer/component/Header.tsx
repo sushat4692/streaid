@@ -11,13 +11,11 @@ import { useSettingState } from "../util/setting";
 // Component
 import ConnectComponent from "./Connect";
 import Container from "../../component/Container";
-import Icon from "../../component/Icon";
 const Nav = tw.header`bg-gray-800 dark:bg-gray-900 fixed w-full z-30`;
 const NavInner = tw.div`flex items-center justify-between h-16 md:h-10`;
 const NavList = tw.div`flex items-center`;
-const NavListBrand = tw(NavLink)`text-white text-2xl flex-shrink-0`;
 const NavListMenu = tw.div`hidden md:block`;
-const NavListMenuInner = tw.div`ml-2 flex items-baseline`;
+const NavListMenuInner = tw.div`flex items-baseline`;
 const NavListMenuButton = styled(NavLink)<{ disabled?: boolean }>(
     ({ disabled }) => [
         tw`text-gray-300 hover:bg-gray-700 hover:text-white px-3 text-sm font-medium flex items-center h-10`,
@@ -66,12 +64,14 @@ const HeaderComponent: React.FC = () => {
             <Container>
                 <NavInner>
                     <NavList>
-                        <NavListBrand to="/">
-                            <Icon icon="twitch" />
-                        </NavListBrand>
-
                         <NavListMenu>
                             <NavListMenuInner>
+                                <NavListMenuButton end to="/">
+                                    <FormattedMessage
+                                        id="Common.Dashboard.Name"
+                                        defaultMessage="Dashboard"
+                                    />
+                                </NavListMenuButton>
                                 <NavListMenuButton
                                     end
                                     disabled={!setting.isEnableBot}
@@ -200,6 +200,12 @@ const HeaderComponent: React.FC = () => {
 
             <NavMobile visible={isSPNavView}>
                 <NavMobileMenu>
+                    <NavMobileMenuButton disabled={false} to="/">
+                        <FormattedMessage
+                            id="Common.Dashboard.Name"
+                            defaultMessage="Dashboard"
+                        />
+                    </NavMobileMenuButton>
                     <NavMobileMenuButton
                         disabled={!setting.isEnableBot}
                         to="chatters"

@@ -63,7 +63,7 @@ const InitComponent: React.FC = () => {
                         <TitleIcon icon={`twitch`} />
                         <FormattedMessage
                             id="Common.Title"
-                            defaultMessage="Twitch Support Tool"
+                            defaultMessage="Streaid"
                         />
                     </Title>
 

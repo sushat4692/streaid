@@ -13,7 +13,6 @@ import Icon from "../../component/Icon";
 import Section from "../../component/Section";
 import ButtonLink from "../../component/ButtonLink";
 import DashboardHeadline from "../component/DashboardHeadline";
-import DashboardHeadlineIcon from "../component/DashboardHeadlineIcon";
 
 const Cards = styled.div([
     { gridTemplateColumns: `repeat(auto-fill, minmax(280px, 1fr))` },
@@ -31,12 +30,8 @@ const DashboardPage: React.FC = () => {
         <>
             <MetaComponent />
 
-            <DashboardHeadline>
-                <DashboardHeadlineIcon icon={`twitch`} />
-                <FormattedMessage
-                    id="Common.Title"
-                    defaultMessage="Twitch Support Tool"
-                />
+            <DashboardHeadline secondary="Aiding your streaming">
+                <FormattedMessage id="Common.Title" defaultMessage="Streaid" />
             </DashboardHeadline>
 
             <Container>
