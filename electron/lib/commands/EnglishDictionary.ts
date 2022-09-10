@@ -56,6 +56,7 @@ export const getWordMeanEnToJa = async (
     const count = await (async () => {
         const indexed = await findByWordIndexedWord({
             word,
+            type: "e2j",
             username: UserState.username ?? "",
         });
 
@@ -66,6 +67,7 @@ export const getWordMeanEnToJa = async (
         } else {
             const indexed: RequestIndexedWordType = {
                 word,
+                type: "e2j",
                 username: UserState.username ?? "",
                 count: 1,
             };
