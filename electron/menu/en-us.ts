@@ -10,7 +10,13 @@ const template: (MenuItem | MenuItemConstructorOptions)[] = [
         ? [
               {
                   label: app.name,
-                  submenu: [{ role: "quit", label: `Quit ${app.name}` }],
+                  submenu: [
+                      {
+                          role: "about",
+                          label: `About ${app.name}`,
+                      },
+                      { role: "quit", label: `Quit ${app.name}` },
+                  ],
               },
           ]
         : []),
@@ -30,6 +36,15 @@ const template: (MenuItem | MenuItemConstructorOptions)[] = [
         role: "help",
         label: "Help",
         submenu: [
+            ...(!isMac
+                ? [
+                      {
+                          role: "about",
+                          label: `About ${app.name}`,
+                      },
+                      { type: "separator" },
+                  ]
+                : []),
             {
                 label: "Learn More",
                 click: async () => {
