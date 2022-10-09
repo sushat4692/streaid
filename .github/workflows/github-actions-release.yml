@@ -18,7 +18,7 @@ jobs:
           node-version: 16
 
       - name: Install app dependencies and build
-        run: npm install && npm run build
+        run: npm install --legacy-peer-deps --legacy-peer-deps && npm run build
 
       - name: Build application
         run: npm run pack:mac
@@ -45,7 +45,7 @@ jobs:
           node-version: 16
 
       - name: Install app dependencies and build
-        run: npm install && npm run build
+        run: npm install --legacy-peer-deps && npm run build
 
       - name: Build application
         run: npm run pack:mac
