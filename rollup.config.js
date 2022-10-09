@@ -5,6 +5,11 @@ import pluginReplace from "@rollup/plugin-replace";
 import * as dotenv from "dotenv";
 dotenv.config();
 
+/** @param {string} str */
+const capitize = (str) => {
+    return `${str.charAt(0).toUpperCase()}${str.substring(1).toLowerCase()}`;
+};
+
 export default [
     // Electron
     {
@@ -23,6 +28,8 @@ export default [
                 __build__: process.env.BUILD,
                 // eslint-disable-next-line no-undef
                 __version__: process.env.npm_package_version,
+                // eslint-disable-next-line no-undef
+                __name__: capitize(process.env.npm_package_name),
             }),
             pluginEsbuild({
                 include: /\.[jt]sx?$/,

@@ -15,6 +15,7 @@ import { useEnv } from "./util/Env";
 const env = useEnv();
 env.set("mode", "__build__");
 env.set("version", "__version__");
+env.set("name", "__name__");
 
 async function createWindow() {
     const win = new BrowserWindow({
@@ -67,6 +68,15 @@ async function createWindow() {
         });
     }
 }
+
+app.setAboutPanelOptions({
+    applicationName: `${env.get("name")}`,
+    applicationVersion: `v${env.get("version")}`,
+    // copyright: 'Copyright (C)',
+    authors: ["SUSH"],
+    website: "https://streaid.vercel.app/",
+    iconPath: "assets/icon.png",
+});
 
 app.whenReady().then(() => {
     const store = getStoreInstance();

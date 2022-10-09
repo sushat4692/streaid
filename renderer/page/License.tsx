@@ -101,12 +101,10 @@ const LicensePage: React.FC = () => {
                             </ListSmall>
                         </ListItem>
                         <ListItem>
-                            Japanese DB is a utility for generating a Japanese
-                            dictionary SQLite database from open-source
-                            materials. (MPL-2.0) by Ezzat Chamudi
+                            English-Dictionary-SQLite (MIT) by AyeshJayasekara
                             <br />
                             <ListSmall>
-                                https://github.com/echamudi/japanese-toolkit
+                                https://github.com/AyeshJayasekara/English-Dictionary-SQLite
                             </ListSmall>
                         </ListItem>
                     </List>

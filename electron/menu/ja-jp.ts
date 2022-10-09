@@ -1,16 +1,25 @@
-import { app, MenuItem, MenuItemConstructorOptions, shell } from "electron";
+import { app, MenuItemConstructorOptions, shell } from "electron";
 
 // Util
 import { getWindow } from "../util/window";
 
 const isMac = process.platform === "darwin";
 
-const template: (MenuItem | MenuItemConstructorOptions)[] = [
+const template: MenuItemConstructorOptions[] = [
     ...(isMac
         ? [
               {
                   label: app.name,
-                  submenu: [{ role: "quit", label: `${app.name}を終了` }],
+                  submenu: [
+                      {
+                          role: "about",
+                          label: `${app.name}について`,
+                      },
+                      {
+                          role: "quit",
+                          label: `${app.name}を終了`,
+                      },
+                  ],
               },
           ]
         : []),
@@ -30,6 +39,15 @@ const template: (MenuItem | MenuItemConstructorOptions)[] = [
         role: "help",
         label: "ヘルプ",
         submenu: [
+            ...(!isMac
+                ? [
+                      {
+                          role: "about",
+                          label: `${app.name}について`,
+                      },
+                      { type: "separator" },
+                  ]
+                : []),
             {
                 label: "詳細はこちら",
                 click: async () => {

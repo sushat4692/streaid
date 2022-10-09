@@ -78,6 +78,7 @@ export const getWordMeanJaToEn = async (
     const count = await (async () => {
         const indexed = await findByWordIndexedWord({
             word: resultWord,
+            type: "j2e",
             username: UserState.username ?? "",
         });
 
@@ -88,6 +89,7 @@ export const getWordMeanJaToEn = async (
         } else {
             const indexed: RequestIndexedWordType = {
                 word: resultWord,
+                type: "j2e",
                 username: UserState.username ?? "",
                 count: 1,
             };

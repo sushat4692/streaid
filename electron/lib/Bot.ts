@@ -24,6 +24,10 @@ import {
     initialize as initializeWordMeanJaToEn,
     getWordMeanJaToEn,
 } from "./commands/JapaneseDictionary";
+import {
+    initialize as initializeWordMeanEnToEn,
+    getWordMeanEnToEn,
+} from "./commands/English2EnglishDictionary";
 
 // Util
 import { getWindow } from "../util/window";
@@ -76,6 +80,13 @@ class Bot {
                 allow: "everyone",
                 return: true,
                 handler: getWordMeanJaToEn,
+            });
+
+            await initializeWordMeanEnToEn();
+            commandModel.push("!e2e", {
+                allow: "everyone",
+                return: true,
+                handler: getWordMeanEnToEn,
             });
 
             // Custom Command

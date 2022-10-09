@@ -21,12 +21,18 @@ export const findIndexedWord = async (id: string) => {
 
 export const findByWordIndexedWord = async ({
     word,
+    type,
     username,
 }: {
     word: string;
+    type: string;
     username: string;
 }) => {
-    return await database.findOne<RequestIndexedWordType>({ word, username });
+    return await database.findOne<RequestIndexedWordType>({
+        word,
+        type,
+        username,
+    });
 };
 
 export const updateCommmand = async (
