@@ -50,7 +50,7 @@ body {
 
 /* Gradient text - kept here as complex webkit properties */
 .gradient-text {
-  background: linear-gradient(135deg, #a970ff 0%, #9146ff 50%, #ff6b9d 100%);
+  background: linear-gradient(135deg, #8d78fd 0%, #9146ff 50%, #6534ed 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -66,7 +66,7 @@ body {
     ),
     radial-gradient(
       circle at 75% 75%,
-      rgba(255, 107, 157, 0.08) 0%,
+      rgba(101, 52, 237, 0.08) 0%,
       transparent 50%
     );
 }

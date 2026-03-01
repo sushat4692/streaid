@@ -9,6 +9,7 @@ import { listen } from '@tauri-apps/api/event'
 import cx from 'classnames'
 import { useState, useEffect, useRef } from 'react'
 
+import AppIcon from '../components/AppIcon'
 import Button from '../components/Button'
 import { LogContext } from '../contexts/logContext'
 import { SoundContext } from '../contexts/soundContext'
@@ -186,7 +187,7 @@ function AuthenticatedLayout() {
       <div className='min-h-screen flex items-center justify-center'>
         <div className='text-center'>
           <svg
-            className='animate-spin h-8 w-8 text-purple-500 mx-auto mb-4'
+            className='animate-spin h-8 w-8 text-[#8d78fd] mx-auto mb-4'
             viewBox='0 0 24 24'
           >
             <circle
@@ -222,7 +223,7 @@ function AuthenticatedLayout() {
       <aside className='w-56 shrink-0 flex flex-col fixed inset-y-0 left-0 z-10 border-r border-white/10 bg-black/20 backdrop-blur-sm'>
         {/* Logo */}
         <div className='flex items-center gap-2 px-4 h-14 border-b border-white/10 shrink-0'>
-          <span className='text-purple-400 text-xl'>◈</span>
+          <AppIcon className='w-6 h-6 shrink-0' />
           <span className='font-bold gradient-text'>streaid</span>
         </div>
 
@@ -246,7 +247,7 @@ function AuthenticatedLayout() {
               <div
                 className={cx(
                   'w-7 h-7 rounded-full shrink-0',
-                  'bg-gradient-to-br from-purple-500 to-pink-500',
+                  'bg-gradient-to-br from-[#8d78fd] to-[#6534ed]',
                   'flex items-center justify-center',
                   'text-white text-xs font-bold'
                 )}
