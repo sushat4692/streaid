@@ -29,4 +29,5 @@ twitch_api = "0.7"
 anyhow = "1.0"
 once_cell = "1.18"
 keyring = "1.1"
+open = "3"
 

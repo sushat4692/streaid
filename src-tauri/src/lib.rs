@@ -80,6 +80,39 @@ async fn refresh_token_cmd() -> Result<Option<TokenInfo>, String> {
     }
 }
 
+#[tauri::command]
+fn open_url_cmd(_app: tauri::AppHandle, url: String) -> Result<(), String> {
+    // Use the `open` crate to launch the URL in the system default browser
+    match open::that(url) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(format!("open_url failed: {}", e)),
+    }
+}
+
+#[derive(serde::Serialize)]
+struct DebugTokenStatus {
+    has_device_code: bool,
+    has_stored_token: bool,
+}
+
+#[tauri::command]
+fn debug_token_status() -> Result<DebugTokenStatus, String> {
+    let state = get_auth_state();
+    let has_device_code = match state.lock() {
+        Ok(s) => s.last_device_code.is_some(),
+        Err(_) => false,
+    };
+    let has_stored_token =
+        match keyring::Entry::new("streaid", "twitch_access_token").get_password() {
+            Ok(_) => true,
+            Err(_) => false,
+        };
+    Ok(DebugTokenStatus {
+        has_device_code,
+        has_stored_token,
+    })
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -106,7 +139,9 @@ pub fn run() {
             poll_device_flow_cmd,
             get_stored_token_cmd,
             clear_stored_token_cmd,
-            refresh_token_cmd
+            refresh_token_cmd,
+            open_url_cmd,
+            debug_token_status
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

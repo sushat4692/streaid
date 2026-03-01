@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
@@ -12,8 +11,9 @@ function App() {
   const [deviceInfo, setDeviceInfo] = useState<any | null>(null);
   const [tokenInfo, setTokenInfo] = useState<any | null>(null);
   const [storedToken, setStoredToken] = useState<any | null>(null);
+  const [debugStatus, setDebugStatus] = useState<any | null>(null);
   const [autoPolling, setAutoPolling] = useState(false);
-  const [pollHandle, setPollHandle] = useState<number | null>(null);
+  const intervalRef = useRef<number | null>(null);
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -23,7 +23,37 @@ function App() {
   async function startDeviceFlow() {
     try {
       const info = await invoke("start_device_flow_cmd", { clientId, scopes });
+      console.log("startDeviceFlow: received info", info);
       setDeviceInfo(info);
+      // Start auto-polling using the returned interval (do this regardless of opener success)
+      const interval = (info as any)?.interval ?? 5;
+      console.log("startDeviceFlow: starting auto-poll with interval", interval);
+      startAutoPolling(interval);
+
+      // Attempt to open the verification URI in the user's default browser (non-blocking)
+      const verificationUri = (info as any)?.verification_uri;
+      if (verificationUri) {
+        // Try plugin opener invoke first, then fallback to window.open
+        try {
+          await invoke("plugin:opener|open", { url: verificationUri });
+          console.log("Opened verification URI via plugin opener");
+        } catch (e) {
+          console.warn("plugin opener failed:", e);
+          try {
+            // Try Rust-provided open_url_cmd as a reliable fallback
+            await invoke("open_url_cmd", { url: verificationUri });
+            console.log("Opened verification URI via open_url_cmd");
+          } catch (e2) {
+            console.warn("open_url_cmd failed:", e2);
+            try {
+              window.open(verificationUri, "_blank");
+              console.log("Opened verification URI via window.open fallback");
+            } catch (e3) {
+              console.error("All opener methods failed:", e3);
+            }
+          }
+        }
+      }
     } catch (e) {
       setDeviceInfo({ error: String(e) });
     }
@@ -32,41 +62,64 @@ function App() {
   function startAutoPolling(intervalSeconds?: number) {
     stopAutoPolling();
     const iv = Math.max(5, intervalSeconds ?? 5) * 1000;
+    console.log(`startAutoPolling: intervalSeconds=${intervalSeconds} -> iv=${iv}ms`);
     const handle = window.setInterval(async () => {
       try {
+        console.log("autoPoll: invoking poll_device_flow_cmd");
         const t = await invoke("poll_device_flow_cmd");
+        console.log("autoPoll: poll_device_flow_cmd result", t);
         if (t) {
           setTokenInfo(t);
-          stopAutoPolling();
+          console.log("autoPoll: token received — stopping auto-poll");
+          // clear using the live ref
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+          setAutoPolling(false);
+          return;
         }
+        // no token yet
+        console.log("autoPoll: no token yet — will poll again");
       } catch (e) {
+        console.error("autoPoll: error polling for token", e);
         setTokenInfo({ error: String(e) });
-        stopAutoPolling();
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        setAutoPolling(false);
+        return;
       }
     }, iv);
-    setPollHandle(handle);
+    intervalRef.current = handle;
+    console.log("startAutoPolling: intervalRef.current set", intervalRef.current);
     setAutoPolling(true);
   }
 
   function stopAutoPolling() {
-    if (pollHandle) {
-      clearInterval(pollHandle);
-      setPollHandle(null);
+    if (intervalRef.current) {
+      console.log("stopAutoPolling: clearing interval", intervalRef.current);
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
     setAutoPolling(false);
   }
 
   useEffect(() => {
     return () => {
-      if (pollHandle) clearInterval(pollHandle);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [pollHandle]);
+  }, []);
 
   async function pollForToken() {
+    console.log("pollForToken: invoking poll_device_flow_cmd");
     try {
       const t = await invoke("poll_device_flow_cmd");
+      console.log("pollForToken: received", t);
       setTokenInfo(t);
     } catch (e) {
+      console.error("pollForToken: error", e);
       setTokenInfo({ error: String(e) });
     }
   }
@@ -165,6 +218,18 @@ function App() {
         <div className="row">
           <button onClick={startDeviceFlow}>Start Device Flow</button>
           <button onClick={pollForToken}>Poll For Token</button>
+          <button
+            onClick={async () => {
+              try {
+                const s = await invoke("debug_token_status");
+                setDebugStatus(s);
+              } catch (e) {
+                setDebugStatus({ error: String(e) });
+              }
+            }}
+          >
+            Debug Status
+          </button>
           <button onClick={getStoredToken}>Get Stored Token</button>
           <button onClick={clearStoredToken}>Clear Stored Token</button>
           <button onClick={refreshToken}>Refresh Token</button>
@@ -185,6 +250,7 @@ function App() {
         <pre style={{ whiteSpace: "pre-wrap" }}>{deviceInfo ? JSON.stringify(deviceInfo, null, 2) : ""}</pre>
         <pre style={{ whiteSpace: "pre-wrap" }}>{tokenInfo ? JSON.stringify(tokenInfo, null, 2) : ""}</pre>
         <pre style={{ whiteSpace: "pre-wrap" }}>{storedToken ? JSON.stringify(storedToken, null, 2) : ""}</pre>
+        <pre style={{ whiteSpace: "pre-wrap" }}>{debugStatus ? JSON.stringify(debugStatus, null, 2) : ""}</pre>
       </section>
     </main>
   );

@@ -57,6 +57,7 @@ pub async fn start_device_flow(
     client_id: &str,
     scopes: Vec<Scope>,
 ) -> Result<DeviceCodeInfo> {
+    eprintln!("start_device_flow: client_id={} scopes={:?}", client_id, scopes);
     let http = Client::builder()
         .redirect(reqwest::redirect::Policy::none())
         .build()
@@ -115,6 +116,7 @@ pub async fn start_device_flow(
 
 // Poll until user authorizes or flow expires
 pub async fn poll_device_flow(state: SharedState) -> Result<Option<TokenInfo>> {
+    eprintln!("poll_device_flow: called");
     // Extract required info from state
     let (device_code, client_id, mut interval, expires_at) = {
         let s = state
@@ -138,98 +140,113 @@ pub async fn poll_device_flow(state: SharedState) -> Result<Option<TokenInfo>> {
 
     let http = Client::new();
 
-    loop {
-        if let Some(exp) = expires_at {
-            if Instant::now() > exp {
-                return Ok(None);
-            }
+    // Single-shot polling: perform one token request and return result.
+    if let Some(exp) = expires_at {
+        if Instant::now() > exp {
+            return Ok(None);
         }
+    }
 
-        let params = [
-            ("client_id", client_id.clone()),
-            (
-                "grant_type",
-                "urn:ietf:params:oauth:grant-type:device_code".to_string(),
-            ),
-            ("device_code", device_code.clone()),
-        ];
+    let params = [
+        ("client_id", client_id.clone()),
+        (
+            "grant_type",
+            "urn:ietf:params:oauth:grant-type:device_code".to_string(),
+        ),
+        ("device_code", device_code.clone()),
+    ];
 
-        let res = http
-            .post("https://id.twitch.tv/oauth2/token")
-            .form(&params)
-            .send()
-            .await
-            .context("requesting token endpoint")?;
+    let res = http
+        .post("https://id.twitch.tv/oauth2/token")
+        .form(&params)
+        .send()
+        .await
+        .context("requesting token endpoint")?;
 
-        let status = res.status();
-        let body = res.text().await.context("reading token response")?;
+    let status = res.status();
+    let body = res.text().await.context("reading token response")?;
 
-        if status.is_success() {
-            let v: Value = serde_json::from_str(&body).context("parsing token success response")?;
-            if let Some(at) = v.get("access_token").and_then(|v| v.as_str()) {
-                // Persist tokens to OS keyring
-                let service = "streaid";
-                let access_key = "twitch_access_token";
-                if let Err(e) = keyring::Entry::new(service, access_key).set_password(at) {
-                    // If keyring fails, return an error so the caller can handle it
-                    return Err(e).context("saving access token to keyring");
+    if status.is_success() {
+        let v: Value = serde_json::from_str(&body).context("parsing token success response")?;
+        if let Some(at) = v.get("access_token").and_then(|v| v.as_str()) {
+            // Persist tokens to OS keyring
+            let service = "streaid";
+            let access_key = "twitch_access_token";
+            eprintln!("poll_device_flow: storing access token");
+            if let Err(e) = keyring::Entry::new(service, access_key).set_password(at) {
+                return Err(e).context("saving access token to keyring");
+            }
+            let mut refresh_opt: Option<String> = None;
+            if let Some(rt) = v.get("refresh_token").and_then(|v| v.as_str()) {
+                let refresh_key = "twitch_refresh_token";
+                if let Err(e) = keyring::Entry::new(service, refresh_key).set_password(rt) {
+                    return Err(e).context("saving refresh token to keyring");
                 }
-                let mut refresh_opt: Option<String> = None;
-                if let Some(rt) = v.get("refresh_token").and_then(|v| v.as_str()) {
-                    let refresh_key = "twitch_refresh_token";
-                    if let Err(e) = keyring::Entry::new(service, refresh_key).set_password(rt) {
-                        return Err(e).context("saving refresh token to keyring");
-                    }
-                    refresh_opt = Some(rt.to_string());
-                }
+                refresh_opt = Some(rt.to_string());
+            }
 
-                let expires_in = v.get("expires_in").and_then(|v| v.as_u64());
-                let scope = v
-                    .get("scope")
-                    .and_then(|v| v.as_str())
-                    .map(|s| s.to_string());
+            let expires_in = v.get("expires_in").and_then(|v| v.as_u64());
+            let scope = v
+                .get("scope")
+                .and_then(|v| v.as_str())
+                .map(|s| s.to_string());
 
-                let info = TokenInfo {
-                    access_token: at.to_string(),
-                    refresh_token: refresh_opt,
-                    expires_in,
-                    scope,
-                };
+            let info = TokenInfo {
+                access_token: at.to_string(),
+                refresh_token: refresh_opt,
+                expires_in,
+                scope,
+            };
 
-                // update state token expiry
+            // update state token expiry and clear device code to stop further polling
+            if let Ok(mut s) = state.lock() {
                 if let Some(exp_secs) = expires_in {
-                    if let Ok(mut s) = state.lock() {
-                        s.token_expires_at = Some(Instant::now() + Duration::from_secs(exp_secs));
-                    }
+                    s.token_expires_at = Some(Instant::now() + Duration::from_secs(exp_secs));
                 }
+                s.last_device_code = None;
+            }
 
-                return Ok(Some(info));
-            } else {
-                return Ok(None);
+            return Ok(Some(info));
+        } else {
+            return Ok(None);
+        }
+    } else {
+        let v: Value = serde_json::from_str(&body).unwrap_or_default();
+        if let Some(err) = v.get("error").and_then(|e| e.as_str()) {
+            match err {
+                "authorization_pending" => {
+                    return Ok(None);
+                }
+                "slow_down" => {
+                    // Frontend may increase polling interval; return pending for now
+                    return Ok(None);
+                }
+                "expired_token" | "access_denied" => {
+                    // Clear device code to stop further polling
+                    if let Ok(mut s) = state.lock() {
+                        s.last_device_code = None;
+                    }
+                    return Ok(None);
+                }
+                other => {
+                    return Err(anyhow::anyhow!("token endpoint error: {}", other));
+                }
+            }
+        } else if let Some(msg) = v.get("message").and_then(|m| m.as_str()) {
+            // Some Twitch responses include {status:400, message:"authorization_pending"}
+            match msg {
+                "authorization_pending" => return Ok(None),
+                "slow_down" => return Ok(None),
+                "expired_token" | "access_denied" => {
+                    if let Ok(mut s) = state.lock() {
+                        s.last_device_code = None;
+                    }
+                    return Ok(None);
+                }
+                other => return Err(anyhow::anyhow!("token endpoint message: {}", other)),
             }
         } else {
-            let v: Value = serde_json::from_str(&body).unwrap_or_default();
-            if let Some(err) = v.get("error").and_then(|e| e.as_str()) {
-                match err {
-                    "authorization_pending" => {
-                        sleep(Duration::from_secs(interval)).await;
-                        continue;
-                    }
-                    "slow_down" => {
-                        interval = interval.saturating_add(5);
-                        sleep(Duration::from_secs(interval)).await;
-                        continue;
-                    }
-                    "expired_token" | "access_denied" => {
-                        return Ok(None);
-                    }
-                    other => {
-                        return Err(anyhow::anyhow!("token endpoint error: {}", other));
-                    }
-                }
-            } else {
-                return Err(anyhow::anyhow!("unexpected token response: {}", body));
-            }
+            return Err(anyhow::anyhow!("unexpected token response: {}", body));
         }
     }
 }
