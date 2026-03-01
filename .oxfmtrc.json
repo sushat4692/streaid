@@ -1,4 +1,25 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": []
+  "printWidth": 80,
+  "singleQuote": true,
+  "semi": false,
+  "jsxSingleQuote": true,
+  "trailingComma": "es5",
+  "endOfLine": "lf",
+  "experimentalSortImports": {
+    "groups": [
+      ["side-effect"],
+      ["builtin"],
+      ["external"],
+      ["internal"],
+      ["parent", "sibling", "index"]
+    ],
+    "sortSideEffects": false,
+    "newlinesBetween": false,
+    "ignoreCase": true
+  },
+  "ignorePatterns": [
+    "dist/*",
+    "node_modules/**"
+  ]
 }
