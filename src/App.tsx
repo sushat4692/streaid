@@ -59,6 +59,27 @@ function App() {
     }
   }
 
+  // Load saved client id on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const saved = await invoke("get_client_id_cmd");
+        if (saved) setClientId(saved as string);
+      } catch (e) {
+        console.warn("get_client_id_cmd failed:", e);
+      }
+    })();
+  }, []);
+
+  async function saveClientId() {
+    try {
+      await invoke("set_client_id_cmd", { clientId });
+      console.log("Client ID saved");
+    } catch (e) {
+      console.error("saveClientId failed:", e);
+    }
+  }
+
   function startAutoPolling(intervalSeconds?: number) {
     stopAutoPolling();
     const iv = Math.max(5, intervalSeconds ?? 5) * 1000;
@@ -189,6 +210,7 @@ function App() {
         <div>
           <label>Client ID: </label>
           <input value={clientId} onChange={(e) => setClientId(e.currentTarget.value)} />
+          <button onClick={saveClientId}>Save Client ID</button>
         </div>
         <div>
           <label>Scopes:</label>

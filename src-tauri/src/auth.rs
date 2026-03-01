@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tokio::time::{sleep, Duration};
 use twitch_oauth2::Scope;
+use std::fs;
+use std::path::PathBuf;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DeviceCodeInfo {
@@ -49,6 +51,36 @@ impl InnerState {
 
 pub fn shared_state() -> SharedState {
     Arc::new(Mutex::new(InnerState::new()))
+}
+
+fn client_id_file_path() -> Option<PathBuf> {
+    dirs::config_dir().map(|mut d| {
+        d.push("streaid");
+        let _ = fs::create_dir_all(&d);
+        d.push("client_id");
+        d
+    })
+}
+
+pub fn save_client_id(client_id: &str) -> Result<()> {
+    if let Some(path) = client_id_file_path() {
+        fs::write(&path, client_id).context("writing client_id file")?;
+    }
+    Ok(())
+}
+
+pub fn load_client_id() -> Result<Option<String>> {
+    if let Some(path) = client_id_file_path() {
+        match fs::read_to_string(&path) {
+            Ok(s) => Ok(Some(s.trim().to_string())),
+            Err(e) => match e.kind() {
+                std::io::ErrorKind::NotFound => Ok(None),
+                _ => Err(e).context("reading client_id file"),
+            },
+        }
+    } else {
+        Ok(None)
+    }
 }
 
 // Start the device flow and save the builder in state

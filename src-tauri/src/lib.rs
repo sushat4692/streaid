@@ -113,6 +113,22 @@ fn debug_token_status() -> Result<DebugTokenStatus, String> {
     })
 }
 
+#[tauri::command]
+fn set_client_id_cmd(client_id: String) -> Result<(), String> {
+    match auth::save_client_id(&client_id) {
+        Ok(()) => Ok(()),
+        Err(e) => Err(format!("set_client_id failed: {}", e)),
+    }
+}
+
+#[tauri::command]
+fn get_client_id_cmd() -> Result<Option<String>, String> {
+    match auth::load_client_id() {
+        Ok(opt) => Ok(opt),
+        Err(e) => Err(format!("get_client_id failed: {}", e)),
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -141,7 +157,9 @@ pub fn run() {
             clear_stored_token_cmd,
             refresh_token_cmd,
             open_url_cmd,
-            debug_token_status
+            debug_token_status,
+            set_client_id_cmd,
+            get_client_id_cmd
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
