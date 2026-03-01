@@ -7,13 +7,13 @@ type Props = {
   className?: string
 } & InputProps
 
-export default function Field({ label, value, onChange, placeholder, className }: Props) {
+export default function Field({ label, value, onChange, placeholder, className, type }: Props) {
   return (
     <BaseField.Root className={cx('space-y-1', className)}>
       <BaseField.Label className="block text-sm font-medium text-[#ADADB8] mb-2">
         {label}
       </BaseField.Label>
-      <Input value={value} onChange={onChange} placeholder={placeholder} />
+      <Input type={type} value={value} onChange={onChange} placeholder={placeholder} />
     </BaseField.Root>
   )
 }

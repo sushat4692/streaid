@@ -3,6 +3,9 @@ import { invoke } from '@tauri-apps/api/core'
 import { useState, useEffect } from 'react'
 import cx from 'classnames'
 import Button from '../components/Button'
+import TranslationSettings from '../components/TranslationSettings'
+import ChatControl from '../components/ChatControl'
+import TranslationLog from '../components/TranslationLog'
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,
@@ -74,7 +77,7 @@ function DashboardPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="glass-card w-full max-w-lg p-8 relative z-10">
+      <div className="glass-card w-full max-w-2xl p-8 relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -89,7 +92,7 @@ function DashboardPage() {
         {/* User info card */}
         <div
           className={cx(
-            'p-6 rounded-xl',
+            'p-6 rounded-xl mb-8',
             'bg-white/5 border border-white/10'
           )}
         >
@@ -111,19 +114,17 @@ function DashboardPage() {
           </div>
         </div>
 
-        {/* Status */}
-        <div className="mt-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20">
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
-            <p className="text-green-400 text-sm font-medium">
-              Twitch に接続中
-            </p>
-          </div>
-        </div>
+        {/* Translation features */}
+        <div className="space-y-8">
+          <TranslationSettings />
 
-        {/* Placeholder for future features */}
-        <div className="mt-8 text-center text-gray-500 text-sm">
-          <p>翻訳機能は準備中です</p>
+          <div className="border-t border-white/10" />
+
+          <ChatControl />
+
+          <div className="border-t border-white/10" />
+
+          <TranslationLog />
         </div>
       </div>
     </div>

@@ -13,7 +13,7 @@ function LoginPage() {
   const navigate = useNavigate()
   const [clientId, setClientId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const scopes = ['chat_read']
+  const scopes = ['chat:read', 'chat:edit']
 
   async function startDeviceFlow() {
     setIsLoading(true)

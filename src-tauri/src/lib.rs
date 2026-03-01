@@ -1,15 +1,48 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 mod auth;
+mod chat;
+mod translate;
+
 use auth::{
     poll_device_flow, shared_state, start_device_flow, DeviceCodeInfo, InnerState, TokenInfo,
 };
+use chat::{
+    connect_to_irc, extract_translate_text, is_translate_command, parse_irc_privmsg,
+    send_chat_message, send_pong, WsStream,
+};
+use futures_util::StreamExt;
 use once_cell::sync::Lazy;
 use std::sync::Arc;
 use std::time::Duration;
 use tauri::async_runtime;
+use tauri::{Emitter, Manager};
 use tokio::time::sleep;
+use tokio_tungstenite::tungstenite::Message;
+use translate::{detect_language, translate_text, Language, TranslationSuggestion};
 
 static AUTH_STATE: Lazy<Arc<std::sync::Mutex<InnerState>>> = Lazy::new(|| shared_state());
+
+// Chat state
+struct ChatState {
+    is_running: bool,
+    is_enabled: bool,
+    channel_name: Option<String>,
+    bot_username: Option<String>,
+}
+
+impl ChatState {
+    fn new() -> Self {
+        ChatState {
+            is_running: false,
+            is_enabled: true,
+            channel_name: None,
+            bot_username: None,
+        }
+    }
+}
+
+static CHAT_STATE: Lazy<Arc<std::sync::Mutex<ChatState>>> =
+    Lazy::new(|| Arc::new(std::sync::Mutex::new(ChatState::new())));
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -22,6 +55,10 @@ fn get_auth_state() -> std::sync::Arc<std::sync::Mutex<InnerState>> {
     AUTH_STATE.clone()
 }
 
+fn get_chat_state() -> Arc<std::sync::Mutex<ChatState>> {
+    CHAT_STATE.clone()
+}
+
 #[tauri::command]
 async fn start_device_flow_cmd(
     client_id: String,
@@ -31,8 +68,8 @@ async fn start_device_flow_cmd(
     let scopes_conv = scopes
         .into_iter()
         .filter_map(|s| match s.as_str() {
-            "chat_read" => Some(twitch_oauth2::Scope::ChatRead),
-            "chat_edit" => Some(twitch_oauth2::Scope::ChatEdit),
+            "chat_read" | "chat:read" => Some(twitch_oauth2::Scope::ChatRead),
+            "chat_edit" | "chat:edit" => Some(twitch_oauth2::Scope::ChatEdit),
             _ => None,
         })
         .collect();
@@ -95,6 +132,26 @@ struct DebugTokenStatus {
     has_stored_token: bool,
 }
 
+#[derive(serde::Serialize, Clone)]
+struct ChatStatus {
+    connected: bool,
+    is_running: bool,
+    is_enabled: bool,
+    channel: Option<String>,
+    last_target_channel: Option<String>,
+}
+
+#[derive(serde::Serialize, Clone)]
+struct TranslationEvent {
+    original_user: String,
+    original_message: String,
+    suggestions: Vec<TranslationSuggestion>,
+    points: Vec<String>,
+    timestamp: String,
+    source_lang: String,
+    target_lang: String,
+}
+
 #[tauri::command]
 fn debug_token_status() -> Result<DebugTokenStatus, String> {
     let state = get_auth_state();
@@ -129,6 +186,425 @@ fn get_client_id_cmd() -> Result<Option<String>, String> {
     }
 }
 
+// Chat commands
+
+#[tauri::command]
+fn set_gemini_api_key_cmd(api_key: String) -> Result<(), String> {
+    keyring::Entry::new("streaid", "gemini_api_key")
+        .set_password(&api_key)
+        .map_err(|e| format!("Failed to save Gemini API key: {}", e))
+}
+
+#[tauri::command]
+fn get_gemini_api_key_cmd() -> Result<Option<String>, String> {
+    match keyring::Entry::new("streaid", "gemini_api_key").get_password() {
+        Ok(key) => {
+            // Return masked version for security
+            if key.len() > 8 {
+                Ok(Some(format!("{}...{}", &key[..4], &key[key.len() - 4..])))
+            } else {
+                Ok(Some("***".to_string()))
+            }
+        }
+        Err(keyring::Error::NoEntry) => Ok(None),
+        Err(e) => Err(format!("Failed to get Gemini API key: {}", e)),
+    }
+}
+
+/// Save last used target channel to keyring
+fn save_last_channel(channel: &str) -> Result<(), String> {
+    keyring::Entry::new("streaid", "last_target_channel")
+        .set_password(channel)
+        .map_err(|e| format!("Failed to save last channel: {}", e))
+}
+
+/// Load last used target channel from keyring
+fn load_last_channel() -> Result<Option<String>, String> {
+    match keyring::Entry::new("streaid", "last_target_channel").get_password() {
+        Ok(channel) => Ok(Some(channel)),
+        Err(keyring::Error::NoEntry) => Ok(None),
+        Err(e) => Err(format!("Failed to load last channel: {}", e)),
+    }
+}
+
+#[tauri::command]
+fn get_chat_status_cmd() -> Result<ChatStatus, String> {
+    let state = get_chat_state();
+    let s = state.lock().map_err(|e| format!("Lock error: {}", e))?;
+    Ok(ChatStatus {
+        connected: s.is_running,
+        is_running: s.is_running,
+        is_enabled: s.is_enabled,
+        channel: s.channel_name.clone(),
+        last_target_channel: load_last_channel().ok().flatten(),
+    })
+}
+
+#[tauri::command]
+fn toggle_translation_cmd(enabled: bool) -> Result<(), String> {
+    let state = get_chat_state();
+    let mut s = state.lock().map_err(|e| format!("Lock error: {}", e))?;
+    s.is_enabled = enabled;
+    eprintln!("Translation toggled: {}", enabled);
+    Ok(())
+}
+
+#[tauri::command]
+async fn start_chat_listener_cmd(
+    app: tauri::AppHandle,
+    target_channel: Option<String>,  // NEW: Optional channel parameter
+) -> Result<(), String> {
+    eprintln!("Starting chat listener...");
+
+    // Get token
+    let token = auth::get_stored_token()
+        .map_err(|e| format!("Failed to get token: {}", e))?
+        .ok_or_else(|| "No token found. Please authenticate first.".to_string())?;
+
+    let username = token
+        .login
+        .ok_or_else(|| "No username found in token".to_string())?;
+
+    let access_token = token.access_token;
+    
+    // Determine which channel to join
+    let channel_to_join = if let Some(ch) = target_channel {
+        // Sanitize input: trim, lowercase, remove # prefix
+        let sanitized = ch.trim().to_lowercase();
+        let sanitized = sanitized.trim_start_matches('#');
+        
+        // Validation
+        if sanitized.contains(' ') {
+            return Err("Channel name cannot contain spaces".to_string());
+        }
+        
+        if sanitized.len() > 25 {
+            return Err("Channel name is too long (max 25 characters)".to_string());
+        }
+        
+        if !sanitized.is_empty() && !sanitized.chars().all(|c| c.is_alphanumeric() || c == '_') {
+            return Err("Channel name can only contain letters, numbers, and underscores".to_string());
+        }
+        
+        if sanitized.is_empty() {
+            username.clone()  // Fallback to own channel if empty after sanitization
+        } else {
+            sanitized.to_string()
+        }
+    } else {
+        username.clone()  // Default to own channel
+    };
+    
+    eprintln!("Target channel: #{}", channel_to_join);
+    
+    // Save for persistence
+    if let Err(e) = save_last_channel(&channel_to_join) {
+        eprintln!("Warning: Failed to save last channel: {}", e);
+    }
+    
+    // Debug: show token format (masked)
+    eprintln!("Token format check:");
+    eprintln!("  - Token length: {}", access_token.len());
+    eprintln!("  - Token prefix: {}", if access_token.len() > 10 { &access_token[..10] } else { &access_token });
+    eprintln!("  - Has 'oauth:' prefix: {}", access_token.starts_with("oauth:"));
+
+    eprintln!("Connecting as: {}", username);
+
+    // Validate token before attempting IRC connection
+    eprintln!("Validating token with Twitch API...");
+    let client = reqwest::Client::new();
+    let validation_response = client
+        .get("https://id.twitch.tv/oauth2/validate")
+        .header("Authorization", format!("Bearer {}", access_token))
+        .send()
+        .await
+        .map_err(|e| format!("Token validation request failed: {}", e))?;
+    
+    if !validation_response.status().is_success() {
+        let status = validation_response.status();
+        let error_text = validation_response.text().await.unwrap_or_default();
+        return Err(format!("Token validation failed ({}): {}. Please re-authenticate.", status, error_text));
+    }
+    
+    let validation_json: serde_json::Value = validation_response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse validation response: {}", e))?;
+    
+    eprintln!("Token validation successful: {:?}", validation_json);
+    
+    // Check if token has required scopes
+    if let Some(scopes) = validation_json.get("scopes").and_then(|s| s.as_array()) {
+        let has_chat_read = scopes.iter().any(|s| s.as_str() == Some("chat:read"));
+        let has_chat_edit = scopes.iter().any(|s| s.as_str() == Some("chat:edit"));
+        
+        if !has_chat_read || !has_chat_edit {
+            return Err(format!(
+                "Token missing required scopes. Has chat:read={}, chat:edit={}. Please re-authenticate with correct scopes.",
+                has_chat_read, has_chat_edit
+            ));
+        }
+        eprintln!("✓ Token has required scopes: chat:read, chat:edit");
+    }
+
+    // Update state
+    {
+        let state = get_chat_state();
+        let mut s = state.lock().map_err(|e| format!("Lock error: {}", e))?;
+        if s.is_running {
+            return Err("Chat listener already running".to_string());
+        }
+        s.is_running = true;
+        s.channel_name = Some(channel_to_join.clone());
+        s.bot_username = Some(username.clone());
+    }
+
+    // Connect to IRC
+    let ws_stream = connect_to_irc(&username, &access_token, &channel_to_join)
+        .await
+        .map_err(|e| {
+            // Reset state on error
+            let state = get_chat_state();
+            if let Ok(mut s) = state.lock() {
+                s.is_running = false;
+            }
+            format!("Failed to connect to IRC: {}", e)
+        })?;
+
+    eprintln!("IRC connected, starting listener task...");
+
+    // Spawn background task
+    async_runtime::spawn(async move {
+        if let Err(e) = chat_listener_task(ws_stream, channel_to_join, app).await {
+            eprintln!("Chat listener error: {}", e);
+        }
+
+        // Cleanup on exit
+        let state = get_chat_state();
+        if let Ok(mut s) = state.lock() {
+            s.is_running = false;
+            s.channel_name = None;
+        }
+        eprintln!("Chat listener stopped");
+    });
+
+    Ok(())
+}
+
+#[tauri::command]
+fn stop_chat_listener_cmd() -> Result<(), String> {
+    let state = get_chat_state();
+    let mut s = state.lock().map_err(|e| format!("Lock error: {}", e))?;
+    s.is_running = false;
+    eprintln!("Stopping chat listener...");
+    Ok(())
+}
+
+// Chat listener background task
+async fn chat_listener_task(
+    mut ws_stream: WsStream,
+    channel: String,
+    app: tauri::AppHandle,
+) -> Result<(), anyhow::Error> {
+    eprintln!("Chat listener task started for #{}", channel);
+
+    loop {
+        // Check if should continue
+        let (should_continue, is_enabled, bot_username) = {
+            let state = get_chat_state();
+            let s = state.lock().unwrap();
+            (s.is_running, s.is_enabled, s.bot_username.clone())
+        };
+
+        if !should_continue {
+            eprintln!("Stopping chat listener (is_running = false)");
+            break;
+        }
+
+        // Read message from WebSocket
+        match ws_stream.next().await {
+            Some(Ok(Message::Text(line))) => {
+                // eprintln!("IRC << {}", line);
+
+                // Handle PING
+                if line.starts_with("PING") {
+                    let server = line.trim_start_matches("PING ").trim_start_matches(':');
+                    if let Err(e) = send_pong(&mut ws_stream, server).await {
+                        eprintln!("Failed to send PONG: {}", e);
+                    }
+                    continue;
+                }
+
+                // Parse PRIVMSG
+                if let Some(irc_msg) = parse_irc_privmsg(&line) {
+                    eprintln!(
+                        "Message from {}: {}",
+                        irc_msg.username, irc_msg.message
+                    );
+
+                    // Ignore own messages (prevent loops)
+                    if let Some(ref bot) = bot_username {
+                        if irc_msg.username.eq_ignore_ascii_case(bot) {
+                            eprintln!("Ignoring own message");
+                            continue;
+                        }
+                    }
+
+                    // Check if translation is enabled
+                    if !is_enabled {
+                        continue;
+                    }
+
+                    // Check for !ts command
+                    if is_translate_command(&irc_msg.message) {
+                        if let Some(text) = extract_translate_text(&irc_msg.message) {
+                            eprintln!("Translation request: {}", text);
+
+                            // Get Gemini API key
+                            let api_key =
+                                match keyring::Entry::new("streaid", "gemini_api_key")
+                                    .get_password()
+                                {
+                                    Ok(key) => key,
+                                    Err(_) => {
+                                        eprintln!("No Gemini API key configured");
+                                        continue;
+                                    }
+                                };
+
+                            // Detect language
+                            let source_lang = detect_language(&text);
+                            if source_lang == Language::Unknown {
+                                eprintln!("Unknown language, skipping");
+                                continue;
+                            }
+
+                            // Translate
+                            match translate_text(&text, &api_key, source_lang).await {
+                                Ok(result) => {
+                                    eprintln!("Translation suggestions: {:?}", result.suggestions);
+
+                                    // Send each suggestion as a separate chat message (without points)
+                                    for (idx, suggestion) in result.suggestions.iter().enumerate() {
+                                        let mut response = format!(
+                                            "@{}: [{}/{}] [{}] {}",
+                                            irc_msg.username,
+                                            idx + 1,
+                                            result.suggestions.len(),
+                                            suggestion.formality,
+                                            suggestion.text
+                                        );
+
+                                        // Handle Twitch's 500 character limit
+                                        if response.len() > 490 {
+                                            let max_text_len = 400 - irc_msg.username.len();
+                                            let truncated_text = if suggestion.text.len() > max_text_len {
+                                                // Use floor_char_boundary to avoid cutting multibyte chars
+                                                let safe_len = suggestion.text.floor_char_boundary(max_text_len);
+                                                format!("{}...", &suggestion.text[..safe_len])
+                                            } else {
+                                                suggestion.text.clone()
+                                            };
+                                            
+                                            response = format!(
+                                                "@{}: [{}/{}] [{}] {}",
+                                                irc_msg.username,
+                                                idx + 1,
+                                                result.suggestions.len(),
+                                                suggestion.formality,
+                                                truncated_text
+                                            );
+                                        }
+
+                                        // Send message
+                                        if let Err(e) = send_chat_message(&mut ws_stream, &channel, &response).await {
+                                            eprintln!("Failed to send message {}/{}: {}", idx + 1, result.suggestions.len(), e);
+                                            // Continue sending other messages even if one fails
+                                        } else {
+                                            eprintln!("Sent suggestion {}/{} to chat", idx + 1, result.suggestions.len());
+                                        }
+
+                                        // Add delay between messages to avoid Twitch rate limiting
+                                        tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+                                    }
+
+                                    // Send linguistic points as a separate message (4th message)
+                                    let points_str = result.points.join(", ");
+                                    let points_message = format!(
+                                        "@{}: 翻訳の根拠: {}",
+                                        irc_msg.username,
+                                        points_str
+                                    );
+
+                                    // Handle truncation for points message
+                                    let final_points_message = if points_message.len() > 490 {
+                                        let max_len = 490 - irc_msg.username.len() - 20;
+                                        // Use floor_char_boundary to avoid cutting multibyte chars
+                                        let safe_len = points_str.floor_char_boundary(max_len.min(points_str.len()));
+                                        format!(
+                                            "@{}: 翻訳の根拠: {}...",
+                                            irc_msg.username,
+                                            &points_str[..safe_len]
+                                        )
+                                    } else {
+                                        points_message
+                                    };
+
+                                    if let Err(e) = send_chat_message(&mut ws_stream, &channel, &final_points_message).await {
+                                        eprintln!("Failed to send points message: {}", e);
+                                    } else {
+                                        eprintln!("Sent linguistic points to chat");
+                                    }
+
+                                    eprintln!("All {} suggestions + points sent to chat", result.suggestions.len());
+
+                                    // Emit event to frontend
+                                    let target_lang = match source_lang {
+                                        Language::Japanese => "English",
+                                        Language::English => "Japanese",
+                                        Language::Unknown => "Unknown",
+                                    };
+
+                                    let event = TranslationEvent {
+                                        original_user: irc_msg.username.clone(),
+                                        original_message: text.clone(),
+                                        suggestions: result.suggestions.clone(),
+                                        points: result.points.clone(),
+                                        timestamp: chrono::Utc::now().to_rfc3339(),
+                                        source_lang: source_lang.to_string(),
+                                        target_lang: target_lang.to_string(),
+                                    };
+
+                                    if let Err(e) = app.emit("translation", event) {
+                                        eprintln!("Failed to emit translation event: {}", e);
+                                    }
+                                }
+                                Err(e) => {
+                                    eprintln!("Translation failed: {}", e);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Some(Err(e)) => {
+                eprintln!("WebSocket error: {}", e);
+                break;
+            }
+            None => {
+                eprintln!("WebSocket closed");
+                break;
+            }
+            _ => {
+                // Ignore other message types (Binary, Ping, Pong, Close, Frame)
+                continue;
+            }
+        }
+    }
+
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -159,7 +635,13 @@ pub fn run() {
             open_url_cmd,
             debug_token_status,
             set_client_id_cmd,
-            get_client_id_cmd
+            get_client_id_cmd,
+            set_gemini_api_key_cmd,
+            get_gemini_api_key_cmd,
+            start_chat_listener_cmd,
+            stop_chat_listener_cmd,
+            get_chat_status_cmd,
+            toggle_translation_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

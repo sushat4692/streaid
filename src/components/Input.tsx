@@ -6,6 +6,7 @@ export type Props = {
   onChange?: (v: string) => void
   placeholder?: string
   className?: string
+  type?: string
 }
 
 const inputStyles = cx(
@@ -18,9 +19,10 @@ const inputStyles = cx(
   'transition-all duration-300 ease-out'
 )
 
-export default function Input({ value, onChange, placeholder, className }: Props) {
+export default function Input({ value, onChange, placeholder, className, type = 'text' }: Props) {
   return (
     <BaseInput
+      type={type}
       value={value}
       onChange={(e) => onChange?.(e.currentTarget.value)}
       placeholder={placeholder}
