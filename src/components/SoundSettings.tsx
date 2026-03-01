@@ -14,7 +14,14 @@ type SoundSlotProps = {
   onVolumeChange: (v: number) => void
 }
 
-function SoundSlot({ label, soundType, sound, volume, onUpdate, onVolumeChange }: SoundSlotProps) {
+function SoundSlot({
+  label,
+  soundType,
+  sound,
+  volume,
+  onUpdate,
+  onVolumeChange,
+}: SoundSlotProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -26,7 +33,9 @@ function SoundSlot({ label, soundType, sound, volume, onUpdate, onVolumeChange }
 
     try {
       await invoke('set_sound_cmd', { soundType, data, fileName: file.name })
-      const result = await invoke<SoundData | null>('get_sound_cmd', { soundType })
+      const result = await invoke<SoundData | null>('get_sound_cmd', {
+        soundType,
+      })
       onUpdate(result)
     } catch (err) {
       console.error('Failed to save sound:', err)
@@ -59,7 +68,11 @@ function SoundSlot({ label, soundType, sound, volume, onUpdate, onVolumeChange }
         {sound ? sound.file_name : 'No file set'}
       </p>
       <div className='flex gap-2'>
-        <Button variant='secondary' size='sm' onClick={() => fileInputRef.current?.click()}>
+        <Button
+          variant='secondary'
+          size='sm'
+          onClick={() => fileInputRef.current?.click()}
+        >
           Upload
         </Button>
         <Button
@@ -89,7 +102,9 @@ function SoundSlot({ label, soundType, sound, volume, onUpdate, onVolumeChange }
           onChange={(e) => onVolumeChange(parseInt(e.target.value) / 100)}
           className='flex-1 accent-purple-500'
         />
-        <span className='text-xs text-gray-400 w-8 text-right'>{Math.round(volume * 100)}%</span>
+        <span className='text-xs text-gray-400 w-8 text-right'>
+          {Math.round(volume * 100)}%
+        </span>
       </div>
       <input
         ref={fileInputRef}
@@ -118,7 +133,8 @@ export default function SoundSettings() {
     <div className='space-y-4'>
       <h3 className='text-lg font-semibold text-white'>Sound Notifications</h3>
       <p className='text-xs text-gray-500'>
-        Plays a sound when a chatter sends a message. First-message tracking resets on app restart.
+        Plays a sound when a chatter sends a message. First-message tracking
+        resets on app restart.
       </p>
 
       <SoundSlot

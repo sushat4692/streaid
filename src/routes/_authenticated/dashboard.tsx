@@ -11,7 +11,9 @@ function DashboardPage() {
         <h1 className='text-4xl font-bold gradient-text mb-4'>
           Welcome to Streaid
         </h1>
-        <p className='text-gray-400'>Twitch チャット翻訳</p>
+        <p className='text-gray-400'>
+          This app is aiding your streaming. (Strea(m) + aid)
+        </p>
       </div>
     </div>
   )

@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "streaid-tauri",
-  "version": "0.1.0",
+  "productName": "Streaid",
+  "version": "0.5.0",
   "identifier": "im.sush.streaid",
   "build": {
     "beforeDevCommand": "pnpm dev",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "streaid-tauri",
+        "title": "Streaid",
         "width": 800,
         "height": 600
       }

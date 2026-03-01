@@ -118,8 +118,10 @@ function LoginPage() {
               </svg>
             </div>
           </div>
-          <h1 className='text-3xl font-bold gradient-text mb-2'>streaid</h1>
-          <p className='text-gray-400 text-sm'>Twitch チャット翻訳サポート</p>
+          <h1 className='text-3xl font-bold gradient-text mb-2'>Streaid</h1>
+          <p className='text-gray-400 text-sm'>
+            This app is aiding your streaming. (Strea(m) + aid)
+          </p>
         </div>
 
         {/* Form section */}
@@ -128,7 +130,7 @@ function LoginPage() {
             label='Client ID'
             value={clientId}
             onChange={setClientId}
-            placeholder='Twitch Developer Console から取得'
+            placeholder='Get from Twitch Developer Console'
           />
 
           <div className='flex gap-3'>
@@ -137,7 +139,7 @@ function LoginPage() {
               onClick={saveClientId}
               className='flex-1'
             >
-              保存
+              Save Client ID
             </Button>
             <Button
               variant='primary'
@@ -163,18 +165,24 @@ function LoginPage() {
                       d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
                     />
                   </svg>
-                  認証待機中...
+                  Waiting for authentication...
                 </span>
               ) : (
-                'Twitch と連携'
+                'Authenticate with Twitch'
               )}
             </Button>
           </div>
 
           <p className='text-xs text-gray-500 text-center mt-4'>
-            Twitch Developer Console で Application を作成し、
-            <br />
-            Client ID を入力してください
+            By authenticating, you agree to Twitch's{' '}
+            <a
+              href='https://www.twitch.tv/p/legal/terms-of-service'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-purple-400 hover:underline'
+            >
+              Terms of Service
+            </a>
           </p>
         </div>
       </div>
