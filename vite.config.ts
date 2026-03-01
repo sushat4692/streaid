@@ -8,14 +8,14 @@ const host = process.env.TAURI_DEV_HOST;
 
 // https://vite.dev/config/
 export default defineConfig(async () => ({
-  plugins: [react(), tailwind(), tanstackRouter({
+  plugins: [tailwind(), tanstackRouter({
     target: 'react',
     autoCodeSplitting: true,
     routesDirectory: './src/routes',
     generatedRouteTree: './src/routeTree.gen.ts',
     routeFileIgnorePrefix: '-',
     quoteStyle: 'single',
-  })],
+  }), react()],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //

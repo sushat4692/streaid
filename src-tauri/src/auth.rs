@@ -25,6 +25,8 @@ pub struct TokenInfo {
     pub refresh_token: Option<String>,
     pub expires_in: Option<u64>,
     pub scope: Option<String>,
+    pub login: Option<String>,
+    pub user_id: Option<String>,
 }
 
 pub struct InnerState {
@@ -146,6 +148,30 @@ pub async fn start_device_flow(
     })
 }
 
+// Fetch user info (login, user_id) from Twitch API using access token
+async fn fetch_user_info(http: &Client, access_token: &str, client_id: &str) -> Result<(Option<String>, Option<String>)> {
+    let res = http
+        .get("https://api.twitch.tv/helix/users")
+        .header("Authorization", format!("Bearer {}", access_token))
+        .header("Client-Id", client_id)
+        .send()
+        .await
+        .context("fetching user info")?;
+
+    let body = res.text().await.context("reading user info response")?;
+    let v: Value = serde_json::from_str(&body).context("parsing user info")?;
+
+    if let Some(data) = v.get("data").and_then(|d| d.as_array()) {
+        if let Some(user) = data.first() {
+            let login = user.get("login").and_then(|l| l.as_str()).map(|s| s.to_string());
+            let user_id = user.get("id").and_then(|i| i.as_str()).map(|s| s.to_string());
+            return Ok((login, user_id));
+        }
+    }
+
+    Ok((None, None))
+}
+
 // Poll until user authorizes or flow expires
 pub async fn poll_device_flow(state: SharedState) -> Result<Option<TokenInfo>> {
     eprintln!("poll_device_flow: called");
@@ -223,11 +249,24 @@ pub async fn poll_device_flow(state: SharedState) -> Result<Option<TokenInfo>> {
                 .and_then(|v| v.as_str())
                 .map(|s| s.to_string());
 
+            // Fetch user info from Twitch API
+            let (login, user_id) = fetch_user_info(&http, at, &client_id).await.unwrap_or((None, None));
+
+            // Save login to keyring
+            if let Some(ref login_name) = login {
+                let _ = keyring::Entry::new(service, "twitch_login").set_password(login_name);
+            }
+            if let Some(ref uid) = user_id {
+                let _ = keyring::Entry::new(service, "twitch_user_id").set_password(uid);
+            }
+
             let info = TokenInfo {
                 access_token: at.to_string(),
                 refresh_token: refresh_opt,
                 expires_in,
                 scope,
+                login,
+                user_id,
             };
 
             // update state token expiry and clear device code to stop further polling
@@ -295,11 +334,21 @@ pub fn get_stored_token() -> Result<Option<TokenInfo>> {
                 Ok(rt) => Some(rt),
                 Err(_) => None,
             };
+            let login = match keyring::Entry::new(service, "twitch_login").get_password() {
+                Ok(l) => Some(l),
+                Err(_) => None,
+            };
+            let user_id = match keyring::Entry::new(service, "twitch_user_id").get_password() {
+                Ok(u) => Some(u),
+                Err(_) => None,
+            };
             Ok(Some(TokenInfo {
                 access_token: at,
                 refresh_token: refresh,
                 expires_in: None,
                 scope: None,
+                login,
+                user_id,
             }))
         }
         Err(keyring::Error::NoEntry) => Ok(None),
@@ -310,9 +359,10 @@ pub fn get_stored_token() -> Result<Option<TokenInfo>> {
 // Remove stored tokens from OS keyring
 pub fn clear_stored_token() -> Result<()> {
     let service = "streaid";
-    let access_key = "twitch_access_token";
-    let _ = keyring::Entry::new(service, access_key).delete_password();
+    let _ = keyring::Entry::new(service, "twitch_access_token").delete_password();
     let _ = keyring::Entry::new(service, "twitch_refresh_token").delete_password();
+    let _ = keyring::Entry::new(service, "twitch_login").delete_password();
+    let _ = keyring::Entry::new(service, "twitch_user_id").delete_password();
     Ok(())
 }
 
@@ -380,11 +430,28 @@ pub async fn refresh_token(state: SharedState) -> Result<Option<TokenInfo>> {
         .and_then(|v| v.as_str())
         .map(|s| s.to_string());
 
+    // Fetch user info from Twitch API
+    let (login, user_id) = fetch_user_info(&http, at, &client_id).await.unwrap_or((None, None));
+
+    // Save login to keyring if we got it (or keep existing one if we didn't? For now just save if we got it)
+    if let Some(ref login_name) = login {
+        let _ = keyring::Entry::new(service, "twitch_login").set_password(login_name);
+    }
+    if let Some(ref uid) = user_id {
+        let _ = keyring::Entry::new(service, "twitch_user_id").set_password(uid);
+    }
+
+    // Fallback: if we failed to fetch (e.g. network glitch but token likely valid), try to read from keyring
+    let login = login.or_else(|| keyring::Entry::new(service, "twitch_login").get_password().ok());
+    let user_id = user_id.or_else(|| keyring::Entry::new(service, "twitch_user_id").get_password().ok());
+
     let info = TokenInfo {
         access_token: at.to_string(),
         refresh_token: refresh_opt,
         expires_in,
         scope,
+        login,
+        user_id,
     };
 
     // update state token expiry
