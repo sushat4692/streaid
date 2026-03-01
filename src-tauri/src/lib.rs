@@ -2,6 +2,7 @@
 mod auth;
 mod chat;
 mod dictionary;
+mod sounds;
 mod translate;
 
 use auth::{
@@ -167,6 +168,14 @@ struct DictionaryEvent {
     target_lang: String,
 }
 
+#[derive(serde::Serialize, Clone)]
+struct ChatMessageEvent {
+    username: String,
+    message: String,
+    channel: String,
+    timestamp: String,
+}
+
 #[tauri::command]
 fn debug_token_status() -> Result<DebugTokenStatus, String> {
     let state = get_auth_state();
@@ -262,6 +271,47 @@ fn toggle_translation_cmd(enabled: bool) -> Result<(), String> {
     s.is_enabled = enabled;
     eprintln!("Translation toggled: {}", enabled);
     Ok(())
+}
+
+#[derive(serde::Serialize)]
+struct SoundDataResponse {
+    data_url: String,
+    file_name: String,
+}
+
+#[tauri::command]
+async fn set_sound_cmd(
+    app: tauri::AppHandle,
+    sound_type: String,
+    data: Vec<u8>,
+    file_name: String,
+) -> Result<(), String> {
+    sounds::save_sound(&app, &sound_type, &data, &file_name)
+        .map_err(|e| format!("Failed to save sound: {}", e))
+}
+
+#[tauri::command]
+async fn get_sound_cmd(
+    app: tauri::AppHandle,
+    sound_type: String,
+) -> Result<Option<SoundDataResponse>, String> {
+    sounds::get_sound(&app, &sound_type)
+        .map_err(|e| format!("Failed to get sound: {}", e))
+        .map(|opt| {
+            opt.map(|s| SoundDataResponse {
+                data_url: s.data_url,
+                file_name: s.file_name,
+            })
+        })
+}
+
+#[tauri::command]
+async fn clear_sound_cmd(
+    app: tauri::AppHandle,
+    sound_type: String,
+) -> Result<(), String> {
+    sounds::delete_sound(&app, &sound_type)
+        .map_err(|e| format!("Failed to clear sound: {}", e))
 }
 
 #[tauri::command]
@@ -463,6 +513,17 @@ async fn chat_listener_task(
                             eprintln!("Ignoring own message");
                             continue;
                         }
+                    }
+
+                    // Emit chat_message event for all user messages (fires regardless of toggle)
+                    let chat_event = ChatMessageEvent {
+                        username: irc_msg.username.clone(),
+                        message: irc_msg.message.clone(),
+                        channel: channel.clone(),
+                        timestamp: chrono::Utc::now().to_rfc3339(),
+                    };
+                    if let Err(e) = app.emit("chat_message", chat_event) {
+                        eprintln!("Failed to emit chat_message event: {}", e);
                     }
 
                     // Check if translation is enabled
@@ -798,6 +859,9 @@ pub fn run() {
             stop_chat_listener_cmd,
             get_chat_status_cmd,
             toggle_translation_cmd,
+            set_sound_cmd,
+            get_sound_cmd,
+            clear_sound_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

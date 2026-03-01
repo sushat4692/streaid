@@ -1,6 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import Card from '../../components/Card'
 import ChatControl from '../../components/ChatControl'
+import PageHeader from '../../components/PageHeader'
+import SoundSettings from '../../components/SoundSettings'
 import TranslationSettings from '../../components/TranslationSettings'
 
 export const Route = createFileRoute('/_authenticated/config')({
@@ -10,10 +13,15 @@ export const Route = createFileRoute('/_authenticated/config')({
 function ConfigPage() {
   return (
     <div className='p-6 flex justify-center'>
-      <div className='glass-card w-full max-w-2xl p-8 relative z-10 space-y-8'>
-        <TranslationSettings />
-        <div className='border-t border-white/10' />
-        <ChatControl />
+      <div className='w-full max-w-2xl space-y-4'>
+        <PageHeader title='Config' />
+        <Card>
+          <TranslationSettings />
+          <div className='border-t border-white/10' />
+          <ChatControl />
+          <div className='border-t border-white/10' />
+          <SoundSettings />
+        </Card>
       </div>
     </div>
   )

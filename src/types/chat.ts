@@ -32,3 +32,15 @@ export type DictionaryEvent = {
   source_lang: string
   target_lang: string
 }
+
+export type ChatMessageEvent = {
+  username: string
+  message: string
+  channel: string
+  timestamp: string
+}
+
+export type SoundData = {
+  data_url: string
+  file_name: string
+}

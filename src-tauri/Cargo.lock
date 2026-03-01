@@ -4152,6 +4152,7 @@ name = "streaid-tauri"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "base64 0.22.1",
  "chrono",
  "dirs 4.0.0",
  "futures-util",
