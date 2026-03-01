@@ -19,7 +19,13 @@ const inputStyles = cx(
   'transition-all duration-300 ease-out'
 )
 
-export default function Input({ value, onChange, placeholder, className, type = 'text' }: Props) {
+export default function Input({
+  value,
+  onChange,
+  placeholder,
+  className,
+  type = 'text',
+}: Props) {
   return (
     <BaseInput
       type={type}

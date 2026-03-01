@@ -7,7 +7,8 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: Variant
 }
 
-const baseStyles = 'px-6 py-3 rounded-xl font-medium transition-all duration-300 ease-out'
+const baseStyles =
+  'px-6 py-3 rounded-xl font-medium transition-all duration-300 ease-out'
 
 const variantStyles: Record<Variant, string> = {
   primary: cx(
@@ -25,10 +26,7 @@ const variantStyles: Record<Variant, string> = {
     'border border-white/10',
     'hover:bg-white/15 hover:border-white/20'
   ),
-  destructive: cx(
-    'bg-red-500/80 text-white',
-    'hover:bg-red-500'
-  ),
+  destructive: cx('bg-red-500/80 text-white', 'hover:bg-red-500'),
 }
 
 export default function Button({

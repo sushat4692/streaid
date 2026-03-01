@@ -1,15 +1,17 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 mod auth;
 mod chat;
+mod dictionary;
 mod translate;
 
 use auth::{
     poll_device_flow, shared_state, start_device_flow, DeviceCodeInfo, InnerState, TokenInfo,
 };
 use chat::{
-    connect_to_irc, extract_translate_text, is_translate_command, parse_irc_privmsg,
-    send_chat_message, send_pong, WsStream,
+    connect_to_irc, extract_dictionary_word, extract_translate_text, is_dictionary_command,
+    is_translate_command, parse_irc_privmsg, send_chat_message, send_pong, WsStream,
 };
+use dictionary::lookup_word;
 use futures_util::StreamExt;
 use once_cell::sync::Lazy;
 use std::sync::Arc;
@@ -147,6 +149,19 @@ struct TranslationEvent {
     original_message: String,
     suggestions: Vec<TranslationSuggestion>,
     points: Vec<String>,
+    timestamp: String,
+    source_lang: String,
+    target_lang: String,
+}
+
+#[derive(serde::Serialize, Clone)]
+struct DictionaryEvent {
+    original_user: String,
+    original_word: String,
+    word: String,
+    meaning: String,
+    examples: Vec<String>,
+    similar_words: Vec<String>,
     timestamp: String,
     source_lang: String,
     target_lang: String,
@@ -581,6 +596,147 @@ async fn chat_listener_task(
                                 }
                                 Err(e) => {
                                     eprintln!("Translation failed: {}", e);
+                                }
+                            }
+                        }
+                    }
+                    // Check for !d command
+                    else if is_dictionary_command(&irc_msg.message) {
+                        if let Some(word) = extract_dictionary_word(&irc_msg.message) {
+                            eprintln!("Dictionary request: {}", word);
+
+                            // Get Gemini API key (same as translation)
+                            let api_key = match keyring::Entry::new("streaid", "gemini_api_key")
+                                .get_password()
+                            {
+                                Ok(key) => key,
+                                Err(_) => {
+                                    eprintln!("No Gemini API key configured");
+                                    continue;
+                                }
+                            };
+
+                            // Detect language
+                            let source_lang = detect_language(&word);
+                            if source_lang == Language::Unknown {
+                                eprintln!("Unknown language, skipping");
+                                continue;
+                            }
+
+                            // Lookup word
+                            match lookup_word(&word, &api_key, source_lang).await {
+                                Ok(result) => {
+                                    eprintln!("Dictionary result: {:?}", result);
+
+                                    // Send meaning message
+                                    let meaning_msg = format!(
+                                        "@{}: [Dict] {} - {}",
+                                        irc_msg.username,
+                                        result.word,
+                                        result.meaning
+                                    );
+
+                                    let truncated_meaning = if meaning_msg.len() > 490 {
+                                        let max_len = 470 - irc_msg.username.len();
+                                        let safe_len = result.meaning.floor_char_boundary(max_len);
+                                        format!(
+                                            "@{}: [Dict] {} - {}...",
+                                            irc_msg.username, result.word, &result.meaning[..safe_len]
+                                        )
+                                    } else {
+                                        meaning_msg
+                                    };
+
+                                    if let Err(e) =
+                                        send_chat_message(&mut ws_stream, &channel, &truncated_meaning)
+                                            .await
+                                    {
+                                        eprintln!("Failed to send meaning: {}", e);
+                                    } else {
+                                        eprintln!("Sent meaning to chat");
+                                    }
+
+                                    tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+
+                                    // Send examples message
+                                    let examples_str = result.examples.join(" | ");
+                                    let examples_msg =
+                                        format!("@{}: [Examples] {}", irc_msg.username, examples_str);
+
+                                    let truncated_examples = if examples_msg.len() > 490 {
+                                        let max_len = 460 - irc_msg.username.len();
+                                        let safe_len = examples_str.floor_char_boundary(max_len);
+                                        format!(
+                                            "@{}: [Examples] {}...",
+                                            irc_msg.username,
+                                            &examples_str[..safe_len]
+                                        )
+                                    } else {
+                                        examples_msg
+                                    };
+
+                                    if let Err(e) =
+                                        send_chat_message(&mut ws_stream, &channel, &truncated_examples)
+                                            .await
+                                    {
+                                        eprintln!("Failed to send examples: {}", e);
+                                    } else {
+                                        eprintln!("Sent examples to chat");
+                                    }
+
+                                    tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+
+                                    // Send synonyms message
+                                    let similar_str = result.similar_words.join(", ");
+                                    let similar_msg =
+                                        format!("@{}: [Synonyms] {}", irc_msg.username, similar_str);
+
+                                    let truncated_similar = if similar_msg.len() > 490 {
+                                        let max_len = 460 - irc_msg.username.len();
+                                        let safe_len = similar_str.floor_char_boundary(max_len);
+                                        format!(
+                                            "@{}: [Synonyms] {}...",
+                                            irc_msg.username,
+                                            &similar_str[..safe_len]
+                                        )
+                                    } else {
+                                        similar_msg
+                                    };
+
+                                    if let Err(e) =
+                                        send_chat_message(&mut ws_stream, &channel, &truncated_similar)
+                                            .await
+                                    {
+                                        eprintln!("Failed to send similar words: {}", e);
+                                    } else {
+                                        eprintln!("Sent similar words to chat");
+                                    }
+
+                                    // Emit event to frontend
+                                    let target_lang = match source_lang {
+                                        Language::Japanese => "English",
+                                        Language::English => "Japanese",
+                                        Language::Unknown => "Unknown",
+                                    };
+
+                                    let event = DictionaryEvent {
+                                        original_user: irc_msg.username.clone(),
+                                        original_word: word.clone(),
+                                        word: result.word.clone(),
+                                        meaning: result.meaning.clone(),
+                                        examples: result.examples.clone(),
+                                        similar_words: result.similar_words.clone(),
+                                        timestamp: chrono::Utc::now().to_rfc3339(),
+                                        source_lang: source_lang.to_string(),
+                                        target_lang: target_lang.to_string(),
+                                    };
+
+                                    if let Err(e) = app.emit("dictionary", event) {
+                                        eprintln!("Failed to emit dictionary event: {}", e);
+                                    }
+                                }
+                                Err(e) => {
+                                    eprintln!("Dictionary lookup failed: {}", e);
                                 }
                             }
                         }

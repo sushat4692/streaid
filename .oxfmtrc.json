@@ -15,7 +15,7 @@
       ["parent", "sibling", "index"]
     ],
     "sortSideEffects": false,
-    "newlinesBetween": false,
+    "newlinesBetween": true,
     "ignoreCase": true
   },
   "ignorePatterns": [

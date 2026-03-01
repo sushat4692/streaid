@@ -20,3 +20,15 @@ export type TranslationEvent = {
   source_lang: string
   target_lang: string
 }
+
+export type DictionaryEvent = {
+  original_user: string
+  original_word: string
+  word: string
+  meaning: string
+  examples: string[]
+  similar_words: string[]
+  timestamp: string
+  source_lang: string
+  target_lang: string
+}

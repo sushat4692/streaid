@@ -242,6 +242,25 @@ pub fn extract_translate_text(msg: &str) -> Option<String> {
     }
 }
 
+/// Check if message is a dictionary command
+pub fn is_dictionary_command(msg: &str) -> bool {
+    msg.starts_with("!d ")
+}
+
+/// Extract word after "!d " (first word only)
+pub fn extract_dictionary_word(msg: &str) -> Option<String> {
+    if !is_dictionary_command(msg) {
+        return None;
+    }
+    let word = msg.trim_start_matches("!d ").trim();
+    if word.is_empty() {
+        None
+    } else {
+        // Take only the first word (ignore extra text)
+        Some(word.split_whitespace().next()?.to_string())
+    }
+}
+
 /// Send a message to chat
 pub async fn send_chat_message(
     ws_stream: &mut WsStream,
@@ -311,5 +330,37 @@ mod tests {
         );
         assert_eq!(extract_translate_text("!ts"), None);
         assert_eq!(extract_translate_text("!ts "), None);
+    }
+
+    #[test]
+    fn test_is_dictionary_command() {
+        assert!(is_dictionary_command("!d apple"));
+        assert!(is_dictionary_command("!d りんご"));
+        assert!(!is_dictionary_command("!dict apple"));
+        assert!(!is_dictionary_command("d apple"));
+        assert!(!is_dictionary_command("!d"));
+    }
+
+    #[test]
+    fn test_extract_dictionary_word() {
+        assert_eq!(
+            extract_dictionary_word("!d apple"),
+            Some("apple".to_string())
+        );
+        assert_eq!(
+            extract_dictionary_word("!d りんご"),
+            Some("りんご".to_string())
+        );
+        // Only first word
+        assert_eq!(
+            extract_dictionary_word("!d apple pie"),
+            Some("apple".to_string())
+        );
+        assert_eq!(
+            extract_dictionary_word("!d   hello   world"),
+            Some("hello".to_string())
+        );
+        assert_eq!(extract_dictionary_word("!d"), None);
+        assert_eq!(extract_dictionary_word("!d "), None);
     }
 }

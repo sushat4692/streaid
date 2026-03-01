@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import cx from 'classnames'
+import { useState, useEffect } from 'react'
+
+import type { ChatStatus } from '../types/chat'
 import Button from './Button'
 import Field from './Field'
-import type { ChatStatus } from '../types/chat'
 
 export default function ChatControl() {
   const [status, setStatus] = useState<ChatStatus>({
@@ -28,9 +29,13 @@ export default function ChatControl() {
     try {
       const chatStatus = await invoke<ChatStatus>('get_chat_status_cmd')
       setStatus(chatStatus)
-      
+
       // Pre-fill last used channel if not running and we have a saved channel
-      if (!chatStatus.is_running && chatStatus.last_target_channel && !targetChannel) {
+      if (
+        !chatStatus.is_running &&
+        chatStatus.last_target_channel &&
+        !targetChannel
+      ) {
         setTargetChannel(chatStatus.last_target_channel)
       }
     } catch (e) {
@@ -78,9 +83,9 @@ export default function ChatControl() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-white">Chat Listener</h3>
+    <div className='space-y-4'>
+      <div className='flex items-center justify-between'>
+        <h3 className='text-lg font-semibold text-white'>Chat Listener</h3>
 
         <div
           className={cx(
@@ -96,32 +101,32 @@ export default function ChatControl() {
 
       {!status.is_running && (
         <Field
-          label="Target Channel"
+          label='Target Channel'
           value={targetChannel}
           onChange={setTargetChannel}
-          placeholder="Leave empty for your channel, or enter any channel (e.g., xqc)"
+          placeholder='Leave empty for your channel, or enter any channel (e.g., xqc)'
         />
       )}
 
       {status.channel && (
-        <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-          <p className="text-sm text-gray-400">Monitoring</p>
-          <p className="text-white font-medium">#{status.channel}</p>
+        <div className='p-4 rounded-xl bg-white/5 border border-white/10'>
+          <p className='text-sm text-gray-400'>Monitoring</p>
+          <p className='text-white font-medium'>#{status.channel}</p>
         </div>
       )}
 
-      <div className="flex gap-3">
+      <div className='flex gap-3'>
         {!status.is_running ? (
           <Button
-            variant="primary"
+            variant='primary'
             onClick={handleStart}
             disabled={isStarting}
-            className="flex-1"
+            className='flex-1'
           >
             {isStarting ? 'Starting...' : 'Start Listening'}
           </Button>
         ) : (
-          <Button variant="destructive" onClick={handleStop} className="flex-1">
+          <Button variant='destructive' onClick={handleStop} className='flex-1'>
             Stop Listening
           </Button>
         )}
@@ -130,15 +135,15 @@ export default function ChatControl() {
           variant={status.is_enabled ? 'secondary' : 'destructive'}
           onClick={handleToggle}
           disabled={!status.is_running}
-          className="flex-1"
+          className='flex-1'
         >
           {status.is_enabled ? 'Disable !ts' : 'Enable !ts'}
         </Button>
       </div>
 
       {status.is_running && !status.is_enabled && (
-        <div className="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
-          <p className="text-xs text-yellow-400">
+        <div className='p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20'>
+          <p className='text-xs text-yellow-400'>
             ⚠ Translation command (!ts) is currently disabled
           </p>
         </div>

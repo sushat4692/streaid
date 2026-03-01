@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { invoke } from '@tauri-apps/api/core'
-import { useState, useEffect } from 'react'
 import cx from 'classnames'
+import { useState, useEffect } from 'react'
+
 import Button from '../components/Button'
 import Field from '../components/Field'
 
@@ -95,11 +96,11 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="glass-card w-full max-w-md p-8 relative z-10">
+    <div className='min-h-screen flex items-center justify-center p-6'>
+      <div className='glass-card w-full max-w-md p-8 relative z-10'>
         {/* Logo section */}
-        <div className="text-center mb-8">
-          <div className="logo-float inline-block mb-4">
+        <div className='text-center mb-8'>
+          <div className='logo-float inline-block mb-4'>
             <div
               className={cx(
                 'w-16 h-16 rounded-2xl',
@@ -109,53 +110,57 @@ function LoginPage() {
               )}
             >
               <svg
-                className="w-8 h-8 text-white"
-                fill="currentColor"
-                viewBox="0 0 24 24"
+                className='w-8 h-8 text-white'
+                fill='currentColor'
+                viewBox='0 0 24 24'
               >
-                <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" />
+                <path d='M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z' />
               </svg>
             </div>
           </div>
-          <h1 className="text-3xl font-bold gradient-text mb-2">streaid</h1>
-          <p className="text-gray-400 text-sm">Twitch チャット翻訳サポート</p>
+          <h1 className='text-3xl font-bold gradient-text mb-2'>streaid</h1>
+          <p className='text-gray-400 text-sm'>Twitch チャット翻訳サポート</p>
         </div>
 
         {/* Form section */}
-        <div className="space-y-6">
+        <div className='space-y-6'>
           <Field
-            label="Client ID"
+            label='Client ID'
             value={clientId}
             onChange={setClientId}
-            placeholder="Twitch Developer Console から取得"
+            placeholder='Twitch Developer Console から取得'
           />
 
-          <div className="flex gap-3">
-            <Button variant="secondary" onClick={saveClientId} className="flex-1">
+          <div className='flex gap-3'>
+            <Button
+              variant='secondary'
+              onClick={saveClientId}
+              className='flex-1'
+            >
               保存
             </Button>
             <Button
-              variant="primary"
+              variant='primary'
               onClick={startDeviceFlow}
               disabled={isLoading || !clientId}
-              className="flex-1"
+              className='flex-1'
             >
               {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <span className='flex items-center justify-center gap-2'>
+                  <svg className='animate-spin h-4 w-4' viewBox='0 0 24 24'>
                     <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="none"
+                      className='opacity-25'
+                      cx='12'
+                      cy='12'
+                      r='10'
+                      stroke='currentColor'
+                      strokeWidth='4'
+                      fill='none'
                     />
                     <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      className='opacity-75'
+                      fill='currentColor'
+                      d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
                     />
                   </svg>
                   認証待機中...
@@ -166,7 +171,7 @@ function LoginPage() {
             </Button>
           </div>
 
-          <p className="text-xs text-gray-500 text-center mt-4">
+          <p className='text-xs text-gray-500 text-center mt-4'>
             Twitch Developer Console で Application を作成し、
             <br />
             Client ID を入力してください

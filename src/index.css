@@ -7,9 +7,15 @@ body,
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, #0E0E10 0%, #1A1A2E 50%, #16213E 100%);
-  color: #EFEFF1;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  background: linear-gradient(135deg, #0e0e10 0%, #1a1a2e 50%, #16213e 100%);
+  color: #efeff1;
   min-height: 100vh;
 }
 
@@ -28,8 +34,13 @@ body {
 
 /* Logo animation - kept here as @keyframes can't be done inline */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .logo-float {
@@ -38,7 +49,7 @@ body {
 
 /* Gradient text - kept here as complex webkit properties */
 .gradient-text {
-  background: linear-gradient(135deg, #A970FF 0%, #9146FF 50%, #FF6B9D 100%);
+  background: linear-gradient(135deg, #a970ff 0%, #9146ff 50%, #ff6b9d 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -47,6 +58,14 @@ body {
 /* Background pattern - kept here for App.tsx */
 .bg-pattern {
   background-image:
-    radial-gradient(circle at 25% 25%, rgba(145, 70, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(255, 107, 157, 0.08) 0%, transparent 50%);
+    radial-gradient(
+      circle at 25% 25%,
+      rgba(145, 70, 255, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 75% 75%,
+      rgba(255, 107, 157, 0.08) 0%,
+      transparent 50%
+    );
 }
