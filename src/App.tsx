@@ -1,11 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import reactLogo from "./assets/react.svg";
+// removed unused reactLogo import
 import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import Layout from "./components/Layout";
+import AuthCard from "./components/AuthCard";
+import Button from "./components/Button";
+import Field from "./components/Field";
+import StatusBadge from "./components/StatusBadge";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  // greetings removed
   const [clientId, setClientId] = useState("");
   const [scopes, setScopes] = useState<string[]>(["chat_read"]);
   const [deviceInfo, setDeviceInfo] = useState<any | null>(null);
@@ -15,10 +18,7 @@ function App() {
   const [autoPolling, setAutoPolling] = useState(false);
   const intervalRef = useRef<number | null>(null);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  // greet removed
 
   async function startDeviceFlow() {
     try {
@@ -173,108 +173,76 @@ function App() {
   }
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
+    <Layout>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Welcome to Tauri + React</h1>
+          <div className="flex items-center space-x-4">
+            <a href="https://vite.dev" target="_blank" className="text-sm text-gray-500 hover:text-gray-900">Vite</a>
+            <a href="https://tauri.app" target="_blank" className="text-sm text-gray-500 hover:text-gray-900">Tauri</a>
+          </div>
+        </div>
 
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <AuthCard>
+          <div className="space-y-4">
+            <div>
+              <div className="flex items-start gap-4">
+                <div className="flex-1">
+                  <Field label="Client ID" value={clientId} onChange={setClientId} placeholder="Enter Twitch Client ID" />
+                </div>
+                <div className="mt-6">
+                  <Button onClick={saveClientId}>Save</Button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium">Scopes</label>
+              <div className="mt-2 flex space-x-4">
+                <label className="inline-flex items-center">
+                  <input type="checkbox" checked={scopes.includes("chat_read")} onChange={(e) => {
+                    if (e.currentTarget.checked) setScopes((s) => Array.from(new Set([...s, "chat_read"])));
+                    else setScopes((s) => s.filter((x) => x !== "chat_read"));
+                  }} />
+                  <span className="ml-2">chat_read</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input type="checkbox" checked={scopes.includes("chat_edit")} onChange={(e) => {
+                    if (e.currentTarget.checked) setScopes((s) => Array.from(new Set([...s, "chat_edit"])));
+                    else setScopes((s) => s.filter((x) => x !== "chat_edit"));
+                  }} />
+                  <span className="ml-2">chat_edit</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 items-center">
+              <Button variant="primary" onClick={startDeviceFlow}>Start Device Flow</Button>
+              <Button variant="secondary" onClick={pollForToken}>Poll For Token</Button>
+              <Button variant="secondary" onClick={async () => { try { const s = await invoke("debug_token_status"); setDebugStatus(s); } catch (e) { setDebugStatus({ error: String(e) }); } }}>Debug Status</Button>
+              <Button variant="secondary" onClick={getStoredToken}>Get Stored Token</Button>
+              <Button variant="destructive" onClick={clearStoredToken}>Clear Stored Token</Button>
+              <Button variant="secondary" onClick={refreshToken}>Refresh Token</Button>
+              {!autoPolling ? (
+                <Button variant="primary" onClick={() => { const interval = deviceInfo?.interval ?? 5; startAutoPolling(interval); }}>Start Auto Poll</Button>
+              ) : (
+                <Button variant="destructive" onClick={stopAutoPolling}>Stop Auto Poll</Button>
+              )}
+              <div className="ml-2">
+                <StatusBadge status={autoPolling ? 'pending' : (tokenInfo ? 'ok' : 'error')}>{autoPolling ? 'Auto Polling' : tokenInfo ? 'Token Present' : 'No Token'}</StatusBadge>
+              </div>
+            </div>
+
+            <div>
+              <pre className="bg-gray-50 p-3 rounded">{deviceInfo ? JSON.stringify(deviceInfo, null, 2) : ""}</pre>
+              <pre className="bg-gray-50 p-3 rounded mt-2">{tokenInfo ? JSON.stringify(tokenInfo, null, 2) : ""}</pre>
+              <pre className="bg-gray-50 p-3 rounded mt-2">{storedToken ? JSON.stringify(storedToken, null, 2) : ""}</pre>
+              <pre className="bg-gray-50 p-3 rounded mt-2">{debugStatus ? JSON.stringify(debugStatus, null, 2) : ""}</pre>
+            </div>
+          </div>
+        </AuthCard>
       </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-
-      <section className="auth">
-        <h2>Twitch Device Flow (Dev)</h2>
-        <div>
-          <label>Client ID: </label>
-          <input value={clientId} onChange={(e) => setClientId(e.currentTarget.value)} />
-          <button onClick={saveClientId}>Save Client ID</button>
-        </div>
-        <div>
-          <label>Scopes:</label>
-          <label>
-            <input
-              type="checkbox"
-              checked={scopes.includes("chat_read")}
-              onChange={(e) => {
-                if (e.currentTarget.checked) setScopes((s) => Array.from(new Set([...s, "chat_read"])));
-                else setScopes((s) => s.filter((x) => x !== "chat_read"));
-              }}
-            />
-            chat_read
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={scopes.includes("chat_edit")}
-              onChange={(e) => {
-                if (e.currentTarget.checked) setScopes((s) => Array.from(new Set([...s, "chat_edit"])));
-                else setScopes((s) => s.filter((x) => x !== "chat_edit"));
-              }}
-            />
-            chat_edit
-          </label>
-        </div>
-        <div className="row">
-          <button onClick={startDeviceFlow}>Start Device Flow</button>
-          <button onClick={pollForToken}>Poll For Token</button>
-          <button
-            onClick={async () => {
-              try {
-                const s = await invoke("debug_token_status");
-                setDebugStatus(s);
-              } catch (e) {
-                setDebugStatus({ error: String(e) });
-              }
-            }}
-          >
-            Debug Status
-          </button>
-          <button onClick={getStoredToken}>Get Stored Token</button>
-          <button onClick={clearStoredToken}>Clear Stored Token</button>
-          <button onClick={refreshToken}>Refresh Token</button>
-          {!autoPolling ? (
-            <button
-              onClick={() => {
-                const interval = deviceInfo?.interval ?? 5;
-                startAutoPolling(interval);
-              }}
-            >
-              Start Auto Poll
-            </button>
-          ) : (
-            <button onClick={stopAutoPolling}>Stop Auto Poll</button>
-          )}
-        </div>
-
-        <pre style={{ whiteSpace: "pre-wrap" }}>{deviceInfo ? JSON.stringify(deviceInfo, null, 2) : ""}</pre>
-        <pre style={{ whiteSpace: "pre-wrap" }}>{tokenInfo ? JSON.stringify(tokenInfo, null, 2) : ""}</pre>
-        <pre style={{ whiteSpace: "pre-wrap" }}>{storedToken ? JSON.stringify(storedToken, null, 2) : ""}</pre>
-        <pre style={{ whiteSpace: "pre-wrap" }}>{debugStatus ? JSON.stringify(debugStatus, null, 2) : ""}</pre>
-      </section>
-    </main>
+    </Layout>
   );
 }
 
