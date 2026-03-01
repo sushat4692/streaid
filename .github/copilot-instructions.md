@@ -1,93 +1,136 @@
-# streaid-tauri — Copilot 用プロジェクト解析メモ（更新）
+# Streaid Tauri Project Instructions
 
-以下は現在のリポジトリ状態を素早く理解して作業を始めるための要点メモです。
+Twitch配信をサポートするTauriデスクトップアプリケーションです。
 
 ## プロジェクト概要
-- このリポジトリは Tauri + React（Vite）で作られたデスクトップアプリケーションです。Twitch の Device Code Grant 認証を含む配信向け機能をネイティブ（Rust）で実装する設計です。
-- フロントエンド: React + Vite（`src/`）。UI ライブラリとして `@base-ui/react`（Base UI）を使用しています（コンポーネント群は `src/components/` にまとまっています）。
-- バックエンド（ネイティブ）: Rust + Tauri（`src-tauri/`） — 認証、トークン管理、バックグラウンドのトークン更新ロジックを実装。
 
-## 重要なファイルとエントリポイント（現在）
-- フロントエンド
-  - `index.html` — Vite エントリ
-  - `src/main.tsx` — React のエントリポイント（`index.css` を読み込み）
-  - `src/index.css` — Tailwind を使い、`@layer base`/`@layer components` にルート・レイアウトルールを定義（`App.css` は削除されました）
-  - `src/App.tsx` — 簡素な UI（`Client ID` 入力、`Save`、`Start Device Flow`）
-  - `src/components/` — 再利用コンポーネント（`Layout`, `Button`, `Field`, `StatusBadge` 等）
-  - `package.json` — スクリプト/依存（`pnpm` 前提）。Tailwind v4 + `@tailwindcss/vite` を使用しています。
+- **名前**: streaid-tauri
+- **バージョン**: 0.1.0
+- **識別子**: im.sush.streaid
+- **目的**: Twitch上のチャット欄で日本語 - 英語間の翻訳をサポートするアプリケーション
 
-- Tauri / Rust
-  - `src-tauri/Cargo.toml` — Rust 依存（`twitch_oauth2`, `reqwest`, `keyring`, `once_cell` 等）
-  - `src-tauri/src/lib.rs` — Tauri のコマンドを公開（認証コマンド含む）、`tauri_plugin_opener` を登録、バックグラウンドで `refresh_token_if_needed` を定期実行しています。
-  - `src-tauri/src/auth.rs` — Device Code フロー、単発ポーリング、トークン永続化（OS キーチェーン via `keyring`）、トークンリフレッシュロジックを実装。
-  - `src-tauri/tauri.conf.json` — Tauri ビルド設定
+## 技術スタック
 
-## 実行・ビルド手順（ローカル）
-- 前提: Node (pnpm 推奨), Rust と Tauri CLI
+### フロントエンド (TypeScript/React)
 
-フロントエンド開発サーバ:
+| ライブラリ | バージョン | 用途 |
+|-----------|----------|------|
+| React | ^19.2.3 | UIフレームワーク |
+| React DOM | ^19.2.3 | DOMレンダリング |
+| @tauri-apps/api | ^2 | Tauriバックエンド通信 |
+| @tauri-apps/plugin-opener | ^2 | URL/ファイルオープン |
+| @tanstack/react-router | ^1.147.3 | ルーティング |
+| @base-ui/react | ^1.0.0 | UIコンポーネント |
+| Tailwind CSS | ^4.1.18 | スタイリング |
+| Vite | ^7.3.1 | ビルドツール |
+| TypeScript | ~5.9.3 | 型システム |
+
+**Linter/Formatter**: oxlint (^1.38.0), oxfmt (^0.23.0)
+
+### バックエンド (Rust/Tauri)
+
+| クレート | バージョン | 用途 |
+|---------|----------|------|
+| tauri | 2 | デスクトップアプリフレームワーク |
+| tauri-plugin-opener | 2 | システムオープナー |
+| twitch_oauth2 | 0.16 | Twitch OAuth認証 |
+| twitch_api | 0.7 | Twitch API クライアント |
+| tokio | 1 | 非同期ランタイム |
+| reqwest | 0.11 | HTTPクライアント |
+| keyring | 1.1 | OSキーチェーン/認証情報保存 |
+| serde/serde_json | 1 | シリアライズ/デシリアライズ |
+| anyhow | 1.0 | エラーハンドリング |
+| once_cell | 1.18 | 遅延初期化 |
+| open | 3 | システムブラウザ起動 |
+| dirs | 4 | ディレクトリパス取得 |
+
+## ディレクトリ構造
+
+```
+streaid-tauri/
+├── src/                          # フロントエンドソース
+│   ├── main.tsx                  # エントリーポイント
+│   ├── App.tsx                   # メインアプリコンポーネント
+│   ├── index.css                 # グローバルスタイル (Tailwind)
+│   ├── components/               # 再利用可能なUIコンポーネント
+│   │   ├── AuthCard.tsx
+│   │   ├── Button.tsx
+│   │   ├── Field.tsx
+│   │   ├── Input.tsx
+│   │   ├── Layout.tsx
+│   │   └── StatusBadge.tsx
+│   └── assets/                   # 静的アセット
+├── src-tauri/                    # Rustバックエンド
+│   ├── src/
+│   │   ├── main.rs               # Tauriエントリーポイント
+│   │   ├── lib.rs                # Tauriコマンド定義
+│   │   └── auth.rs               # Twitch OAuth認証ロジック
+│   ├── capabilities/             # Tauriパーミッション設定
+│   │   └── default.json
+│   ├── icons/                    # アプリアイコン
+│   ├── tauri.conf.json           # Tauri設定
+│   └── Cargo.toml                # Rust依存関係
+├── public/                       # 公開静的ファイル
+├── index.html                    # HTMLテンプレート
+├── vite.config.ts                # Vite設定
+├── tailwind.config.cjs           # Tailwind設定
+├── tsconfig.json                 # TypeScript設定
+└── package.json                  # npm依存関係
+```
+
+## Tauriコマンド一覧
+
+フロントエンドから `invoke()` で呼び出し可能なRustコマンド:
+
+| コマンド | 引数 | 戻り値 | 説明 |
+|---------|-----|-------|------|
+| `greet` | `name: string` | `string` | テスト用挨拶 |
+| `start_device_flow_cmd` | `clientId: string, scopes: string[]` | `DeviceCodeInfo` | Device Flow開始 |
+| `poll_device_flow_cmd` | なし | `TokenInfo \| null` | 認証ポーリング |
+| `get_stored_token_cmd` | なし | `TokenInfo \| null` | 保存済みトークン取得 |
+| `clear_stored_token_cmd` | なし | `void` | トークン削除 |
+| `refresh_token_cmd` | なし | `TokenInfo \| null` | トークン更新 |
+| `open_url_cmd` | `url: string` | `void` | システムブラウザでURL開く |
+| `debug_token_status` | なし | `DebugTokenStatus` | デバッグ用ステータス |
+| `set_client_id_cmd` | `clientId: string` | `void` | Client ID保存 |
+| `get_client_id_cmd` | なし | `string \| null` | Client ID取得 |
+
+## 開発コマンド
+
 ```bash
-pnpm install
+# 開発サーバー起動
 pnpm dev
-```
 
-Tauri アプリ開発（別ターミナルで）:
-```bash
+# Tauriアプリとして起動
 pnpm tauri dev
-```
 
-プロダクションビルド:
-```bash
+# プロダクションビルド
 pnpm build
 pnpm tauri build
+
+# Lint
+pnpm lint
+pnpm lint:fix
+
+# フォーマット
+pnpm format
+pnpm format:check
 ```
 
-## 現在公開されている Tauri コマンド
-- `greet(name: &str)`
-- `start_device_flow_cmd(client_id, scopes)` → Rust 側で `device_code` を取得して共有状態に保存、`DeviceCodeInfo` を返す
-- `poll_device_flow_cmd()` → 単発でトークン取得を試みる（成功時は `TokenInfo` を返し、state の `last_device_code` をクリア）
-- `get_stored_token_cmd()` / `clear_stored_token_cmd()` → OS キーチェーンからの読み取り・削除
-- `refresh_token_cmd()` → リフレッシュトークンでアクセストークンを更新
-- `open_url_cmd()` → `open` クレートで OS デフォルトブラウザを開く
-- `debug_token_status()` → デバッグ用（device_code や keyring の有無を返す）
-- `set_client_id_cmd()` / `get_client_id_cmd()` → `~/.config/streaid/client_id` 相当へ保存/読み込み
+## 認証フロー
 
-## Rust 側の実装要点（`src-tauri/src/auth.rs`）
-- `start_device_flow`:
-  - Twitch の Device Code エンドポイントに POST して `device_code`, `user_code`, `verification_uri`, `interval`, `expires_in` を取得。
-  - `InnerState` に `last_device_code` / `client_id` / `interval` / `expires_at` を保存。
-- `poll_device_flow`:
-  - 共有状態から `device_code` と `client_id` を取り出し、単発で `/oauth2/token` を叩く（フロントはこのコマンドを繰り返し呼ぶ必要があるが、現在の設計ではバックグラウンド刷新や自動ポーリングは Rust 側で扱うことが多い）。
-  - 成功時は `access_token` を OS キーチェーンへ保存し、`last_device_code` をクリア。
-  - `authorization_pending` / `slow_down` / `expired_token` 等のレスポンスを扱う。
-- `refresh_token` / `refresh_token_if_needed`:
-  - keyring に保存されたリフレッシュトークンで `/oauth2/token` を叩き、トークンを更新して keyring を上書き。
-  - アプリ起動時に Tauri の非同期ランタイムで `refresh_token_if_needed` を定期実行するワーカを起動（現在は30秒間隔でチェック）。
+1. ユーザーがClient IDを入力して保存
+2. 「Start Device Flow」でTwitch Device Flow開始
+3. バックエンドがdevice_codeとverification_uriを取得
+4. システムブラウザでverification_uriを自動オープン
+5. バックエンドがポーリングで認証完了を監視
+6. 認証成功後、トークンをOSキーチェーンに保存
+7. バックグラウンドタスクで30秒ごとにトークン更新をチェック
 
-## フロントエンドの現状
-- `App.css` は削除済み。グローバルなリセットやルールは `src/index.css` の Tailwind `@layer` に移行済み。
-- `src/components` に小さい UI コンポーネントを保持しています。
+## コーディング規約
 
-### コード整形 / Lint
-- このプロジェクトは `ox` エコシステムのツールを使用しています。`package.json` のスクリプト:
-
-```bash
-pnpm run format       # oxfmt src
-pnpm run format:check # oxfmt --check src
-pnpm run lint         # oxlint src
-pnpm run lint:fix     # oxlint --fix src
-```
-
-`oxfmt` / `oxlint` は `devDependencies` に含まれており、コードフォーマットと静的解析を担当します。
-
-## セキュリティと運用上の注意
-- トークンは OS のキーチェーン（`keyring`）へ保存されています。キー名は `streaid` スコープで `twitch_access_token` / `twitch_refresh_token` を使用。
-- Device Flow は公開クライアント向けのフローです。クライアントシークレットをアプリに埋め込まないでください。
-
-## 開発の次の一手（候補）
-- フロントエンド: ログをアプリ内で確認できる "ログビューア" を追加するとデバッグは楽になります。
-- UX: Client ID を入力せずにデフォルトのクライアント ID を使えるようにする（開発用）か、設定画面に移す。
-- テスト: Device Flow の E2E をローカルで手動検証して、`poll_device_flow_cmd` とバックグラウンド更新の連携を確認してください。
-
-----
-このファイルは、コントリビュータや自動エージェントが素早く現状を理解して安全に作業できるように更新しました。さらに詳しい実装や設計方針が必要なら指示ください。
+- **フロントエンド**: React 19のフック、関数コンポーネント使用
+- **スタイリング**: Tailwind CSS v4 (index.cssで `@import 'tailwindcss'`)
+- **Linter**: oxlint (ESLintより高速)
+- **Formatter**: oxfmt
+- **Rust**: Tauri v2のコマンドシステム、anyhowでエラーハンドリング
