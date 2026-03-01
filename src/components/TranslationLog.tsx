@@ -1,11 +1,7 @@
 import { Accordion } from '@base-ui/react/accordion'
-import { listen } from '@tauri-apps/api/event'
 import cx from 'classnames'
-import { useState, useEffect } from 'react'
 
-import type { TranslationEvent } from '../types/chat'
-
-const MAX_LOG_ENTRIES = 50
+import { useLogContext } from '../contexts/logContext'
 
 const FORMALITY_COLORS = {
   casual: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
@@ -14,20 +10,7 @@ const FORMALITY_COLORS = {
 } as const
 
 export default function TranslationLog() {
-  const [translations, setTranslations] = useState<TranslationEvent[]>([])
-
-  useEffect(() => {
-    const unlisten = listen<TranslationEvent>('translation', (event) => {
-      console.log('Translation event received:', event.payload)
-      setTranslations((prev) =>
-        [event.payload, ...prev].slice(0, MAX_LOG_ENTRIES)
-      )
-    })
-
-    return () => {
-      unlisten.then((fn) => fn())
-    }
-  }, [])
+  const { translations, clearTranslations } = useLogContext()
 
   if (translations.length === 0) {
     return (
@@ -47,7 +30,7 @@ export default function TranslationLog() {
       <div className='flex items-center justify-between'>
         <h3 className='text-lg font-semibold text-white'>Translation Log</h3>
         <button
-          onClick={() => setTranslations([])}
+          onClick={clearTranslations}
           className='text-xs text-gray-400 hover:text-white transition'
         >
           Clear

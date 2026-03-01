@@ -1,25 +1,10 @@
 import { Accordion } from '@base-ui/react/accordion'
-import { listen } from '@tauri-apps/api/event'
 import cx from 'classnames'
-import { useState, useEffect } from 'react'
 
-import type { DictionaryEvent } from '../types/chat'
-
-const MAX_LOG_ENTRIES = 50
+import { useLogContext } from '../contexts/logContext'
 
 export default function DictionaryLog() {
-  const [lookups, setLookups] = useState<DictionaryEvent[]>([])
-
-  useEffect(() => {
-    const unlisten = listen<DictionaryEvent>('dictionary', (event) => {
-      console.log('Dictionary event received:', event.payload)
-      setLookups((prev) => [event.payload, ...prev].slice(0, MAX_LOG_ENTRIES))
-    })
-
-    return () => {
-      unlisten.then((fn) => fn())
-    }
-  }, [])
+  const { lookups, clearLookups } = useLogContext()
 
   if (lookups.length === 0) {
     return (
@@ -39,7 +24,7 @@ export default function DictionaryLog() {
       <div className='flex items-center justify-between'>
         <h3 className='text-lg font-semibold text-white'>Dictionary Log</h3>
         <button
-          onClick={() => setLookups([])}
+          onClick={clearLookups}
           className='text-xs text-gray-400 hover:text-white transition'
         >
           Clear

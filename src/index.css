@@ -15,6 +15,7 @@ body {
     Roboto,
     sans-serif;
   background: linear-gradient(135deg, #0e0e10 0%, #1a1a2e 50%, #16213e 100%);
+  background-attachment: fixed;
   color: #efeff1;
   min-height: 100vh;
 }
