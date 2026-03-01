@@ -7,58 +7,46 @@ body,
 }
 
 body {
-  @apply bg-gray-50 text-gray-900 relative;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #0E0E10 0%, #1A1A2E 50%, #16213E 100%);
+  color: #EFEFF1;
+  min-height: 100vh;
 }
 
-.layout {
-  isolation: isolate;
+/* Glassmorphism card - kept here as it's complex and used in App.tsx */
+.glass-card {
+  background: rgba(24, 24, 27, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(145, 70, 255, 0.3);
+  border-radius: 1.5rem;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(145, 70, 255, 0.1),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
 }
 
-@layer base {
-  :root {
-    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 400;
-    color: #0f0f0f;
-    background-color: #f6f6f6;
-  }
-
-  .logo {
-    height: 6rem;
-    padding: 1.5rem;
-    will-change: filter;
-    transition: 0.75s;
-  }
-
-  h1 {
-    text-align: center;
-  }
+/* Logo animation - kept here as @keyframes can't be done inline */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
 }
 
-@layer components {
-  .container {
-    margin: 0;
-    padding-top: 10vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-  }
+.logo-float {
+  animation: float 3s ease-in-out infinite;
+}
 
-  .row {
-    display: flex;
-    justify-content: center;
-  }
+/* Gradient text - kept here as complex webkit properties */
+.gradient-text {
+  background: linear-gradient(135deg, #A970FF 0%, #9146FF 50%, #FF6B9D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  a {
-    @apply font-medium text-indigo-500;
-  }
-  a:hover {
-    color: #535bf2;
-  }
-
-  #greet-input {
-    margin-right: 5px;
-  }
+/* Background pattern - kept here for App.tsx */
+.bg-pattern {
+  background-image:
+    radial-gradient(circle at 25% 25%, rgba(145, 70, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255, 107, 157, 0.08) 0%, transparent 50%);
 }

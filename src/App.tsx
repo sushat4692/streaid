@@ -1,34 +1,28 @@
-// removed unused reactLogo import
 import { invoke } from '@tauri-apps/api/core'
 import { useState, useEffect } from 'react'
+import cx from 'classnames'
 import Button from './components/Button'
 import Field from './components/Field'
-import Layout from './components/Layout'
 
 function App() {
-  // greetings removed
   const [clientId, setClientId] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const scopes = ['chat_read']
 
-  // greet removed
-
   async function startDeviceFlow() {
+    setIsLoading(true)
     try {
       const info = await invoke('start_device_flow_cmd', { clientId, scopes })
       console.log('startDeviceFlow: received info', info)
-      // Device flow started; frontend logs to console for debugging.
 
-      // Attempt to open the verification URI in the user's default browser (non-blocking)
       const verificationUri = (info as any)?.verification_uri
       if (verificationUri) {
-        // Try plugin opener invoke first, then fallback to window.open
         try {
           await invoke('plugin:opener|open', { url: verificationUri })
           console.log('Opened verification URI via plugin opener')
         } catch (e) {
           console.warn('plugin opener failed:', e)
           try {
-            // Try Rust-provided open_url_cmd as a reliable fallback
             await invoke('open_url_cmd', { url: verificationUri })
             console.log('Opened verification URI via open_url_cmd')
           } catch (e2) {
@@ -44,10 +38,11 @@ function App() {
       }
     } catch (e) {
       console.error('startDeviceFlow error', e)
+    } finally {
+      setIsLoading(false)
     }
   }
 
-  // Load saved client id on mount
   useEffect(() => {
     ;(async () => {
       try {
@@ -68,32 +63,94 @@ function App() {
     }
   }
 
-  // Auto-polling is handled internally by the backend; frontend keeps things simple.
-
-  // removed poll/get/clear/refresh handlers from UI — backend provides these.
-
   return (
-    <Layout>
-      <div className='max-w-2xl mx-auto mt-12'>
-        <h1 className='text-2xl font-bold mb-4'>
-          streaid — Twitch Device Flow
-        </h1>
-        <div className='space-y-4'>
+    <div className="min-h-screen bg-pattern flex items-center justify-center p-6">
+      {/* Background decorative elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl" />
+      </div>
+
+      {/* Main login card */}
+      <div className="glass-card w-full max-w-md p-8 relative z-10">
+        {/* Logo section */}
+        <div className="text-center mb-8">
+          <div className="logo-float inline-block mb-4">
+            <div
+              className={cx(
+                'w-16 h-16 rounded-2xl',
+                'bg-gradient-to-br from-purple-500 to-pink-500',
+                'flex items-center justify-center',
+                'shadow-lg shadow-purple-500/30'
+              )}
+            >
+              <svg
+                className="w-8 h-8 text-white"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" />
+              </svg>
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold gradient-text mb-2">streaid</h1>
+          <p className="text-gray-400 text-sm">Twitch チャット翻訳サポート</p>
+        </div>
+
+        {/* Form section */}
+        <div className="space-y-6">
           <Field
-            label='Client ID'
+            label="Client ID"
             value={clientId}
             onChange={setClientId}
-            placeholder='Enter Twitch Client ID'
+            placeholder="Twitch Developer Console から取得"
           />
-          <div className='flex gap-2'>
-            <Button onClick={saveClientId}>Save</Button>
-            <Button variant='primary' onClick={startDeviceFlow}>
-              Start Device Flow
+
+          <div className="flex gap-3">
+            <Button variant="secondary" onClick={saveClientId} className="flex-1">
+              保存
+            </Button>
+            <Button
+              variant="primary"
+              onClick={startDeviceFlow}
+              disabled={isLoading || !clientId}
+              className="flex-1"
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  接続中...
+                </span>
+              ) : (
+                'Twitch と連携'
+              )}
             </Button>
           </div>
+
+          {/* Help text */}
+          <p className="text-xs text-gray-500 text-center mt-4">
+            Twitch Developer Console で Application を作成し、
+            <br />
+            Client ID を入力してください
+          </p>
         </div>
       </div>
-    </Layout>
+    </div>
   )
 }
 

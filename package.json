@@ -19,6 +19,7 @@
     "@tanstack/react-router-devtools": "^1.149.0",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
+    "classnames": "^2.5.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"
   },
