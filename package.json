@@ -14,9 +14,9 @@
     "lint:fix": "oxlint --fix src"
   },
   "dependencies": {
+    "@base-ui/react": "^1.0.0",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
-    "baseui": "^10.10.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"
   },

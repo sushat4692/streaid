@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button as BaseButton } from '@base-ui/react/button'
 
 type Variant = 'primary' | 'secondary' | 'destructive';
 
@@ -14,8 +15,8 @@ const variantClasses: Record<Variant, string> = {
 
 export default function Button({ variant = 'primary', className = '', children, ...rest }: Props) {
   return (
-    <button className={`px-4 py-2 rounded ${variantClasses[variant]} ${className}`} {...rest}>
+    <BaseButton className={`px-4 py-2 rounded ${variantClasses[variant]} ${className}`} {...rest}>
       {children}
-    </button>
+    </BaseButton>
   );
 }

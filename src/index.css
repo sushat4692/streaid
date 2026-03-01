@@ -5,7 +5,11 @@ html, body, #root {
 }
 
 body {
-  @apply bg-gray-50 text-gray-900;
+  @apply bg-gray-50 text-gray-900 relative;
+}
+
+.layout {
+    isolation: isolate;
 }
 
 @layer base {

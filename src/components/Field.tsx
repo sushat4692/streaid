@@ -1,15 +1,15 @@
+import { Field as BaseField } from '@base-ui/react/field'
+import Input, { Props as InputProps } from './Input'
+
 type Props = {
   label: string;
-  value?: string;
-  onChange?: (v: string) => void;
-  placeholder?: string;
-};
+} & InputProps;
 
 export default function Field({ label, value, onChange, placeholder }: Props) {
   return (
-    <div>
-      <label className="block text-sm font-medium">{label}</label>
-      <input value={value} onChange={(e) => onChange && onChange(e.currentTarget.value)} placeholder={placeholder} className="mt-1 block w-full border rounded px-3 py-2" />
-    </div>
+    <BaseField.Root>
+      <BaseField.Label className="block text-sm font-medium">{label}</BaseField.Label>
+      <Input value={value} onChange={onChange} placeholder={placeholder} />
+    </BaseField.Root>
   );
 }
