@@ -1,6 +1,6 @@
 [package]
 name = "Streaid"
-version = "0.1.0"
+version = "0.5.0"
 description = "This app is aiding your streaming. (Strea(m) + aid)"
 authors = ["SUSH"]
 edition = "2021"

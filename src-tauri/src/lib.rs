@@ -18,7 +18,7 @@ use once_cell::sync::Lazy;
 use std::sync::Arc;
 use std::time::Duration;
 use tauri::async_runtime;
-use tauri::{Emitter, Manager};
+use tauri::Emitter;
 use tokio::time::sleep;
 use tokio_tungstenite::tungstenite::Message;
 use translate::{detect_language, translate_text, Language, TranslationSuggestion};
@@ -235,19 +235,36 @@ fn get_gemini_api_key_cmd() -> Result<Option<String>, String> {
     }
 }
 
-/// Save last used target channel to keyring
-fn save_last_channel(channel: &str) -> Result<(), String> {
-    keyring::Entry::new("streaid", "last_target_channel")
-        .set_password(channel)
-        .map_err(|e| format!("Failed to save last channel: {}", e))
+fn last_channel_file_path() -> Option<std::path::PathBuf> {
+    dirs::config_dir().map(|mut d| {
+        d.push("streaid");
+        d.push("last_channel");
+        d
+    })
 }
 
-/// Load last used target channel from keyring
+/// Save last used target channel to disk
+fn save_last_channel(channel: &str) -> Result<(), String> {
+    if let Some(path) = last_channel_file_path() {
+        if let Some(parent) = path.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        std::fs::write(&path, channel).map_err(|e| format!("Failed to save last channel: {}", e))
+    } else {
+        Err("Could not determine config directory".to_string())
+    }
+}
+
+/// Load last used target channel from disk
 fn load_last_channel() -> Result<Option<String>, String> {
-    match keyring::Entry::new("streaid", "last_target_channel").get_password() {
-        Ok(channel) => Ok(Some(channel)),
-        Err(keyring::Error::NoEntry) => Ok(None),
-        Err(e) => Err(format!("Failed to load last channel: {}", e)),
+    if let Some(path) = last_channel_file_path() {
+        match std::fs::read_to_string(&path) {
+            Ok(s) => Ok(Some(s.trim().to_string())),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+            Err(e) => Err(format!("Failed to load last channel: {}", e)),
+        }
+    } else {
+        Ok(None)
     }
 }
 
@@ -321,10 +338,18 @@ async fn start_chat_listener_cmd(
 ) -> Result<(), String> {
     eprintln!("Starting chat listener...");
 
-    // Get token
-    let token = auth::get_stored_token()
-        .map_err(|e| format!("Failed to get token: {}", e))?
-        .ok_or_else(|| "No token found. Please authenticate first.".to_string())?;
+    // Attempt a proactive token refresh before connecting.
+    let auth_state = get_auth_state();
+    let refreshed_token = auth::refresh_token_if_needed(auth_state, 300).await.ok().flatten();
+
+    let token = if let Some(t) = refreshed_token {
+        eprintln!("Using refreshed token for IRC connection");
+        t
+    } else {
+        auth::get_stored_token()
+            .map_err(|e| format!("Failed to get token: {}", e))?
+            .ok_or_else(|| "No token found. Please authenticate first.".to_string())?
+    };
 
     let username = token
         .login

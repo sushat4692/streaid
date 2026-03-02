@@ -224,7 +224,7 @@ function AuthenticatedLayout() {
         {/* Logo */}
         <div className='flex items-center gap-2 px-4 h-14 border-b border-white/10 shrink-0'>
           <AppIcon className='w-6 h-6 shrink-0' />
-          <span className='font-bold gradient-text'>streaid</span>
+          <span className='font-bold gradient-text'>Streaid</span>
         </div>
 
         {/* Nav */}

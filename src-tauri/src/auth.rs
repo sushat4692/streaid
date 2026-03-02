@@ -6,7 +6,7 @@ use anyhow::Result;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tokio::time::{sleep, Duration};
+use tokio::time::Duration;
 use twitch_oauth2::Scope;
 use std::fs;
 use std::path::PathBuf;
@@ -82,6 +82,52 @@ pub fn load_client_id() -> Result<Option<String>> {
         }
     } else {
         Ok(None)
+    }
+}
+
+fn user_info_file_path(key: &str) -> Option<PathBuf> {
+    dirs::config_dir().map(|mut d| {
+        d.push("streaid");
+        d.push(key);
+        d
+    })
+}
+
+pub fn save_user_info(login: Option<&str>, user_id: Option<&str>) {
+    if let Some(name) = login {
+        if let Some(path) = user_info_file_path("twitch_login") {
+            if let Some(parent) = path.parent() {
+                let _ = fs::create_dir_all(parent);
+            }
+            let _ = fs::write(&path, name);
+        }
+    }
+    if let Some(uid) = user_id {
+        if let Some(path) = user_info_file_path("twitch_user_id") {
+            if let Some(parent) = path.parent() {
+                let _ = fs::create_dir_all(parent);
+            }
+            let _ = fs::write(&path, uid);
+        }
+    }
+}
+
+pub fn load_user_info() -> (Option<String>, Option<String>) {
+    let login = user_info_file_path("twitch_login")
+        .and_then(|p| fs::read_to_string(p).ok())
+        .map(|s| s.trim().to_string());
+    let user_id = user_info_file_path("twitch_user_id")
+        .and_then(|p| fs::read_to_string(p).ok())
+        .map(|s| s.trim().to_string());
+    (login, user_id)
+}
+
+pub fn clear_user_info() {
+    if let Some(p) = user_info_file_path("twitch_login") {
+        let _ = fs::remove_file(p);
+    }
+    if let Some(p) = user_info_file_path("twitch_user_id") {
+        let _ = fs::remove_file(p);
     }
 }
 
@@ -176,7 +222,7 @@ async fn fetch_user_info(http: &Client, access_token: &str, client_id: &str) -> 
 pub async fn poll_device_flow(state: SharedState) -> Result<Option<TokenInfo>> {
     eprintln!("poll_device_flow: called");
     // Extract required info from state
-    let (device_code, client_id, mut interval, expires_at) = {
+    let (device_code, client_id, _interval, expires_at) = {
         let s = state
             .lock()
             .map_err(|e| anyhow::anyhow!("state lock poisoned: {}", e))?;
@@ -252,13 +298,8 @@ pub async fn poll_device_flow(state: SharedState) -> Result<Option<TokenInfo>> {
             // Fetch user info from Twitch API
             let (login, user_id) = fetch_user_info(&http, at, &client_id).await.unwrap_or((None, None));
 
-            // Save login to keyring
-            if let Some(ref login_name) = login {
-                let _ = keyring::Entry::new(service, "twitch_login").set_password(login_name);
-            }
-            if let Some(ref uid) = user_id {
-                let _ = keyring::Entry::new(service, "twitch_user_id").set_password(uid);
-            }
+            // Save login/user_id to disk
+            save_user_info(login.as_deref(), user_id.as_deref());
 
             let info = TokenInfo {
                 access_token: at.to_string(),
@@ -334,14 +375,7 @@ pub fn get_stored_token() -> Result<Option<TokenInfo>> {
                 Ok(rt) => Some(rt),
                 Err(_) => None,
             };
-            let login = match keyring::Entry::new(service, "twitch_login").get_password() {
-                Ok(l) => Some(l),
-                Err(_) => None,
-            };
-            let user_id = match keyring::Entry::new(service, "twitch_user_id").get_password() {
-                Ok(u) => Some(u),
-                Err(_) => None,
-            };
+            let (login, user_id) = load_user_info();
             Ok(Some(TokenInfo {
                 access_token: at,
                 refresh_token: refresh,
@@ -361,8 +395,7 @@ pub fn clear_stored_token() -> Result<()> {
     let service = "streaid";
     let _ = keyring::Entry::new(service, "twitch_access_token").delete_password();
     let _ = keyring::Entry::new(service, "twitch_refresh_token").delete_password();
-    let _ = keyring::Entry::new(service, "twitch_login").delete_password();
-    let _ = keyring::Entry::new(service, "twitch_user_id").delete_password();
+    clear_user_info();
     Ok(())
 }
 
@@ -381,7 +414,12 @@ pub async fn refresh_token(state: SharedState) -> Result<Option<TokenInfo>> {
             .map_err(|e| anyhow::anyhow!("state lock poisoned: {}", e))?;
         match &s.client_id {
             Some(c) => c.clone(),
-            None => return Ok(None),
+            None => {
+                match load_client_id() {
+                    Ok(Some(id)) => id,
+                    _ => return Ok(None),
+                }
+            }
         }
     };
 
@@ -433,17 +471,13 @@ pub async fn refresh_token(state: SharedState) -> Result<Option<TokenInfo>> {
     // Fetch user info from Twitch API
     let (login, user_id) = fetch_user_info(&http, at, &client_id).await.unwrap_or((None, None));
 
-    // Save login to keyring if we got it (or keep existing one if we didn't? For now just save if we got it)
-    if let Some(ref login_name) = login {
-        let _ = keyring::Entry::new(service, "twitch_login").set_password(login_name);
-    }
-    if let Some(ref uid) = user_id {
-        let _ = keyring::Entry::new(service, "twitch_user_id").set_password(uid);
-    }
+    // Save login/user_id to disk if we got it
+    save_user_info(login.as_deref(), user_id.as_deref());
 
-    // Fallback: if we failed to fetch (e.g. network glitch but token likely valid), try to read from keyring
-    let login = login.or_else(|| keyring::Entry::new(service, "twitch_login").get_password().ok());
-    let user_id = user_id.or_else(|| keyring::Entry::new(service, "twitch_user_id").get_password().ok());
+    // Fallback: if we failed to fetch (e.g. network glitch but token likely valid), try to read from disk
+    let (fallback_login, fallback_user_id) = load_user_info();
+    let login = login.or(fallback_login);
+    let user_id = user_id.or(fallback_user_id);
 
     let info = TokenInfo {
         access_token: at.to_string(),
@@ -482,7 +516,12 @@ pub async fn refresh_token_if_needed(
                     false
                 }
             }
-            None => false,
+            None => {
+                // Expiry not tracked (app just restarted). Refresh if a refresh token exists.
+                keyring::Entry::new("streaid", "twitch_refresh_token")
+                    .get_password()
+                    .is_ok()
+            }
         }
     };
 

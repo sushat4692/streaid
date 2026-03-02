@@ -11,6 +11,7 @@ pub type WsStream = WebSocketStream<MaybeTlsStream<TcpStream>>;
 pub struct IrcMessage {
     pub username: String,
     pub message: String,
+    #[allow(dead_code)]
     pub channel: String,
 }
 
