@@ -41,12 +41,7 @@ fn find_sound_file(dir: &PathBuf, sound_type: &str) -> Option<PathBuf> {
     None
 }
 
-pub fn save_sound(
-    app: &AppHandle,
-    sound_type: &str,
-    data: &[u8],
-    file_name: &str,
-) -> Result<()> {
+pub fn save_sound(app: &AppHandle, sound_type: &str, data: &[u8], file_name: &str) -> Result<()> {
     let dir = sounds_dir(app)?;
 
     // Delete existing files for this sound type

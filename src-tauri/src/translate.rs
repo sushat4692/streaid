@@ -23,7 +23,7 @@ impl std::fmt::Display for Language {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TranslationSuggestion {
     pub text: String,
-    pub formality: String,   // "casual", "neutral", "formal"
+    pub formality: String, // "casual", "neutral", "formal"
 }
 
 /// Multiple translation suggestions with linguistic reasoning
@@ -166,11 +166,11 @@ IMPORTANT:
 - Focus on WHY specific translations were chosen, not what they mean
 
 Now translate the input text above following this exact format."#,
-        from_lang,    // "Japanese"
-        target_lang,  // "English"
-        text,         // "コレはテストですよ"
-        target_lang,  // "English" - for points
-        target_lang   // "English" - emphasis
+        from_lang,   // "Japanese"
+        target_lang, // "English"
+        text,        // "コレはテストですよ"
+        target_lang, // "English" - for points
+        target_lang  // "English" - emphasis
     );
 
     eprintln!("Translating {} -> {}: {}", from_lang, target_lang, text);
@@ -260,8 +260,8 @@ Now translate the input text above following this exact format."#,
 
     eprintln!("Translation JSON: {}", json_text);
 
-    let result: TranslationResult = serde_json::from_str(&json_text)
-        .context("Failed to parse translation result JSON")?;
+    let result: TranslationResult =
+        serde_json::from_str(&json_text).context("Failed to parse translation result JSON")?;
 
     if result.suggestions.is_empty() {
         anyhow::bail!("No translation suggestions returned");

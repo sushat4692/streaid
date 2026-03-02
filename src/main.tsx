@@ -1,5 +1,4 @@
 import './index.css'
-
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import React from 'react'
 import ReactDOM from 'react-dom/client'

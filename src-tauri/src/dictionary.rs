@@ -120,15 +120,15 @@ IMPORTANT:
 - DO NOT mix languages in similar_words - they must all be in {} (SOURCE LANGUAGE)
 
 Now provide the dictionary entry for the word above."#,
-        from_lang,    // "Japanese"
-        word,         // "りんご"
-        target_lang,  // "English"
-        target_lang,  // "English" - emphasis for meaning
-        from_lang,    // "Japanese" - for similar_words
-        word,         // "りんご" - for examples similar_words
-        word,         // "りんご" - for examples
-        word,         // "りんご" - for examples (repeated)
-        from_lang     // "Japanese" - emphasis for similar_words
+        from_lang,   // "Japanese"
+        word,        // "りんご"
+        target_lang, // "English"
+        target_lang, // "English" - emphasis for meaning
+        from_lang,   // "Japanese" - for similar_words
+        word,        // "りんご" - for examples similar_words
+        word,        // "りんご" - for examples
+        word,        // "りんご" - for examples (repeated)
+        from_lang    // "Japanese" - emphasis for similar_words
     );
 
     eprintln!("Looking up {} word: {}", from_lang, word);
@@ -220,12 +220,20 @@ Now provide the dictionary entry for the word above."#,
 
     eprintln!("Dictionary JSON: {}", json_text);
 
-    let result: DictionaryResult = serde_json::from_str(&json_text)
-        .context("Failed to parse dictionary result JSON")?;
+    let result: DictionaryResult =
+        serde_json::from_str(&json_text).context("Failed to parse dictionary result JSON")?;
 
     eprintln!("Dictionary result: {} - {}", result.word, result.meaning);
-    eprintln!("  Examples ({}): {:?}", result.examples.len(), result.examples);
-    eprintln!("  Similar words ({}): {:?}", result.similar_words.len(), result.similar_words);
+    eprintln!(
+        "  Examples ({}): {:?}",
+        result.examples.len(),
+        result.examples
+    );
+    eprintln!(
+        "  Similar words ({}): {:?}",
+        result.similar_words.len(),
+        result.similar_words
+    );
 
     Ok(result)
 }

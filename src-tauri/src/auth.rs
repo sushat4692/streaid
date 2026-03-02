@@ -6,10 +6,10 @@ use anyhow::Result;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tokio::time::Duration;
-use twitch_oauth2::Scope;
 use std::fs;
 use std::path::PathBuf;
+use tokio::time::Duration;
+use twitch_oauth2::Scope;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DeviceCodeInfo {
@@ -137,7 +137,10 @@ pub async fn start_device_flow(
     client_id: &str,
     scopes: Vec<Scope>,
 ) -> Result<DeviceCodeInfo> {
-    eprintln!("start_device_flow: client_id={} scopes={:?}", client_id, scopes);
+    eprintln!(
+        "start_device_flow: client_id={} scopes={:?}",
+        client_id, scopes
+    );
     let http = Client::builder()
         .redirect(reqwest::redirect::Policy::none())
         .build()
@@ -195,7 +198,11 @@ pub async fn start_device_flow(
 }
 
 // Fetch user info (login, user_id) from Twitch API using access token
-async fn fetch_user_info(http: &Client, access_token: &str, client_id: &str) -> Result<(Option<String>, Option<String>)> {
+async fn fetch_user_info(
+    http: &Client,
+    access_token: &str,
+    client_id: &str,
+) -> Result<(Option<String>, Option<String>)> {
     let res = http
         .get("https://api.twitch.tv/helix/users")
         .header("Authorization", format!("Bearer {}", access_token))
@@ -209,8 +216,14 @@ async fn fetch_user_info(http: &Client, access_token: &str, client_id: &str) -> 
 
     if let Some(data) = v.get("data").and_then(|d| d.as_array()) {
         if let Some(user) = data.first() {
-            let login = user.get("login").and_then(|l| l.as_str()).map(|s| s.to_string());
-            let user_id = user.get("id").and_then(|i| i.as_str()).map(|s| s.to_string());
+            let login = user
+                .get("login")
+                .and_then(|l| l.as_str())
+                .map(|s| s.to_string());
+            let user_id = user
+                .get("id")
+                .and_then(|i| i.as_str())
+                .map(|s| s.to_string());
             return Ok((login, user_id));
         }
     }
@@ -296,7 +309,9 @@ pub async fn poll_device_flow(state: SharedState) -> Result<Option<TokenInfo>> {
                 .map(|s| s.to_string());
 
             // Fetch user info from Twitch API
-            let (login, user_id) = fetch_user_info(&http, at, &client_id).await.unwrap_or((None, None));
+            let (login, user_id) = fetch_user_info(&http, at, &client_id)
+                .await
+                .unwrap_or((None, None));
 
             // Save login/user_id to disk
             save_user_info(login.as_deref(), user_id.as_deref());
@@ -414,12 +429,10 @@ pub async fn refresh_token(state: SharedState) -> Result<Option<TokenInfo>> {
             .map_err(|e| anyhow::anyhow!("state lock poisoned: {}", e))?;
         match &s.client_id {
             Some(c) => c.clone(),
-            None => {
-                match load_client_id() {
-                    Ok(Some(id)) => id,
-                    _ => return Ok(None),
-                }
-            }
+            None => match load_client_id() {
+                Ok(Some(id)) => id,
+                _ => return Ok(None),
+            },
         }
     };
 
@@ -469,7 +482,9 @@ pub async fn refresh_token(state: SharedState) -> Result<Option<TokenInfo>> {
         .map(|s| s.to_string());
 
     // Fetch user info from Twitch API
-    let (login, user_id) = fetch_user_info(&http, at, &client_id).await.unwrap_or((None, None));
+    let (login, user_id) = fetch_user_info(&http, at, &client_id)
+        .await
+        .unwrap_or((None, None));
 
     // Save login/user_id to disk if we got it
     save_user_info(login.as_deref(), user_id.as_deref());

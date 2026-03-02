@@ -9,11 +9,6 @@ import { listen } from '@tauri-apps/api/event'
 import cx from 'classnames'
 import { useState, useEffect, useRef } from 'react'
 
-import AppIcon from '../components/AppIcon'
-import Button from '../components/Button'
-import { LogContext } from '../contexts/logContext'
-import { SoundContext } from '../contexts/soundContext'
-import { getInitial } from '../utils/string'
 import type {
   ChatMessageEvent,
   ChatStatus,
@@ -21,6 +16,12 @@ import type {
   SoundData,
   TranslationEvent,
 } from '../types/chat'
+
+import AppIcon from '../components/AppIcon'
+import Button from '../components/Button'
+import { LogContext } from '../contexts/logContext'
+import { SoundContext } from '../contexts/soundContext'
+import { getInitial } from '../utils/string'
 
 const MAX_LOG_ENTRIES = 50
 

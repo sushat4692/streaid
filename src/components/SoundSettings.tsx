@@ -1,8 +1,9 @@
 import { invoke } from '@tauri-apps/api/core'
 import { useRef } from 'react'
 
-import { useSoundContext } from '../contexts/soundContext'
 import type { SoundData } from '../types/chat'
+
+import { useSoundContext } from '../contexts/soundContext'
 import Button from './Button'
 
 type SoundSlotProps = {

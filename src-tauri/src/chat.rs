@@ -1,9 +1,7 @@
 use anyhow::{Context, Result};
 use futures_util::{SinkExt, StreamExt};
 use tokio::net::TcpStream;
-use tokio_tungstenite::{
-    connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream,
-};
+use tokio_tungstenite::{connect_async, tungstenite::Message, MaybeTlsStream, WebSocketStream};
 
 pub type WsStream = WebSocketStream<MaybeTlsStream<TcpStream>>;
 
@@ -43,7 +41,9 @@ pub async fn connect_to_irc(
     // 1. CAP REQ - Request capabilities
     eprintln!("Step 1: Requesting capabilities...");
     write
-        .send(Message::Text("CAP REQ :twitch.tv/tags twitch.tv/commands".to_string()))
+        .send(Message::Text(
+            "CAP REQ :twitch.tv/tags twitch.tv/commands".to_string(),
+        ))
         .await
         .context("Failed to request capabilities")?;
 
@@ -71,28 +71,32 @@ pub async fn connect_to_irc(
         if message_count > 30 {
             anyhow::bail!("Timeout waiting for authentication confirmation");
         }
-        
+
         match msg {
             Ok(Message::Text(line)) => {
                 eprintln!("IRC << {}", line);
-                
+
                 // Check for authentication failure
-                if line.contains("Login authentication failed") || line.contains("NOTICE * :Login unsuccessful") {
-                    anyhow::bail!("Twitch IRC authentication failed. Please re-authenticate your account.");
+                if line.contains("Login authentication failed")
+                    || line.contains("NOTICE * :Login unsuccessful")
+                {
+                    anyhow::bail!(
+                        "Twitch IRC authentication failed. Please re-authenticate your account."
+                    );
                 }
-                
+
                 // Check for improperly formatted auth
                 if line.contains("Improperly formatted auth") {
                     anyhow::bail!("IRC authentication format error. Please contact support.");
                 }
-                
+
                 // Check for successful authentication - Twitch sends "001 <user> :Welcome, GLHF!"
                 if line.contains(" 001 ") && line.contains("Welcome, GLHF!") {
                     authenticated = true;
                     eprintln!("✓ Authentication successful! (Received 001 welcome message)");
                     break;
                 }
-                
+
                 // Respond to PING during auth
                 if line.starts_with("PING") {
                     let pong = line.replace("PING", "PONG");
@@ -129,23 +133,28 @@ pub async fn connect_to_irc(
         if join_msg_count > 20 {
             anyhow::bail!("Timeout waiting for JOIN confirmation");
         }
-        
+
         match msg {
             Ok(Message::Text(line)) => {
                 eprintln!("IRC << {}", line);
-                
+
                 // Check for channel-specific errors
                 if line.contains("msg_channel_suspended") || line.contains("msg_banned") {
-                    anyhow::bail!("Cannot join #{}: channel is suspended or you are banned", target_channel);
+                    anyhow::bail!(
+                        "Cannot join #{}: channel is suspended or you are banned",
+                        target_channel
+                    );
                 }
-                
+
                 // Check for successful JOIN (366 = end of NAMES list)
-                if line.contains(" 366 ") || (line.contains("JOIN") && line.contains(&format!("#{}", target_channel))) {
+                if line.contains(" 366 ")
+                    || (line.contains("JOIN") && line.contains(&format!("#{}", target_channel)))
+                {
                     joined = true;
                     eprintln!("✓ Successfully joined channel #{}", target_channel);
                     break;
                 }
-                
+
                 // Respond to PING
                 if line.starts_with("PING") {
                     let pong = line.replace("PING", "PONG");
@@ -163,7 +172,10 @@ pub async fn connect_to_irc(
     }
 
     if !joined {
-        anyhow::bail!("Failed to join channel #{} - no confirmation received", target_channel);
+        anyhow::bail!(
+            "Failed to join channel #{} - no confirmation received",
+            target_channel
+        );
     }
 
     eprintln!("✓ Successfully authenticated and joined channel!");
@@ -209,8 +221,10 @@ pub fn parse_irc_privmsg(line: &str) -> Option<IrcMessage> {
 
     // Extract message (everything after the second ':')
     let message_start = line_without_tags.find(" :")?;
-    let message_start = line_without_tags[message_start + 2..].find(':').map(|i| i + message_start + 2);
-    
+    let message_start = line_without_tags[message_start + 2..]
+        .find(':')
+        .map(|i| i + message_start + 2);
+
     let message = if let Some(idx) = message_start {
         line_without_tags[idx + 1..].trim().to_string()
     } else {
