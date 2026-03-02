@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "pnpm run format && pnpm run lint"
+            "command": "pnpm run format && pnpm run lint && pnpm test && (cd src-tauri && cargo test 2>&1)"
           }
         ]
       }

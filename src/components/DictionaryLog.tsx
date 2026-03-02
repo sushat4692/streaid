@@ -2,6 +2,7 @@ import { Accordion } from '@base-ui/react/accordion'
 import cx from 'classnames'
 
 import { useLogContext } from '../contexts/logContext'
+import { formatTime } from '../utils/time'
 
 export default function DictionaryLog() {
   const { lookups, clearLookups } = useLogContext()
@@ -52,7 +53,7 @@ export default function DictionaryLog() {
                 </span>
               </div>
               <span className='text-xs text-gray-500'>
-                {new Date(lookup.timestamp).toLocaleTimeString()}
+                {formatTime(lookup.timestamp)}
               </span>
             </div>
 

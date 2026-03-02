@@ -235,6 +235,28 @@ fn get_gemini_api_key_cmd() -> Result<Option<String>, String> {
     }
 }
 
+fn sanitize_channel_name(raw: &str) -> Result<String, String> {
+    let s = raw.trim().to_lowercase();
+    let s = s.trim_start_matches('#').to_string();
+    if s.contains(' ') {
+        return Err("Channel name cannot contain spaces".to_string());
+    }
+    if s.len() > 25 {
+        return Err("Channel name is too long (max 25 characters)".to_string());
+    }
+    if !s.is_empty() && !s.chars().all(|c| c.is_alphanumeric() || c == '_') {
+        return Err(
+            "Channel name can only contain letters, numbers, and underscores".to_string(),
+        );
+    }
+    Ok(s)
+}
+
+fn truncate_utf8(s: &str, max_bytes: usize) -> &str {
+    let safe_len = s.floor_char_boundary(max_bytes.min(s.len()));
+    &s[..safe_len]
+}
+
 fn last_channel_file_path() -> Option<std::path::PathBuf> {
     dirs::config_dir().map(|mut d| {
         d.push("streaid");
@@ -359,30 +381,14 @@ async fn start_chat_listener_cmd(
     
     // Determine which channel to join
     let channel_to_join = if let Some(ch) = target_channel {
-        // Sanitize input: trim, lowercase, remove # prefix
-        let sanitized = ch.trim().to_lowercase();
-        let sanitized = sanitized.trim_start_matches('#');
-        
-        // Validation
-        if sanitized.contains(' ') {
-            return Err("Channel name cannot contain spaces".to_string());
-        }
-        
-        if sanitized.len() > 25 {
-            return Err("Channel name is too long (max 25 characters)".to_string());
-        }
-        
-        if !sanitized.is_empty() && !sanitized.chars().all(|c| c.is_alphanumeric() || c == '_') {
-            return Err("Channel name can only contain letters, numbers, and underscores".to_string());
-        }
-        
+        let sanitized = sanitize_channel_name(&ch)?;
         if sanitized.is_empty() {
-            username.clone()  // Fallback to own channel if empty after sanitization
+            username.clone() // Fallback to own channel if empty after sanitization
         } else {
-            sanitized.to_string()
+            sanitized
         }
     } else {
-        username.clone()  // Default to own channel
+        username.clone() // Default to own channel
     };
     
     eprintln!("Target channel: #{}", channel_to_join);
@@ -600,9 +606,7 @@ async fn chat_listener_task(
                                         if response.len() > 490 {
                                             let max_text_len = 400 - irc_msg.username.len();
                                             let truncated_text = if suggestion.text.len() > max_text_len {
-                                                // Use floor_char_boundary to avoid cutting multibyte chars
-                                                let safe_len = suggestion.text.floor_char_boundary(max_text_len);
-                                                format!("{}...", &suggestion.text[..safe_len])
+                                                format!("{}...", truncate_utf8(&suggestion.text, max_text_len))
                                             } else {
                                                 suggestion.text.clone()
                                             };
@@ -640,12 +644,10 @@ async fn chat_listener_task(
                                     // Handle truncation for points message
                                     let final_points_message = if points_message.len() > 490 {
                                         let max_len = 490 - irc_msg.username.len() - 20;
-                                        // Use floor_char_boundary to avoid cutting multibyte chars
-                                        let safe_len = points_str.floor_char_boundary(max_len.min(points_str.len()));
                                         format!(
                                             "@{}: 翻訳の根拠: {}...",
                                             irc_msg.username,
-                                            &points_str[..safe_len]
+                                            truncate_utf8(&points_str, max_len)
                                         )
                                     } else {
                                         points_message
@@ -724,10 +726,11 @@ async fn chat_listener_task(
 
                                     let truncated_meaning = if meaning_msg.len() > 490 {
                                         let max_len = 470 - irc_msg.username.len();
-                                        let safe_len = result.meaning.floor_char_boundary(max_len);
                                         format!(
                                             "@{}: [Dict] {} - {}...",
-                                            irc_msg.username, result.word, &result.meaning[..safe_len]
+                                            irc_msg.username,
+                                            result.word,
+                                            truncate_utf8(&result.meaning, max_len)
                                         )
                                     } else {
                                         meaning_msg
@@ -751,11 +754,10 @@ async fn chat_listener_task(
 
                                     let truncated_examples = if examples_msg.len() > 490 {
                                         let max_len = 460 - irc_msg.username.len();
-                                        let safe_len = examples_str.floor_char_boundary(max_len);
                                         format!(
                                             "@{}: [Examples] {}...",
                                             irc_msg.username,
-                                            &examples_str[..safe_len]
+                                            truncate_utf8(&examples_str, max_len)
                                         )
                                     } else {
                                         examples_msg
@@ -779,11 +781,10 @@ async fn chat_listener_task(
 
                                     let truncated_similar = if similar_msg.len() > 490 {
                                         let max_len = 460 - irc_msg.username.len();
-                                        let safe_len = similar_str.floor_char_boundary(max_len);
                                         format!(
                                             "@{}: [Synonyms] {}...",
                                             irc_msg.username,
-                                            &similar_str[..safe_len]
+                                            truncate_utf8(&similar_str, max_len)
                                         )
                                     } else {
                                         similar_msg
@@ -890,4 +891,78 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_sanitize_lowercase() {
+        assert_eq!(sanitize_channel_name("MyChannel").unwrap(), "mychannel");
+    }
+
+    #[test]
+    fn test_sanitize_strip_hash() {
+        assert_eq!(sanitize_channel_name("#streamer").unwrap(), "streamer");
+    }
+
+    #[test]
+    fn test_sanitize_empty_after_hash() {
+        assert_eq!(sanitize_channel_name("#").unwrap(), "");
+    }
+
+    #[test]
+    fn test_sanitize_spaces_err() {
+        assert!(sanitize_channel_name("my channel").is_err());
+    }
+
+    #[test]
+    fn test_sanitize_too_long_err() {
+        assert!(sanitize_channel_name(&"a".repeat(26)).is_err());
+    }
+
+    #[test]
+    fn test_sanitize_special_chars_err() {
+        assert!(sanitize_channel_name("chan!nel").is_err());
+    }
+
+    #[test]
+    fn test_sanitize_underscores_ok() {
+        assert_eq!(
+            sanitize_channel_name("my_channel_1").unwrap(),
+            "my_channel_1"
+        );
+    }
+
+    #[test]
+    fn test_truncate_ascii_within() {
+        assert_eq!(truncate_utf8("hello", 10), "hello");
+    }
+
+    #[test]
+    fn test_truncate_ascii_at_limit() {
+        assert_eq!(truncate_utf8("hello world", 5), "hello");
+    }
+
+    #[test]
+    fn test_truncate_japanese_safe() {
+        let s = "こんにちは"; // 15 bytes; truncate at 10
+        let t = truncate_utf8(s, 10);
+        assert!(s.is_char_boundary(t.len()));
+        assert!(t.len() <= 10);
+    }
+
+    #[test]
+    fn test_truncate_mixed() {
+        let s = "hello こんにちは";
+        let t = truncate_utf8(s, 8);
+        assert!(s.is_char_boundary(t.len()));
+        assert!(t.len() <= 8);
+    }
+
+    #[test]
+    fn test_truncate_empty() {
+        assert_eq!(truncate_utf8("", 10), "");
+    }
 }

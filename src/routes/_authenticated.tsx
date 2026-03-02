@@ -13,6 +13,7 @@ import AppIcon from '../components/AppIcon'
 import Button from '../components/Button'
 import { LogContext } from '../contexts/logContext'
 import { SoundContext } from '../contexts/soundContext'
+import { getInitial } from '../utils/string'
 import type {
   ChatMessageEvent,
   ChatStatus,
@@ -252,7 +253,7 @@ function AuthenticatedLayout() {
                   'text-white text-xs font-bold'
                 )}
               >
-                {username.charAt(0).toUpperCase()}
+                {getInitial(username)}
               </div>
               <span className='text-sm text-gray-300 truncate'>{username}</span>
             </div>

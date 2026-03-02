@@ -229,3 +229,30 @@ Now provide the dictionary entry for the word above."#,
 
     Ok(result)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::translate::Language;
+
+    #[tokio::test]
+    async fn test_lookup_unknown_language_errors() {
+        let result = lookup_word("hello", "fake_key", Language::Unknown).await;
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_dictionary_result_deserializes_english() {
+        let json = r#"{"word":"apple","meaning":"A round fruit.","examples":["I eat an apple."],"similar_words":["fruit"]}"#;
+        let r: DictionaryResult = serde_json::from_str(json).unwrap();
+        assert_eq!(r.word, "apple");
+    }
+
+    #[test]
+    fn test_dictionary_result_deserializes_japanese() {
+        let json = r#"{"word":"りんご","meaning":"Apple.","examples":["りんごが好きです"],"similar_words":["果物","フルーツ"]}"#;
+        let r: DictionaryResult = serde_json::from_str(json).unwrap();
+        assert_eq!(r.word, "りんご");
+        assert_eq!(r.similar_words[0], "果物");
+    }
+}

@@ -2,6 +2,7 @@ import { Accordion } from '@base-ui/react/accordion'
 import cx from 'classnames'
 
 import { useLogContext } from '../contexts/logContext'
+import { formatTime } from '../utils/time'
 
 const FORMALITY_COLORS = {
   casual: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
@@ -57,7 +58,7 @@ export default function TranslationLog() {
                 </span>
               </div>
               <span className='text-xs text-gray-500'>
-                {new Date(t.timestamp).toLocaleTimeString()}
+                {formatTime(t.timestamp)}
               </span>
             </div>
 
