@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import Card from '../../components/Card'
 import ChatControl from '../../components/ChatControl'
+import OverlaySettings from '../../components/OverlaySettings'
 import PageHeader from '../../components/PageHeader'
 import SoundSettings from '../../components/SoundSettings'
 import TranslationSettings from '../../components/TranslationSettings'
@@ -21,6 +22,8 @@ function ConfigPage() {
           <ChatControl />
           <div className='border-t border-white/10' />
           <SoundSettings />
+          <div className='border-t border-white/10' />
+          <OverlaySettings />
         </Card>
       </div>
     </div>

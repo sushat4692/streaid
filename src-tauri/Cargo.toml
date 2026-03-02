@@ -35,3 +35,5 @@ tokio-tungstenite = { version = "0.21", features = ["native-tls"] }
 futures-util = "0.3"
 chrono = { version = "0.4", features = ["serde"] }
 base64 = "0.22"
+axum = "0.7"
+tokio-stream = { version = "0.1", features = ["sync"] }

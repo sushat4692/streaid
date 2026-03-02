@@ -3,6 +3,7 @@ import cx from 'classnames'
 import { useState, useEffect } from 'react'
 
 import type { ChatStatus } from '../types/chat'
+
 import Button from './Button'
 import Field from './Field'
 
@@ -16,11 +17,24 @@ export default function ChatControl() {
   const [isStarting, setIsStarting] = useState(false)
   const [targetChannel, setTargetChannel] = useState('')
 
-  // Poll status every 2 seconds
+  // One-time init: fetch status and pre-fill saved channel
   useEffect(() => {
-    // Initial fetch
-    fetchStatus()
+    async function init() {
+      try {
+        const chatStatus = await invoke<ChatStatus>('get_chat_status_cmd')
+        setStatus(chatStatus)
+        if (!chatStatus.is_running && chatStatus.last_target_channel) {
+          setTargetChannel(chatStatus.last_target_channel)
+        }
+      } catch (e) {
+        console.error('Failed to get chat status:', e)
+      }
+    }
+    init()
+  }, [])
 
+  // Polling: only updates status, never touches targetChannel
+  useEffect(() => {
     const interval = setInterval(fetchStatus, 2000)
     return () => clearInterval(interval)
   }, [])
@@ -29,15 +43,6 @@ export default function ChatControl() {
     try {
       const chatStatus = await invoke<ChatStatus>('get_chat_status_cmd')
       setStatus(chatStatus)
-
-      // Pre-fill last used channel if not running and we have a saved channel
-      if (
-        !chatStatus.is_running &&
-        chatStatus.last_target_channel &&
-        !targetChannel
-      ) {
-        setTargetChannel(chatStatus.last_target_channel)
-      }
     } catch (e) {
       console.error('Failed to get chat status:', e)
     }

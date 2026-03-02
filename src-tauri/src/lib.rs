@@ -2,6 +2,7 @@
 mod auth;
 mod chat;
 mod dictionary;
+mod overlay;
 mod sounds;
 mod translate;
 
@@ -245,9 +246,7 @@ fn sanitize_channel_name(raw: &str) -> Result<String, String> {
         return Err("Channel name is too long (max 25 characters)".to_string());
     }
     if !s.is_empty() && !s.chars().all(|c| c.is_alphanumeric() || c == '_') {
-        return Err(
-            "Channel name can only contain letters, numbers, and underscores".to_string(),
-        );
+        return Err("Channel name can only contain letters, numbers, and underscores".to_string());
     }
     Ok(s)
 }
@@ -345,24 +344,23 @@ async fn get_sound_cmd(
 }
 
 #[tauri::command]
-async fn clear_sound_cmd(
-    app: tauri::AppHandle,
-    sound_type: String,
-) -> Result<(), String> {
-    sounds::delete_sound(&app, &sound_type)
-        .map_err(|e| format!("Failed to clear sound: {}", e))
+async fn clear_sound_cmd(app: tauri::AppHandle, sound_type: String) -> Result<(), String> {
+    sounds::delete_sound(&app, &sound_type).map_err(|e| format!("Failed to clear sound: {}", e))
 }
 
 #[tauri::command]
 async fn start_chat_listener_cmd(
     app: tauri::AppHandle,
-    target_channel: Option<String>,  // NEW: Optional channel parameter
+    target_channel: Option<String>, // NEW: Optional channel parameter
 ) -> Result<(), String> {
     eprintln!("Starting chat listener...");
 
     // Attempt a proactive token refresh before connecting.
     let auth_state = get_auth_state();
-    let refreshed_token = auth::refresh_token_if_needed(auth_state, 300).await.ok().flatten();
+    let refreshed_token = auth::refresh_token_if_needed(auth_state, 300)
+        .await
+        .ok()
+        .flatten();
 
     let token = if let Some(t) = refreshed_token {
         eprintln!("Using refreshed token for IRC connection");
@@ -378,7 +376,7 @@ async fn start_chat_listener_cmd(
         .ok_or_else(|| "No username found in token".to_string())?;
 
     let access_token = token.access_token;
-    
+
     // Determine which channel to join
     let channel_to_join = if let Some(ch) = target_channel {
         let sanitized = sanitize_channel_name(&ch)?;
@@ -390,19 +388,29 @@ async fn start_chat_listener_cmd(
     } else {
         username.clone() // Default to own channel
     };
-    
+
     eprintln!("Target channel: #{}", channel_to_join);
-    
+
     // Save for persistence
     if let Err(e) = save_last_channel(&channel_to_join) {
         eprintln!("Warning: Failed to save last channel: {}", e);
     }
-    
+
     // Debug: show token format (masked)
     eprintln!("Token format check:");
     eprintln!("  - Token length: {}", access_token.len());
-    eprintln!("  - Token prefix: {}", if access_token.len() > 10 { &access_token[..10] } else { &access_token });
-    eprintln!("  - Has 'oauth:' prefix: {}", access_token.starts_with("oauth:"));
+    eprintln!(
+        "  - Token prefix: {}",
+        if access_token.len() > 10 {
+            &access_token[..10]
+        } else {
+            &access_token
+        }
+    );
+    eprintln!(
+        "  - Has 'oauth:' prefix: {}",
+        access_token.starts_with("oauth:")
+    );
 
     eprintln!("Connecting as: {}", username);
 
@@ -415,25 +423,28 @@ async fn start_chat_listener_cmd(
         .send()
         .await
         .map_err(|e| format!("Token validation request failed: {}", e))?;
-    
+
     if !validation_response.status().is_success() {
         let status = validation_response.status();
         let error_text = validation_response.text().await.unwrap_or_default();
-        return Err(format!("Token validation failed ({}): {}. Please re-authenticate.", status, error_text));
+        return Err(format!(
+            "Token validation failed ({}): {}. Please re-authenticate.",
+            status, error_text
+        ));
     }
-    
+
     let validation_json: serde_json::Value = validation_response
         .json()
         .await
         .map_err(|e| format!("Failed to parse validation response: {}", e))?;
-    
+
     eprintln!("Token validation successful: {:?}", validation_json);
-    
+
     // Check if token has required scopes
     if let Some(scopes) = validation_json.get("scopes").and_then(|s| s.as_array()) {
         let has_chat_read = scopes.iter().any(|s| s.as_str() == Some("chat:read"));
         let has_chat_edit = scopes.iter().any(|s| s.as_str() == Some("chat:edit"));
-        
+
         if !has_chat_read || !has_chat_edit {
             return Err(format!(
                 "Token missing required scopes. Has chat:read={}, chat:edit={}. Please re-authenticate with correct scopes.",
@@ -488,6 +499,11 @@ async fn start_chat_listener_cmd(
 }
 
 #[tauri::command]
+fn get_overlay_url_cmd() -> String {
+    "http://localhost:4242".to_string()
+}
+
+#[tauri::command]
 fn stop_chat_listener_cmd() -> Result<(), String> {
     let state = get_chat_state();
     let mut s = state.lock().map_err(|e| format!("Lock error: {}", e))?;
@@ -533,10 +549,7 @@ async fn chat_listener_task(
 
                 // Parse PRIVMSG
                 if let Some(irc_msg) = parse_irc_privmsg(&line) {
-                    eprintln!(
-                        "Message from {}: {}",
-                        irc_msg.username, irc_msg.message
-                    );
+                    eprintln!("Message from {}: {}", irc_msg.username, irc_msg.message);
 
                     // Ignore own messages (prevent loops)
                     if let Some(ref bot) = bot_username {
@@ -568,16 +581,15 @@ async fn chat_listener_task(
                             eprintln!("Translation request: {}", text);
 
                             // Get Gemini API key
-                            let api_key =
-                                match keyring::Entry::new("streaid", "gemini_api_key")
-                                    .get_password()
-                                {
-                                    Ok(key) => key,
-                                    Err(_) => {
-                                        eprintln!("No Gemini API key configured");
-                                        continue;
-                                    }
-                                };
+                            let api_key = match keyring::Entry::new("streaid", "gemini_api_key")
+                                .get_password()
+                            {
+                                Ok(key) => key,
+                                Err(_) => {
+                                    eprintln!("No Gemini API key configured");
+                                    continue;
+                                }
+                            };
 
                             // Detect language
                             let source_lang = detect_language(&text);
@@ -605,12 +617,17 @@ async fn chat_listener_task(
                                         // Handle Twitch's 500 character limit
                                         if response.len() > 490 {
                                             let max_text_len = 400 - irc_msg.username.len();
-                                            let truncated_text = if suggestion.text.len() > max_text_len {
-                                                format!("{}...", truncate_utf8(&suggestion.text, max_text_len))
+                                            let truncated_text = if suggestion.text.len()
+                                                > max_text_len
+                                            {
+                                                format!(
+                                                    "{}...",
+                                                    truncate_utf8(&suggestion.text, max_text_len)
+                                                )
                                             } else {
                                                 suggestion.text.clone()
                                             };
-                                            
+
                                             response = format!(
                                                 "@{}: [{}/{}] [{}] {}",
                                                 irc_msg.username,
@@ -622,23 +639,35 @@ async fn chat_listener_task(
                                         }
 
                                         // Send message
-                                        if let Err(e) = send_chat_message(&mut ws_stream, &channel, &response).await {
-                                            eprintln!("Failed to send message {}/{}: {}", idx + 1, result.suggestions.len(), e);
+                                        if let Err(e) =
+                                            send_chat_message(&mut ws_stream, &channel, &response)
+                                                .await
+                                        {
+                                            eprintln!(
+                                                "Failed to send message {}/{}: {}",
+                                                idx + 1,
+                                                result.suggestions.len(),
+                                                e
+                                            );
                                             // Continue sending other messages even if one fails
                                         } else {
-                                            eprintln!("Sent suggestion {}/{} to chat", idx + 1, result.suggestions.len());
+                                            eprintln!(
+                                                "Sent suggestion {}/{} to chat",
+                                                idx + 1,
+                                                result.suggestions.len()
+                                            );
                                         }
 
                                         // Add delay between messages to avoid Twitch rate limiting
-                                        tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+                                        tokio::time::sleep(tokio::time::Duration::from_millis(500))
+                                            .await;
                                     }
 
                                     // Send linguistic points as a separate message (4th message)
                                     let points_str = result.points.join(", ");
                                     let points_message = format!(
                                         "@{}: 翻訳の根拠: {}",
-                                        irc_msg.username,
-                                        points_str
+                                        irc_msg.username, points_str
                                     );
 
                                     // Handle truncation for points message
@@ -653,13 +682,22 @@ async fn chat_listener_task(
                                         points_message
                                     };
 
-                                    if let Err(e) = send_chat_message(&mut ws_stream, &channel, &final_points_message).await {
+                                    if let Err(e) = send_chat_message(
+                                        &mut ws_stream,
+                                        &channel,
+                                        &final_points_message,
+                                    )
+                                    .await
+                                    {
                                         eprintln!("Failed to send points message: {}", e);
                                     } else {
                                         eprintln!("Sent linguistic points to chat");
                                     }
 
-                                    eprintln!("All {} suggestions + points sent to chat", result.suggestions.len());
+                                    eprintln!(
+                                        "All {} suggestions + points sent to chat",
+                                        result.suggestions.len()
+                                    );
 
                                     // Emit event to frontend
                                     let target_lang = match source_lang {
@@ -678,9 +716,13 @@ async fn chat_listener_task(
                                         target_lang: target_lang.to_string(),
                                     };
 
-                                    if let Err(e) = app.emit("translation", event) {
+                                    if let Err(e) = app.emit("translation", &event) {
                                         eprintln!("Failed to emit translation event: {}", e);
                                     }
+                                    let _ = overlay::OVERLAY_TX.send(overlay::OverlayMessage {
+                                        event_type: "translation".to_string(),
+                                        data: serde_json::to_value(&event).unwrap_or_default(),
+                                    });
                                 }
                                 Err(e) => {
                                     eprintln!("Translation failed: {}", e);
@@ -719,9 +761,7 @@ async fn chat_listener_task(
                                     // Send meaning message
                                     let meaning_msg = format!(
                                         "@{}: [Dict] {} - {}",
-                                        irc_msg.username,
-                                        result.word,
-                                        result.meaning
+                                        irc_msg.username, result.word, result.meaning
                                     );
 
                                     let truncated_meaning = if meaning_msg.len() > 490 {
@@ -736,21 +776,27 @@ async fn chat_listener_task(
                                         meaning_msg
                                     };
 
-                                    if let Err(e) =
-                                        send_chat_message(&mut ws_stream, &channel, &truncated_meaning)
-                                            .await
+                                    if let Err(e) = send_chat_message(
+                                        &mut ws_stream,
+                                        &channel,
+                                        &truncated_meaning,
+                                    )
+                                    .await
                                     {
                                         eprintln!("Failed to send meaning: {}", e);
                                     } else {
                                         eprintln!("Sent meaning to chat");
                                     }
 
-                                    tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+                                    tokio::time::sleep(tokio::time::Duration::from_millis(500))
+                                        .await;
 
                                     // Send examples message
                                     let examples_str = result.examples.join(" | ");
-                                    let examples_msg =
-                                        format!("@{}: [Examples] {}", irc_msg.username, examples_str);
+                                    let examples_msg = format!(
+                                        "@{}: [Examples] {}",
+                                        irc_msg.username, examples_str
+                                    );
 
                                     let truncated_examples = if examples_msg.len() > 490 {
                                         let max_len = 460 - irc_msg.username.len();
@@ -763,21 +809,27 @@ async fn chat_listener_task(
                                         examples_msg
                                     };
 
-                                    if let Err(e) =
-                                        send_chat_message(&mut ws_stream, &channel, &truncated_examples)
-                                            .await
+                                    if let Err(e) = send_chat_message(
+                                        &mut ws_stream,
+                                        &channel,
+                                        &truncated_examples,
+                                    )
+                                    .await
                                     {
                                         eprintln!("Failed to send examples: {}", e);
                                     } else {
                                         eprintln!("Sent examples to chat");
                                     }
 
-                                    tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+                                    tokio::time::sleep(tokio::time::Duration::from_millis(500))
+                                        .await;
 
                                     // Send synonyms message
                                     let similar_str = result.similar_words.join(", ");
-                                    let similar_msg =
-                                        format!("@{}: [Synonyms] {}", irc_msg.username, similar_str);
+                                    let similar_msg = format!(
+                                        "@{}: [Synonyms] {}",
+                                        irc_msg.username, similar_str
+                                    );
 
                                     let truncated_similar = if similar_msg.len() > 490 {
                                         let max_len = 460 - irc_msg.username.len();
@@ -790,9 +842,12 @@ async fn chat_listener_task(
                                         similar_msg
                                     };
 
-                                    if let Err(e) =
-                                        send_chat_message(&mut ws_stream, &channel, &truncated_similar)
-                                            .await
+                                    if let Err(e) = send_chat_message(
+                                        &mut ws_stream,
+                                        &channel,
+                                        &truncated_similar,
+                                    )
+                                    .await
                                     {
                                         eprintln!("Failed to send similar words: {}", e);
                                     } else {
@@ -818,9 +873,13 @@ async fn chat_listener_task(
                                         target_lang: target_lang.to_string(),
                                     };
 
-                                    if let Err(e) = app.emit("dictionary", event) {
+                                    if let Err(e) = app.emit("dictionary", &event) {
                                         eprintln!("Failed to emit dictionary event: {}", e);
                                     }
+                                    let _ = overlay::OVERLAY_TX.send(overlay::OverlayMessage {
+                                        event_type: "dictionary".to_string(),
+                                        data: serde_json::to_value(&event).unwrap_or_default(),
+                                    });
                                 }
                                 Err(e) => {
                                     eprintln!("Dictionary lookup failed: {}", e);
@@ -853,6 +912,12 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .setup(|_app| {
+            // Start the OBS overlay HTTP server
+            async_runtime::spawn(overlay::start_overlay_server(
+                4242,
+                overlay::OVERLAY_TX.clone(),
+            ));
+
             // spawn a background task using Tauri's async runtime to periodically refresh tokens
             let state = get_auth_state();
             async_runtime::spawn(async move {
@@ -888,6 +953,7 @@ pub fn run() {
             set_sound_cmd,
             get_sound_cmd,
             clear_sound_cmd,
+            get_overlay_url_cmd,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
