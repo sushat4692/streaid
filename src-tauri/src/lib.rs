@@ -115,7 +115,7 @@ async fn poll_device_flow_cmd() -> Result<Option<TokenInfo>, String> {
 
 #[tauri::command]
 fn get_stored_token_cmd() -> Result<Option<TokenInfo>, String> {
-    match auth::get_stored_token() {
+    match auth::get_stored_token(&get_auth_state()) {
         Ok(Some(t)) => Ok(Some(t)),
         Ok(None) => Ok(None),
         Err(e) => Err(format!("get_stored_token failed: {}", e)),
@@ -203,14 +203,9 @@ fn debug_token_status() -> Result<DebugTokenStatus, String> {
         Ok(s) => s.last_device_code.is_some(),
         Err(_) => false,
     };
-    let has_stored_token =
-        match keyring::Entry::new("streaid", "twitch_access_token").get_password() {
-            Ok(_) => true,
-            Err(_) => false,
-        };
     Ok(DebugTokenStatus {
         has_device_code,
-        has_stored_token,
+        has_stored_token: auth::has_stored_token(),
     })
 }
 
@@ -232,26 +227,48 @@ fn get_client_id_cmd() -> Result<Option<String>, String> {
 
 // Chat commands
 
+// Gemini API key is read from the keyring once and cached in memory, so
+// !ts / !d requests don't trigger repeated keychain access prompts.
+static GEMINI_KEY_CACHE: Lazy<std::sync::Mutex<Option<String>>> =
+    Lazy::new(|| std::sync::Mutex::new(None));
+
+fn get_gemini_api_key() -> Result<String, String> {
+    if let Ok(cache) = GEMINI_KEY_CACHE.lock() {
+        if let Some(key) = cache.as_ref() {
+            return Ok(key.clone());
+        }
+    }
+    let key = keyring::Entry::new("streaid", "gemini_api_key")
+        .get_password()
+        .map_err(|_| "No Gemini API key configured".to_string())?;
+    if let Ok(mut cache) = GEMINI_KEY_CACHE.lock() {
+        *cache = Some(key.clone());
+    }
+    Ok(key)
+}
+
 #[tauri::command]
 fn set_gemini_api_key_cmd(api_key: String) -> Result<(), String> {
     keyring::Entry::new("streaid", "gemini_api_key")
         .set_password(&api_key)
-        .map_err(|e| format!("Failed to save Gemini API key: {}", e))
+        .map_err(|e| format!("Failed to save Gemini API key: {}", e))?;
+    if let Ok(mut cache) = GEMINI_KEY_CACHE.lock() {
+        *cache = Some(api_key);
+    }
+    Ok(())
 }
 
 #[tauri::command]
 fn get_gemini_api_key_cmd() -> Result<Option<String>, String> {
-    match keyring::Entry::new("streaid", "gemini_api_key").get_password() {
-        Ok(key) => {
-            // Return masked version for security
-            if key.len() > 8 {
-                Ok(Some(format!("{}...{}", &key[..4], &key[key.len() - 4..])))
-            } else {
-                Ok(Some("***".to_string()))
-            }
-        }
-        Err(keyring::Error::NoEntry) => Ok(None),
-        Err(e) => Err(format!("Failed to get Gemini API key: {}", e)),
+    let key = match get_gemini_api_key() {
+        Ok(k) => k,
+        Err(_) => return Ok(None),
+    };
+    // Return masked version for security
+    if key.len() > 8 {
+        Ok(Some(format!("{}...{}", &key[..4], &key[key.len() - 4..])))
+    } else {
+        Ok(Some("***".to_string()))
     }
 }
 
@@ -565,20 +582,36 @@ async fn start_chat_listener_cmd(
 ) -> Result<(), String> {
     eprintln!("Starting chat listener...");
 
-    // Attempt a proactive token refresh before connecting.
+    // Load the stored token first so the state knows when it expires (avoids
+    // repeated keychain reads by the background refresh loop).
     let auth_state = get_auth_state();
-    let refreshed_token = auth::refresh_token_if_needed(auth_state, 300)
-        .await
-        .ok()
-        .flatten();
+    let stored_token = auth::get_stored_token(&auth_state)
+        .map_err(|e| format!("Failed to get token: {}", e))?
+        .ok_or_else(|| "No token found. Please authenticate first.".to_string())?;
+
+    // Proactively refresh before connecting: when the expiry is unknown
+    // (fresh start / migrated legacy tokens) refresh once, otherwise only
+    // when the token is near expiry.
+    let expiry_known = {
+        let s = auth_state
+            .lock()
+            .map_err(|e| format!("Lock error: {}", e))?;
+        s.token_expires_at.is_some()
+    };
+    let refreshed_token = if expiry_known {
+        auth::refresh_token_if_needed(auth_state.clone(), 300)
+            .await
+            .ok()
+            .flatten()
+    } else {
+        auth::refresh_token(auth_state.clone()).await.ok().flatten()
+    };
 
     let token = if let Some(t) = refreshed_token {
         eprintln!("Using refreshed token for IRC connection");
         t
     } else {
-        auth::get_stored_token()
-            .map_err(|e| format!("Failed to get token: {}", e))?
-            .ok_or_else(|| "No token found. Please authenticate first.".to_string())?
+        stored_token
     };
 
     let username = token
@@ -803,13 +836,10 @@ async fn chat_listener_task(
                             let result = if use_local {
                                 bonsai::translate(&text, source_lang).await
                             } else {
-                                // Get Gemini API key
-                                let api_key = match keyring::Entry::new("streaid", "gemini_api_key")
-                                    .get_password()
-                                {
+                                let api_key = match get_gemini_api_key() {
                                     Ok(key) => key,
-                                    Err(_) => {
-                                        eprintln!("No Gemini API key configured");
+                                    Err(e) => {
+                                        eprintln!("{}", e);
                                         continue;
                                     }
                                 };
@@ -966,13 +996,10 @@ async fn chat_listener_task(
                             let result = if use_local {
                                 bonsai::lookup_word(&word, source_lang).await
                             } else {
-                                // Get Gemini API key (same as translation)
-                                let api_key = match keyring::Entry::new("streaid", "gemini_api_key")
-                                    .get_password()
-                                {
+                                let api_key = match get_gemini_api_key() {
                                     Ok(key) => key,
-                                    Err(_) => {
-                                        eprintln!("No Gemini API key configured");
+                                    Err(e) => {
+                                        eprintln!("{}", e);
                                         continue;
                                     }
                                 };

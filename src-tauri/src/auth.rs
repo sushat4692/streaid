@@ -1,5 +1,5 @@
 use std::sync::{Arc, Mutex};
-use std::time::Instant;
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 use anyhow::Context;
 use anyhow::Result;
@@ -10,6 +10,100 @@ use std::fs;
 use std::path::PathBuf;
 use tokio::time::Duration;
 use twitch_oauth2::Scope;
+
+// Twitch tokens are stored as ONE keychain entry (JSON) instead of two, so
+// macOS prompts once per launch instead of multiple times.
+const TOKEN_SERVICE: &str = "streaid";
+const TOKEN_ENTRY: &str = "twitch_tokens";
+const LEGACY_ACCESS_KEY: &str = "twitch_access_token";
+const LEGACY_REFRESH_KEY: &str = "twitch_refresh_token";
+
+/// JSON blob persisted in the keychain. `saved_at_epoch` + `expires_in_secs`
+/// let the app recompute the token expiry after a restart without touching
+/// the keychain again, so the background refresh loop stays silent.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct StoredTokens {
+    access_token: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    refresh_token: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    saved_at_epoch: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    expires_in_secs: Option<u64>,
+}
+
+fn now_unix_secs() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_secs())
+        .unwrap_or(0)
+}
+
+fn blob_expiry(blob: &StoredTokens) -> Option<Instant> {
+    let saved = blob.saved_at_epoch?;
+    let exp = blob.expires_in_secs?;
+    let remaining = (saved + exp).saturating_sub(now_unix_secs());
+    Some(Instant::now() + Duration::from_secs(remaining))
+}
+
+/// Write both tokens as a single keychain entry and clean up legacy entries.
+fn save_tokens(access: &str, refresh: Option<&str>, expires_in_secs: Option<u64>) -> Result<()> {
+    let blob = StoredTokens {
+        access_token: access.to_string(),
+        refresh_token: refresh.map(String::from),
+        saved_at_epoch: Some(now_unix_secs()),
+        expires_in_secs,
+    };
+    keyring::Entry::new(TOKEN_SERVICE, TOKEN_ENTRY)
+        .set_password(&serde_json::to_string(&blob).context("serializing stored tokens")?)
+        .context("saving tokens to keyring")?;
+    let _ = keyring::Entry::new(TOKEN_SERVICE, LEGACY_ACCESS_KEY).delete_password();
+    let _ = keyring::Entry::new(TOKEN_SERVICE, LEGACY_REFRESH_KEY).delete_password();
+    Ok(())
+}
+
+fn load_tokens() -> Result<Option<StoredTokens>> {
+    match keyring::Entry::new(TOKEN_SERVICE, TOKEN_ENTRY).get_password() {
+        Ok(json) => serde_json::from_str(&json)
+            .map(Some)
+            .context("parsing stored tokens"),
+        Err(keyring::Error::NoEntry) => migrate_legacy_tokens(),
+        Err(e) => Err(e).context("reading tokens from keyring"),
+    }
+}
+
+/// One-time migration from the old two-entry layout. Legacy entries have no
+/// expiry metadata, so the refresh loop stays silent until the next auth.
+fn migrate_legacy_tokens() -> Result<Option<StoredTokens>> {
+    let access = match keyring::Entry::new(TOKEN_SERVICE, LEGACY_ACCESS_KEY).get_password() {
+        Ok(at) => at,
+        Err(_) => return Ok(None),
+    };
+    let refresh = keyring::Entry::new(TOKEN_SERVICE, LEGACY_REFRESH_KEY)
+        .get_password()
+        .ok();
+    let blob = StoredTokens {
+        access_token: access,
+        refresh_token: refresh,
+        saved_at_epoch: None,
+        expires_in_secs: None,
+    };
+    let _ = keyring::Entry::new(TOKEN_SERVICE, TOKEN_ENTRY)
+        .set_password(&serde_json::to_string(&blob).context("serializing migrated tokens")?);
+    let _ = keyring::Entry::new(TOKEN_SERVICE, LEGACY_ACCESS_KEY).delete_password();
+    let _ = keyring::Entry::new(TOKEN_SERVICE, LEGACY_REFRESH_KEY).delete_password();
+    Ok(Some(blob))
+}
+
+fn delete_tokens() {
+    let _ = keyring::Entry::new(TOKEN_SERVICE, TOKEN_ENTRY).delete_password();
+    let _ = keyring::Entry::new(TOKEN_SERVICE, LEGACY_ACCESS_KEY).delete_password();
+    let _ = keyring::Entry::new(TOKEN_SERVICE, LEGACY_REFRESH_KEY).delete_password();
+}
+
+pub fn has_stored_token() -> bool {
+    load_tokens().map(|o| o.is_some()).unwrap_or(false)
+}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DeviceCodeInfo {
@@ -286,27 +380,20 @@ pub async fn poll_device_flow(state: SharedState) -> Result<Option<TokenInfo>> {
     if status.is_success() {
         let v: Value = serde_json::from_str(&body).context("parsing token success response")?;
         if let Some(at) = v.get("access_token").and_then(|v| v.as_str()) {
-            // Persist tokens to OS keyring
-            let service = "streaid";
-            let access_key = "twitch_access_token";
-            eprintln!("poll_device_flow: storing access token");
-            if let Err(e) = keyring::Entry::new(service, access_key).set_password(at) {
-                return Err(e).context("saving access token to keyring");
-            }
             let mut refresh_opt: Option<String> = None;
             if let Some(rt) = v.get("refresh_token").and_then(|v| v.as_str()) {
-                let refresh_key = "twitch_refresh_token";
-                if let Err(e) = keyring::Entry::new(service, refresh_key).set_password(rt) {
-                    return Err(e).context("saving refresh token to keyring");
-                }
                 refresh_opt = Some(rt.to_string());
             }
-
             let expires_in = v.get("expires_in").and_then(|v| v.as_u64());
             let scope = v
                 .get("scope")
                 .and_then(|v| v.as_str())
                 .map(|s| s.to_string());
+
+            // Persist tokens as a single keychain entry
+            save_tokens(at, refresh_opt.as_deref(), expires_in)
+                .context("saving tokens to keyring")?;
+            eprintln!("poll_device_flow: tokens stored");
 
             // Fetch user info from Twitch API
             let (login, user_id) = fetch_user_info(&http, at, &client_id)
@@ -378,48 +465,43 @@ pub async fn poll_device_flow(state: SharedState) -> Result<Option<TokenInfo>> {
     }
 }
 
-// Read stored tokens from OS keyring (if present)
-pub fn get_stored_token() -> Result<Option<TokenInfo>> {
-    let service = "streaid";
-    let access_key = "twitch_access_token";
-
-    match keyring::Entry::new(service, access_key).get_password() {
-        Ok(at) => {
-            let refresh = match keyring::Entry::new(service, "twitch_refresh_token").get_password()
-            {
-                Ok(rt) => Some(rt),
-                Err(_) => None,
-            };
-            let (login, user_id) = load_user_info();
-            Ok(Some(TokenInfo {
-                access_token: at,
-                refresh_token: refresh,
-                expires_in: None,
-                scope: None,
-                login,
-                user_id,
-            }))
-        }
-        Err(keyring::Error::NoEntry) => Ok(None),
-        Err(e) => Err(e).context("reading token from keyring"),
+// Read stored tokens from OS keyring (if present). Also records the token
+// expiry in `state` so the background refresh loop doesn't need to touch the
+// keychain repeatedly after a restart.
+pub fn get_stored_token(state: &SharedState) -> Result<Option<TokenInfo>> {
+    let blob = match load_tokens()? {
+        Some(b) => b,
+        None => return Ok(None),
+    };
+    let (login, user_id) = load_user_info();
+    if let Ok(mut s) = state.lock() {
+        s.token_expires_at = blob_expiry(&blob);
     }
+    Ok(Some(TokenInfo {
+        access_token: blob.access_token,
+        refresh_token: blob.refresh_token,
+        expires_in: blob.expires_in_secs,
+        scope: None,
+        login,
+        user_id,
+    }))
 }
 
 // Remove stored tokens from OS keyring
 pub fn clear_stored_token() -> Result<()> {
-    let service = "streaid";
-    let _ = keyring::Entry::new(service, "twitch_access_token").delete_password();
-    let _ = keyring::Entry::new(service, "twitch_refresh_token").delete_password();
+    delete_tokens();
     clear_user_info();
     Ok(())
 }
 
 // Refresh token using stored refresh token. Returns new TokenInfo if refreshed.
 pub async fn refresh_token(state: SharedState) -> Result<Option<TokenInfo>> {
-    let service = "streaid";
-    let refresh = match keyring::Entry::new(service, "twitch_refresh_token").get_password() {
-        Ok(rt) => rt,
-        Err(_) => return Ok(None),
+    let refresh = match load_tokens()? {
+        Some(blob) => match blob.refresh_token {
+            Some(rt) => rt,
+            None => return Ok(None),
+        },
+        None => return Ok(None),
     };
 
     // need client_id from state
@@ -463,19 +545,16 @@ pub async fn refresh_token(state: SharedState) -> Result<Option<TokenInfo>> {
         .and_then(|v| v.as_str())
         .ok_or_else(|| anyhow::anyhow!("no access_token in refresh response"))?;
 
-    // Persist new tokens
-    if let Err(e) = keyring::Entry::new(service, "twitch_access_token").set_password(at) {
-        return Err(e).context("saving refreshed access token");
-    }
     let mut refresh_opt: Option<String> = None;
     if let Some(rt) = v.get("refresh_token").and_then(|v| v.as_str()) {
-        if let Err(e) = keyring::Entry::new(service, "twitch_refresh_token").set_password(rt) {
-            return Err(e).context("saving refreshed refresh token");
-        }
         refresh_opt = Some(rt.to_string());
     }
-
     let expires_in = v.get("expires_in").and_then(|v| v.as_u64());
+
+    // Persist new tokens (single keychain entry)
+    save_tokens(at, refresh_opt.as_deref(), expires_in)
+        .context("saving refreshed tokens to keyring")?;
+
     let scope = v
         .get("scope")
         .and_then(|v| v.as_str())
@@ -531,12 +610,11 @@ pub async fn refresh_token_if_needed(
                     false
                 }
             }
-            None => {
-                // Expiry not tracked (app just restarted). Refresh if a refresh token exists.
-                keyring::Entry::new("streaid", "twitch_refresh_token")
-                    .get_password()
-                    .is_ok()
-            }
+            // Expiry unknown (fresh start before `get_stored_token` runs, or
+            // legacy tokens without metadata). Do NOT touch the keychain here —
+            // the expiry gets populated when the frontend checks the stored
+            // token at startup, and `start_chat_listener_cmd` refreshes once.
+            None => false,
         }
     };
 
@@ -544,5 +622,38 @@ pub async fn refresh_token_if_needed(
         refresh_token(state).await
     } else {
         Ok(None)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_blob_expiry_computes_remaining_lifetime() {
+        let blob = StoredTokens {
+            access_token: "at".to_string(),
+            refresh_token: None,
+            saved_at_epoch: Some(now_unix_secs() - 100),
+            expires_in_secs: Some(200),
+        };
+        let expiry = blob_expiry(&blob).expect("expiry should be computable");
+        let remaining = expiry.duration_since(Instant::now()).as_secs();
+        assert!(
+            (90..=110).contains(&remaining),
+            "expected ~100s remaining, got {}",
+            remaining
+        );
+    }
+
+    #[test]
+    fn test_blob_expiry_none_when_metadata_missing() {
+        let blob = StoredTokens {
+            access_token: "at".to_string(),
+            refresh_token: Some("rt".to_string()),
+            saved_at_epoch: None,
+            expires_in_secs: None,
+        };
+        assert!(blob_expiry(&blob).is_none());
     }
 }
