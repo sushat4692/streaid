@@ -121,6 +121,13 @@ busy chat:
   events are appended to `streaid.log` in the app data directory
   (`~/Library/Application Support/im.sush.streaid/streaid.log`)
 
+## Credits (sidebar → Credits)
+
+The Credits page lists the app version, the AI models/providers used (Bonsai
+by Prism ML, MLX, Gemini), and the frontend/backend libraries with their
+licenses. All dependencies are permissively licensed (MIT / Apache-2.0); the
+local Bonsai models are Apache-2.0 and downloaded at runtime.
+
 ## Model Test (sidebar → Model Test)
 
 The Model Test page lets anyone test a provider without Twitch chat: pick a

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedConfigRouteImport } from './routes/_authenticated/config'
+import { Route as AuthenticatedCreditsRouteImport } from './routes/_authenticated/credits'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedLogRouteImport } from './routes/_authenticated/log'
 import { Route as AuthenticatedModelTestRouteImport } from './routes/_authenticated/model-test'
@@ -46,6 +47,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedCreditsRoute = AuthenticatedCreditsRouteImport.update({
+  id: '/credits',
+  path: '/credits',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedConfigRoute = AuthenticatedConfigRouteImport.update({
   id: '/config',
   path: '/config',
@@ -56,6 +62,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/config': typeof AuthenticatedConfigRoute
+  '/credits': typeof AuthenticatedCreditsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/log': typeof AuthenticatedLogRoute
   '/model-test': typeof AuthenticatedModelTestRoute
@@ -64,6 +71,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/config': typeof AuthenticatedConfigRoute
+  '/credits': typeof AuthenticatedCreditsRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/log': typeof AuthenticatedLogRoute
   '/model-test': typeof AuthenticatedModelTestRoute
@@ -74,21 +82,37 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/config': typeof AuthenticatedConfigRoute
+  '/_authenticated/credits': typeof AuthenticatedCreditsRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/log': typeof AuthenticatedLogRoute
   '/_authenticated/model-test': typeof AuthenticatedModelTestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/config' | '/dashboard' | '/log' | '/model-test'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/config'
+    | '/credits'
+    | '/dashboard'
+    | '/log'
+    | '/model-test'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/config' | '/dashboard' | '/log' | '/model-test'
+  to:
+    | '/'
+    | '/login'
+    | '/config'
+    | '/credits'
+    | '/dashboard'
+    | '/log'
+    | '/model-test'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/login'
     | '/_authenticated/config'
+    | '/_authenticated/credits'
     | '/_authenticated/dashboard'
     | '/_authenticated/log'
     | '/_authenticated/model-test'
@@ -144,6 +168,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/credits': {
+      id: '/_authenticated/credits'
+      path: '/credits'
+      fullPath: '/credits'
+      preLoaderRoute: typeof AuthenticatedCreditsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/config': {
       id: '/_authenticated/config'
       path: '/config'
@@ -156,6 +187,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedConfigRoute: typeof AuthenticatedConfigRoute
+  AuthenticatedCreditsRoute: typeof AuthenticatedCreditsRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedLogRoute: typeof AuthenticatedLogRoute
   AuthenticatedModelTestRoute: typeof AuthenticatedModelTestRoute
@@ -163,6 +195,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedConfigRoute: AuthenticatedConfigRoute,
+  AuthenticatedCreditsRoute: AuthenticatedCreditsRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedLogRoute: AuthenticatedLogRoute,
   AuthenticatedModelTestRoute: AuthenticatedModelTestRoute,

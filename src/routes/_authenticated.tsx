@@ -243,6 +243,9 @@ function AuthenticatedLayout() {
           <Link to='/log' className={navLinkClass}>
             Log
           </Link>
+          <Link to='/credits' className={navLinkClass}>
+            Credits
+          </Link>
         </nav>
 
         {/* Bottom: user + actions */}
