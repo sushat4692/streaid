@@ -9,14 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AuthenticatedConfigRouteImport } from './routes/_authenticated/config'
-import { Route as AuthenticatedCreditsRouteImport } from './routes/_authenticated/credits'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedLogRouteImport } from './routes/_authenticated/log'
-import { Route as AuthenticatedModelTestRouteImport } from './routes/_authenticated/model-test'
-import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedModelTestRouteImport } from './routes/_authenticated/model-test'
+import { Route as AuthenticatedLogRouteImport } from './routes/_authenticated/log'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCreditsRouteImport } from './routes/_authenticated/credits'
+import { Route as AuthenticatedConfigRouteImport } from './routes/_authenticated/config'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -202,7 +202,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren
+  AuthenticatedRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
