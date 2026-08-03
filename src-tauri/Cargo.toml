@@ -1,0 +1,39 @@
+[package]
+name = "Streaid"
+version = "0.5.0"
+description = "This app is aiding your streaming. (Strea(m) + aid)"
+authors = ["SUSH"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "streaid_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
+reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+twitch_oauth2 = { version = "0.16", features = ["reqwest", "client"] }
+twitch_api = "0.7"
+anyhow = "1.0"
+once_cell = "1.18"
+keyring = "1.1"
+open = "3"
+dirs = "4"
+tokio-tungstenite = { version = "0.21", features = ["native-tls"] }
+futures-util = "0.3"
+chrono = { version = "0.4", features = ["serde"] }
+base64 = "0.22"
+axum = "0.7"
+tokio-stream = { version = "0.1", features = ["sync"] }
