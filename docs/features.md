@@ -106,6 +106,21 @@ The models take a few seconds to load on enable; until then the status shows "St
 Translation quality is lower than Gemini 2.5-flash-lite — use for cost/privacy testing.
 If the local server errors, the command is skipped and logged (no silent fallback to Gemini).
 
+## Gemini Rate Limiting & Fallback
+
+The Gemini free tier is limited (~10 requests/minute). To avoid 429 errors during
+busy chat:
+
+- **Global token bucket**: Gemini calls (chat `!ts`/`!d` and the Model Test page)
+  are capped at **8 requests/minute** (`GEMINI_RPM_LIMIT` in `lib.rs`)
+- **When the budget is exhausted**: if the local Bonsai model is running, the
+  command is answered by the local model automatically (logged as
+  `[fallback]`); otherwise the command is skipped with a log
+- **On a 429 from Gemini**: same automatic local fallback when available
+- **Diagnostics**: Gemini errors (including the 429 quota details) and rate-limit
+  events are appended to `streaid.log` in the app data directory
+  (`~/Library/Application Support/im.sush.streaid/streaid.log`)
+
 ## Model Test (sidebar → Model Test)
 
 The Model Test page lets anyone test a provider without Twitch chat: pick a

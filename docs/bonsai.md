@@ -60,6 +60,10 @@ Installs into the app data directory:
   field when omitted
 - No fallback: if the local server errors, the command is skipped and logged
   (`[bonsai]` prefix)
+- **Automatic fallback INTO Bonsai**: when the Gemini path hits its rate limit
+  (8 requests/min budget) or returns a 429, chat commands are automatically
+  answered by the local model if it is running (logged as `[fallback]`) — see
+  `docs/features.md`
 
 ## Known limitations
 

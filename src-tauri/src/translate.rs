@@ -108,6 +108,8 @@ pub fn detect_language(text: &str) -> Language {
 
 /// Shared prompt builder used by both the cloud Gemini API and the local Bonsai provider.
 /// The returned string is a full system-style instruction ending with a JSON example.
+/// Kept deliberately short: the response_schema already enforces the JSON shape,
+/// so the example only demonstrates the tone of the linguistic points.
 pub fn build_translation_prompt(text: &str, from_lang: Language, target_lang: &str) -> String {
     format!(
         r#"Translate the following {} text to {}: "{}"
@@ -119,35 +121,9 @@ These points should be in the TARGET LANGUAGE ({}) and follow this format:
 - "「original word/phrase」→ \"translated word\": reason for choice"
 
 EXAMPLE (translating Japanese "こんにちは" to English):
-{{
-  "suggestions": [
-    {{ "text": "Hi", "formality": "casual" }},
-    {{ "text": "Hello", "formality": "neutral" }},
-    {{ "text": "Good day", "formality": "formal" }}
-  ],
-  "points": [
-    "「こん」comes from 今日 (today), making this a time-specific greeting",
-    "「にちは」completes the phrase for daytime usage",
-    "Translated as 'Hello' - the most natural English equivalent for general greetings"
-  ]
-}}
-
-ANOTHER EXAMPLE (translating English "Hello" to Japanese):
-{{
-  "suggestions": [
-    {{ "text": "やあ", "formality": "casual" }},
-    {{ "text": "こんにちは", "formality": "neutral" }},
-    {{ "text": "ご挨拶申し上げます", "formality": "formal" }}
-  ],
-  "points": [
-    "'Hello'は時間帯に依存しない一般的な挨拶",
-    "「こんにちは」が最も自然な日本語の対応語",
-    "Casualでは「やあ」、Formalでは「ご挨拶申し上げます」を選択"
-  ]
-}}
+{{ "suggestions": [{{ "text": "Hi", "formality": "casual" }}, {{ "text": "Hello", "formality": "neutral" }}, {{ "text": "Good day", "formality": "formal" }}], "points": ["「こん」comes from 今日 (today), a time-specific greeting", "Translated as 'Hello' - the most natural English equivalent for general greetings"] }}
 
 IMPORTANT:
-- Each point should explain word/phrase choice with linguistic reasoning
 - Write points ONLY in the TARGET LANGUAGE ({})
 - Keep each point concise but informative (10-20 words)
 - Focus on WHY specific translations were chosen, not what they mean

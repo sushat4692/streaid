@@ -280,6 +280,189 @@ fn get_client_id_cmd() -> Result<Option<String>, String> {
     }
 }
 
+// ── Gemini rate limiting & resilience ────────────────────────────────────────
+
+/// Token bucket that caps Gemini API calls (free tier is ~10 requests/minute,
+/// so stay below it). Applies to chat replies AND the Model Test page.
+struct TokenBucket {
+    capacity: f64,
+    tokens: f64,
+    refill_per_sec: f64,
+    last_refill: std::time::Instant,
+}
+
+impl TokenBucket {
+    fn new(capacity: f64, refill_per_sec: f64) -> Self {
+        TokenBucket {
+            capacity,
+            tokens: capacity,
+            refill_per_sec,
+            last_refill: std::time::Instant::now(),
+        }
+    }
+
+    fn try_take(&mut self) -> bool {
+        let now = std::time::Instant::now();
+        let elapsed = now.duration_since(self.last_refill).as_secs_f64();
+        self.tokens = (self.tokens + elapsed * self.refill_per_sec).min(self.capacity);
+        self.last_refill = now;
+        if self.tokens >= 1.0 {
+            self.tokens -= 1.0;
+            true
+        } else {
+            false
+        }
+    }
+}
+
+/// Max Gemini requests per minute. Set below the free-tier RPM (~10).
+const GEMINI_RPM_LIMIT: f64 = 8.0;
+
+static GEMINI_RATE_LIMIT: Lazy<std::sync::Mutex<TokenBucket>> = Lazy::new(|| {
+    std::sync::Mutex::new(TokenBucket::new(GEMINI_RPM_LIMIT, GEMINI_RPM_LIMIT / 60.0))
+});
+
+fn gemini_budget_try_take() -> bool {
+    GEMINI_RATE_LIMIT
+        .lock()
+        .map(|mut b| b.try_take())
+        .unwrap_or(true) // never block the app if the lock is poisoned
+}
+
+/// Append a line to the app log (app data dir / streaid.log) for diagnosing
+/// quota errors that are otherwise only visible in the terminal.
+fn append_app_log(app: &tauri::AppHandle, msg: &str) {
+    let path = app
+        .path()
+        .app_data_dir()
+        .ok()
+        .map(|d| d.join("streaid.log"));
+    if let Some(path) = path {
+        use std::io::Write;
+        if let Ok(file) = std::fs::OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(path)
+        {
+            let mut file = file;
+            let _ = writeln!(file, "[{}] {}", chrono::Utc::now().to_rfc3339(), msg);
+        }
+    }
+}
+
+/// Provider call outcome for the chat listener: Skipped means "do not reply
+/// to this command" (rate-limited and no local model available).
+enum ProviderError {
+    Skipped,
+    Failed(String),
+}
+
+/// True when the selected local model's server is up.
+async fn local_model_running() -> bool {
+    bonsai::server_ready_at(active_bonsai_url()).await
+}
+
+/// Translate via the local Bonsai model (used as a fallback).
+async fn fallback_translate(
+    app: &tauri::AppHandle,
+    text: &str,
+    source_lang: Language,
+) -> Result<translate::TranslationResult, ProviderError> {
+    eprintln!("[fallback] using local model");
+    append_app_log(
+        app,
+        "Gemini unavailable (429 or rate limit) - answered with the local model",
+    );
+    bonsai::translate_at(active_bonsai_url(), text, source_lang)
+        .await
+        .map_err(|e| ProviderError::Failed(e.to_string()))
+}
+
+async fn fallback_lookup(
+    app: &tauri::AppHandle,
+    word: &str,
+    source_lang: Language,
+) -> Result<dictionary::DictionaryResult, ProviderError> {
+    eprintln!("[fallback] using local model");
+    append_app_log(
+        app,
+        "Gemini unavailable (429 or rate limit) - answered with the local model",
+    );
+    bonsai::lookup_word_at(active_bonsai_url(), word, source_lang)
+        .await
+        .map_err(|e| ProviderError::Failed(e.to_string()))
+}
+
+/// Gemini translate with rate limiting + automatic local fallback on 429.
+async fn gemini_translate(
+    app: &tauri::AppHandle,
+    text: &str,
+    source_lang: Language,
+) -> Result<translate::TranslationResult, ProviderError> {
+    if !gemini_budget_try_take() {
+        eprintln!(
+            "[rate-limit] Gemini budget exhausted (max {}/min), using local model",
+            GEMINI_RPM_LIMIT
+        );
+        append_app_log(
+            app,
+            &format!("Gemini rate limit reached (max {}/min)", GEMINI_RPM_LIMIT),
+        );
+        if local_model_running().await {
+            return fallback_translate(app, text, source_lang).await;
+        }
+        return Err(ProviderError::Skipped);
+    }
+    let api_key = get_gemini_api_key().map_err(ProviderError::Failed)?;
+    match translate_text(text, &api_key, source_lang).await {
+        Ok(r) => Ok(r),
+        Err(e) if e.to_string().contains("429") => {
+            append_app_log(app, &format!("Gemini 429: {}", e));
+            if local_model_running().await {
+                fallback_translate(app, text, source_lang).await
+            } else {
+                Err(ProviderError::Failed(format!("Gemini 429: {}", e)))
+            }
+        }
+        Err(e) => Err(ProviderError::Failed(format!("Gemini error: {}", e))),
+    }
+}
+
+/// Gemini dictionary lookup with rate limiting + automatic local fallback on 429.
+async fn gemini_lookup(
+    app: &tauri::AppHandle,
+    word: &str,
+    source_lang: Language,
+) -> Result<dictionary::DictionaryResult, ProviderError> {
+    if !gemini_budget_try_take() {
+        eprintln!(
+            "[rate-limit] Gemini budget exhausted (max {}/min), using local model",
+            GEMINI_RPM_LIMIT
+        );
+        append_app_log(
+            app,
+            &format!("Gemini rate limit reached (max {}/min)", GEMINI_RPM_LIMIT),
+        );
+        if local_model_running().await {
+            return fallback_lookup(app, word, source_lang).await;
+        }
+        return Err(ProviderError::Skipped);
+    }
+    let api_key = get_gemini_api_key().map_err(ProviderError::Failed)?;
+    match lookup_word(word, &api_key, source_lang).await {
+        Ok(r) => Ok(r),
+        Err(e) if e.to_string().contains("429") => {
+            append_app_log(app, &format!("Gemini 429: {}", e));
+            if local_model_running().await {
+                fallback_lookup(app, word, source_lang).await
+            } else {
+                Err(ProviderError::Failed(format!("Gemini 429: {}", e)))
+            }
+        }
+        Err(e) => Err(ProviderError::Failed(format!("Gemini error: {}", e))),
+    }
+}
+
 // Chat commands
 
 // Gemini API key is read from the keyring once and cached in memory, so
@@ -584,6 +767,12 @@ async fn provider_translate(
 ) -> Result<translate::TranslationResult, String> {
     match provider {
         "gemini" => {
+            if !gemini_budget_try_take() {
+                return Err(format!(
+                    "Gemini rate limit reached (max {}/min). Try again in a moment.",
+                    GEMINI_RPM_LIMIT
+                ));
+            }
             let api_key = get_gemini_api_key()?;
             translate_text(text, &api_key, source_lang)
                 .await
@@ -602,6 +791,12 @@ async fn provider_lookup(
 ) -> Result<dictionary::DictionaryResult, String> {
     match provider {
         "gemini" => {
+            if !gemini_budget_try_take() {
+                return Err(format!(
+                    "Gemini rate limit reached (max {}/min). Try again in a moment.",
+                    GEMINI_RPM_LIMIT
+                ));
+            }
             let api_key = get_gemini_api_key()?;
             lookup_word(word, &api_key, source_lang)
                 .await
@@ -1046,20 +1241,15 @@ async fn chat_listener_task(
                             }
 
                             // Provider: local Bonsai model (sidecar) or cloud Gemini API
+                            // (rate-limited, with automatic local fallback on 429)
                             let use_local = { get_bonsai_state().lock().unwrap().enabled };
 
                             let result = if use_local {
-                                bonsai::translate_at(active_bonsai_url(), &text, source_lang).await
+                                bonsai::translate_at(active_bonsai_url(), &text, source_lang)
+                                    .await
+                                    .map_err(|e| ProviderError::Failed(e.to_string()))
                             } else {
-                                let api_key = match get_gemini_api_key() {
-                                    Ok(key) => key,
-                                    Err(e) => {
-                                        eprintln!("{}", e);
-                                        continue;
-                                    }
-                                };
-
-                                translate_text(&text, &api_key, source_lang).await
+                                gemini_translate(&app, &text, source_lang).await
                             };
 
                             match result {
@@ -1187,7 +1377,10 @@ async fn chat_listener_task(
                                         data: serde_json::to_value(&event).unwrap_or_default(),
                                     });
                                 }
-                                Err(e) => {
+                                Err(ProviderError::Skipped) => {
+                                    eprintln!("[rate-limit] skipped (no local model available)");
+                                }
+                                Err(ProviderError::Failed(e)) => {
                                     eprintln!("Translation failed: {}", e);
                                 }
                             }
@@ -1206,21 +1399,15 @@ async fn chat_listener_task(
                             }
 
                             // Provider: local Bonsai model (sidecar) or cloud Gemini API
+                            // (rate-limited, with automatic local fallback on 429)
                             let use_local = { get_bonsai_state().lock().unwrap().enabled };
 
                             let result = if use_local {
                                 bonsai::lookup_word_at(active_bonsai_url(), &word, source_lang)
                                     .await
+                                    .map_err(|e| ProviderError::Failed(e.to_string()))
                             } else {
-                                let api_key = match get_gemini_api_key() {
-                                    Ok(key) => key,
-                                    Err(e) => {
-                                        eprintln!("{}", e);
-                                        continue;
-                                    }
-                                };
-
-                                lookup_word(&word, &api_key, source_lang).await
+                                gemini_lookup(&app, &word, source_lang).await
                             };
 
                             // Lookup word
@@ -1351,7 +1538,10 @@ async fn chat_listener_task(
                                         data: serde_json::to_value(&event).unwrap_or_default(),
                                     });
                                 }
-                                Err(e) => {
+                                Err(ProviderError::Skipped) => {
+                                    eprintln!("[rate-limit] skipped (no local model available)");
+                                }
+                                Err(ProviderError::Failed(e)) => {
                                     eprintln!("Dictionary lookup failed: {}", e);
                                 }
                             }
@@ -1442,6 +1632,24 @@ pub fn run() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_token_bucket_allows_capacity_burst() {
+        let mut bucket = TokenBucket::new(3.0, 3.0 / 60.0);
+        assert!(bucket.try_take());
+        assert!(bucket.try_take());
+        assert!(bucket.try_take());
+        assert!(!bucket.try_take(), "fourth take should fail");
+    }
+
+    #[test]
+    fn test_token_bucket_refills_over_time() {
+        let mut bucket = TokenBucket::new(1.0, 2.0); // 2 tokens/sec
+        assert!(bucket.try_take());
+        assert!(!bucket.try_take(), "no tokens left immediately");
+        std::thread::sleep(std::time::Duration::from_millis(600));
+        assert!(bucket.try_take(), "one token should have refilled");
+    }
 
     #[test]
     fn test_sanitize_lowercase() {

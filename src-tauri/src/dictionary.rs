@@ -65,6 +65,7 @@ struct PartResponse {
 
 /// Shared prompt builder used by both the cloud Gemini API and the local Bonsai provider.
 /// The returned string is a full system-style instruction ending with a JSON example.
+/// Kept deliberately short: the response_schema already enforces the JSON shape.
 pub fn build_dictionary_prompt(word: &str, from_lang: Language, target_lang: &str) -> String {
     format!(
         r#"You are a bilingual dictionary. Provide a dictionary definition for the {} word: "{}"
@@ -72,28 +73,7 @@ pub fn build_dictionary_prompt(word: &str, from_lang: Language, target_lang: &st
 Return the result in {} (TARGET LANGUAGE).
 
 EXAMPLE (English word "apple" → Japanese):
-{{
-  "word": "apple",
-  "meaning": "りんご。バラ科リンゴ属の落葉高木、またはその果実。",
-  "examples": [
-    "I eat an apple every day. (私は毎日りんごを食べます)",
-    "This apple is very sweet. (このりんごはとても甘い)",
-    "She bought apples at the market. (彼女は市場でりんごを買った)"
-  ],
-  "similar_words": ["fruit", "pome", "orchard fruit", "red apple", "green apple"]
-}}
-
-EXAMPLE (Japanese word "りんご" → English):
-{{
-  "word": "りんご",
-  "meaning": "Apple. A deciduous tree of the genus Malus in the family Rosaceae, or its fruit.",
-  "examples": [
-    "りんごが好きです (I like apples)",
-    "赤いりんごを食べました (I ate a red apple)",
-    "りんごの木 (apple tree)"
-  ],
-  "similar_words": ["果物", "フルーツ", "林檎", "果実", "赤りんご"]
-}}
+{{ "word": "apple", "meaning": "りんご。バラ科リンゴ属の落葉高木、またはその果実。", "examples": ["I eat an apple every day. (私は毎日りんごを食べます)", "This apple is very sweet. (このりんごはとても甘い)"], "similar_words": ["fruit", "pome", "orchard fruit", "red apple"] }}
 
 IMPORTANT:
 - Write "meaning" ONLY in the TARGET LANGUAGE ({})
