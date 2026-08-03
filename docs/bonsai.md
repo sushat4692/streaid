@@ -63,6 +63,20 @@ Downloads into the app data directory:
   8B is too heavy for a machine (update `BONSAI_MODEL_FILE` in `lib.rs` and
   `MODEL_FILE` in `scripts/setup-bonsai.sh`)
 
+## Measured quality (Aug 2026 trial, Ternary-Bonsai-8B Q2_0)
+
+| Case | Result |
+|---|---|
+| JA→EN translation | Good — natural formality levels + linguistic points |
+| EN→JA translation | Usable — natural grammar, but occasional broken katakana loanwords (e.g. ステーミング) and English leftovers |
+| Dictionary | Good — clean meanings/examples, no duplicate synonyms |
+| Latency | ~12–17 s per request (M-series, single slot) |
+| 4B comparison | 4B was faster (~7–11 s) but EN→JA was word-by-word and dictionary had duplicate synonyms |
+
+Overall: usable as a free/offline option, quality clearly below Gemini 2.5-flash-lite
+for EN→JA. Prompt engineering (explicit "use natural katakana" guidance) may
+improve the EN→JA case.
+
 ## Files
 
 - `src-tauri/src/bonsai.rs` — OpenAI-compatible client + health check
