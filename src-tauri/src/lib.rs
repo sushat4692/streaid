@@ -50,23 +50,23 @@ static CHAT_STATE: Lazy<Arc<std::sync::Mutex<ChatState>>> =
     Lazy::new(|| Arc::new(std::sync::Mutex::new(ChatState::new())));
 
 // Bonsai (local model sidecar) state
-/// One model server instance managed as a sidecar.
+/// One MLX model server instance managed as a sidecar.
 struct BonsaiModel {
     name: &'static str, // "8b" | "4b" — used by the frontend and logs
     port: u16,
-    file: &'static str,
+    dir: &'static str, // directory under bonsai/models/mlx/
 }
 
 const BONSAI_MODELS: [BonsaiModel; 2] = [
     BonsaiModel {
         name: "8b",
         port: 4243,
-        file: "Ternary-Bonsai-8B-Q2_0.gguf",
+        dir: "Ternary-Bonsai-8B-mlx-2bit",
     },
     BonsaiModel {
         name: "4b",
         port: 4244,
-        file: "Ternary-Bonsai-4B-Q2_0.gguf",
+        dir: "Ternary-Bonsai-4B-mlx-2bit",
     },
 ];
 
@@ -422,10 +422,15 @@ struct BonsaiModelStatus {
 #[derive(serde::Serialize)]
 struct BonsaiStatus {
     enabled: bool,
-    binary_found: bool,
+    runtime_found: bool,
     /// Model used for actual !ts / !d chat replies ("8b" | "4b")
     active_model: String,
     models: Vec<BonsaiModelStatus>,
+}
+
+/// Path of the MLX runtime (venv python) used to serve the local models.
+fn bonsai_mlx_python(app: &tauri::AppHandle) -> std::path::PathBuf {
+    bonsai_dir(app).join("mlx-venv").join("bin").join("python")
 }
 
 /// Selects which local model answers !ts / !d in chat. Persisted to disk.
@@ -453,7 +458,7 @@ fn active_bonsai_url() -> &'static str {
     }
 }
 
-/// Spawns (or kills) the local llama-server sidecars and switches the
+/// Spawns (or kills) the local MLX model servers and switches the
 /// !ts / !d provider to the local Bonsai models.
 #[tauri::command]
 async fn set_local_model_cmd(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
@@ -482,12 +487,12 @@ async fn get_bonsai_status_cmd(app: tauri::AppHandle) -> Result<BonsaiStatus, St
             name: model.name.to_string(),
             running: running_models.contains(&model.name)
                 && bonsai::server_ready_at(&base_url).await,
-            model_found: dir.join("models").join(model.file).exists(),
+            model_found: dir.join("models").join("mlx").join(model.dir).exists(),
         });
     }
     Ok(BonsaiStatus {
         enabled,
-        binary_found: dir.join("bin").join("llama-server").exists(),
+        runtime_found: bonsai_mlx_python(&app).exists(),
         active_model,
         models,
     })
@@ -642,15 +647,13 @@ async fn local_lookup(
 
 async fn start_bonsai(app: &tauri::AppHandle) -> Result<(), String> {
     let dir = bonsai_dir(app);
-    let bin = dir.join("bin").join("llama-server");
+    let python = bonsai_mlx_python(app);
 
-    if !bin.exists() {
-        return Err(
-            "llama-server binary not found. Run scripts/setup-bonsai.sh first.".to_string(),
-        );
+    if !python.exists() {
+        return Err("MLX runtime not found. Run scripts/setup-bonsai.sh first.".to_string());
     }
 
-    // Spawn one llama-server per model that has its file present
+    // Spawn one MLX server per model directory that is present
     let mut spawned: Vec<(&'static str, u16)> = Vec::new();
     {
         let state = get_bonsai_state();
@@ -668,39 +671,37 @@ async fn start_bonsai(app: &tauri::AppHandle) -> Result<(), String> {
         std::fs::create_dir_all(&dir).map_err(|e| format!("Failed to create bonsai dir: {}", e))?;
 
         for model in BONSAI_MODELS.iter() {
-            let model_path = dir.join("models").join(model.file);
+            let model_path = dir.join("models").join("mlx").join(model.dir);
             if !model_path.exists() {
                 eprintln!(
-                    "Skipping local model {}: file {} not found",
-                    model.name, model.file
+                    "Skipping local model {}: directory {} not found",
+                    model.name, model.dir
                 );
                 continue;
             }
             let log_file =
-                std::fs::File::create(dir.join(format!("llama-server-{}.log", model.name)))
-                    .map_err(|e| format!("Failed to open llama-server log: {}", e))?;
+                std::fs::File::create(dir.join(format!("mlx-server-{}.log", model.name)))
+                    .map_err(|e| format!("Failed to open mlx-server log: {}", e))?;
 
-            let child = std::process::Command::new(&bin)
+            let child = std::process::Command::new(&python)
                 .arg("-m")
+                .arg("mlx_lm.server")
+                .arg("--model")
                 .arg(&model_path)
-                .arg("--host")
-                .arg("127.0.0.1")
                 .arg("--port")
                 .arg(model.port.to_string())
-                .arg("-c")
-                .arg("8192")
-                .arg("--jinja")
+                .arg("--temp")
+                .arg("0.7")
                 .stdout(std::process::Stdio::null())
                 .stderr(std::process::Stdio::from(log_file))
                 .spawn()
-                .map_err(|e| format!("Failed to start llama-server ({}): {}", model.name, e))?;
+                .map_err(|e| format!("Failed to start MLX server ({}): {}", model.name, e))?;
 
             eprintln!(
-                "llama-server ({}) started on port {} (log: {})",
+                "MLX server ({}) started on port {} (log: {})",
                 model.name,
                 model.port,
-                dir.join(format!("llama-server-{}.log", model.name))
-                    .display()
+                dir.join(format!("mlx-server-{}.log", model.name)).display()
             );
             spawned.push((model.name, model.port));
             s.children.push(BonsaiChild {
@@ -714,7 +715,7 @@ async fn start_bonsai(app: &tauri::AppHandle) -> Result<(), String> {
     if spawned.is_empty() {
         stop_bonsai();
         return Err(
-            "No local model files found. Run scripts/setup-bonsai.sh (with --with-4b for the 4B model) first."
+            "No local model found. Run scripts/setup-bonsai.sh (with --with-4b for the 4B model) first."
                 .to_string(),
         );
     }
@@ -726,7 +727,7 @@ async fn start_bonsai(app: &tauri::AppHandle) -> Result<(), String> {
         attempts += 1;
         let base_url = format!("http://127.0.0.1:{}", spawned[0].1);
         if bonsai::server_ready_at(&base_url).await {
-            eprintln!("llama-server ({}) is ready", spawned[0].0);
+            eprintln!("MLX server ({}) is ready", spawned[0].0);
             spawned.remove(0);
         }
     }
@@ -734,7 +735,7 @@ async fn start_bonsai(app: &tauri::AppHandle) -> Result<(), String> {
     if !spawned.is_empty() {
         stop_bonsai();
         return Err(
-            "llama-server did not become ready within 90s (check bonsai/llama-server-*.log)"
+            "MLX server did not become ready within 90s (check bonsai/mlx-server-*.log)"
                 .to_string(),
         );
     }

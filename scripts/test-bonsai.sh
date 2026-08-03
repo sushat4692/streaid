@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the Bonsai integration tests against a real llama-server, without
+# Runs the Bonsai integration tests against a real MLX server, without
 # needing Twitch. Starts the server automatically if it isn't already running
 # (e.g. when the app's Local Model toggle is off), and stops it afterwards
 # only if this script started it.
@@ -10,43 +10,43 @@
 set -euo pipefail
 
 BONSAI_DIR="$HOME/Library/Application Support/im.sush.streaid/bonsai"
-BIN="$BONSAI_DIR/bin/llama-server"
-MODEL="$BONSAI_DIR/models/Ternary-Bonsai-8B-Q2_0.gguf"
+PYTHON="$BONSAI_DIR/mlx-venv/bin/python"
+MODEL="$BONSAI_DIR/models/mlx/Ternary-Bonsai-8B-mlx-2bit"
 PORT=4243
 BASE="http://127.0.0.1:$PORT"
 
-if [ ! -x "$BIN" ] || [ ! -f "$MODEL" ]; then
+if [ ! -x "$PYTHON" ] || [ ! -f "$MODEL/model.safetensors" ]; then
   echo "Bonsai is not set up. Run scripts/setup-bonsai.sh first." >&2
   exit 1
 fi
 
 started_server=0
 if ! curl -sf -m 2 "$BASE/health" > /dev/null 2>&1; then
-  echo "Starting llama-server on port $PORT ..."
-  "$BIN" -m "$MODEL" --host 127.0.0.1 --port "$PORT" -c 8192 --jinja &
+  echo "Starting MLX server on port $PORT ..."
+  "$PYTHON" -m mlx_lm.server --model "$MODEL" --port "$PORT" --temp 0.7 &
   SERVER_PID=$!
   started_server=1
   ready=0
-  for _ in $(seq 1 60); do
+  for _ in $(seq 1 90); do
     if curl -sf -m 2 "$BASE/health" > /dev/null 2>&1; then
       ready=1
       break
     fi
-    sleep 2
+    sleep 1
   done
   if [ "$ready" != "1" ]; then
-    echo "llama-server did not become ready (see log)." >&2
+    echo "MLX server did not become ready." >&2
     kill "$SERVER_PID" 2>/dev/null || true
     exit 1
   fi
-  echo "llama-server ready"
+  echo "MLX server ready"
 else
-  echo "Using already-running llama-server on port $PORT"
+  echo "Using already-running MLX server on port $PORT"
 fi
 
 cleanup() {
   if [ "$started_server" = "1" ]; then
-    echo "Stopping llama-server (started by this script)..."
+    echo "Stopping MLX server (started by this script)..."
     kill "$SERVER_PID" 2>/dev/null || true
   fi
 }

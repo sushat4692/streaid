@@ -86,18 +86,18 @@ A single toggle on the dashboard controls both `!ts` and `!d`. When off, both co
 Optional on-device provider that replaces the cloud Gemini API for both `!ts` and `!d`:
 
 - **Toggle** in the Chat Listener card (dashboard): "Enable Local Model"
-- When enabled, requests go to locally running `llama-server` sidecars (ports 4243 = 8B, 4244 = 4B); the Gemini API key is not used
+- When enabled, requests go to locally running `mlx_lm.server` sidecars (ports 4243 = 8B, 4244 = 4B); the Gemini API key is not used
 - **Chat model**: a small 8B / 4B selector (next to the toggle) picks which model
   actually answers `!ts` / `!d` in chat; the choice is persisted to disk
 - When disabled, the Gemini path is used as before
 - The sidecars are spawned when enabling and killed when disabling or on app exit
-- Models: Ternary-Bonsai-8B (Q2_0, ~2.1 GB, default) and Ternary-Bonsai-4B
-  (Q2_0, ~1.1 GB, optional) — see `scripts/setup-bonsai.sh` and `docs/bonsai.md`
+- Models: Ternary-Bonsai-8B (2-bit, ~2.3 GB, default) and Ternary-Bonsai-4B
+  (2-bit, ~1.1 GB, optional) — see `scripts/setup-bonsai.sh` and `docs/bonsai.md`
 
 Setup:
 
 ```bash
-scripts/setup-bonsai.sh            # 8B only (~2.1 GB)
+scripts/setup-bonsai.sh            # 8B only (~2.3 GB)
 scripts/setup-bonsai.sh --with-4b  # also download 4B for the lighter option
 ```
 

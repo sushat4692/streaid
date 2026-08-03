@@ -25,7 +25,6 @@ pub const SERVER_URL: &str = SERVER_URL_8B;
 
 #[derive(Serialize)]
 struct ChatRequest {
-    model: String,
     messages: Vec<ChatMessage>,
     temperature: f32,
     response_format: ResponseFormat,
@@ -179,7 +178,6 @@ async fn call_json_chat(
     schema: serde_json::Value,
 ) -> Result<String> {
     let body = ChatRequest {
-        model: "bonsai".to_string(),
         messages: vec![
             ChatMessage {
                 role: "system".to_string(),

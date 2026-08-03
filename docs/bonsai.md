@@ -1,24 +1,24 @@
 # Local Model Provider (Bonsai)
 
 Optional on-device LLM provider for `!ts` / `!d`, used instead of the cloud
-Gemini API. Runs **Bonsai** (Prism ML, Apache 2.0, ternary-quantized) through a
-local `llama-server` sidecar.
+Gemini API. Runs **Bonsai** (Prism ML, Apache 2.0, ternary-quantized) through
+`mlx_lm.server` (Apple's MLX framework — significantly faster than the
+llama.cpp backend, especially prompt prefill).
 
-## Why Bonsai
+## Why Bonsai + MLX
 
-- Open weights (Apache 2.0), GGUF format — can be bundled/run inside the desktop app
-  (unlike Chrome's built-in Gemini Nano, which is Chrome-only and cannot run in the
-  Tauri WKWebView)
-- Ternary (1.58-bit) quantization: Ternary-Bonsai-8B Q2_0 is only ~2.1 GB on disk
-  (Gemma 3n E4B Q4_K_M would be ~4.5 GB; Nano needs ~22 GB free space)
+- Open weights (Apache 2.0), MLX safetensors — run natively on Apple Silicon
+- Ternary (1.58-bit) quantization: Ternary-Bonsai-8B 2-bit is ~2.3 GB on disk
+  (Gemma 3n E4B Q4_K_M would be ~4.5 GB; Chrome's Nano needs ~22 GB free space)
 - Runs fully offline; no API key, no chat data leaves the machine
+- Measured on an M1: ~2x faster than the llama.cpp (GGUF) backend — decode
+  ~21–26 tok/s vs ~9–15 tok/s, prefill ~300 tok/s vs ~36 tok/s
 
 ## Requirements
 
-- macOS (arm64 or x64) — this trial targets macOS only
+- macOS on Apple Silicon (MLX does not run on Intel Macs)
 - ~4 GB free disk, ~4 GB RAM free for inference
-- macOS Gatekeeper: `scripts/setup-bonsai.sh` clears the quarantine attribute
-  and ad-hoc codesigns the binary
+- Python 3 (used only to create the bundled venv)
 
 ## Setup
 
@@ -27,26 +27,24 @@ scripts/setup-bonsai.sh            # 8B only (recommended default)
 scripts/setup-bonsai.sh --with-4b  # also download the lighter 4B model
 ```
 
-Downloads into the app data directory:
+Installs into the app data directory:
 
 ```
 ~/Library/Application Support/im.sush.streaid/bonsai/
-  bin/llama-server                          (Prism ML llama.cpp fork, macos)
-  models/Ternary-Bonsai-8B-Q2_0.gguf        (~2.1 GB, port 4243)
-  models/Ternary-Bonsai-4B-Q2_0.gguf        (~1.1 GB, port 4244, optional)
-  llama-server-{8b,4b}.log                  (sidecar stderr, written at runtime)
+  mlx-venv/                                      (Python venv with mlx-lm)
+  models/mlx/Ternary-Bonsai-8B-mlx-2bit/         (~2.3 GB, port 4243)
+  models/mlx/Ternary-Bonsai-4B-mlx-2bit/         (~1.1 GB, port 4244, optional)
+  mlx-server-{8b,4b}.log                         (server stderr, written at runtime)
 ```
 
 ## Runtime
 
 - Toggle "Enable Local Model" in the Chat Listener card → backend spawns one
-  llama-server per model file that is present:
+  MLX server per model directory that is present:
 
   ```
-  llama-server -m models/Ternary-Bonsai-8B-Q2_0.gguf
-               --host 127.0.0.1 --port 4243 -c 8192 --jinja
-  llama-server -m models/Ternary-Bonsai-4B-Q2_0.gguf
-               --host 127.0.0.1 --port 4244 -c 8192 --jinja   (if downloaded)
+  <venv>/bin/python -m mlx_lm.server --model models/mlx/Ternary-Bonsai-8B-mlx-2bit \
+      --port 4243 --temp 0.7
   ```
 
 - **Chat model selection**: the "Chat model: 8B / 4B" selector next to the
@@ -57,29 +55,33 @@ Downloads into the app data directory:
   `response_format: { type: "json_schema", json_schema: {...} }`
 - The JSON schemas and prompts are shared with the Gemini provider
   (`translate::translation_schema`, `dictionary::dictionary_schema`)
+- The request body omits the `model` field — mlx_lm.server rejects unknown
+  model names (it would try to fetch them from HuggingFace) but ignores the
+  field when omitted
 - No fallback: if the local server errors, the command is skipped and logged
   (`[bonsai]` prefix)
 
 ## Known limitations
 
-- Requires the Prism ML llama.cpp fork (Q2_0 ternary kernels not yet in
-  upstream llama.cpp); binary obtained from GitHub Release `prism-b9596-9fcaed7`
-- Temperature is fixed at 0.7 (llama-server default is 0.8); not exposed in UI
+- Apple Silicon only (no Intel Mac support)
+- `mlx_lm.server` is single-user by design and warns it is "not recommended for
+  production" — fine for localhost use
+- No cross-request prompt cache (each request re-prefills), but prefill is
+  ~300 tok/s so it barely matters for these short requests
 - Translation quality is lower than Gemini 2.5-flash-lite — verify on real chat
   before relying on it
-- Both models share the 8192-token context; the 4B (port 4244) is the lighter
-  option (~1.1 GB / ~2 GB RAM) for weaker machines, at the cost of the EN→JA
-  quality drop noted below
+- The 4B (port 4244) is the lighter option (~1.1 GB / ~2 GB RAM) for weaker
+  machines, at the cost of the EN→JA quality drop noted below
 
-## Measured quality (Aug 2026 trial, Ternary-Bonsai-8B Q2_0)
+## Measured quality (Aug 2026 trial, Ternary-Bonsai-8B)
 
 | Case | Result |
 |---|---|
 | JA→EN translation | Good — natural formality levels + linguistic points |
 | EN→JA translation | Usable — natural grammar, but occasional broken katakana loanwords (e.g. ステーミング) and English leftovers |
 | Dictionary | Good — clean meanings/examples, no duplicate synonyms |
-| Latency | ~12–17 s per request (M-series, single slot) |
-| 4B comparison | 4B was faster (~7–11 s) but EN→JA was word-by-word and dictionary had duplicate synonyms |
+| Latency (MLX, M1) | ~10 s per request (~21 tok/s decode) |
+| 4B comparison | 4B faster (~26 tok/s decode) but EN→JA was word-by-word and dictionary had duplicate synonyms |
 
 Overall: usable as a free/offline option, quality clearly below Gemini 2.5-flash-lite
 for EN→JA. Prompt engineering (explicit "use natural katakana" guidance) may
@@ -90,7 +92,7 @@ improve the EN→JA case.
 - **App UI**: the Model Test page (sidebar) translates a sentence with any
   provider (Gemini, Local 8B, Local 4B) via a switch (needs the Local Model
   toggle enabled so the servers run)
-- **Integration tests**: `scripts/test-bonsai.sh` — spawns llama-server if
+- **Integration tests**: `scripts/test-bonsai.sh` — spawns the MLX server if
   needed and runs the Rust integration tests (`bonsai::translate`,
   `bonsai::lookup_word`) against it
 - **Interactive CLI**: `scripts/test-bonsai.sh --chat` — pipe sentences in,
@@ -102,5 +104,5 @@ improve the EN→JA case.
 - `src-tauri/src/lib.rs` — sidecar spawn/kill (one per model), model registry
   (`BONSAI_MODELS`), `set_local_model_cmd`, `set_local_model_variant_cmd`,
   `get_bonsai_status_cmd`, provider branching in the chat listener
-- `scripts/setup-bonsai.sh` — one-shot download of binary + models
+- `scripts/setup-bonsai.sh` — one-shot setup: venv + mlx-lm + model downloads
 - `src/components/ChatControl.tsx` — toggle + chat model selector + status UI

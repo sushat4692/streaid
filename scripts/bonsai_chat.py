@@ -20,7 +20,6 @@ def has_japanese(text: str) -> bool:
 def translate(text: str) -> str:
     from_lang, to_lang = ("Japanese", "English") if has_japanese(text) else ("English", "Japanese")
     body = {
-        "model": "bonsai",
         "messages": [
             {"role": "system", "content": f"You are a Japanese-English translator. Translate the user's {from_lang} text to natural {to_lang}. Do not explain."},
             {"role": "user", "content": text},

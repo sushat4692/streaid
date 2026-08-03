@@ -16,7 +16,7 @@ export default function ChatControl() {
   })
   const [bonsai, setBonsai] = useState<BonsaiStatus>({
     enabled: false,
-    binary_found: false,
+    runtime_found: false,
     active_model: '8b',
     models: [],
   })
@@ -271,7 +271,7 @@ export default function ChatControl() {
           </div>
         )}
 
-        {!bonsai.binary_found || bonsai.models.every((m) => !m.model_found) ? (
+        {!bonsai.runtime_found || bonsai.models.every((m) => !m.model_found) ? (
           <div className='mt-2 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20'>
             <p className='text-xs text-yellow-400'>
               ⚠ Not set up — run{' '}

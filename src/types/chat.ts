@@ -14,7 +14,7 @@ export type BonsaiModelStatus = {
 
 export type BonsaiStatus = {
   enabled: boolean
-  binary_found: boolean
+  runtime_found: boolean
   active_model: '8b' | '4b'
   models: BonsaiModelStatus[]
 }

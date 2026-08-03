@@ -23,7 +23,7 @@ All commands are async and return `Result<T, String>` (Rust side: `anyhow::Resul
 | `get_sound_cmd` | `soundType: string` | `SoundDataResponse \| null` | Retrieve audio as base64 data URL + file name |
 | `clear_sound_cmd` | `soundType: string` | `void` | Delete audio file for a sound slot |
 | `get_overlay_url_cmd` | — | `string` | Returns `"http://localhost:4242"` |
-| `set_local_model_cmd` | `enabled: bool` | `void` | Enable/disable the Bonsai sidecars (spawn/kill llama-server, all available models) and switch provider |
+| `set_local_model_cmd` | `enabled: bool` | `void` | Enable/disable the Bonsai sidecars (spawn/kill MLX servers, all available models) and switch provider |
 | `set_local_model_variant_cmd` | `model: "8b" \| "4b"` | `void` | Select which local model answers `!ts` / `!d` in chat (persisted to disk) |
 | `get_bonsai_status_cmd` | — | `BonsaiStatus` | Local model status (enabled, active model, per-model running/file state) |
 | `test_model_cmd` | `text: string, provider: "gemini" \| "bonsai-8b" \| "bonsai-4b", mode: "ts" \| "d"` | `ModelTestResult` | One-shot translation (`ts`) or dictionary lookup (`d`) with a chosen provider (Model Test page) |
@@ -78,7 +78,7 @@ export type BonsaiModelStatus = {
 
 export type BonsaiStatus = {
   enabled: boolean
-  binary_found: boolean
+  runtime_found: boolean
   active_model: '8b' | '4b'
   models: BonsaiModelStatus[]
 }
