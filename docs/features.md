@@ -103,7 +103,7 @@ scripts/setup-bonsai.sh --with-4b  # also download 4B for the lighter option
 
 Requirements: macOS arm64/x64, ~4 GB disk, ~4 GB RAM free for inference.
 The models take a few seconds to load on enable; until then the status shows "Starting...".
-Translation quality is lower than Gemini 2.5-flash-lite — use for cost/privacy testing.
+Translation quality is lower than Gemini 3.1-flash-lite — use for cost/privacy testing.
 If the local server errors, the command is skipped and logged (no silent fallback to Gemini).
 
 ## Gemini Rate Limiting & Fallback
@@ -124,7 +124,7 @@ busy chat:
 ## Model Test (sidebar → Model Test)
 
 The Model Test page lets anyone test a provider without Twitch chat: pick a
-provider with the switch (Gemini 2.5 Flash Lite, Local Model 8B, or Local
+provider with the switch (Gemini 3.1 Flash Lite, Local Model 8B, or Local
 Model 4B), pick a
 mode (`!ts` 翻訳 or `!d` 辞書), enter a sentence/word (JA or EN), and press
 Translate/Lookup to see the result for that provider only (suggestions +

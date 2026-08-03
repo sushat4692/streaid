@@ -72,7 +72,7 @@ Installs into the app data directory:
   production" — fine for localhost use
 - No cross-request prompt cache (each request re-prefills), but prefill is
   ~300 tok/s so it barely matters for these short requests
-- Translation quality is lower than Gemini 2.5-flash-lite — verify on real chat
+- Translation quality is lower than Gemini 3.1-flash-lite — verify on real chat
   before relying on it
 - The 4B (port 4244) is the lighter option (~1.1 GB / ~2 GB RAM) for weaker
   machines, at the cost of the EN→JA quality drop noted below
@@ -87,7 +87,7 @@ Installs into the app data directory:
 | Latency (MLX, M1) | ~10 s per request (~21 tok/s decode) |
 | 4B comparison | 4B faster (~26 tok/s decode) but EN→JA was word-by-word and dictionary had duplicate synonyms |
 
-Overall: usable as a free/offline option, quality clearly below Gemini 2.5-flash-lite
+Overall: usable as a free/offline option, quality clearly below Gemini 3.1-flash-lite
 for EN→JA. Prompt engineering (explicit "use natural katakana" guidance) may
 improve the EN→JA case.
 

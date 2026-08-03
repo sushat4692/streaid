@@ -12,7 +12,7 @@ type Mode = 'ts' | 'd'
 const PROVIDERS: { id: Provider; label: string; description: string }[] = [
   {
     id: 'gemini',
-    label: 'Gemini 2.5 Flash Lite',
+    label: 'Gemini 3.1 Flash Lite',
     description: 'Cloud API',
   },
   {

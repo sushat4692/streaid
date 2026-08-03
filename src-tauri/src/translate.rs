@@ -195,9 +195,9 @@ pub async fn translate_text(
     eprintln!("Translating {} -> {}: {}", from_lang, target_lang, text);
 
     let client = Client::new();
-    // Use gemini-2.5-flash-lite which is available on the free tier
+    // Use gemini-3.1-flash-lite (free tier; 2.5-flash-lite's free RPD was too low)
     let url = format!(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={}",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key={}",
         api_key
     );
 

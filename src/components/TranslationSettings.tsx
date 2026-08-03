@@ -75,7 +75,7 @@ export default function TranslationSettings() {
             Google AI Studio
           </a>
         </p>
-        <p>Uses Gemini 2.5 Flash Lite model (free tier supported)</p>
+        <p>Uses Gemini 3.1 Flash Lite model (free tier supported)</p>
         <p className='text-gray-600'>
           Used for translating Japanese ↔ English chat messages
         </p>

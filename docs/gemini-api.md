@@ -4,8 +4,8 @@ Used by both `!ts` (translate.rs) and `!d` (dictionary.rs). One API key is share
 
 ## Request
 
-- **Model**: `gemini-2.5-flash-lite` (free tier supported)
-- **Endpoint**: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent`
+- **Model**: `gemini-3.1-flash-lite` (free tier supported)
+- **Endpoint**: `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent`
 - **Response format**: Structured JSON via `response_schema` + `response_mime_type: "application/json"` in request body
 
 ## Structured Output Pattern
