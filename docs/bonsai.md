@@ -9,14 +9,14 @@ local `llama-server` sidecar.
 - Open weights (Apache 2.0), GGUF format — can be bundled/run inside the desktop app
   (unlike Chrome's built-in Gemini Nano, which is Chrome-only and cannot run in the
   Tauri WKWebView)
-- Ternary (1.58-bit) quantization: Ternary-Bonsai-4B Q2_0 is only ~1.1 GB on disk
-  (Gemma 3n E2B Q4_K_M would be ~3 GB; Nano needs ~22 GB free space)
+- Ternary (1.58-bit) quantization: Ternary-Bonsai-8B Q2_0 is only ~2.1 GB on disk
+  (Gemma 3n E4B Q4_K_M would be ~4.5 GB; Nano needs ~22 GB free space)
 - Runs fully offline; no API key, no chat data leaves the machine
 
 ## Requirements
 
 - macOS (arm64 or x64) — this trial targets macOS only
-- ~2 GB free disk, ~2 GB RAM free for inference
+- ~4 GB free disk, ~4 GB RAM free for inference
 - macOS Gatekeeper: `scripts/setup-bonsai.sh` clears the quarantine attribute
   and ad-hoc codesigns the binary
 
@@ -31,7 +31,7 @@ Downloads into the app data directory:
 ```
 ~/Library/Application Support/im.sush.streaid/bonsai/
   bin/llama-server                          (Prism ML llama.cpp fork, macos)
-  models/Ternary-Bonsai-4B-Q2_0.gguf        (~1.1 GB)
+  models/Ternary-Bonsai-8B-Q2_0.gguf        (~2.1 GB)
   llama-server.log                          (sidecar stderr, written at runtime)
 ```
 
@@ -40,7 +40,7 @@ Downloads into the app data directory:
 - Toggle "Enable Local Model" in the dashboard → backend spawns:
 
   ```
-  llama-server -m models/Ternary-Bonsai-4B-Q2_0.gguf
+  llama-server -m models/Ternary-Bonsai-8B-Q2_0.gguf
                --host 127.0.0.1 --port 4243 -c 8192 --jinja
   ```
 
@@ -59,8 +59,9 @@ Downloads into the app data directory:
 - Temperature is fixed at 0.7 (llama-server default is 0.8); not exposed in UI
 - Translation quality is lower than Gemini 2.5-flash-lite — verify on real chat
   before relying on it
-- Model variants: Ternary-Bonsai 8B Q2_0 (2.1 GB) is the next step up if 4B
-  quality is insufficient (update `BONSAI_MODEL_FILE` in `lib.rs` and the script)
+- Model variants: Ternary-Bonsai 4B Q2_0 (1.1 GB) is the lighter fallback if
+  8B is too heavy for a machine (update `BONSAI_MODEL_FILE` in `lib.rs` and
+  `MODEL_FILE` in `scripts/setup-bonsai.sh`)
 
 ## Files
 

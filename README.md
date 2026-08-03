@@ -36,7 +36,7 @@ Open the Config page to authenticate Twitch and set your Gemini API key, then en
 ## Local Model Setup (optional)
 
 ```bash
-scripts/setup-bonsai.sh    # downloads llama-server + Ternary-Bonsai-4B (~1.1 GB)
+scripts/setup-bonsai.sh    # downloads llama-server + Ternary-Bonsai-8B (~2.1 GB)
 ```
 
 Then toggle "Enable Local Model" in the dashboard. See `docs/bonsai.md`.

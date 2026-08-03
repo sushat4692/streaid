@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Downloads the llama-server binary (Prism ML fork) and the Ternary-Bonsai-4B
+# Downloads the llama-server binary (Prism ML fork) and the Ternary-Bonsai-8B
 # model into the Streaid app data directory so the app can use the local model.
 #
 # App data dir (macOS): ~/Library/Application Support/im.sush.streaid/bonsai/
 #   bin/llama-server
-#   models/Ternary-Bonsai-4B-Q2_0.gguf
+#   models/Ternary-Bonsai-8B-Q2_0.gguf
 #
 # Re-running the script skips files that are already present.
 set -euo pipefail
@@ -13,6 +13,8 @@ APP_DATA_DIR="$HOME/Library/Application Support/im.sush.streaid"
 BONSAI_DIR="$APP_DATA_DIR/bonsai"
 BIN_DIR="$BONSAI_DIR/bin"
 MODELS_DIR="$BONSAI_DIR/models"
+
+MODEL_FILE="Ternary-Bonsai-8B-Q2_0.gguf"
 
 RELEASE_TAG="prism-b9596-9fcaed7"
 ARCH="$(uname -m)"
@@ -26,7 +28,7 @@ case "$ARCH" in
 esac
 
 BINARY_URL="https://github.com/PrismML-Eng/llama.cpp/releases/download/$RELEASE_TAG/$ASSET"
-MODEL_URL="https://huggingface.co/prism-ml/Ternary-Bonsai-4B-gguf/resolve/main/Ternary-Bonsai-4B-Q2_0.gguf"
+MODEL_URL="https://huggingface.co/prism-ml/Ternary-Bonsai-8B-gguf/resolve/main/$MODEL_FILE"
 
 mkdir -p "$BIN_DIR" "$MODELS_DIR"
 
@@ -47,14 +49,14 @@ else
   echo "llama-server installed"
 fi
 
-if [ -f "$MODELS_DIR/Ternary-Bonsai-4B-Q2_0.gguf" ]; then
+if [ -f "$MODELS_DIR/$MODEL_FILE" ]; then
   echo "Model already present"
 else
-  echo "Downloading Ternary-Bonsai-4B-Q2_0.gguf (~1.1 GB)..."
-  curl -LsSf -o "$MODELS_DIR/Ternary-Bonsai-4B-Q2_0.gguf" "$MODEL_URL"
+  echo "Downloading $MODEL_FILE (~2.1 GB)..."
+  curl -LsSf -o "$MODELS_DIR/$MODEL_FILE" "$MODEL_URL"
   echo "Model downloaded"
 fi
 
 echo ""
 echo "Done. Files:"
-ls -lh "$BIN_DIR/llama-server" "$MODELS_DIR/Ternary-Bonsai-4B-Q2_0.gguf"
+ls -lh "$BIN_DIR/llama-server" "$MODELS_DIR/$MODEL_FILE"

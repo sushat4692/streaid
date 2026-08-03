@@ -89,15 +89,15 @@ Optional on-device provider that replaces the cloud Gemini API for both `!ts` an
 - When enabled, requests go to a locally running `llama-server` sidecar (OpenAI-compatible API on `http://127.0.0.1:4243`); the Gemini API key is not used
 - When disabled, the Gemini path is used as before
 - The sidecar is spawned when enabling and killed when disabling or on app exit
-- Model: Ternary-Bonsai-4B (Q2_0, ~1.1 GB) — see `scripts/setup-bonsai.sh` and `docs/bonsai.md`
+- Model: Ternary-Bonsai-8B (Q2_0, ~2.1 GB) — see `scripts/setup-bonsai.sh` and `docs/bonsai.md`
 
 Setup:
 
 ```bash
-scripts/setup-bonsai.sh    # downloads llama-server binary + model (~1.1 GB)
+scripts/setup-bonsai.sh    # downloads llama-server binary + model (~2.1 GB)
 ```
 
-Requirements: macOS arm64/x64, ~2 GB disk, ~2 GB RAM free for inference.
+Requirements: macOS arm64/x64, ~4 GB disk, ~4 GB RAM free for inference.
 The model takes a few seconds to load on enable; until then the status shows "Starting...".
 Translation quality is lower than Gemini 2.5-flash-lite — use for cost/privacy testing.
 If the local server errors, the command is skipped and logged (no silent fallback to Gemini).

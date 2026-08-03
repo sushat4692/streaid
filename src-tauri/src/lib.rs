@@ -340,7 +340,7 @@ fn bonsai_dir(app: &tauri::AppHandle) -> std::path::PathBuf {
     app.path().app_data_dir().unwrap_or_default().join("bonsai")
 }
 
-const BONSAI_MODEL_FILE: &str = "Ternary-Bonsai-4B-Q2_0.gguf";
+const BONSAI_MODEL_FILE: &str = "Ternary-Bonsai-8B-Q2_0.gguf";
 
 #[derive(serde::Serialize)]
 struct BonsaiStatus {
