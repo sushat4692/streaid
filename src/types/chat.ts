@@ -6,20 +6,38 @@ export type ChatStatus = {
   last_target_channel?: string | null
 }
 
-export type BonsaiStatus = {
-  enabled: boolean
-  server_running: boolean
-  binary_found: boolean
+export type BonsaiModelStatus = {
+  name: '8b' | '4b'
+  running: boolean
   model_found: boolean
 }
 
-export type ModelTestResult = {
-  source_lang: string
-  target_lang: string
-  suggestions: TranslationSuggestion[]
-  points: string[]
-  duration_ms: number
+export type BonsaiStatus = {
+  enabled: boolean
+  binary_found: boolean
+  active_model: '8b' | '4b'
+  models: BonsaiModelStatus[]
 }
+
+export type ModelTestResult =
+  | {
+      mode: 'ts'
+      source_lang: string
+      target_lang: string
+      suggestions: TranslationSuggestion[]
+      points: string[]
+      duration_ms: number
+    }
+  | {
+      mode: 'd'
+      source_lang: string
+      target_lang: string
+      word: string
+      meaning: string
+      examples: string[]
+      similar_words: string[]
+      duration_ms: number
+    }
 
 export type TranslationSuggestion = {
   text: string

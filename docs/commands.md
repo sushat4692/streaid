@@ -23,9 +23,10 @@ All commands are async and return `Result<T, String>` (Rust side: `anyhow::Resul
 | `get_sound_cmd` | `soundType: string` | `SoundDataResponse \| null` | Retrieve audio as base64 data URL + file name |
 | `clear_sound_cmd` | `soundType: string` | `void` | Delete audio file for a sound slot |
 | `get_overlay_url_cmd` | — | `string` | Returns `"http://localhost:4242"` |
-| `set_local_model_cmd` | `enabled: bool` | `void` | Enable/disable the Bonsai sidecar (spawn/kill llama-server) and switch provider |
-| `get_bonsai_status_cmd` | — | `BonsaiStatus` | Local model status (enabled, server running, binary/model present) |
-| `test_translation_cmd` | `text: string, provider: "gemini" \| "bonsai"` | `ModelTestResult` | One-shot translation with a chosen provider (dashboard comparison UI) |
+| `set_local_model_cmd` | `enabled: bool` | `void` | Enable/disable the Bonsai sidecars (spawn/kill llama-server, all available models) and switch provider |
+| `set_local_model_variant_cmd` | `model: "8b" \| "4b"` | `void` | Select which local model answers `!ts` / `!d` in chat (persisted to disk) |
+| `get_bonsai_status_cmd` | — | `BonsaiStatus` | Local model status (enabled, active model, per-model running/file state) |
+| `test_model_cmd` | `text: string, provider: "gemini" \| "bonsai-8b" \| "bonsai-4b", mode: "ts" \| "d"` | `ModelTestResult` | One-shot translation (`ts`) or dictionary lookup (`d`) with a chosen provider (Model Test page) |
 
 `targetChannel` is optional; if omitted, monitors the authenticated user's own channel. It is auto-sanitized (lowercased, `#` stripped, max 25 chars, alphanumeric + underscore only).
 
@@ -69,20 +70,38 @@ export type ChatStatus = {
   last_target_channel?: string | null
 }
 
-export type BonsaiStatus = {
-  enabled: boolean
-  server_running: boolean
-  binary_found: boolean
+export type BonsaiModelStatus = {
+  name: '8b' | '4b'
+  running: boolean
   model_found: boolean
 }
 
-export type ModelTestResult = {
-  source_lang: string
-  target_lang: string
-  suggestions: TranslationSuggestion[]
-  points: string[]
-  duration_ms: number
+export type BonsaiStatus = {
+  enabled: boolean
+  binary_found: boolean
+  active_model: '8b' | '4b'
+  models: BonsaiModelStatus[]
 }
+
+export type ModelTestResult =
+  | {
+      mode: 'ts'
+      source_lang: string
+      target_lang: string
+      suggestions: TranslationSuggestion[]
+      points: string[]
+      duration_ms: number
+    }
+  | {
+      mode: 'd'
+      source_lang: string
+      target_lang: string
+      word: string
+      meaning: string
+      examples: string[]
+      similar_words: string[]
+      duration_ms: number
+    }
 
 export type ChatMessageEvent = {
   username: string

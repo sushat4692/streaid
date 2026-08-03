@@ -16,9 +16,9 @@ export default function ChatControl() {
   })
   const [bonsai, setBonsai] = useState<BonsaiStatus>({
     enabled: false,
-    server_running: false,
     binary_found: false,
-    model_found: false,
+    active_model: '8b',
+    models: [],
   })
   const [isStarting, setIsStarting] = useState(false)
   const [isBonsaiToggling, setIsBonsaiToggling] = useState(false)
@@ -113,6 +113,15 @@ export default function ChatControl() {
     }
   }
 
+  async function handleVariantChange(model: '8b' | '4b') {
+    try {
+      await invoke('set_local_model_variant_cmd', { model })
+      setTimeout(fetchStatus, 200)
+    } catch (e) {
+      console.error('Failed to set local model variant:', e)
+    }
+  }
+
   return (
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>
@@ -189,14 +198,14 @@ export default function ChatControl() {
           <div
             className={cx(
               'px-3 py-1 rounded-full text-xs font-medium',
-              bonsai.server_running
+              bonsai.models.some((m) => m.running)
                 ? 'bg-green-500/20 text-green-400'
                 : bonsai.enabled
                   ? 'bg-yellow-500/20 text-yellow-400'
                   : 'bg-gray-500/20 text-gray-400'
             )}
           >
-            {bonsai.server_running
+            {bonsai.models.some((m) => m.running)
               ? '● Running'
               : bonsai.enabled
                 ? '● Starting...'
@@ -209,12 +218,66 @@ export default function ChatControl() {
           the Gemini API.
         </p>
 
-        {!bonsai.binary_found || !bonsai.model_found ? (
+        {bonsai.models.length > 0 && (
+          <div className='mt-2 flex gap-2 flex-wrap'>
+            {bonsai.models.map((m) => (
+              <span
+                key={m.name}
+                className={cx(
+                  'px-2.5 py-1 rounded-full text-[10px] font-medium border',
+                  m.running
+                    ? 'bg-green-500/10 border-green-500/20 text-green-400'
+                    : m.model_found
+                      ? 'bg-white/5 border-white/10 text-gray-400'
+                      : 'bg-white/5 border-white/10 text-gray-600'
+                )}
+              >
+                {m.name.toUpperCase()}:{' '}
+                {m.running ? '●' : m.model_found ? '○' : '—'}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {bonsai.enabled && (
+          <div className='mt-3 flex items-center gap-2'>
+            <span className='text-[10px] font-semibold uppercase tracking-wide text-gray-500'>
+              Chat model:
+            </span>
+            <div className='flex gap-1 p-0.5 rounded-lg bg-white/5 border border-white/10'>
+              {(['8b', '4b'] as const).map((m) => {
+                const available = bonsai.models.some(
+                  (x) => x.name === m && x.model_found
+                )
+                return (
+                  <button
+                    key={m}
+                    type='button'
+                    onClick={() => handleVariantChange(m)}
+                    disabled={!available}
+                    className={cx(
+                      'px-3 py-1 rounded-md text-xs font-medium transition-all cursor-pointer',
+                      bonsai.active_model === m
+                        ? 'bg-[#9146FF]/20 text-white ring-1 ring-[#9146FF]/40'
+                        : 'text-gray-400 hover:text-white',
+                      !available && 'opacity-40 cursor-not-allowed'
+                    )}
+                  >
+                    {m.toUpperCase()}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {!bonsai.binary_found || bonsai.models.every((m) => !m.model_found) ? (
           <div className='mt-2 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20'>
             <p className='text-xs text-yellow-400'>
               ⚠ Not set up — run{' '}
               <code className='font-mono'>scripts/setup-bonsai.sh</code> to
-              download the model
+              download the model (add{' '}
+              <code className='font-mono'>--with-4b</code> for the 4B variant)
             </p>
           </div>
         ) : (

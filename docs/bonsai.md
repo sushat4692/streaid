@@ -23,7 +23,8 @@ local `llama-server` sidecar.
 ## Setup
 
 ```bash
-scripts/setup-bonsai.sh
+scripts/setup-bonsai.sh            # 8B only (recommended default)
+scripts/setup-bonsai.sh --with-4b  # also download the lighter 4B model
 ```
 
 Downloads into the app data directory:
@@ -31,20 +32,27 @@ Downloads into the app data directory:
 ```
 ~/Library/Application Support/im.sush.streaid/bonsai/
   bin/llama-server                          (Prism ML llama.cpp fork, macos)
-  models/Ternary-Bonsai-8B-Q2_0.gguf        (~2.1 GB)
-  llama-server.log                          (sidecar stderr, written at runtime)
+  models/Ternary-Bonsai-8B-Q2_0.gguf        (~2.1 GB, port 4243)
+  models/Ternary-Bonsai-4B-Q2_0.gguf        (~1.1 GB, port 4244, optional)
+  llama-server-{8b,4b}.log                  (sidecar stderr, written at runtime)
 ```
 
 ## Runtime
 
-- Toggle "Enable Local Model" in the dashboard → backend spawns:
+- Toggle "Enable Local Model" in the Chat Listener card → backend spawns one
+  llama-server per model file that is present:
 
   ```
   llama-server -m models/Ternary-Bonsai-8B-Q2_0.gguf
                --host 127.0.0.1 --port 4243 -c 8192 --jinja
+  llama-server -m models/Ternary-Bonsai-4B-Q2_0.gguf
+               --host 127.0.0.1 --port 4244 -c 8192 --jinja   (if downloaded)
   ```
 
-- Backend polls `GET /health` until ready (up to 60 s), then `!ts` / `!d`
+- **Chat model selection**: the "Chat model: 8B / 4B" selector next to the
+  toggle picks which model answers `!ts` / `!d` in chat (`set_local_model_variant_cmd`,
+  persisted to `~/Library/Application Support/streaid/local_model_variant`)
+- Backend polls `GET /health` until ready (up to 90 s), then `!ts` / `!d`
   requests go to `POST /v1/chat/completions` with
   `response_format: { type: "json_schema", json_schema: {...} }`
 - The JSON schemas and prompts are shared with the Gemini provider
@@ -59,9 +67,9 @@ Downloads into the app data directory:
 - Temperature is fixed at 0.7 (llama-server default is 0.8); not exposed in UI
 - Translation quality is lower than Gemini 2.5-flash-lite — verify on real chat
   before relying on it
-- Model variants: Ternary-Bonsai 4B Q2_0 (1.1 GB) is the lighter fallback if
-  8B is too heavy for a machine (update `BONSAI_MODEL_FILE` in `lib.rs` and
-  `MODEL_FILE` in `scripts/setup-bonsai.sh`)
+- Both models share the 8192-token context; the 4B (port 4244) is the lighter
+  option (~1.1 GB / ~2 GB RAM) for weaker machines, at the cost of the EN→JA
+  quality drop noted below
 
 ## Measured quality (Aug 2026 trial, Ternary-Bonsai-8B Q2_0)
 
@@ -79,9 +87,9 @@ improve the EN→JA case.
 
 ## Testing without Twitch
 
-- **App UI**: the Model Test page (sidebar) translates a sentence with either
-  Gemini or Bonsai via a provider switch (needs the Local Model toggle enabled
-  so the server runs)
+- **App UI**: the Model Test page (sidebar) translates a sentence with any
+  provider (Gemini, Local 8B, Local 4B) via a switch (needs the Local Model
+  toggle enabled so the servers run)
 - **Integration tests**: `scripts/test-bonsai.sh` — spawns llama-server if
   needed and runs the Rust integration tests (`bonsai::translate`,
   `bonsai::lookup_word`) against it
@@ -90,8 +98,9 @@ improve the EN→JA case.
 
 ## Files
 
-- `src-tauri/src/bonsai.rs` — OpenAI-compatible client + health check
-- `src-tauri/src/lib.rs` — sidecar spawn/kill, `set_local_model_cmd`,
+- `src-tauri/src/bonsai.rs` — OpenAI-compatible client (per-server base URL)
+- `src-tauri/src/lib.rs` — sidecar spawn/kill (one per model), model registry
+  (`BONSAI_MODELS`), `set_local_model_cmd`, `set_local_model_variant_cmd`,
   `get_bonsai_status_cmd`, provider branching in the chat listener
-- `scripts/setup-bonsai.sh` — one-shot download of binary + model
-- `src/components/ChatControl.tsx` — toggle + status UI
+- `scripts/setup-bonsai.sh` — one-shot download of binary + models
+- `src/components/ChatControl.tsx` — toggle + chat model selector + status UI

@@ -86,27 +86,34 @@ A single toggle on the dashboard controls both `!ts` and `!d`. When off, both co
 Optional on-device provider that replaces the cloud Gemini API for both `!ts` and `!d`:
 
 - **Toggle** in the Chat Listener card (dashboard): "Enable Local Model"
-- When enabled, requests go to a locally running `llama-server` sidecar (OpenAI-compatible API on `http://127.0.0.1:4243`); the Gemini API key is not used
+- When enabled, requests go to locally running `llama-server` sidecars (ports 4243 = 8B, 4244 = 4B); the Gemini API key is not used
+- **Chat model**: a small 8B / 4B selector (next to the toggle) picks which model
+  actually answers `!ts` / `!d` in chat; the choice is persisted to disk
 - When disabled, the Gemini path is used as before
-- The sidecar is spawned when enabling and killed when disabling or on app exit
-- Model: Ternary-Bonsai-8B (Q2_0, ~2.1 GB) — see `scripts/setup-bonsai.sh` and `docs/bonsai.md`
+- The sidecars are spawned when enabling and killed when disabling or on app exit
+- Models: Ternary-Bonsai-8B (Q2_0, ~2.1 GB, default) and Ternary-Bonsai-4B
+  (Q2_0, ~1.1 GB, optional) — see `scripts/setup-bonsai.sh` and `docs/bonsai.md`
 
 Setup:
 
 ```bash
-scripts/setup-bonsai.sh    # downloads llama-server binary + model (~2.1 GB)
+scripts/setup-bonsai.sh            # 8B only (~2.1 GB)
+scripts/setup-bonsai.sh --with-4b  # also download 4B for the lighter option
 ```
 
 Requirements: macOS arm64/x64, ~4 GB disk, ~4 GB RAM free for inference.
-The model takes a few seconds to load on enable; until then the status shows "Starting...".
+The models take a few seconds to load on enable; until then the status shows "Starting...".
 Translation quality is lower than Gemini 2.5-flash-lite — use for cost/privacy testing.
 If the local server errors, the command is skipped and logged (no silent fallback to Gemini).
 
 ## Model Test (sidebar → Model Test)
 
 The Model Test page lets anyone test a provider without Twitch chat: pick a
-provider with the switch (Gemini 2.5 Flash Lite or Local Model Bonsai), enter a
-sentence (JA or EN), and press Translate to see suggestions, linguistic points,
-and duration for that provider only. Powered by `test_translation_cmd`. The
-Bonsai side must be running (toggle it on in the Chat Listener card first).
+provider with the switch (Gemini 2.5 Flash Lite, Local Model 8B, or Local
+Model 4B), pick a
+mode (`!ts` 翻訳 or `!d` 辞書), enter a sentence/word (JA or EN), and press
+Translate/Lookup to see the result for that provider only (suggestions +
+linguistic points for `!ts`; meaning + examples + similar words for `!d`,
+including duration). Powered by `test_model_cmd`. The Bonsai side must be
+running (toggle it on in the Chat Listener card first).
 

@@ -50,17 +50,72 @@ static CHAT_STATE: Lazy<Arc<std::sync::Mutex<ChatState>>> =
     Lazy::new(|| Arc::new(std::sync::Mutex::new(ChatState::new())));
 
 // Bonsai (local model sidecar) state
+/// One model server instance managed as a sidecar.
+struct BonsaiModel {
+    name: &'static str, // "8b" | "4b" — used by the frontend and logs
+    port: u16,
+    file: &'static str,
+}
+
+const BONSAI_MODELS: [BonsaiModel; 2] = [
+    BonsaiModel {
+        name: "8b",
+        port: 4243,
+        file: "Ternary-Bonsai-8B-Q2_0.gguf",
+    },
+    BonsaiModel {
+        name: "4b",
+        port: 4244,
+        file: "Ternary-Bonsai-4B-Q2_0.gguf",
+    },
+];
+
+struct BonsaiChild {
+    model_name: &'static str,
+    child: std::process::Child,
+}
+
 struct BonsaiState {
     enabled: bool,
-    child: Option<std::process::Child>,
+    /// Model used for actual !ts / !d chat replies ("8b" or "4b").
+    active_model: String,
+    children: Vec<BonsaiChild>,
 }
 
 impl BonsaiState {
     fn new() -> Self {
         BonsaiState {
             enabled: false,
-            child: None,
+            active_model: load_local_model_variant(),
+            children: Vec::new(),
         }
+    }
+}
+
+fn local_model_variant_path() -> Option<std::path::PathBuf> {
+    dirs::config_dir().map(|mut d| {
+        d.push("streaid");
+        d.push("local_model_variant");
+        d
+    })
+}
+
+fn load_local_model_variant() -> String {
+    let variant = local_model_variant_path()
+        .and_then(|p| std::fs::read_to_string(p).ok())
+        .map(|s| s.trim().to_string());
+    match variant.as_deref() {
+        Some("4b") | Some("8b") => variant.unwrap(),
+        _ => "8b".to_string(),
+    }
+}
+
+fn save_local_model_variant(model: &str) {
+    if let Some(path) = local_model_variant_path() {
+        if let Some(parent) = path.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        let _ = std::fs::write(&path, model);
     }
 }
 
@@ -357,18 +412,49 @@ fn bonsai_dir(app: &tauri::AppHandle) -> std::path::PathBuf {
     app.path().app_data_dir().unwrap_or_default().join("bonsai")
 }
 
-const BONSAI_MODEL_FILE: &str = "Ternary-Bonsai-8B-Q2_0.gguf";
+#[derive(serde::Serialize)]
+struct BonsaiModelStatus {
+    name: String, // "8b" | "4b"
+    running: bool,
+    model_found: bool,
+}
 
 #[derive(serde::Serialize)]
 struct BonsaiStatus {
     enabled: bool,
-    server_running: bool,
     binary_found: bool,
-    model_found: bool,
+    /// Model used for actual !ts / !d chat replies ("8b" | "4b")
+    active_model: String,
+    models: Vec<BonsaiModelStatus>,
 }
 
-/// Spawns (or kills) the local llama-server sidecar and switches the
-/// !ts / !d provider to the local Bonsai model.
+/// Selects which local model answers !ts / !d in chat. Persisted to disk.
+#[tauri::command]
+fn set_local_model_variant_cmd(model: String) -> Result<(), String> {
+    if model != "8b" && model != "4b" {
+        return Err(format!("Unknown local model variant: {}", model));
+    }
+    let state = get_bonsai_state();
+    let mut s = state.lock().map_err(|e| format!("Lock error: {}", e))?;
+    s.active_model = model.clone();
+    save_local_model_variant(&model);
+    eprintln!("Local model variant set to {}", model);
+    Ok(())
+}
+
+/// Base URL of the llama-server for the currently selected chat model.
+fn active_bonsai_url() -> &'static str {
+    let state = get_bonsai_state();
+    let s = state.lock().unwrap_or_else(|e| e.into_inner());
+    if s.active_model == "4b" {
+        bonsai::SERVER_URL_4B
+    } else {
+        bonsai::SERVER_URL_8B
+    }
+}
+
+/// Spawns (or kills) the local llama-server sidecars and switches the
+/// !ts / !d provider to the local Bonsai models.
 #[tauri::command]
 async fn set_local_model_cmd(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
     if enabled {
@@ -383,32 +469,59 @@ async fn set_local_model_cmd(app: tauri::AppHandle, enabled: bool) -> Result<(),
 #[tauri::command]
 async fn get_bonsai_status_cmd(app: tauri::AppHandle) -> Result<BonsaiStatus, String> {
     let dir = bonsai_dir(&app);
-    let (enabled, has_child) = {
+    let (enabled, active_model, running_models) = {
         let state = get_bonsai_state();
         let s = state.lock().map_err(|e| format!("Lock error: {}", e))?;
-        (s.enabled, s.child.is_some())
+        let running: Vec<&str> = s.children.iter().map(|c| c.model_name).collect();
+        (s.enabled, s.active_model.clone(), running)
     };
+    let mut models = Vec::with_capacity(BONSAI_MODELS.len());
+    for model in BONSAI_MODELS.iter() {
+        let base_url = format!("http://127.0.0.1:{}", model.port);
+        models.push(BonsaiModelStatus {
+            name: model.name.to_string(),
+            running: running_models.contains(&model.name)
+                && bonsai::server_ready_at(&base_url).await,
+            model_found: dir.join("models").join(model.file).exists(),
+        });
+    }
     Ok(BonsaiStatus {
         enabled,
-        server_running: has_child && bonsai::server_ready().await,
         binary_found: dir.join("bin").join("llama-server").exists(),
-        model_found: dir.join("models").join(BONSAI_MODEL_FILE).exists(),
+        active_model,
+        models,
     })
 }
 
 #[derive(serde::Serialize)]
-struct ModelTestResult {
-    source_lang: String,
-    target_lang: String,
-    suggestions: Vec<TranslationSuggestion>,
-    points: Vec<String>,
-    duration_ms: u64,
+#[serde(tag = "mode", rename_all = "lowercase")]
+enum ModelTestResult {
+    Ts {
+        source_lang: String,
+        target_lang: String,
+        suggestions: Vec<TranslationSuggestion>,
+        points: Vec<String>,
+        duration_ms: u64,
+    },
+    D {
+        source_lang: String,
+        target_lang: String,
+        word: String,
+        meaning: String,
+        examples: Vec<String>,
+        similar_words: Vec<String>,
+        duration_ms: u64,
+    },
 }
 
-/// One-shot translation with a chosen provider, used by the dashboard's
-/// Gemini vs local model comparison UI.
+/// One-shot translation (!ts) or dictionary lookup (!d) with a chosen provider,
+/// used by the Model Test page.
 #[tauri::command]
-async fn test_translation_cmd(text: String, provider: String) -> Result<ModelTestResult, String> {
+async fn test_model_cmd(
+    text: String,
+    provider: String,
+    mode: String,
+) -> Result<ModelTestResult, String> {
     let source_lang = detect_language(&text);
     if source_lang == Language::Unknown {
         return Err("Unknown language".to_string());
@@ -420,122 +533,223 @@ async fn test_translation_cmd(text: String, provider: String) -> Result<ModelTes
     };
 
     let start = std::time::Instant::now();
-    let result = match provider.as_str() {
-        "gemini" => {
-            let api_key = keyring::Entry::new("streaid", "gemini_api_key")
-                .get_password()
-                .map_err(|_| "No Gemini API key configured".to_string())?;
-            translate_text(&text, &api_key, source_lang)
-                .await
-                .map_err(|e| format!("Gemini error: {}", e))?
-        }
-        "bonsai" => {
-            if !bonsai::server_ready().await {
-                return Err(
-                    "Local model server is not running. Enable Local Model in Chat Listener first."
-                        .to_string(),
-                );
-            }
-            bonsai::translate(&text, source_lang)
-                .await
-                .map_err(|e| format!("Local model error: {}", e))?
-        }
-        other => return Err(format!("Unknown provider: {}", other)),
-    };
-    let duration_ms = start.elapsed().as_millis() as u64;
 
-    Ok(ModelTestResult {
-        source_lang: source_lang.to_string(),
-        target_lang: target_lang.to_string(),
-        suggestions: result.suggestions,
-        points: result.points,
-        duration_ms,
-    })
+    let result = match mode.as_str() {
+        "ts" => {
+            let res = provider_translate(&text, source_lang, &provider).await?;
+            ModelTestResult::Ts {
+                source_lang: source_lang.to_string(),
+                target_lang: target_lang.to_string(),
+                suggestions: res.suggestions,
+                points: res.points,
+                duration_ms: start.elapsed().as_millis() as u64,
+            }
+        }
+        "d" => {
+            // Mirror the real !d behavior: only the first word is looked up
+            let word = text
+                .split_whitespace()
+                .next()
+                .unwrap_or_default()
+                .to_string();
+            if word.is_empty() {
+                return Err("Empty word".to_string());
+            }
+            let res = provider_lookup(&word, source_lang, &provider).await?;
+            ModelTestResult::D {
+                source_lang: source_lang.to_string(),
+                target_lang: target_lang.to_string(),
+                word,
+                meaning: res.meaning,
+                examples: res.examples,
+                similar_words: res.similar_words,
+                duration_ms: start.elapsed().as_millis() as u64,
+            }
+        }
+        other => return Err(format!("Unknown mode: {}", other)),
+    };
+
+    Ok(result)
+}
+
+async fn provider_translate(
+    text: &str,
+    source_lang: Language,
+    provider: &str,
+) -> Result<translate::TranslationResult, String> {
+    match provider {
+        "gemini" => {
+            let api_key = get_gemini_api_key()?;
+            translate_text(text, &api_key, source_lang)
+                .await
+                .map_err(|e| format!("Gemini error: {}", e))
+        }
+        "bonsai-8b" | "bonsai" => local_translate(bonsai::SERVER_URL_8B, text, source_lang).await,
+        "bonsai-4b" => local_translate(bonsai::SERVER_URL_4B, text, source_lang).await,
+        other => Err(format!("Unknown provider: {}", other)),
+    }
+}
+
+async fn provider_lookup(
+    word: &str,
+    source_lang: Language,
+    provider: &str,
+) -> Result<dictionary::DictionaryResult, String> {
+    match provider {
+        "gemini" => {
+            let api_key = get_gemini_api_key()?;
+            lookup_word(word, &api_key, source_lang)
+                .await
+                .map_err(|e| format!("Gemini error: {}", e))
+        }
+        "bonsai-8b" | "bonsai" => local_lookup(bonsai::SERVER_URL_8B, word, source_lang).await,
+        "bonsai-4b" => local_lookup(bonsai::SERVER_URL_4B, word, source_lang).await,
+        other => Err(format!("Unknown provider: {}", other)),
+    }
+}
+
+async fn local_translate(
+    base_url: &str,
+    text: &str,
+    source_lang: Language,
+) -> Result<translate::TranslationResult, String> {
+    if !bonsai::server_ready_at(base_url).await {
+        return Err(
+            "Local model server is not running. Enable Local Model in Chat Listener first."
+                .to_string(),
+        );
+    }
+    bonsai::translate_at(base_url, text, source_lang)
+        .await
+        .map_err(|e| format!("Local model error: {}", e))
+}
+
+async fn local_lookup(
+    base_url: &str,
+    word: &str,
+    source_lang: Language,
+) -> Result<dictionary::DictionaryResult, String> {
+    if !bonsai::server_ready_at(base_url).await {
+        return Err(
+            "Local model server is not running. Enable Local Model in Chat Listener first."
+                .to_string(),
+        );
+    }
+    bonsai::lookup_word_at(base_url, word, source_lang)
+        .await
+        .map_err(|e| format!("Local model error: {}", e))
 }
 
 async fn start_bonsai(app: &tauri::AppHandle) -> Result<(), String> {
     let dir = bonsai_dir(app);
     let bin = dir.join("bin").join("llama-server");
-    let model = dir.join("models").join(BONSAI_MODEL_FILE);
 
     if !bin.exists() {
         return Err(
             "llama-server binary not found. Run scripts/setup-bonsai.sh first.".to_string(),
         );
     }
-    if !model.exists() {
-        return Err(format!(
-            "Model file {} not found. Run scripts/setup-bonsai.sh first.",
-            BONSAI_MODEL_FILE
-        ));
-    }
 
+    // Spawn one llama-server per model that has its file present
+    let mut spawned: Vec<(&'static str, u16)> = Vec::new();
     {
         let state = get_bonsai_state();
         let mut s = state.lock().map_err(|e| format!("Lock error: {}", e))?;
-        if s.enabled && s.child.is_some() {
+        if s.enabled && !s.children.is_empty() {
             return Ok(());
         }
-        if s.child.is_some() {
-            // Clean up a stale handle before re-spawning
-            if let Some(mut old) = s.child.take() {
-                let _ = old.kill();
-                let _ = old.wait();
-            }
+        // Clean up stale handles before re-spawning
+        for old in s.children.drain(..) {
+            let mut old = old.child;
+            let _ = old.kill();
+            let _ = old.wait();
         }
 
         std::fs::create_dir_all(&dir).map_err(|e| format!("Failed to create bonsai dir: {}", e))?;
-        let log_file = std::fs::File::create(dir.join("llama-server.log"))
-            .map_err(|e| format!("Failed to open llama-server log: {}", e))?;
 
-        let child = std::process::Command::new(&bin)
-            .arg("-m")
-            .arg(&model)
-            .arg("--host")
-            .arg("127.0.0.1")
-            .arg("--port")
-            .arg("4243")
-            .arg("-c")
-            .arg("8192")
-            .arg("--jinja")
-            .stdout(std::process::Stdio::null())
-            .stderr(std::process::Stdio::from(log_file))
-            .spawn()
-            .map_err(|e| format!("Failed to start llama-server: {}", e))?;
+        for model in BONSAI_MODELS.iter() {
+            let model_path = dir.join("models").join(model.file);
+            if !model_path.exists() {
+                eprintln!(
+                    "Skipping local model {}: file {} not found",
+                    model.name, model.file
+                );
+                continue;
+            }
+            let log_file =
+                std::fs::File::create(dir.join(format!("llama-server-{}.log", model.name)))
+                    .map_err(|e| format!("Failed to open llama-server log: {}", e))?;
 
-        s.child = Some(child);
+            let child = std::process::Command::new(&bin)
+                .arg("-m")
+                .arg(&model_path)
+                .arg("--host")
+                .arg("127.0.0.1")
+                .arg("--port")
+                .arg(model.port.to_string())
+                .arg("-c")
+                .arg("8192")
+                .arg("--jinja")
+                .stdout(std::process::Stdio::null())
+                .stderr(std::process::Stdio::from(log_file))
+                .spawn()
+                .map_err(|e| format!("Failed to start llama-server ({}): {}", model.name, e))?;
+
+            eprintln!(
+                "llama-server ({}) started on port {} (log: {})",
+                model.name,
+                model.port,
+                dir.join(format!("llama-server-{}.log", model.name))
+                    .display()
+            );
+            spawned.push((model.name, model.port));
+            s.children.push(BonsaiChild {
+                model_name: model.name,
+                child,
+            });
+        }
         s.enabled = true;
     };
 
-    eprintln!(
-        "llama-server started (log: {})",
-        dir.join("llama-server.log").display()
-    );
-
-    // Wait for the server to become ready (model load takes a few seconds)
-    let mut attempts = 0;
-    while attempts < 60 {
-        if bonsai::server_ready().await {
-            eprintln!("llama-server is ready");
-            return Ok(());
-        }
-        tokio::time::sleep(Duration::from_secs(1)).await;
-        attempts += 1;
+    if spawned.is_empty() {
+        stop_bonsai();
+        return Err(
+            "No local model files found. Run scripts/setup-bonsai.sh (with --with-4b for the 4B model) first."
+                .to_string(),
+        );
     }
 
-    stop_bonsai();
-    Err("llama-server did not become ready within 60s (check bonsai/llama-server.log)".to_string())
+    // Wait for every spawned server to become ready (model load takes seconds)
+    let mut attempts = 0;
+    while attempts < 90 && !spawned.is_empty() {
+        tokio::time::sleep(Duration::from_secs(1)).await;
+        attempts += 1;
+        let base_url = format!("http://127.0.0.1:{}", spawned[0].1);
+        if bonsai::server_ready_at(&base_url).await {
+            eprintln!("llama-server ({}) is ready", spawned[0].0);
+            spawned.remove(0);
+        }
+    }
+
+    if !spawned.is_empty() {
+        stop_bonsai();
+        return Err(
+            "llama-server did not become ready within 90s (check bonsai/llama-server-*.log)"
+                .to_string(),
+        );
+    }
+
+    Ok(())
 }
 
 fn stop_bonsai() {
     let state = get_bonsai_state();
     let mut s = state.lock().unwrap_or_else(|e| e.into_inner());
-    if let Some(mut child) = s.child.take() {
-        let _ = child.kill();
-        let _ = child.wait();
+    for mut child in s.children.drain(..) {
+        let _ = child.child.kill();
+        let _ = child.child.wait();
     }
     s.enabled = false;
-    s.child = None;
 }
 
 #[derive(serde::Serialize)]
@@ -834,7 +1048,7 @@ async fn chat_listener_task(
                             let use_local = { get_bonsai_state().lock().unwrap().enabled };
 
                             let result = if use_local {
-                                bonsai::translate(&text, source_lang).await
+                                bonsai::translate_at(active_bonsai_url(), &text, source_lang).await
                             } else {
                                 let api_key = match get_gemini_api_key() {
                                     Ok(key) => key,
@@ -994,7 +1208,8 @@ async fn chat_listener_task(
                             let use_local = { get_bonsai_state().lock().unwrap().enabled };
 
                             let result = if use_local {
-                                bonsai::lookup_word(&word, source_lang).await
+                                bonsai::lookup_word_at(active_bonsai_url(), &word, source_lang)
+                                    .await
                             } else {
                                 let api_key = match get_gemini_api_key() {
                                     Ok(key) => key,
@@ -1209,8 +1424,9 @@ pub fn run() {
             clear_sound_cmd,
             get_overlay_url_cmd,
             set_local_model_cmd,
+            set_local_model_variant_cmd,
             get_bonsai_status_cmd,
-            test_translation_cmd,
+            test_model_cmd,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

@@ -1,20 +1,31 @@
 #!/usr/bin/env bash
-# Downloads the llama-server binary (Prism ML fork) and the Ternary-Bonsai-8B
-# model into the Streaid app data directory so the app can use the local model.
+# Downloads the llama-server binary (Prism ML fork) and the Bonsai models into
+# the Streaid app data directory so the app can use the local model.
+#
+# Usage:
+#   ./setup-bonsai.sh            # 8B model only (recommended default)
+#   ./setup-bonsai.sh --with-4b  # also download the lighter 4B model
 #
 # App data dir (macOS): ~/Library/Application Support/im.sush.streaid/bonsai/
 #   bin/llama-server
-#   models/Ternary-Bonsai-8B-Q2_0.gguf
+#   models/Ternary-Bonsai-8B-Q2_0.gguf   (8B, ~2.1 GB, port 4243)
+#   models/Ternary-Bonsai-4B-Q2_0.gguf   (4B, ~1.1 GB, port 4244, optional)
 #
 # Re-running the script skips files that are already present.
 set -euo pipefail
+
+INCLUDE_4B=0
+if [ "${1:-}" = "--with-4b" ]; then
+  INCLUDE_4B=1
+elif [ $# -gt 0 ]; then
+  echo "Usage: $0 [--with-4b]" >&2
+  exit 1
+fi
 
 APP_DATA_DIR="$HOME/Library/Application Support/im.sush.streaid"
 BONSAI_DIR="$APP_DATA_DIR/bonsai"
 BIN_DIR="$BONSAI_DIR/bin"
 MODELS_DIR="$BONSAI_DIR/models"
-
-MODEL_FILE="Ternary-Bonsai-8B-Q2_0.gguf"
 
 RELEASE_TAG="prism-b9596-9fcaed7"
 ARCH="$(uname -m)"
@@ -28,7 +39,6 @@ case "$ARCH" in
 esac
 
 BINARY_URL="https://github.com/PrismML-Eng/llama.cpp/releases/download/$RELEASE_TAG/$ASSET"
-MODEL_URL="https://huggingface.co/prism-ml/Ternary-Bonsai-8B-gguf/resolve/main/$MODEL_FILE"
 
 mkdir -p "$BIN_DIR" "$MODELS_DIR"
 
@@ -49,14 +59,26 @@ else
   echo "llama-server installed"
 fi
 
-if [ -f "$MODELS_DIR/$MODEL_FILE" ]; then
-  echo "Model already present"
-else
-  echo "Downloading $MODEL_FILE (~2.1 GB)..."
-  curl -LsSf -o "$MODELS_DIR/$MODEL_FILE" "$MODEL_URL"
-  echo "Model downloaded"
+download_model() {
+  local file="$1"
+  local url="$2"
+  if [ -f "$MODELS_DIR/$file" ]; then
+    echo "Model $file already present"
+  else
+    echo "Downloading $file..."
+    curl -LsSf -o "$MODELS_DIR/$file" "$url"
+    echo "Model $file downloaded"
+  fi
+}
+
+download_model "Ternary-Bonsai-8B-Q2_0.gguf" \
+  "https://huggingface.co/prism-ml/Ternary-Bonsai-8B-gguf/resolve/main/Ternary-Bonsai-8B-Q2_0.gguf"
+
+if [ "$INCLUDE_4B" = "1" ]; then
+  download_model "Ternary-Bonsai-4B-Q2_0.gguf" \
+    "https://huggingface.co/prism-ml/Ternary-Bonsai-4B-gguf/resolve/main/Ternary-Bonsai-4B-Q2_0.gguf"
 fi
 
 echo ""
 echo "Done. Files:"
-ls -lh "$BIN_DIR/llama-server" "$MODELS_DIR/$MODEL_FILE"
+ls -lh "$BIN_DIR/llama-server" "$MODELS_DIR"/*.gguf

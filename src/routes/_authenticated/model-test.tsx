@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import Card from '../../components/Card'
 import ModelTest from '../../components/ModelTest'
 import PageHeader from '../../components/PageHeader'
 
@@ -13,9 +12,7 @@ function ModelTestPage() {
     <div className='p-6 flex justify-center'>
       <div className='w-full max-w-3xl'>
         <PageHeader title='Model Test' />
-        <Card>
-          <ModelTest />
-        </Card>
+        <ModelTest />
       </div>
     </div>
   )

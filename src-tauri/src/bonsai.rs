@@ -13,10 +13,15 @@ use std::time::Duration;
 use crate::dictionary::{build_dictionary_prompt, dictionary_schema, DictionaryResult};
 use crate::translate::{build_translation_prompt, translation_schema, Language, TranslationResult};
 
-/// Base URL of the local llama-server (started as a sidecar by `set_local_model_cmd`).
-/// Port 4243 (adjacent to the overlay's 4242) to avoid conflicts with other
-/// local services that commonly use 8080.
-pub const SERVER_URL: &str = "http://127.0.0.1:4243";
+/// Base URLs of the local llama-server instances (started as sidecars by
+/// `set_local_model_cmd`). Port 4243 (8B) and 4244 (4B), adjacent to the
+/// overlay's 4242, to avoid conflicts with other local services that
+/// commonly use 8080.
+pub const SERVER_URL_8B: &str = "http://127.0.0.1:4243";
+pub const SERVER_URL_4B: &str = "http://127.0.0.1:4244";
+
+/// Base URL used by the chat listener's default local model (8B).
+pub const SERVER_URL: &str = SERVER_URL_8B;
 
 #[derive(Serialize)]
 struct ChatRequest {
@@ -59,11 +64,11 @@ struct ChatResponseMessage {
     content: String,
 }
 
-/// Returns true when the local llama-server is up and accepting requests.
-pub async fn server_ready() -> bool {
+/// Returns true when the local llama-server at `base_url` is up and accepting requests.
+pub async fn server_ready_at(base_url: &str) -> bool {
     let client = Client::new();
     client
-        .get(format!("{}/health", SERVER_URL))
+        .get(format!("{}/health", base_url))
         .timeout(Duration::from_secs(2))
         .send()
         .await
@@ -71,8 +76,27 @@ pub async fn server_ready() -> bool {
         .unwrap_or(false)
 }
 
+/// Returns true when the default (8B) llama-server is up.
+/// Only used by the ignored integration tests; runtime code uses `server_ready_at`.
+#[cfg_attr(not(test), allow(dead_code))]
+pub async fn server_ready() -> bool {
+    server_ready_at(SERVER_URL).await
+}
+
 /// Translate text using the local model. Mirrors `translate::translate_text`'s contract.
+/// Translate text using the default (8B) model. Only used by the ignored
+/// integration tests; runtime code uses `translate_at`.
+#[cfg_attr(not(test), allow(dead_code))]
 pub async fn translate(text: &str, from_lang: Language) -> Result<TranslationResult> {
+    translate_at(SERVER_URL, text, from_lang).await
+}
+
+/// Translate text using the local model at the given base URL (8B or 4B server).
+pub async fn translate_at(
+    base_url: &str,
+    text: &str,
+    from_lang: Language,
+) -> Result<TranslationResult> {
     if from_lang == Language::Unknown {
         anyhow::bail!("Cannot translate unknown language");
     }
@@ -89,7 +113,7 @@ pub async fn translate(text: &str, from_lang: Language) -> Result<TranslationRes
         from_lang, target_lang, text
     );
 
-    let json_text = call_json_chat("translate", &prompt, translation_schema()).await?;
+    let json_text = call_json_chat(base_url, "translate", &prompt, translation_schema()).await?;
 
     let result: TranslationResult = serde_json::from_str(&json_text)
         .context("Failed to parse local translation result JSON")?;
@@ -107,8 +131,19 @@ pub async fn translate(text: &str, from_lang: Language) -> Result<TranslationRes
     Ok(result)
 }
 
-/// Look up a word using the local model. Mirrors `dictionary::lookup_word`'s contract.
+/// Look up a word using the default (8B) model. Only used by the ignored
+/// integration tests; runtime code uses `lookup_word_at`.
+#[cfg_attr(not(test), allow(dead_code))]
 pub async fn lookup_word(word: &str, from_lang: Language) -> Result<DictionaryResult> {
+    lookup_word_at(SERVER_URL, word, from_lang).await
+}
+
+/// Look up a word using the local model at the given base URL (8B or 4B server).
+pub async fn lookup_word_at(
+    base_url: &str,
+    word: &str,
+    from_lang: Language,
+) -> Result<DictionaryResult> {
     if from_lang == Language::Unknown {
         anyhow::bail!("Cannot lookup unknown language");
     }
@@ -122,7 +157,7 @@ pub async fn lookup_word(word: &str, from_lang: Language) -> Result<DictionaryRe
     let prompt = build_dictionary_prompt(word, from_lang, target_lang);
     eprintln!("[bonsai] Looking up {} word: {}", from_lang, word);
 
-    let json_text = call_json_chat("dictionary", &prompt, dictionary_schema()).await?;
+    let json_text = call_json_chat(base_url, "dictionary", &prompt, dictionary_schema()).await?;
 
     let result: DictionaryResult =
         serde_json::from_str(&json_text).context("Failed to parse local dictionary result JSON")?;
@@ -138,6 +173,7 @@ pub async fn lookup_word(word: &str, from_lang: Language) -> Result<DictionaryRe
 /// POST a single-turn chat request with JSON-schema-constrained output and
 /// return the raw JSON text from the response.
 async fn call_json_chat(
+    base_url: &str,
     name: &str,
     system_prompt: &str,
     schema: serde_json::Value,
@@ -167,7 +203,7 @@ async fn call_json_chat(
 
     let client = Client::new();
     let response = client
-        .post(format!("{}/v1/chat/completions", SERVER_URL))
+        .post(format!("{}/v1/chat/completions", base_url))
         .json(&body)
         .send()
         .await
