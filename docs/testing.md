@@ -1,4 +1,6 @@
-# Dictionary Feature Testing Guide
+# Manual Testing Guide
+
+Covers the dictionary feature (`!d`) and general feature verification. Run the app in dev mode with `pnpm tauri dev` and test against a live Twitch channel.
 
 ## Pre-Testing Checklist
 
