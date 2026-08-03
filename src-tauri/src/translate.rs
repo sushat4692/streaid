@@ -106,23 +106,10 @@ pub fn detect_language(text: &str) -> Language {
     }
 }
 
-/// Translate text using Gemini API with multiple suggestions
-pub async fn translate_text(
-    text: &str,
-    api_key: &str,
-    from_lang: Language,
-) -> Result<TranslationResult> {
-    if from_lang == Language::Unknown {
-        anyhow::bail!("Cannot translate unknown language");
-    }
-
-    let target_lang = match from_lang {
-        Language::Japanese => "English",
-        Language::English => "Japanese",
-        Language::Unknown => unreachable!(),
-    };
-
-    let prompt = format!(
+/// Shared prompt builder used by both the cloud Gemini API and the local Bonsai provider.
+/// The returned string is a full system-style instruction ending with a JSON example.
+pub fn build_translation_prompt(text: &str, from_lang: Language, target_lang: &str) -> String {
+    format!(
         r#"Translate the following {} text to {}: "{}"
 
 Provide 3 translation suggestions with different formality levels (casual, neutral, formal).
@@ -171,19 +158,13 @@ Now translate the input text above following this exact format."#,
         text,        // "コレはテストですよ"
         target_lang, // "English" - for points
         target_lang  // "English" - emphasis
-    );
+    )
+}
 
-    eprintln!("Translating {} -> {}: {}", from_lang, target_lang, text);
-
-    let client = Client::new();
-    // Use gemini-2.5-flash-lite which is available on the free tier
-    let url = format!(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={}",
-        api_key
-    );
-
-    // Define JSON schema for structured output
-    let schema = serde_json::json!({
+/// JSON schema for the structured translation output.
+/// Used by both the Gemini REST API (response_schema) and the local Bonsai provider.
+pub fn translation_schema() -> serde_json::Value {
+    serde_json::json!({
         "type": "object",
         "properties": {
             "suggestions": {
@@ -214,7 +195,38 @@ Now translate the input text above following this exact format."#,
             }
         },
         "required": ["suggestions", "points"]
-    });
+    })
+}
+
+/// Translate text using Gemini API with multiple suggestions
+pub async fn translate_text(
+    text: &str,
+    api_key: &str,
+    from_lang: Language,
+) -> Result<TranslationResult> {
+    if from_lang == Language::Unknown {
+        anyhow::bail!("Cannot translate unknown language");
+    }
+
+    let target_lang = match from_lang {
+        Language::Japanese => "English",
+        Language::English => "Japanese",
+        Language::Unknown => unreachable!(),
+    };
+
+    let prompt = build_translation_prompt(text, from_lang, target_lang);
+
+    eprintln!("Translating {} -> {}: {}", from_lang, target_lang, text);
+
+    let client = Client::new();
+    // Use gemini-2.5-flash-lite which is available on the free tier
+    let url = format!(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={}",
+        api_key
+    );
+
+    // Define JSON schema for structured output
+    let schema = translation_schema();
 
     let request_body = GeminiRequest {
         contents: vec![Content {

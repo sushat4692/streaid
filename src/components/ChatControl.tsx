@@ -2,7 +2,7 @@ import { invoke } from '@tauri-apps/api/core'
 import cx from 'classnames'
 import { useState, useEffect } from 'react'
 
-import type { ChatStatus } from '../types/chat'
+import type { BonsaiStatus, ChatStatus } from '../types/chat'
 
 import Button from './Button'
 import Field from './Field'
@@ -14,7 +14,14 @@ export default function ChatControl() {
     is_enabled: true,
     channel: null,
   })
+  const [bonsai, setBonsai] = useState<BonsaiStatus>({
+    enabled: false,
+    server_running: false,
+    binary_found: false,
+    model_found: false,
+  })
   const [isStarting, setIsStarting] = useState(false)
+  const [isBonsaiToggling, setIsBonsaiToggling] = useState(false)
   const [targetChannel, setTargetChannel] = useState('')
 
   // One-time init: fetch status and pre-fill saved channel
@@ -45,6 +52,12 @@ export default function ChatControl() {
       setStatus(chatStatus)
     } catch (e) {
       console.error('Failed to get chat status:', e)
+    }
+    try {
+      const bonsaiStatus = await invoke<BonsaiStatus>('get_bonsai_status_cmd')
+      setBonsai(bonsaiStatus)
+    } catch (e) {
+      console.error('Failed to get bonsai status:', e)
     }
   }
 
@@ -84,6 +97,19 @@ export default function ChatControl() {
       setTimeout(fetchStatus, 200)
     } catch (e) {
       console.error('Failed to toggle translation:', e)
+    }
+  }
+
+  async function handleBonsaiToggle() {
+    setIsBonsaiToggling(true)
+    try {
+      await invoke('set_local_model_cmd', { enabled: !bonsai.enabled })
+      setTimeout(fetchStatus, 300)
+    } catch (e) {
+      console.error('Failed to toggle local model:', e)
+      alert(`Failed to toggle local model: ${e}`)
+    } finally {
+      setIsBonsaiToggling(false)
     }
   }
 
@@ -153,6 +179,61 @@ export default function ChatControl() {
           </p>
         </div>
       )}
+
+      <div className='pt-2 border-t border-white/10'>
+        <div className='flex items-center justify-between'>
+          <h4 className='text-sm font-semibold text-white'>
+            Local Model (Bonsai)
+          </h4>
+
+          <div
+            className={cx(
+              'px-3 py-1 rounded-full text-xs font-medium',
+              bonsai.server_running
+                ? 'bg-green-500/20 text-green-400'
+                : bonsai.enabled
+                  ? 'bg-yellow-500/20 text-yellow-400'
+                  : 'bg-gray-500/20 text-gray-400'
+            )}
+          >
+            {bonsai.server_running
+              ? '● Running'
+              : bonsai.enabled
+                ? '● Starting...'
+                : '○ Off'}
+          </div>
+        </div>
+
+        <p className='text-xs text-gray-400 mt-1'>
+          When enabled, !ts and !d are answered by the local model instead of
+          the Gemini API.
+        </p>
+
+        {!bonsai.binary_found || !bonsai.model_found ? (
+          <div className='mt-2 p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20'>
+            <p className='text-xs text-yellow-400'>
+              ⚠ Not set up — run{' '}
+              <code className='font-mono'>scripts/setup-bonsai.sh</code> to
+              download the model
+            </p>
+          </div>
+        ) : (
+          <div className='mt-3'>
+            <Button
+              variant={bonsai.enabled ? 'destructive' : 'secondary'}
+              onClick={handleBonsaiToggle}
+              disabled={isBonsaiToggling}
+              className='w-full'
+            >
+              {isBonsaiToggling
+                ? 'Switching...'
+                : bonsai.enabled
+                  ? 'Disable Local Model'
+                  : 'Enable Local Model'}
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

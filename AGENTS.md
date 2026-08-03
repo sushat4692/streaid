@@ -36,7 +36,8 @@ After completing a task, run: `pnpm run format && pnpm run lint && pnpm test` an
 
 - `src/` — React frontend (routes, components, contexts, types, utils)
 - `src/routes/` — TanStack Router file-based routes; `src/routeTree.gen.ts` is auto-generated, never edit manually
-- `src-tauri/src/` — Rust backend: `lib.rs` (commands + IRC listener loop), `auth.rs` (Twitch OAuth), `chat.rs` (IRC), `translate.rs` (`!ts`), `dictionary.rs` (`!d`), `sounds.rs`, `overlay.rs` (OBS overlay, port 4242)
+- `src-tauri/src/` — Rust backend: `lib.rs` (commands + IRC listener loop + Bonsai sidecar), `auth.rs` (Twitch OAuth), `chat.rs` (IRC), `translate.rs` (`!ts`), `dictionary.rs` (`!d`), `bonsai.rs` (local model provider), `sounds.rs`, `overlay.rs` (OBS overlay, port 4242)
+- `scripts/setup-bonsai.sh` — one-shot download of the Bonsai binary + model
 - `docs/` — detailed developer documentation (see "External File Loading" below)
 
 ## Architecture & Data Flow
@@ -68,6 +69,7 @@ CRITICAL: When a task touches the areas below, use your Read tool to load the re
 
 - `docs/commands.md` — full Tauri command reference + TS event types (when working on frontend/backend IPC or event payloads)
 - `docs/features.md` — `!ts` / `!d` formats, language detection, toggle, sound notifications, OBS overlay details
+- `docs/bonsai.md` — local model provider (Bonsai/llama-server sidecar) details
 - `docs/conventions.md` — full TS/Rust conventions, credentials, troubleshooting
 - `docs/gemini-api.md` — Gemini request/response details (when editing `translate.rs` / `dictionary.rs`)
 - `docs/architecture.md` — deeper architecture and module details

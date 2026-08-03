@@ -23,6 +23,8 @@ All commands are async and return `Result<T, String>` (Rust side: `anyhow::Resul
 | `get_sound_cmd` | `soundType: string` | `SoundDataResponse \| null` | Retrieve audio as base64 data URL + file name |
 | `clear_sound_cmd` | `soundType: string` | `void` | Delete audio file for a sound slot |
 | `get_overlay_url_cmd` | — | `string` | Returns `"http://localhost:4242"` |
+| `set_local_model_cmd` | `enabled: bool` | `void` | Enable/disable the Bonsai sidecar (spawn/kill llama-server) and switch provider |
+| `get_bonsai_status_cmd` | — | `BonsaiStatus` | Local model status (enabled, server running, binary/model present) |
 
 `targetChannel` is optional; if omitted, monitors the authenticated user's own channel. It is auto-sanitized (lowercased, `#` stripped, max 25 chars, alphanumeric + underscore only).
 
@@ -64,6 +66,13 @@ export type ChatStatus = {
   is_enabled: boolean
   channel: string | null
   last_target_channel?: string | null
+}
+
+export type BonsaiStatus = {
+  enabled: boolean
+  server_running: boolean
+  binary_found: boolean
+  model_found: boolean
 }
 
 export type ChatMessageEvent = {

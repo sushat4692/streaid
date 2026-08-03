@@ -32,11 +32,12 @@ Components live in `src/components/`, contexts in `src/contexts/`, types in `src
 
 | File | Responsibility |
 |------|---------------|
-| `lib.rs` | Tauri command registration, global shared state, IRC chat listener loop |
+| `lib.rs` | Tauri command registration, global shared state, IRC chat listener loop, Bonsai sidecar spawn/kill |
 | `auth.rs` | Twitch OAuth2 device flow, token storage/refresh via OS keyring |
 | `chat.rs` | Twitch IRC WebSocket connection, command parsing helpers |
-| `translate.rs` | `!ts` command: Gemini API call, language detection, `TranslationResult` |
-| `dictionary.rs` | `!d` command: Gemini API call, `DictionaryResult` |
+| `translate.rs` | `!ts` command: Gemini API call, language detection, `TranslationResult`, shared prompt/schema builders |
+| `dictionary.rs` | `!d` command: Gemini API call, `DictionaryResult`, shared prompt/schema builders |
+| `bonsai.rs` | Local model provider: OpenAI-compatible llama-server client, JSON-schema constrained output |
 | `sounds.rs` | Audio file save/retrieve/delete for notification sound slots; stores in app data `sounds/` dir |
 | `overlay.rs` | OBS overlay: axum HTTP server on port 4242, SSE endpoint, static `OVERLAY_TX` broadcast channel |
 | `overlay.html` | Transparent overlay HTML embedded into the binary |

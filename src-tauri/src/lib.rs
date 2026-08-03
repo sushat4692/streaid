@@ -1,5 +1,6 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 mod auth;
+mod bonsai;
 mod chat;
 mod dictionary;
 mod overlay;
@@ -19,7 +20,7 @@ use once_cell::sync::Lazy;
 use std::sync::Arc;
 use std::time::Duration;
 use tauri::async_runtime;
-use tauri::Emitter;
+use tauri::{Emitter, Manager};
 use tokio::time::sleep;
 use tokio_tungstenite::tungstenite::Message;
 use translate::{detect_language, translate_text, Language, TranslationSuggestion};
@@ -47,6 +48,24 @@ impl ChatState {
 
 static CHAT_STATE: Lazy<Arc<std::sync::Mutex<ChatState>>> =
     Lazy::new(|| Arc::new(std::sync::Mutex::new(ChatState::new())));
+
+// Bonsai (local model sidecar) state
+struct BonsaiState {
+    enabled: bool,
+    child: Option<std::process::Child>,
+}
+
+impl BonsaiState {
+    fn new() -> Self {
+        BonsaiState {
+            enabled: false,
+            child: None,
+        }
+    }
+}
+
+static BONSAI_STATE: Lazy<Arc<std::sync::Mutex<BonsaiState>>> =
+    Lazy::new(|| Arc::new(std::sync::Mutex::new(BonsaiState::new())));
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -309,6 +328,140 @@ fn toggle_translation_cmd(enabled: bool) -> Result<(), String> {
     s.is_enabled = enabled;
     eprintln!("Translation toggled: {}", enabled);
     Ok(())
+}
+
+// ── Bonsai (local model sidecar) ─────────────────────────────────────────────
+
+fn get_bonsai_state() -> Arc<std::sync::Mutex<BonsaiState>> {
+    BONSAI_STATE.clone()
+}
+
+fn bonsai_dir(app: &tauri::AppHandle) -> std::path::PathBuf {
+    app.path().app_data_dir().unwrap_or_default().join("bonsai")
+}
+
+const BONSAI_MODEL_FILE: &str = "Ternary-Bonsai-4B-Q2_0.gguf";
+
+#[derive(serde::Serialize)]
+struct BonsaiStatus {
+    enabled: bool,
+    server_running: bool,
+    binary_found: bool,
+    model_found: bool,
+}
+
+/// Spawns (or kills) the local llama-server sidecar and switches the
+/// !ts / !d provider to the local Bonsai model.
+#[tauri::command]
+async fn set_local_model_cmd(app: tauri::AppHandle, enabled: bool) -> Result<(), String> {
+    if enabled {
+        start_bonsai(&app).await
+    } else {
+        stop_bonsai();
+        eprintln!("Local model disabled");
+        Ok(())
+    }
+}
+
+#[tauri::command]
+async fn get_bonsai_status_cmd(app: tauri::AppHandle) -> Result<BonsaiStatus, String> {
+    let dir = bonsai_dir(&app);
+    let (enabled, has_child) = {
+        let state = get_bonsai_state();
+        let s = state.lock().map_err(|e| format!("Lock error: {}", e))?;
+        (s.enabled, s.child.is_some())
+    };
+    Ok(BonsaiStatus {
+        enabled,
+        server_running: has_child && bonsai::server_ready().await,
+        binary_found: dir.join("bin").join("llama-server").exists(),
+        model_found: dir.join("models").join(BONSAI_MODEL_FILE).exists(),
+    })
+}
+
+async fn start_bonsai(app: &tauri::AppHandle) -> Result<(), String> {
+    let dir = bonsai_dir(app);
+    let bin = dir.join("bin").join("llama-server");
+    let model = dir.join("models").join(BONSAI_MODEL_FILE);
+
+    if !bin.exists() {
+        return Err(
+            "llama-server binary not found. Run scripts/setup-bonsai.sh first.".to_string(),
+        );
+    }
+    if !model.exists() {
+        return Err(format!(
+            "Model file {} not found. Run scripts/setup-bonsai.sh first.",
+            BONSAI_MODEL_FILE
+        ));
+    }
+
+    {
+        let state = get_bonsai_state();
+        let mut s = state.lock().map_err(|e| format!("Lock error: {}", e))?;
+        if s.enabled && s.child.is_some() {
+            return Ok(());
+        }
+        if s.child.is_some() {
+            // Clean up a stale handle before re-spawning
+            if let Some(mut old) = s.child.take() {
+                let _ = old.kill();
+                let _ = old.wait();
+            }
+        }
+
+        std::fs::create_dir_all(&dir).map_err(|e| format!("Failed to create bonsai dir: {}", e))?;
+        let log_file = std::fs::File::create(dir.join("llama-server.log"))
+            .map_err(|e| format!("Failed to open llama-server log: {}", e))?;
+
+        let child = std::process::Command::new(&bin)
+            .arg("-m")
+            .arg(&model)
+            .arg("--host")
+            .arg("127.0.0.1")
+            .arg("--port")
+            .arg("4243")
+            .arg("-c")
+            .arg("8192")
+            .arg("--jinja")
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::from(log_file))
+            .spawn()
+            .map_err(|e| format!("Failed to start llama-server: {}", e))?;
+
+        s.child = Some(child);
+        s.enabled = true;
+    };
+
+    eprintln!(
+        "llama-server started (log: {})",
+        dir.join("llama-server.log").display()
+    );
+
+    // Wait for the server to become ready (model load takes a few seconds)
+    let mut attempts = 0;
+    while attempts < 60 {
+        if bonsai::server_ready().await {
+            eprintln!("llama-server is ready");
+            return Ok(());
+        }
+        tokio::time::sleep(Duration::from_secs(1)).await;
+        attempts += 1;
+    }
+
+    stop_bonsai();
+    Err("llama-server did not become ready within 60s (check bonsai/llama-server.log)".to_string())
+}
+
+fn stop_bonsai() {
+    let state = get_bonsai_state();
+    let mut s = state.lock().unwrap_or_else(|e| e.into_inner());
+    if let Some(mut child) = s.child.take() {
+        let _ = child.kill();
+        let _ = child.wait();
+    }
+    s.enabled = false;
+    s.child = None;
 }
 
 #[derive(serde::Serialize)]
@@ -580,17 +733,6 @@ async fn chat_listener_task(
                         if let Some(text) = extract_translate_text(&irc_msg.message) {
                             eprintln!("Translation request: {}", text);
 
-                            // Get Gemini API key
-                            let api_key = match keyring::Entry::new("streaid", "gemini_api_key")
-                                .get_password()
-                            {
-                                Ok(key) => key,
-                                Err(_) => {
-                                    eprintln!("No Gemini API key configured");
-                                    continue;
-                                }
-                            };
-
                             // Detect language
                             let source_lang = detect_language(&text);
                             if source_lang == Language::Unknown {
@@ -598,8 +740,27 @@ async fn chat_listener_task(
                                 continue;
                             }
 
-                            // Translate
-                            match translate_text(&text, &api_key, source_lang).await {
+                            // Provider: local Bonsai model (sidecar) or cloud Gemini API
+                            let use_local = { get_bonsai_state().lock().unwrap().enabled };
+
+                            let result = if use_local {
+                                bonsai::translate(&text, source_lang).await
+                            } else {
+                                // Get Gemini API key
+                                let api_key = match keyring::Entry::new("streaid", "gemini_api_key")
+                                    .get_password()
+                                {
+                                    Ok(key) => key,
+                                    Err(_) => {
+                                        eprintln!("No Gemini API key configured");
+                                        continue;
+                                    }
+                                };
+
+                                translate_text(&text, &api_key, source_lang).await
+                            };
+
+                            match result {
                                 Ok(result) => {
                                     eprintln!("Translation suggestions: {:?}", result.suggestions);
 
@@ -735,17 +896,6 @@ async fn chat_listener_task(
                         if let Some(word) = extract_dictionary_word(&irc_msg.message) {
                             eprintln!("Dictionary request: {}", word);
 
-                            // Get Gemini API key (same as translation)
-                            let api_key = match keyring::Entry::new("streaid", "gemini_api_key")
-                                .get_password()
-                            {
-                                Ok(key) => key,
-                                Err(_) => {
-                                    eprintln!("No Gemini API key configured");
-                                    continue;
-                                }
-                            };
-
                             // Detect language
                             let source_lang = detect_language(&word);
                             if source_lang == Language::Unknown {
@@ -753,8 +903,28 @@ async fn chat_listener_task(
                                 continue;
                             }
 
+                            // Provider: local Bonsai model (sidecar) or cloud Gemini API
+                            let use_local = { get_bonsai_state().lock().unwrap().enabled };
+
+                            let result = if use_local {
+                                bonsai::lookup_word(&word, source_lang).await
+                            } else {
+                                // Get Gemini API key (same as translation)
+                                let api_key = match keyring::Entry::new("streaid", "gemini_api_key")
+                                    .get_password()
+                                {
+                                    Ok(key) => key,
+                                    Err(_) => {
+                                        eprintln!("No Gemini API key configured");
+                                        continue;
+                                    }
+                                };
+
+                                lookup_word(&word, &api_key, source_lang).await
+                            };
+
                             // Lookup word
-                            match lookup_word(&word, &api_key, source_lang).await {
+                            match result {
                                 Ok(result) => {
                                     eprintln!("Dictionary result: {:?}", result);
 
@@ -954,9 +1124,17 @@ pub fn run() {
             get_sound_cmd,
             clear_sound_cmd,
             get_overlay_url_cmd,
+            set_local_model_cmd,
+            get_bonsai_status_cmd,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|_app_handle, event| {
+            // Kill the local model sidecar when the app exits
+            if let tauri::RunEvent::Exit = event {
+                stop_bonsai();
+            }
+        });
 }
 
 #[cfg(test)]

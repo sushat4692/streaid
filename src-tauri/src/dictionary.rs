@@ -63,23 +63,10 @@ struct PartResponse {
     text: String,
 }
 
-/// Lookup word definition using Gemini API
-pub async fn lookup_word(
-    word: &str,
-    api_key: &str,
-    from_lang: Language,
-) -> Result<DictionaryResult> {
-    if from_lang == Language::Unknown {
-        anyhow::bail!("Cannot lookup unknown language");
-    }
-
-    let target_lang = match from_lang {
-        Language::Japanese => "English",
-        Language::English => "Japanese",
-        Language::Unknown => unreachable!(),
-    };
-
-    let prompt = format!(
+/// Shared prompt builder used by both the cloud Gemini API and the local Bonsai provider.
+/// The returned string is a full system-style instruction ending with a JSON example.
+pub fn build_dictionary_prompt(word: &str, from_lang: Language, target_lang: &str) -> String {
+    format!(
         r#"You are a bilingual dictionary. Provide a dictionary definition for the {} word: "{}"
 
 Return the result in {} (TARGET LANGUAGE).
@@ -129,18 +116,13 @@ Now provide the dictionary entry for the word above."#,
         word,        // "りんご" - for examples
         word,        // "りんご" - for examples (repeated)
         from_lang    // "Japanese" - emphasis for similar_words
-    );
+    )
+}
 
-    eprintln!("Looking up {} word: {}", from_lang, word);
-
-    let client = Client::new();
-    let url = format!(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={}",
-        api_key
-    );
-
-    // Define JSON schema for structured output
-    let schema = serde_json::json!({
+/// JSON schema for the structured dictionary output.
+/// Used by both the Gemini REST API (response_schema) and the local Bonsai provider.
+pub fn dictionary_schema() -> serde_json::Value {
+    serde_json::json!({
         "type": "object",
         "properties": {
             "word": {
@@ -169,7 +151,37 @@ Now provide the dictionary entry for the word above."#,
             }
         },
         "required": ["word", "meaning", "examples", "similar_words"]
-    });
+    })
+}
+
+/// Lookup word definition using Gemini API
+pub async fn lookup_word(
+    word: &str,
+    api_key: &str,
+    from_lang: Language,
+) -> Result<DictionaryResult> {
+    if from_lang == Language::Unknown {
+        anyhow::bail!("Cannot lookup unknown language");
+    }
+
+    let target_lang = match from_lang {
+        Language::Japanese => "English",
+        Language::English => "Japanese",
+        Language::Unknown => unreachable!(),
+    };
+
+    let prompt = build_dictionary_prompt(word, from_lang, target_lang);
+
+    eprintln!("Looking up {} word: {}", from_lang, word);
+
+    let client = Client::new();
+    let url = format!(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={}",
+        api_key
+    );
+
+    // Define JSON schema for structured output
+    let schema = dictionary_schema();
 
     let request_body = GeminiRequest {
         contents: vec![Content {

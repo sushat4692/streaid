@@ -6,6 +6,13 @@ export type ChatStatus = {
   last_target_channel?: string | null
 }
 
+export type BonsaiStatus = {
+  enabled: boolean
+  server_running: boolean
+  binary_found: boolean
+  model_found: boolean
+}
+
 export type TranslationSuggestion = {
   text: string
   formality: 'casual' | 'neutral' | 'formal'

@@ -6,6 +6,7 @@ A Tauri desktop app that listens to a Twitch IRC chat channel and provides real-
 
 - **`!ts`** — real-time Japanese ↔ English translation (3 formality levels + linguistic reasoning)
 - **`!d`** — dictionary lookup (meaning, examples, synonyms)
+- **Local model (Bonsai)** — optional on-device LLM provider (Apache 2.0, runs offline, no API key)
 - **OBS overlay** — live translation events on stream via embedded HTTP server (`http://localhost:4242`)
 - **Sound notifications** — configurable slots with volume control
 - OAuth2 device flow for Twitch, Gemini API key stored in the OS keyring
@@ -29,7 +30,16 @@ Open the Config page to authenticate Twitch and set your Gemini API key, then en
 - **Architecture**: `docs/architecture.md`
 - **IPC reference**: `docs/commands.md`
 - **Feature details**: `docs/features.md`
+- **Local model (Bonsai)**: `docs/bonsai.md`
 - **Manual testing**: `docs/testing.md`
+
+## Local Model Setup (optional)
+
+```bash
+scripts/setup-bonsai.sh    # downloads llama-server + Ternary-Bonsai-4B (~1.1 GB)
+```
+
+Then toggle "Enable Local Model" in the dashboard. See `docs/bonsai.md`.
 
 ## Tests & Checks
 
