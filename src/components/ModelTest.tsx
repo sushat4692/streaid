@@ -1,6 +1,6 @@
 import { invoke } from '@tauri-apps/api/core'
 import cx from 'classnames'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import type { ModelTestResult } from '../types/chat'
 
@@ -69,6 +69,7 @@ export default function ModelTest() {
   const [result, setResult] = useState<ModelTestResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const runningRef = useRef(false)
 
   function resetResult() {
     setResult(null)
@@ -77,7 +78,10 @@ export default function ModelTest() {
 
   async function run() {
     const input = text.trim()
-    if (!input || loading) return
+    // Ref guard: React state updates are async, so a rapid double-click could
+    // otherwise fire two API calls for one click.
+    if (!input || runningRef.current) return
+    runningRef.current = true
     setLoading(true)
     setError(null)
     setResult(null)
@@ -91,6 +95,7 @@ export default function ModelTest() {
     } catch (e) {
       setError(String(e))
     } finally {
+      runningRef.current = false
       setLoading(false)
     }
   }

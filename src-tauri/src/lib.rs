@@ -318,6 +318,16 @@ impl TokenBucket {
 /// Max Gemini requests per minute. Set below the free-tier RPM (~10).
 const GEMINI_RPM_LIMIT: f64 = 8.0;
 
+/// Monotonic counter of Gemini API calls (for quota diagnostics).
+static GEMINI_CALL_COUNTER: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
+/// Log every Gemini call with its source so quota usage can be audited
+/// (one command should produce exactly one call).
+fn log_gemini_call(app: &tauri::AppHandle, source: &str) {
+    let n = GEMINI_CALL_COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed) + 1;
+    append_app_log(app, &format!("Gemini API call #{} ({})", n, source));
+}
+
 static GEMINI_RATE_LIMIT: Lazy<std::sync::Mutex<TokenBucket>> = Lazy::new(|| {
     std::sync::Mutex::new(TokenBucket::new(GEMINI_RPM_LIMIT, GEMINI_RPM_LIMIT / 60.0))
 });
@@ -414,6 +424,7 @@ async fn gemini_translate(
         return Err(ProviderError::Skipped);
     }
     let api_key = get_gemini_api_key().map_err(ProviderError::Failed)?;
+    log_gemini_call(app, "chat !ts");
     match translate_text(text, &api_key, source_lang).await {
         Ok(r) => Ok(r),
         Err(e) if e.to_string().contains("429") => {
@@ -449,6 +460,7 @@ async fn gemini_lookup(
         return Err(ProviderError::Skipped);
     }
     let api_key = get_gemini_api_key().map_err(ProviderError::Failed)?;
+    log_gemini_call(app, "chat !d");
     match lookup_word(word, &api_key, source_lang).await {
         Ok(r) => Ok(r),
         Err(e) if e.to_string().contains("429") => {
@@ -706,6 +718,7 @@ enum ModelTestResult {
 /// used by the Model Test page.
 #[tauri::command]
 async fn test_model_cmd(
+    app: tauri::AppHandle,
     text: String,
     provider: String,
     mode: String,
@@ -724,7 +737,7 @@ async fn test_model_cmd(
 
     let result = match mode.as_str() {
         "ts" => {
-            let res = provider_translate(&text, source_lang, &provider).await?;
+            let res = provider_translate(&app, &text, source_lang, &provider).await?;
             ModelTestResult::Ts {
                 source_lang: source_lang.to_string(),
                 target_lang: target_lang.to_string(),
@@ -743,7 +756,7 @@ async fn test_model_cmd(
             if word.is_empty() {
                 return Err("Empty word".to_string());
             }
-            let res = provider_lookup(&word, source_lang, &provider).await?;
+            let res = provider_lookup(&app, &word, source_lang, &provider).await?;
             ModelTestResult::D {
                 source_lang: source_lang.to_string(),
                 target_lang: target_lang.to_string(),
@@ -761,6 +774,7 @@ async fn test_model_cmd(
 }
 
 async fn provider_translate(
+    app: &tauri::AppHandle,
     text: &str,
     source_lang: Language,
     provider: &str,
@@ -774,6 +788,7 @@ async fn provider_translate(
                 ));
             }
             let api_key = get_gemini_api_key()?;
+            log_gemini_call(app, "model test !ts");
             translate_text(text, &api_key, source_lang)
                 .await
                 .map_err(|e| format!("Gemini error: {}", e))
@@ -785,6 +800,7 @@ async fn provider_translate(
 }
 
 async fn provider_lookup(
+    app: &tauri::AppHandle,
     word: &str,
     source_lang: Language,
     provider: &str,
@@ -798,6 +814,7 @@ async fn provider_lookup(
                 ));
             }
             let api_key = get_gemini_api_key()?;
+            log_gemini_call(app, "model test !d");
             lookup_word(word, &api_key, source_lang)
                 .await
                 .map_err(|e| format!("Gemini error: {}", e))
