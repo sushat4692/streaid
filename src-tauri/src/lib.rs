@@ -379,6 +379,63 @@ async fn get_bonsai_status_cmd(app: tauri::AppHandle) -> Result<BonsaiStatus, St
     })
 }
 
+#[derive(serde::Serialize)]
+struct ModelTestResult {
+    source_lang: String,
+    target_lang: String,
+    suggestions: Vec<TranslationSuggestion>,
+    points: Vec<String>,
+    duration_ms: u64,
+}
+
+/// One-shot translation with a chosen provider, used by the dashboard's
+/// Gemini vs local model comparison UI.
+#[tauri::command]
+async fn test_translation_cmd(text: String, provider: String) -> Result<ModelTestResult, String> {
+    let source_lang = detect_language(&text);
+    if source_lang == Language::Unknown {
+        return Err("Unknown language".to_string());
+    }
+    let target_lang = match source_lang {
+        Language::Japanese => "English",
+        Language::English => "Japanese",
+        Language::Unknown => "Unknown",
+    };
+
+    let start = std::time::Instant::now();
+    let result = match provider.as_str() {
+        "gemini" => {
+            let api_key = keyring::Entry::new("streaid", "gemini_api_key")
+                .get_password()
+                .map_err(|_| "No Gemini API key configured".to_string())?;
+            translate_text(&text, &api_key, source_lang)
+                .await
+                .map_err(|e| format!("Gemini error: {}", e))?
+        }
+        "bonsai" => {
+            if !bonsai::server_ready().await {
+                return Err(
+                    "Local model server is not running. Enable Local Model in Chat Listener first."
+                        .to_string(),
+                );
+            }
+            bonsai::translate(&text, source_lang)
+                .await
+                .map_err(|e| format!("Local model error: {}", e))?
+        }
+        other => return Err(format!("Unknown provider: {}", other)),
+    };
+    let duration_ms = start.elapsed().as_millis() as u64;
+
+    Ok(ModelTestResult {
+        source_lang: source_lang.to_string(),
+        target_lang: target_lang.to_string(),
+        suggestions: result.suggestions,
+        points: result.points,
+        duration_ms,
+    })
+}
+
 async fn start_bonsai(app: &tauri::AppHandle) -> Result<(), String> {
     let dir = bonsai_dir(app);
     let bin = dir.join("bin").join("llama-server");
@@ -1126,6 +1183,7 @@ pub fn run() {
             get_overlay_url_cmd,
             set_local_model_cmd,
             get_bonsai_status_cmd,
+            test_translation_cmd,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

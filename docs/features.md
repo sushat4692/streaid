@@ -102,3 +102,11 @@ The model takes a few seconds to load on enable; until then the status shows "St
 Translation quality is lower than Gemini 2.5-flash-lite — use for cost/privacy testing.
 If the local server errors, the command is skipped and logged (no silent fallback to Gemini).
 
+## Model Comparison (dashboard)
+
+The dashboard's "Model Comparison" card lets anyone test both providers without
+Twitch chat: enter a sentence (JA or EN), click "Compare Both", and the results
+appear side by side (suggestions, linguistic points, duration). Powered by
+`test_translation_cmd`. The Bonsai side must be running (toggle it on in the
+Chat Listener card first).
+

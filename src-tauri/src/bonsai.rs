@@ -191,3 +191,61 @@ async fn call_json_chat(
         .filter(|s| !s.is_empty())
         .ok_or_else(|| anyhow::anyhow!("No response from local model"))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Integration tests against a real llama-server. Ignored by default —
+    // run with `scripts/test-bonsai.sh` (starts the server if needed) or
+    // `cargo test -- --ignored` when the server is already running.
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_server_ready_against_running_server() {
+        assert!(
+            server_ready().await,
+            "llama-server must be running on port 4243 (see scripts/test-bonsai.sh)"
+        );
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_translate_against_running_server() {
+        assert!(server_ready().await, "llama-server not running");
+
+        let result = translate("今日の配信めっちゃ面白かったね", Language::Japanese)
+            .await
+            .expect("translate should succeed");
+
+        assert_eq!(result.suggestions.len(), 3, "expected 3 suggestions");
+        for s in &result.suggestions {
+            assert!(!s.text.is_empty());
+            assert!(
+                matches!(s.formality.as_str(), "casual" | "neutral" | "formal"),
+                "unexpected formality: {}",
+                s.formality
+            );
+        }
+        assert!(!result.points.is_empty(), "expected linguistic points");
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_lookup_against_running_server() {
+        assert!(server_ready().await, "llama-server not running");
+
+        let result = lookup_word("serendipity", Language::English)
+            .await
+            .expect("lookup should succeed");
+
+        assert_eq!(result.word, "serendipity");
+        assert!(!result.meaning.is_empty(), "expected a meaning");
+        assert!(!result.examples.is_empty(), "expected examples");
+        assert!(
+            result.similar_words.len() >= 3,
+            "expected at least 3 similar words, got {}",
+            result.similar_words.len()
+        );
+    }
+}

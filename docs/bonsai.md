@@ -77,6 +77,17 @@ Overall: usable as a free/offline option, quality clearly below Gemini 2.5-flash
 for EN→JA. Prompt engineering (explicit "use natural katakana" guidance) may
 improve the EN→JA case.
 
+## Testing without Twitch
+
+- **Dashboard UI**: the Model Comparison card translates a sentence with both
+  Gemini and Bonsai side by side (needs the Local Model toggle enabled so the
+  server runs)
+- **Integration tests**: `scripts/test-bonsai.sh` — spawns llama-server if
+  needed and runs the Rust integration tests (`bonsai::translate`,
+  `bonsai::lookup_word`) against it
+- **Interactive CLI**: `scripts/test-bonsai.sh --chat` — pipe sentences in,
+  get translations out (uses `scripts/bonsai_chat.py`)
+
 ## Files
 
 - `src-tauri/src/bonsai.rs` — OpenAI-compatible client + health check

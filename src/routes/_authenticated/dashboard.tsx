@@ -1,20 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import ModelTest from '../../components/ModelTest'
+
 export const Route = createFileRoute('/_authenticated/dashboard')({
   component: DashboardPage,
 })
 
 function DashboardPage() {
   return (
-    <div className='min-h-full flex items-center justify-center p-6'>
-      <div className='glass-card p-12 text-center relative z-10'>
-        <h1 className='text-4xl font-bold gradient-text mb-4'>
-          Welcome to Streaid
-        </h1>
-        <p className='text-gray-400'>
-          This app is aiding your streaming. (Strea(m) + aid)
+    <div className='min-h-full p-6 space-y-6'>
+      <div>
+        <h1 className='text-2xl font-bold gradient-text'>Dashboard</h1>
+        <p className='text-gray-400 mt-1'>
+          Compare translation quality between the cloud Gemini API and the local
+          model — no Twitch chat needed.
         </p>
       </div>
+      <ModelTest />
     </div>
   )
 }

@@ -25,6 +25,7 @@ All commands are async and return `Result<T, String>` (Rust side: `anyhow::Resul
 | `get_overlay_url_cmd` | — | `string` | Returns `"http://localhost:4242"` |
 | `set_local_model_cmd` | `enabled: bool` | `void` | Enable/disable the Bonsai sidecar (spawn/kill llama-server) and switch provider |
 | `get_bonsai_status_cmd` | — | `BonsaiStatus` | Local model status (enabled, server running, binary/model present) |
+| `test_translation_cmd` | `text: string, provider: "gemini" \| "bonsai"` | `ModelTestResult` | One-shot translation with a chosen provider (dashboard comparison UI) |
 
 `targetChannel` is optional; if omitted, monitors the authenticated user's own channel. It is auto-sanitized (lowercased, `#` stripped, max 25 chars, alphanumeric + underscore only).
 
@@ -73,6 +74,14 @@ export type BonsaiStatus = {
   server_running: boolean
   binary_found: boolean
   model_found: boolean
+}
+
+export type ModelTestResult = {
+  source_lang: string
+  target_lang: string
+  suggestions: TranslationSuggestion[]
+  points: string[]
+  duration_ms: number
 }
 
 export type ChatMessageEvent = {

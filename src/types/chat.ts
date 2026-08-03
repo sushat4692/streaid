@@ -13,6 +13,14 @@ export type BonsaiStatus = {
   model_found: boolean
 }
 
+export type ModelTestResult = {
+  source_lang: string
+  target_lang: string
+  suggestions: TranslationSuggestion[]
+  points: string[]
+  duration_ms: number
+}
+
 export type TranslationSuggestion = {
   text: string
   formality: 'casual' | 'neutral' | 'formal'
