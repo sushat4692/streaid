@@ -234,6 +234,9 @@ function AuthenticatedLayout() {
           <Link to='/dashboard' className={navLinkClass}>
             Dashboard
           </Link>
+          <Link to='/model-test' className={navLinkClass}>
+            Model Test
+          </Link>
           <Link to='/config' className={navLinkClass}>
             Config
           </Link>

@@ -79,9 +79,9 @@ improve the EN→JA case.
 
 ## Testing without Twitch
 
-- **Dashboard UI**: the Model Comparison card translates a sentence with both
-  Gemini and Bonsai side by side (needs the Local Model toggle enabled so the
-  server runs)
+- **App UI**: the Model Test page (sidebar) translates a sentence with either
+  Gemini or Bonsai via a provider switch (needs the Local Model toggle enabled
+  so the server runs)
 - **Integration tests**: `scripts/test-bonsai.sh` — spawns llama-server if
   needed and runs the Rust integration tests (`bonsai::translate`,
   `bonsai::lookup_word`) against it
