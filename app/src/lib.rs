@@ -1737,6 +1737,14 @@ pub fn run() {
 
         cx.activate(true);
 
+        // Quit the app when the last window is closed
+        cx.on_window_closed(|cx| {
+            if cx.windows().is_empty() {
+                cx.quit();
+            }
+        })
+        .detach();
+
         cx.on_app_quit(|_cx| async move {
             stop_bonsai();
         })
