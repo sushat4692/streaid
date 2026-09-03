@@ -30,7 +30,7 @@ cargo clippy                   # Rust linter
 cargo fmt                      # Format Rust code
 ```
 
-After completing a task, run: `pnpm run format && pnpm run lint && pnpm test` and `cd src-tauri && cargo test`. This also runs automatically via the `session.idle` plugin hook (`.opencode/plugins/auto-verify.ts`).
+After completing a task, run: `pnpm run format && pnpm run lint && pnpm test` and `cd src-tauri && cargo test`.
 
 ## Project Structure
 
