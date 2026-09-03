@@ -1,6 +1,6 @@
 # Streaid
 
-A Tauri desktop app that listens to a Twitch IRC chat channel and provides real-time Japanese ↔ English translation and dictionary lookup via the Gemini AI API, with a React frontend.
+A native macOS desktop app (Zed's **gpui** + **gpui-component**) that listens to a Twitch IRC chat channel and provides real-time Japanese ↔ English translation and dictionary lookup via the Gemini AI API. No WebView, no Node.js — a single lightweight Rust binary.
 
 ## Features
 
@@ -10,19 +10,21 @@ A Tauri desktop app that listens to a Twitch IRC chat channel and provides real-
 - **OBS overlay** — live translation events on stream via embedded HTTP server (`http://localhost:4242`)
 - **Sound notifications** — configurable slots with volume control
 - OAuth2 device flow for Twitch, Gemini API key stored in the OS keyring
+- Auto-reconnecting Twitch IRC connection (keepalive heartbeat, backoff, `RECONNECT` handling)
 
 ## Stack
 
-React 19 + TypeScript + Vite + TanStack Router + Tailwind CSS v4 · Tauri 2 + Rust (tokio-tungstenite, axum, reqwest)
+Rust (gpui 0.2 / gpui-component / tokio-tungstenite / axum / reqwest / rodio)
 
 ## Getting Started
 
 ```bash
-pnpm install
-pnpm tauri dev        # requires Tauri 2 CLI
+cargo run --manifest-path app/Cargo.toml
 ```
 
-Open the Config page to authenticate Twitch and set your Gemini API key, then enable the translation toggle.
+> First build requires Xcode + Metal Toolchain (`xcodebuild -downloadComponent MetalToolchain`).
+
+Log in with your Twitch account (device flow), then open the Config page to set your Gemini API key and start the chat listener.
 
 ## Development
 
@@ -44,6 +46,5 @@ Then toggle "Enable Local Model" in the dashboard. See `docs/bonsai.md`.
 ## Tests & Checks
 
 ```bash
-pnpm run format && pnpm run lint && pnpm test    # frontend
-cd src-tauri && cargo test                        # backend
+cd app && cargo test && cargo clippy && cargo fmt --check
 ```

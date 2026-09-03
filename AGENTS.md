@@ -1,73 +1,63 @@
 # AGENTS.md
 
-Streaid is a Tauri desktop app that listens to a Twitch IRC chat channel and provides real-time Japanese ↔ English translation (`!ts`) and dictionary lookup (`!d`) via the Gemini AI API, displaying results in a React frontend.
+Streaid is a native macOS desktop app (Zed's **gpui** + **gpui-component**) that listens to a Twitch IRC chat channel and provides real-time Japanese ↔ English translation (`!ts`) and dictionary lookup (`!d`) via the Gemini AI API, with an optional on-device local model (Bonsai).
 
-Stack: React 19 + TypeScript + Vite + TanStack Router + Tailwind CSS v4 + Tauri 2 + Rust
+Stack: Rust (gpui 0.2.2, gpui-component 0.5.1, tokio-tungstenite, axum, reqwest, rodio)
 
 ## Commands
 
-### Frontend
 ```bash
-pnpm dev                  # Start Vite dev server (port 1420, used standalone)
-pnpm tauri dev            # Launch full Tauri app with hot reload (preferred)
-pnpm build                # tsc + vite build
-pnpm tauri build          # Build production Tauri app
-pnpm lint                 # oxlint on src/
-pnpm format               # oxfmt on src/
-pnpm format:check         # Check formatting without writing
-pnpm exec tsc --noEmit    # TypeScript type check only
-pnpm test                 # Vitest (frontend unit tests)
-```
-
-### Backend (Rust)
-```bash
-cd src-tauri
+cd app
 cargo test                     # Run all tests
 cargo test test_name           # Run specific test
 cargo test -- --nocapture      # Show println! output
 cargo check                    # Fast compilation check
 cargo clippy                   # Rust linter
 cargo fmt                      # Format Rust code
+cargo run                      # Run the app (first build needs Metal toolchain)
 ```
 
-After completing a task, run: `pnpm run format && pnpm run lint && pnpm test` and `cd src-tauri && cargo test`.
+After completing a task, run: `cd app && cargo test && cargo clippy && cargo fmt --check`.
 
 ## Project Structure
 
-- `src/` — React frontend (routes, components, contexts, types, utils)
-- `src/routes/` — TanStack Router file-based routes; `src/routeTree.gen.ts` is auto-generated, never edit manually
-- `src-tauri/src/` — Rust backend: `lib.rs` (commands + IRC listener loop + Bonsai sidecar), `auth.rs` (Twitch OAuth), `chat.rs` (IRC), `translate.rs` (`!ts`), `dictionary.rs` (`!d`), `bonsai.rs` (local model provider), `sounds.rs`, `overlay.rs` (OBS overlay, port 4242)
+- `app/src/lib.rs` — app core: tokio runtime, chat listener supervision (auto-reconnect), Gemini rate limiting + Bonsai fallback, events channel
+- `app/src/ui/` — gpui views: `mod.rs` (AppModel + AppView + theme), `login.rs`, `pages/` (shell, dashboard, config, log, model_test, credits)
+- `app/src/auth.rs` — Twitch OAuth device flow (OS keyring)
+- `app/src/chat.rs` — IRC WebSocket connect/parse
+- `app/src/translate.rs` (`!ts`), `dictionary.rs` (`!d`) — Gemini API calls
+- `app/src/bonsai.rs` — local model provider (MLX sidecar, ports 4243/4244)
+- `app/src/sounds.rs` — sound file storage; playback via `rodio` (play_sound_file)
+- `app/src/overlay.rs` — OBS overlay HTTP server (port 4242)
 - `scripts/setup-bonsai.sh` — one-shot download of the Bonsai binary + model
 - `docs/` — detailed developer documentation (see "External File Loading" below)
 
 ## Architecture & Data Flow
 
 ```
-Twitch IRC → tokio-tungstenite WebSocket → lib.rs listener loop
+Twitch IRC → tokio-tungstenite WebSocket → lib.rs run_irc_session (read loop)
   → chat.rs: is_translation_command() / is_dictionary_command()
-  → translate.rs / dictionary.rs: Gemini API call
+  → worker task → translate.rs / dictionary.rs: Gemini API call
   → Send messages back to Twitch chat (500ms delay between each)
-  → app.emit("translation" | "dictionary", event)  →  React UI
-  → app.emit("chat_message", ChatMessageEvent)      →  React UI (every message)
-  → OVERLAY_TX.send(OverlayMessage)                 →  OBS overlay SSE clients
+  → EVENT_TX.send(AppEvent::Translation|Dictionary|ChatMessage) → UI polls event_receiver() every 100ms
+  → OVERLAY_TX.send(OverlayMessage) → OBS overlay SSE clients
 ```
 
-Frontend ↔ backend communication: `invoke()` for commands, `listen()` for events (both from `@tauri-apps/api`).
+UI ↔ backend: the UI calls `crate::` functions directly (no IPC layer). Events flow through the `AppEvent` channel (`lib.rs`), drained by `AppView`'s polling loop into the shared `AppModel` entity. Status/bonsai state is polled every 2s via `get_chat_status()` / `get_bonsai_status()`.
 
 ## Critical Conventions
 
 - **UTF-8 safety (Japanese text)**: always use `floor_char_boundary()` when truncating strings in Rust; byte-index slicing panics on multibyte chars
 - **Toggle**: a single dashboard toggle controls both `!ts` and `!d`; when off, both are silently ignored
-- **`src/routeTree.gen.ts` is auto-generated** — never edit it directly
-- Tauri commands are snake_case with `_cmd` suffix, return `Result<T, String>`
+- **gpui async**: tokio futures must be spawned via `spawn_task()` (uses the app's tokio runtime); the runtime is entered on the main thread so reqwest works from gpui's executor. UI async uses `cx.spawn(async move |_, cx| ...)` (async-closure syntax; `&mut *cx` to reborrow)
+- **Events**: never emit from the read loop directly — send `AppEvent` via `emit_event()`
 - Secrets (Twitch token, Gemini API key) live in the OS keyring (service `streaid`); never log or commit them
-- `src/routes/` files prefixed with `-` are ignored by the router plugin
+- App data lives in `~/Library/Application Support/streaid` (`app_data_dir()`): bonsai sidecar, sounds, logs, volumes
 
 ## External File Loading
 
 CRITICAL: When a task touches the areas below, use your Read tool to load the relevant doc on a need-to-know basis. Do NOT preemptively load all of them. When loaded, treat their content as mandatory instructions.
 
-- `docs/commands.md` — full Tauri command reference + TS event types (when working on frontend/backend IPC or event payloads)
 - `docs/features.md` — `!ts` / `!d` formats, language detection, toggle, sound notifications, OBS overlay details
 - `docs/bonsai.md` — local model provider (Bonsai/llama-server sidecar) details
 - `docs/conventions.md` — full TS/Rust conventions, credentials, troubleshooting
