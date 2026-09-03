@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
 
 use crate::translate::Language;
 
@@ -154,7 +155,10 @@ pub async fn lookup_word(
 
     eprintln!("Looking up {} word: {}", from_lang, word);
 
-    let client = Client::new();
+    let client = Client::builder()
+        .timeout(Duration::from_secs(45))
+        .build()
+        .context("Failed to build HTTP client")?;
     let url = format!(
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key={}",
         api_key

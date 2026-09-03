@@ -276,31 +276,6 @@ pub fn extract_dictionary_word(msg: &str) -> Option<String> {
     }
 }
 
-/// Send a message to chat
-pub async fn send_chat_message(
-    ws_stream: &mut WsStream,
-    channel: &str,
-    message: &str,
-) -> Result<()> {
-    let msg = format!("PRIVMSG #{} :{}", channel, message);
-    eprintln!("IRC >> {}", msg);
-    ws_stream
-        .send(Message::Text(msg))
-        .await
-        .context("Failed to send chat message")?;
-    Ok(())
-}
-
-/// Send PONG in response to PING
-pub async fn send_pong(ws_stream: &mut WsStream, server: &str) -> Result<()> {
-    let pong = format!("PONG :{}", server);
-    ws_stream
-        .send(Message::Text(pong))
-        .await
-        .context("Failed to send PONG")?;
-    Ok(())
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

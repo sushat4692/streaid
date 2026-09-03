@@ -43,6 +43,7 @@ function AuthenticatedLayout() {
     connected: false,
     is_running: false,
     is_enabled: true,
+    reconnecting: false,
     channel: null,
   })
   const [translations, setTranslations] = useState<TranslationEvent[]>([])
@@ -267,12 +268,22 @@ function AuthenticatedLayout() {
           )}
 
           <Button
-            variant={status.is_running ? 'destructive' : 'primary'}
+            variant={
+              status.is_running
+                ? status.reconnecting
+                  ? 'secondary'
+                  : 'destructive'
+                : 'primary'
+            }
             size='sm'
             onClick={handleStartStop}
             className='w-full'
           >
-            {status.is_running ? '● Stop' : 'Start Listening'}
+            {status.reconnecting
+              ? '● Reconnecting…'
+              : status.is_running
+                ? '● Stop'
+                : 'Start Listening'}
           </Button>
 
           <Button

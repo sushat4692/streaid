@@ -199,7 +199,10 @@ async fn call_json_chat(
         },
     };
 
-    let client = Client::new();
+    let client = Client::builder()
+        .timeout(Duration::from_secs(45))
+        .build()
+        .context("Failed to build HTTP client")?;
     let response = client
         .post(format!("{}/v1/chat/completions", base_url))
         .json(&body)

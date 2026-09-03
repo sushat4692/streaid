@@ -12,6 +12,7 @@ export default function ChatControl() {
     connected: false,
     is_running: false,
     is_enabled: true,
+    reconnecting: false,
     channel: null,
   })
   const [bonsai, setBonsai] = useState<BonsaiStatus>({
@@ -130,12 +131,18 @@ export default function ChatControl() {
         <div
           className={cx(
             'px-3 py-1 rounded-full text-xs font-medium',
-            status.is_running
-              ? 'bg-green-500/20 text-green-400'
-              : 'bg-gray-500/20 text-gray-400'
+            status.reconnecting
+              ? 'bg-yellow-500/20 text-yellow-400'
+              : status.is_running
+                ? 'bg-green-500/20 text-green-400'
+                : 'bg-gray-500/20 text-gray-400'
           )}
         >
-          {status.is_running ? '● Running' : '○ Stopped'}
+          {status.reconnecting
+            ? '● Reconnecting…'
+            : status.is_running
+              ? '● Running'
+              : '○ Stopped'}
         </div>
       </div>
 

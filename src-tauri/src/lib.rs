@@ -12,15 +12,16 @@ use auth::{
 };
 use chat::{
     connect_to_irc, extract_dictionary_word, extract_translate_text, is_dictionary_command,
-    is_translate_command, parse_irc_privmsg, send_chat_message, send_pong, WsStream,
+    is_translate_command, parse_irc_privmsg, WsStream,
 };
 use dictionary::lookup_word;
-use futures_util::StreamExt;
+use futures_util::{SinkExt, StreamExt};
 use once_cell::sync::Lazy;
 use std::sync::Arc;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use tauri::async_runtime;
 use tauri::{Emitter, Manager};
+use tokio::sync::{mpsc, Notify};
 use tokio::time::sleep;
 use tokio_tungstenite::tungstenite::Message;
 use translate::{detect_language, translate_text, Language, TranslationSuggestion};
@@ -33,6 +34,8 @@ struct ChatState {
     is_enabled: bool,
     channel_name: Option<String>,
     bot_username: Option<String>,
+    /// True between a dropped IRC connection and a successful reconnect.
+    reconnecting: bool,
 }
 
 impl ChatState {
@@ -42,12 +45,17 @@ impl ChatState {
             is_enabled: true,
             channel_name: None,
             bot_username: None,
+            reconnecting: false,
         }
     }
 }
 
 static CHAT_STATE: Lazy<Arc<std::sync::Mutex<ChatState>>> =
     Lazy::new(|| Arc::new(std::sync::Mutex::new(ChatState::new())));
+
+/// Wakes the IRC read loop so stop takes effect immediately, even when the
+/// socket is idle or dead (no inbound messages to trip the loop's stop check).
+static CHAT_STOP_NOTIFY: Lazy<Notify> = Lazy::new(Notify::new);
 
 // Bonsai (local model sidecar) state
 /// One MLX model server instance managed as a sidecar.
@@ -215,6 +223,7 @@ struct ChatStatus {
     connected: bool,
     is_running: bool,
     is_enabled: bool,
+    reconnecting: bool,
     channel: Option<String>,
     last_target_channel: Option<String>,
 }
@@ -583,6 +592,7 @@ fn get_chat_status_cmd() -> Result<ChatStatus, String> {
         connected: s.is_running,
         is_running: s.is_running,
         is_enabled: s.is_enabled,
+        reconnecting: s.reconnecting,
         channel: s.channel_name.clone(),
         last_target_channel: load_last_channel().ok().flatten(),
     })
@@ -1086,7 +1096,10 @@ async fn start_chat_listener_cmd(
 
     // Validate token before attempting IRC connection
     eprintln!("Validating token with Twitch API...");
-    let client = reqwest::Client::new();
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(15))
+        .build()
+        .map_err(|e| format!("Failed to build HTTP client: {}", e))?;
     let validation_response = client
         .get("https://id.twitch.tv/oauth2/validate")
         .header("Authorization", format!("Bearer {}", access_token))
@@ -1132,6 +1145,7 @@ async fn start_chat_listener_cmd(
             return Err("Chat listener already running".to_string());
         }
         s.is_running = true;
+        s.reconnecting = false;
         s.channel_name = Some(channel_to_join.clone());
         s.bot_username = Some(username.clone());
     }
@@ -1150,19 +1164,11 @@ async fn start_chat_listener_cmd(
 
     eprintln!("IRC connected, starting listener task...");
 
-    // Spawn background task
+    // Spawn background task (owns the connection and reconnects on drop)
     async_runtime::spawn(async move {
         if let Err(e) = chat_listener_task(ws_stream, channel_to_join, app).await {
             eprintln!("Chat listener error: {}", e);
         }
-
-        // Cleanup on exit
-        let state = get_chat_state();
-        if let Ok(mut s) = state.lock() {
-            s.is_running = false;
-            s.channel_name = None;
-        }
-        eprintln!("Chat listener stopped");
     });
 
     Ok(())
@@ -1178,410 +1184,630 @@ fn stop_chat_listener_cmd() -> Result<(), String> {
     let state = get_chat_state();
     let mut s = state.lock().map_err(|e| format!("Lock error: {}", e))?;
     s.is_running = false;
+    s.reconnecting = false;
+    // Wake the IRC read loop immediately (it may be blocked on a dead socket)
+    CHAT_STOP_NOTIFY.notify_waiters();
     eprintln!("Stopping chat listener...");
     Ok(())
 }
 
-// Chat listener background task
+// ── Chat listener: connection supervision ───────────────────────────────────
+
+/// Interval between client-initiated keepalive PINGs. Twitch only sends its
+/// own PINGs sparingly (and quiet chats may be silent for minutes), so we
+/// probe the server ourselves to detect half-open connections.
+const IRC_PING_INTERVAL: Duration = Duration::from_secs(90);
+/// If the server does not answer our PING within this window, the connection
+/// is considered dead and a reconnect is triggered.
+const IRC_PONG_TIMEOUT: Duration = Duration::from_secs(30);
+/// How often the liveness check runs.
+const IRC_HEARTBEAT_TICK: Duration = Duration::from_secs(10);
+/// Reconnect backoff cap: 1s -> 2s -> 5s -> 10s -> 20s -> 30s (capped).
+const RECONNECT_BACKOFF_MAX: Duration = Duration::from_secs(30);
+
+fn chat_is_running() -> bool {
+    get_chat_state()
+        .lock()
+        .map(|s| s.is_running)
+        .unwrap_or(false)
+}
+
+fn chat_is_enabled() -> bool {
+    get_chat_state()
+        .lock()
+        .map(|s| s.is_enabled)
+        .unwrap_or(false)
+}
+
+fn chat_bot_username() -> Option<String> {
+    get_chat_state()
+        .lock()
+        .ok()
+        .and_then(|s| s.bot_username.clone())
+}
+
+fn set_reconnecting(reconnecting: bool) {
+    let _ = get_chat_state()
+        .lock()
+        .map(|mut s| s.reconnecting = reconnecting);
+}
+
+/// Sleep for `duration`, but wake up early (returning false) when the
+/// listener has been stopped in the meantime.
+async fn wait_or_stop(duration: Duration) -> bool {
+    tokio::select! {
+        _ = sleep(duration) => true,
+        _ = CHAT_STOP_NOTIFY.notified() => chat_is_running(),
+    }
+}
+
+/// Latest IRC credentials: refresh the token if it is near expiry, then read
+/// the stored token. Used for every (re)connect so a dropped session always
+/// re-authenticates with a fresh access token.
+async fn fresh_irc_credentials() -> Result<(String, String), String> {
+    let auth_state = get_auth_state();
+    match auth::refresh_token_if_needed(auth_state.clone(), 300).await {
+        Ok(Some(_)) => eprintln!("Refreshed token before reconnect"),
+        Ok(None) => {}
+        Err(e) => eprintln!("Token refresh before reconnect failed: {}", e),
+    }
+    let token = auth::get_stored_token(&auth_state)
+        .map_err(|e| format!("Failed to get token: {}", e))?
+        .ok_or_else(|| "No token found. Please authenticate first.".to_string())?;
+    let username = token
+        .login
+        .ok_or_else(|| "No username found in token".to_string())?;
+    Ok((username, token.access_token))
+}
+
+// Chat listener background task: runs the IRC session and reconnects
+// automatically whenever the connection is dropped.
 async fn chat_listener_task(
-    mut ws_stream: WsStream,
+    ws_stream: WsStream,
     channel: String,
     app: tauri::AppHandle,
 ) -> Result<(), anyhow::Error> {
     eprintln!("Chat listener task started for #{}", channel);
 
-    loop {
-        // Check if should continue
-        let (should_continue, is_enabled, bot_username) = {
-            let state = get_chat_state();
-            let s = state.lock().unwrap();
-            (s.is_running, s.is_enabled, s.bot_username.clone())
-        };
+    let mut ws_stream = Some(ws_stream);
+    let mut backoff = Duration::from_secs(1);
 
-        if !should_continue {
-            eprintln!("Stopping chat listener (is_running = false)");
+    loop {
+        let stream = ws_stream.take().expect("ws_stream must be present");
+        if let Err(e) = run_irc_session(stream, channel.clone(), app.clone()).await {
+            eprintln!("IRC session ended with error: {}", e);
+        } else {
+            eprintln!("IRC session ended");
+        }
+
+        if !chat_is_running() {
             break;
         }
 
-        // Read message from WebSocket
-        match ws_stream.next().await {
-            Some(Ok(Message::Text(line))) => {
-                // eprintln!("IRC << {}", line);
-
-                // Handle PING
-                if line.starts_with("PING") {
-                    let server = line.trim_start_matches("PING ").trim_start_matches(':');
-                    if let Err(e) = send_pong(&mut ws_stream, server).await {
-                        eprintln!("Failed to send PONG: {}", e);
+        // Reconnect with backoff until the channel is joined again
+        let mut reconnected = false;
+        while !reconnected && chat_is_running() {
+            set_reconnecting(true);
+            eprintln!("Reconnecting to #{} in {:?}...", channel, backoff);
+            if !wait_or_stop(backoff).await {
+                break;
+            }
+            if !chat_is_running() {
+                break;
+            }
+            match fresh_irc_credentials().await {
+                Ok((username, access_token)) => {
+                    match connect_to_irc(&username, &access_token, &channel).await {
+                        Ok(stream) => {
+                            ws_stream = Some(stream);
+                            backoff = Duration::from_secs(1);
+                            reconnected = true;
+                        }
+                        Err(e) => eprintln!("Reconnect attempt failed: {}", e),
                     }
-                    continue;
                 }
+                Err(e) => eprintln!("Failed to fetch IRC credentials: {}", e),
+            }
+            if !reconnected {
+                backoff = (backoff * 2).min(RECONNECT_BACKOFF_MAX);
+            }
+        }
+        set_reconnecting(false);
 
-                // Parse PRIVMSG
-                if let Some(irc_msg) = parse_irc_privmsg(&line) {
-                    eprintln!("Message from {}: {}", irc_msg.username, irc_msg.message);
+        if !reconnected {
+            break;
+        }
+    }
 
-                    // Ignore own messages (prevent loops)
-                    if let Some(ref bot) = bot_username {
-                        if irc_msg.username.eq_ignore_ascii_case(bot) {
-                            eprintln!("Ignoring own message");
+    // Cleanup on exit
+    let state = get_chat_state();
+    if let Ok(mut s) = state.lock() {
+        s.is_running = false;
+        s.channel_name = None;
+        s.reconnecting = false;
+    }
+    eprintln!("Chat listener stopped");
+    Ok(())
+}
+
+/// One IRC session: reads messages, answers PINGs immediately, feeds !ts / !d
+/// commands to a dedicated worker, and monitors the connection with a
+/// client-initiated heartbeat. Returns when the connection dies or the
+/// listener is stopped.
+async fn run_irc_session(
+    ws_stream: WsStream,
+    channel: String,
+    app: tauri::AppHandle,
+) -> Result<(), anyhow::Error> {
+    let (mut write, mut read) = ws_stream.split();
+
+    // Outbound messages are serialized through one writer task so the read
+    // loop never blocks on slow network writes.
+    let (out_tx, mut out_rx) = mpsc::channel::<String>(64);
+    let writer = async_runtime::spawn(async move {
+        while let Some(msg) = out_rx.recv().await {
+            if let Err(e) = write.send(Message::Text(msg)).await {
+                eprintln!("Failed to send to IRC: {}", e);
+                break;
+            }
+        }
+    });
+    // The writer finishes on its own once every sender is dropped.
+    let _writer = writer;
+
+    // !ts / !d commands are handled serially by a dedicated worker so the
+    // read loop stays responsive (PING/PONG, chat_message events) while
+    // Gemini is busy.
+    let (cmd_tx, cmd_rx) = mpsc::channel::<(String, String)>(32);
+    let worker = async_runtime::spawn(handle_commands(
+        cmd_rx,
+        out_tx.clone(),
+        channel.clone(),
+        app.clone(),
+    ));
+    let _worker = worker;
+
+    let mut last_ping_sent = Instant::now();
+    let mut ping_sent_at: Option<Instant> = None;
+
+    loop {
+        if !chat_is_running() {
+            break;
+        }
+
+        tokio::select! {
+            _ = CHAT_STOP_NOTIFY.notified() => {
+                if !chat_is_running() {
+                    break;
+                }
+            }
+            _ = sleep(IRC_HEARTBEAT_TICK) => {
+                // No answer to our keepalive PING means the socket is dead
+                // (half-open TCP); force a reconnect.
+                if let Some(sent_at) = ping_sent_at {
+                    if sent_at.elapsed() > IRC_PONG_TIMEOUT {
+                        eprintln!(
+                            "IRC PONG timeout (no response in {:?}), reconnecting",
+                            IRC_PONG_TIMEOUT
+                        );
+                        break;
+                    }
+                }
+                // Client-initiated keepalive: quiet chats may be silent for
+                // minutes, so probe the server ourselves.
+                if last_ping_sent.elapsed() >= IRC_PING_INTERVAL
+                    && out_tx
+                        .send("PING :tmi.twitch.tv".to_string())
+                        .await
+                        .is_ok()
+                {
+                    last_ping_sent = Instant::now();
+                    ping_sent_at = Some(last_ping_sent);
+                }
+            }
+            msg = read.next() => {
+                match msg {
+                    Some(Ok(Message::Text(line))) => {
+                        // Any inbound message proves the connection is alive
+                        ping_sent_at = None;
+
+                        // Server keepalive: answer immediately or Twitch drops us
+                        if line.starts_with("PING") {
+                            let server = line.trim_start_matches("PING ").trim_start_matches(':');
+                            if let Err(e) = out_tx.send(format!("PONG :{}", server)).await {
+                                eprintln!("Failed to send PONG: {}", e);
+                            }
                             continue;
                         }
-                    }
 
-                    // Emit chat_message event for all user messages (fires regardless of toggle)
-                    let chat_event = ChatMessageEvent {
-                        username: irc_msg.username.clone(),
-                        message: irc_msg.message.clone(),
-                        channel: channel.clone(),
-                        timestamp: chrono::Utc::now().to_rfc3339(),
-                    };
-                    if let Err(e) = app.emit("chat_message", chat_event) {
-                        eprintln!("Failed to emit chat_message event: {}", e);
-                    }
+                        // Twitch is going down for maintenance; reconnect promptly
+                        if line.contains("RECONNECT") {
+                            eprintln!("IRC RECONNECT received, reconnecting");
+                            break;
+                        }
 
-                    // Check if translation is enabled
-                    if !is_enabled {
+                        if let Some(irc_msg) = parse_irc_privmsg(&line) {
+                            eprintln!("Message from {}: {}", irc_msg.username, irc_msg.message);
+
+                            // Ignore own messages (prevent loops)
+                            if let Some(ref bot) = chat_bot_username() {
+                                if irc_msg.username.eq_ignore_ascii_case(bot) {
+                                    eprintln!("Ignoring own message");
+                                    continue;
+                                }
+                            }
+
+                            // Emit chat_message event for all user messages
+                            // (fires regardless of toggle)
+                            let chat_event = ChatMessageEvent {
+                                username: irc_msg.username.clone(),
+                                message: irc_msg.message.clone(),
+                                channel: channel.clone(),
+                                timestamp: chrono::Utc::now().to_rfc3339(),
+                            };
+                            if let Err(e) = app.emit("chat_message", chat_event) {
+                                eprintln!("Failed to emit chat_message event: {}", e);
+                            }
+
+                            // Check if translation is enabled
+                            if !chat_is_enabled() {
+                                continue;
+                            }
+
+                            // Hand off commands to the worker (serialized, so
+                            // replies stay in request order)
+                            let is_command = is_translate_command(&irc_msg.message)
+                                || is_dictionary_command(&irc_msg.message);
+                            if is_command
+                                && cmd_tx
+                                    .send((irc_msg.username, irc_msg.message))
+                                    .await
+                                    .is_err()
+                            {
+                                eprintln!("Failed to queue command (worker gone)");
+                            }
+                        }
+                    }
+                    Some(Err(e)) => {
+                        eprintln!("WebSocket error: {}", e);
+                        break;
+                    }
+                    None => {
+                        eprintln!("WebSocket closed");
+                        break;
+                    }
+                    _ => {
+                        // Ignore other message types (Binary, Ping, Pong, Close)
                         continue;
                     }
-
-                    // Check for !ts command
-                    if is_translate_command(&irc_msg.message) {
-                        if let Some(text) = extract_translate_text(&irc_msg.message) {
-                            eprintln!("Translation request: {}", text);
-
-                            // Detect language
-                            let source_lang = detect_language(&text);
-                            if source_lang == Language::Unknown {
-                                eprintln!("Unknown language, skipping");
-                                continue;
-                            }
-
-                            // Provider: local Bonsai model (sidecar) or cloud Gemini API
-                            // (rate-limited, with automatic local fallback on 429)
-                            let use_local = { get_bonsai_state().lock().unwrap().enabled };
-
-                            let result = if use_local {
-                                bonsai::translate_at(active_bonsai_url(), &text, source_lang)
-                                    .await
-                                    .map_err(|e| ProviderError::Failed(e.to_string()))
-                            } else {
-                                gemini_translate(&app, &text, source_lang).await
-                            };
-
-                            match result {
-                                Ok(result) => {
-                                    eprintln!("Translation suggestions: {:?}", result.suggestions);
-
-                                    // Send each suggestion as a separate chat message (without points)
-                                    for (idx, suggestion) in result.suggestions.iter().enumerate() {
-                                        let mut response = format!(
-                                            "@{}: [{}/{}] [{}] {}",
-                                            irc_msg.username,
-                                            idx + 1,
-                                            result.suggestions.len(),
-                                            suggestion.formality,
-                                            suggestion.text
-                                        );
-
-                                        // Handle Twitch's 500 character limit
-                                        if response.len() > 490 {
-                                            let max_text_len = 400 - irc_msg.username.len();
-                                            let truncated_text = if suggestion.text.len()
-                                                > max_text_len
-                                            {
-                                                format!(
-                                                    "{}...",
-                                                    truncate_utf8(&suggestion.text, max_text_len)
-                                                )
-                                            } else {
-                                                suggestion.text.clone()
-                                            };
-
-                                            response = format!(
-                                                "@{}: [{}/{}] [{}] {}",
-                                                irc_msg.username,
-                                                idx + 1,
-                                                result.suggestions.len(),
-                                                suggestion.formality,
-                                                truncated_text
-                                            );
-                                        }
-
-                                        // Send message
-                                        if let Err(e) =
-                                            send_chat_message(&mut ws_stream, &channel, &response)
-                                                .await
-                                        {
-                                            eprintln!(
-                                                "Failed to send message {}/{}: {}",
-                                                idx + 1,
-                                                result.suggestions.len(),
-                                                e
-                                            );
-                                            // Continue sending other messages even if one fails
-                                        } else {
-                                            eprintln!(
-                                                "Sent suggestion {}/{} to chat",
-                                                idx + 1,
-                                                result.suggestions.len()
-                                            );
-                                        }
-
-                                        // Add delay between messages to avoid Twitch rate limiting
-                                        tokio::time::sleep(tokio::time::Duration::from_millis(500))
-                                            .await;
-                                    }
-
-                                    // Send linguistic points as a separate message (4th message)
-                                    let points_str = result.points.join(", ");
-                                    let points_message = format!(
-                                        "@{}: 翻訳の根拠: {}",
-                                        irc_msg.username, points_str
-                                    );
-
-                                    // Handle truncation for points message
-                                    let final_points_message = if points_message.len() > 490 {
-                                        let max_len = 490 - irc_msg.username.len() - 20;
-                                        format!(
-                                            "@{}: 翻訳の根拠: {}...",
-                                            irc_msg.username,
-                                            truncate_utf8(&points_str, max_len)
-                                        )
-                                    } else {
-                                        points_message
-                                    };
-
-                                    if let Err(e) = send_chat_message(
-                                        &mut ws_stream,
-                                        &channel,
-                                        &final_points_message,
-                                    )
-                                    .await
-                                    {
-                                        eprintln!("Failed to send points message: {}", e);
-                                    } else {
-                                        eprintln!("Sent linguistic points to chat");
-                                    }
-
-                                    eprintln!(
-                                        "All {} suggestions + points sent to chat",
-                                        result.suggestions.len()
-                                    );
-
-                                    // Emit event to frontend
-                                    let target_lang = match source_lang {
-                                        Language::Japanese => "English",
-                                        Language::English => "Japanese",
-                                        Language::Unknown => "Unknown",
-                                    };
-
-                                    let event = TranslationEvent {
-                                        original_user: irc_msg.username.clone(),
-                                        original_message: text.clone(),
-                                        suggestions: result.suggestions.clone(),
-                                        points: result.points.clone(),
-                                        timestamp: chrono::Utc::now().to_rfc3339(),
-                                        source_lang: source_lang.to_string(),
-                                        target_lang: target_lang.to_string(),
-                                    };
-
-                                    if let Err(e) = app.emit("translation", &event) {
-                                        eprintln!("Failed to emit translation event: {}", e);
-                                    }
-                                    let _ = overlay::OVERLAY_TX.send(overlay::OverlayMessage {
-                                        event_type: "translation".to_string(),
-                                        data: serde_json::to_value(&event).unwrap_or_default(),
-                                    });
-                                }
-                                Err(ProviderError::Skipped) => {
-                                    eprintln!("[rate-limit] skipped (no local model available)");
-                                }
-                                Err(ProviderError::Failed(e)) => {
-                                    eprintln!("Translation failed: {}", e);
-                                }
-                            }
-                        }
-                    }
-                    // Check for !d command
-                    else if is_dictionary_command(&irc_msg.message) {
-                        if let Some(word) = extract_dictionary_word(&irc_msg.message) {
-                            eprintln!("Dictionary request: {}", word);
-
-                            // Detect language
-                            let source_lang = detect_language(&word);
-                            if source_lang == Language::Unknown {
-                                eprintln!("Unknown language, skipping");
-                                continue;
-                            }
-
-                            // Provider: local Bonsai model (sidecar) or cloud Gemini API
-                            // (rate-limited, with automatic local fallback on 429)
-                            let use_local = { get_bonsai_state().lock().unwrap().enabled };
-
-                            let result = if use_local {
-                                bonsai::lookup_word_at(active_bonsai_url(), &word, source_lang)
-                                    .await
-                                    .map_err(|e| ProviderError::Failed(e.to_string()))
-                            } else {
-                                gemini_lookup(&app, &word, source_lang).await
-                            };
-
-                            // Lookup word
-                            match result {
-                                Ok(result) => {
-                                    eprintln!("Dictionary result: {:?}", result);
-
-                                    // Send meaning message
-                                    let meaning_msg = format!(
-                                        "@{}: [Dict] {} - {}",
-                                        irc_msg.username, result.word, result.meaning
-                                    );
-
-                                    let truncated_meaning = if meaning_msg.len() > 490 {
-                                        let max_len = 470 - irc_msg.username.len();
-                                        format!(
-                                            "@{}: [Dict] {} - {}...",
-                                            irc_msg.username,
-                                            result.word,
-                                            truncate_utf8(&result.meaning, max_len)
-                                        )
-                                    } else {
-                                        meaning_msg
-                                    };
-
-                                    if let Err(e) = send_chat_message(
-                                        &mut ws_stream,
-                                        &channel,
-                                        &truncated_meaning,
-                                    )
-                                    .await
-                                    {
-                                        eprintln!("Failed to send meaning: {}", e);
-                                    } else {
-                                        eprintln!("Sent meaning to chat");
-                                    }
-
-                                    tokio::time::sleep(tokio::time::Duration::from_millis(500))
-                                        .await;
-
-                                    // Send examples message
-                                    let examples_str = result.examples.join(" | ");
-                                    let examples_msg = format!(
-                                        "@{}: [Examples] {}",
-                                        irc_msg.username, examples_str
-                                    );
-
-                                    let truncated_examples = if examples_msg.len() > 490 {
-                                        let max_len = 460 - irc_msg.username.len();
-                                        format!(
-                                            "@{}: [Examples] {}...",
-                                            irc_msg.username,
-                                            truncate_utf8(&examples_str, max_len)
-                                        )
-                                    } else {
-                                        examples_msg
-                                    };
-
-                                    if let Err(e) = send_chat_message(
-                                        &mut ws_stream,
-                                        &channel,
-                                        &truncated_examples,
-                                    )
-                                    .await
-                                    {
-                                        eprintln!("Failed to send examples: {}", e);
-                                    } else {
-                                        eprintln!("Sent examples to chat");
-                                    }
-
-                                    tokio::time::sleep(tokio::time::Duration::from_millis(500))
-                                        .await;
-
-                                    // Send synonyms message
-                                    let similar_str = result.similar_words.join(", ");
-                                    let similar_msg = format!(
-                                        "@{}: [Synonyms] {}",
-                                        irc_msg.username, similar_str
-                                    );
-
-                                    let truncated_similar = if similar_msg.len() > 490 {
-                                        let max_len = 460 - irc_msg.username.len();
-                                        format!(
-                                            "@{}: [Synonyms] {}...",
-                                            irc_msg.username,
-                                            truncate_utf8(&similar_str, max_len)
-                                        )
-                                    } else {
-                                        similar_msg
-                                    };
-
-                                    if let Err(e) = send_chat_message(
-                                        &mut ws_stream,
-                                        &channel,
-                                        &truncated_similar,
-                                    )
-                                    .await
-                                    {
-                                        eprintln!("Failed to send similar words: {}", e);
-                                    } else {
-                                        eprintln!("Sent similar words to chat");
-                                    }
-
-                                    // Emit event to frontend
-                                    let target_lang = match source_lang {
-                                        Language::Japanese => "English",
-                                        Language::English => "Japanese",
-                                        Language::Unknown => "Unknown",
-                                    };
-
-                                    let event = DictionaryEvent {
-                                        original_user: irc_msg.username.clone(),
-                                        original_word: word.clone(),
-                                        word: result.word.clone(),
-                                        meaning: result.meaning.clone(),
-                                        examples: result.examples.clone(),
-                                        similar_words: result.similar_words.clone(),
-                                        timestamp: chrono::Utc::now().to_rfc3339(),
-                                        source_lang: source_lang.to_string(),
-                                        target_lang: target_lang.to_string(),
-                                    };
-
-                                    if let Err(e) = app.emit("dictionary", &event) {
-                                        eprintln!("Failed to emit dictionary event: {}", e);
-                                    }
-                                    let _ = overlay::OVERLAY_TX.send(overlay::OverlayMessage {
-                                        event_type: "dictionary".to_string(),
-                                        data: serde_json::to_value(&event).unwrap_or_default(),
-                                    });
-                                }
-                                Err(ProviderError::Skipped) => {
-                                    eprintln!("[rate-limit] skipped (no local model available)");
-                                }
-                                Err(ProviderError::Failed(e)) => {
-                                    eprintln!("Dictionary lookup failed: {}", e);
-                                }
-                            }
-                        }
-                    }
                 }
-            }
-            Some(Err(e)) => {
-                eprintln!("WebSocket error: {}", e);
-                break;
-            }
-            None => {
-                eprintln!("WebSocket closed");
-                break;
-            }
-            _ => {
-                // Ignore other message types (Binary, Ping, Pong, Close, Frame)
-                continue;
             }
         }
     }
 
+    // Dropping the senders lets the writer and worker tasks wind down.
+    drop(cmd_tx);
+    drop(out_tx);
     Ok(())
+}
+
+/// Queue a line to be written to the IRC socket (serialized by the writer).
+async fn send_to_irc(
+    out_tx: &mpsc::Sender<String>,
+    channel: &str,
+    message: &str,
+) -> Result<(), String> {
+    let msg = format!("PRIVMSG #{} :{}", channel, message);
+    eprintln!("IRC >> {}", msg);
+    out_tx
+        .send(msg)
+        .await
+        .map_err(|e| format!("Failed to send chat message: {}", e))
+}
+
+/// Serialized handler for !ts / !d commands. Runs off the read loop so
+/// PING/PONG and chat_message events are never blocked by API calls.
+async fn handle_commands(
+    mut cmd_rx: mpsc::Receiver<(String, String)>,
+    out_tx: mpsc::Sender<String>,
+    channel: String,
+    app: tauri::AppHandle,
+) {
+    while let Some((username, message)) = cmd_rx.recv().await {
+        if is_translate_command(&message) {
+            if let Some(text) = extract_translate_text(&message) {
+                handle_translate_request(&app, &out_tx, &channel, &username, &text).await;
+            }
+        } else if is_dictionary_command(&message) {
+            if let Some(word) = extract_dictionary_word(&message) {
+                handle_dictionary_request(&app, &out_tx, &channel, &username, &word).await;
+            }
+        }
+    }
+}
+
+/// Handle a !ts command: detect language, call the provider, send up to 4
+/// chat replies (spaced to respect Twitch's message limits), and emit the
+/// translation event to the frontend + overlay.
+async fn handle_translate_request(
+    app: &tauri::AppHandle,
+    out_tx: &mpsc::Sender<String>,
+    channel: &str,
+    username: &str,
+    text: &str,
+) {
+    eprintln!("Translation request: {}", text);
+
+    // Detect language
+    let source_lang = detect_language(text);
+    if source_lang == Language::Unknown {
+        eprintln!("Unknown language, skipping");
+        return;
+    }
+
+    // Provider: local Bonsai model (sidecar) or cloud Gemini API
+    // (rate-limited, with automatic local fallback on 429)
+    let use_local = { get_bonsai_state().lock().unwrap().enabled };
+
+    let result = if use_local {
+        bonsai::translate_at(active_bonsai_url(), text, source_lang)
+            .await
+            .map_err(|e| ProviderError::Failed(e.to_string()))
+    } else {
+        gemini_translate(app, text, source_lang).await
+    };
+
+    match result {
+        Ok(result) => {
+            eprintln!("Translation suggestions: {:?}", result.suggestions);
+
+            // Send each suggestion as a separate chat message (without points)
+            for (idx, suggestion) in result.suggestions.iter().enumerate() {
+                let mut response = format!(
+                    "@{}: [{}/{}] [{}] {}",
+                    username,
+                    idx + 1,
+                    result.suggestions.len(),
+                    suggestion.formality,
+                    suggestion.text
+                );
+
+                // Handle Twitch's 500 character limit
+                if response.len() > 490 {
+                    let max_text_len = 400 - username.len();
+                    let truncated_text = if suggestion.text.len() > max_text_len {
+                        format!("{}...", truncate_utf8(&suggestion.text, max_text_len))
+                    } else {
+                        suggestion.text.clone()
+                    };
+
+                    response = format!(
+                        "@{}: [{}/{}] [{}] {}",
+                        username,
+                        idx + 1,
+                        result.suggestions.len(),
+                        suggestion.formality,
+                        truncated_text
+                    );
+                }
+
+                // Send message
+                if let Err(e) = send_to_irc(out_tx, channel, &response).await {
+                    eprintln!(
+                        "Failed to send message {}/{}: {}",
+                        idx + 1,
+                        result.suggestions.len(),
+                        e
+                    );
+                    // Continue sending other messages even if one fails
+                } else {
+                    eprintln!(
+                        "Sent suggestion {}/{} to chat",
+                        idx + 1,
+                        result.suggestions.len()
+                    );
+                }
+
+                // Add delay between messages to avoid Twitch rate limiting
+                tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+            }
+
+            // Send linguistic points as a separate message (4th message)
+            let points_str = result.points.join(", ");
+            let points_message = format!("@{}: 翻訳の根拠: {}", username, points_str);
+
+            // Handle truncation for points message
+            let final_points_message = if points_message.len() > 490 {
+                let max_len = 490 - username.len() - 20;
+                format!(
+                    "@{}: 翻訳の根拠: {}...",
+                    username,
+                    truncate_utf8(&points_str, max_len)
+                )
+            } else {
+                points_message
+            };
+
+            if let Err(e) = send_to_irc(out_tx, channel, &final_points_message).await {
+                eprintln!("Failed to send points message: {}", e);
+            } else {
+                eprintln!("Sent linguistic points to chat");
+            }
+
+            eprintln!(
+                "All {} suggestions + points sent to chat",
+                result.suggestions.len()
+            );
+
+            // Emit event to frontend
+            let target_lang = match source_lang {
+                Language::Japanese => "English",
+                Language::English => "Japanese",
+                Language::Unknown => "Unknown",
+            };
+
+            let event = TranslationEvent {
+                original_user: username.to_string(),
+                original_message: text.to_string(),
+                suggestions: result.suggestions.clone(),
+                points: result.points.clone(),
+                timestamp: chrono::Utc::now().to_rfc3339(),
+                source_lang: source_lang.to_string(),
+                target_lang: target_lang.to_string(),
+            };
+
+            if let Err(e) = app.emit("translation", &event) {
+                eprintln!("Failed to emit translation event: {}", e);
+            }
+            let _ = overlay::OVERLAY_TX.send(overlay::OverlayMessage {
+                event_type: "translation".to_string(),
+                data: serde_json::to_value(&event).unwrap_or_default(),
+            });
+        }
+        Err(ProviderError::Skipped) => {
+            eprintln!("[rate-limit] skipped (no local model available)");
+        }
+        Err(ProviderError::Failed(e)) => {
+            eprintln!("Translation failed: {}", e);
+        }
+    }
+}
+
+/// Handle a !d command: detect language, call the provider, send up to 4
+/// chat replies, and emit the dictionary event to the frontend + overlay.
+async fn handle_dictionary_request(
+    app: &tauri::AppHandle,
+    out_tx: &mpsc::Sender<String>,
+    channel: &str,
+    username: &str,
+    word: &str,
+) {
+    eprintln!("Dictionary request: {}", word);
+
+    // Detect language
+    let source_lang = detect_language(word);
+    if source_lang == Language::Unknown {
+        eprintln!("Unknown language, skipping");
+        return;
+    }
+
+    // Provider: local Bonsai model (sidecar) or cloud Gemini API
+    // (rate-limited, with automatic local fallback on 429)
+    let use_local = { get_bonsai_state().lock().unwrap().enabled };
+
+    let result = if use_local {
+        bonsai::lookup_word_at(active_bonsai_url(), word, source_lang)
+            .await
+            .map_err(|e| ProviderError::Failed(e.to_string()))
+    } else {
+        gemini_lookup(app, word, source_lang).await
+    };
+
+    match result {
+        Ok(result) => {
+            eprintln!("Dictionary result: {:?}", result);
+
+            // Send meaning message
+            let meaning_msg = format!("@{}: [Dict] {} - {}", username, result.word, result.meaning);
+
+            let truncated_meaning = if meaning_msg.len() > 490 {
+                let max_len = 470 - username.len();
+                format!(
+                    "@{}: [Dict] {} - {}...",
+                    username,
+                    result.word,
+                    truncate_utf8(&result.meaning, max_len)
+                )
+            } else {
+                meaning_msg
+            };
+
+            if let Err(e) = send_to_irc(out_tx, channel, &truncated_meaning).await {
+                eprintln!("Failed to send meaning: {}", e);
+            } else {
+                eprintln!("Sent meaning to chat");
+            }
+
+            tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+
+            // Send examples message
+            let examples_str = result.examples.join(" | ");
+            let examples_msg = format!("@{}: [Examples] {}", username, examples_str);
+
+            let truncated_examples = if examples_msg.len() > 490 {
+                let max_len = 460 - username.len();
+                format!(
+                    "@{}: [Examples] {}...",
+                    username,
+                    truncate_utf8(&examples_str, max_len)
+                )
+            } else {
+                examples_msg
+            };
+
+            if let Err(e) = send_to_irc(out_tx, channel, &truncated_examples).await {
+                eprintln!("Failed to send examples: {}", e);
+            } else {
+                eprintln!("Sent examples to chat");
+            }
+
+            tokio::time::sleep(tokio::time::Duration::from_millis(500)).await;
+
+            // Send synonyms message
+            let similar_str = result.similar_words.join(", ");
+            let similar_msg = format!("@{}: [Synonyms] {}", username, similar_str);
+
+            let truncated_similar = if similar_msg.len() > 490 {
+                let max_len = 460 - username.len();
+                format!(
+                    "@{}: [Synonyms] {}...",
+                    username,
+                    truncate_utf8(&similar_str, max_len)
+                )
+            } else {
+                similar_msg
+            };
+
+            if let Err(e) = send_to_irc(out_tx, channel, &truncated_similar).await {
+                eprintln!("Failed to send similar words: {}", e);
+            } else {
+                eprintln!("Sent similar words to chat");
+            }
+
+            // Emit event to frontend
+            let target_lang = match source_lang {
+                Language::Japanese => "English",
+                Language::English => "Japanese",
+                Language::Unknown => "Unknown",
+            };
+
+            let event = DictionaryEvent {
+                original_user: username.to_string(),
+                original_word: word.to_string(),
+                word: result.word.clone(),
+                meaning: result.meaning.clone(),
+                examples: result.examples.clone(),
+                similar_words: result.similar_words.clone(),
+                timestamp: chrono::Utc::now().to_rfc3339(),
+                source_lang: source_lang.to_string(),
+                target_lang: target_lang.to_string(),
+            };
+
+            if let Err(e) = app.emit("dictionary", &event) {
+                eprintln!("Failed to emit dictionary event: {}", e);
+            }
+            let _ = overlay::OVERLAY_TX.send(overlay::OverlayMessage {
+                event_type: "dictionary".to_string(),
+                data: serde_json::to_value(&event).unwrap_or_default(),
+            });
+        }
+        Err(ProviderError::Skipped) => {
+            eprintln!("[rate-limit] skipped (no local model available)");
+        }
+        Err(ProviderError::Failed(e)) => {
+            eprintln!("Dictionary lookup failed: {}", e);
+        }
+    }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]

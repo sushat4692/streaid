@@ -66,6 +66,7 @@ export type ChatStatus = {
   connected: boolean
   is_running: boolean
   is_enabled: boolean
+  reconnecting: boolean   // true between an IRC drop and a successful reconnect
   channel: string | null
   last_target_channel?: string | null
 }

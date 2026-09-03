@@ -237,6 +237,7 @@ pub async fn start_device_flow(
     );
     let http = Client::builder()
         .redirect(reqwest::redirect::Policy::none())
+        .timeout(Duration::from_secs(15))
         .build()
         .context("building http client")?;
 
@@ -349,7 +350,10 @@ pub async fn poll_device_flow(state: SharedState) -> Result<Option<TokenInfo>> {
         )
     };
 
-    let http = Client::new();
+    let http = Client::builder()
+        .timeout(Duration::from_secs(15))
+        .build()
+        .context("building http client")?;
 
     // Single-shot polling: perform one token request and return result.
     if let Some(exp) = expires_at {
@@ -518,7 +522,10 @@ pub async fn refresh_token(state: SharedState) -> Result<Option<TokenInfo>> {
         }
     };
 
-    let http = Client::new();
+    let http = Client::builder()
+        .timeout(Duration::from_secs(15))
+        .build()
+        .context("building http client")?;
 
     let params = [
         ("grant_type", "refresh_token".to_string()),

@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Language {
@@ -194,7 +195,10 @@ pub async fn translate_text(
 
     eprintln!("Translating {} -> {}: {}", from_lang, target_lang, text);
 
-    let client = Client::new();
+    let client = Client::builder()
+        .timeout(Duration::from_secs(45))
+        .build()
+        .context("Failed to build HTTP client")?;
     // Use gemini-3.1-flash-lite (free tier; 2.5-flash-lite's free RPD was too low)
     let url = format!(
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key={}",
