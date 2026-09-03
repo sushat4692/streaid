@@ -13,6 +13,15 @@ crate-type = ["cdylib", "rlib"]
 name = "streaid"
 path = "src/main.rs"
 
+# Packaging config for `cargo packager` (see packager.toml for overrides)
+[package.metadata.packager]
+product_name = "Streaid"
+identifier = "im.sush.streaid"
+icons = ["icon.icns"]
+
+[package.metadata.packager.macos]
+minimum_system_version = "12.0"
+
 [dependencies]
 gpui = "0.2.2"
 gpui-component = "0.5.1"

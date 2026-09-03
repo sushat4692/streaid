@@ -43,6 +43,17 @@ scripts/setup-bonsai.sh    # downloads llama-server + Ternary-Bonsai-8B (~2.1 GB
 
 Then toggle "Enable Local Model" in the dashboard. See `docs/bonsai.md`.
 
+## Packaging (.app / .dmg)
+
+```bash
+scripts/build-app.sh       # release build + .app + .dmg + ad-hoc codesign
+```
+
+Outputs `app/target/release/Streaid.app` and `Streaid_0.6.0_aarch64.dmg`.
+Packaging settings live in `[package.metadata.packager]` in `app/Cargo.toml`
+(icon: `app/icon.icns`). For distribution, replace the ad-hoc signature with
+a Developer ID certificate and run `xcrun notarytool` for notarization.
+
 ## Tests & Checks
 
 ```bash

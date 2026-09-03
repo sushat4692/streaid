@@ -15,7 +15,12 @@ cargo check                    # Fast compilation check
 cargo clippy                   # Rust linter
 cargo fmt                      # Format Rust code
 cargo run                      # Run the app (first build needs Metal toolchain)
+cargo packager --release --formats app,dmg   # Build .app/.dmg (needs cargo-packager)
+scripts/build-app.sh           # One-shot: release build + .app + .dmg + ad-hoc codesign
 ```
+
+Packaging settings: `[package.metadata.packager]` in `app/Cargo.toml` (icon `app/icon.icns`).
+Outputs land in `app/target/release/` (gitignored).
 
 After completing a task, run: `cd app && cargo test && cargo clippy && cargo fmt --check`.
 
