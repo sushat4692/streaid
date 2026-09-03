@@ -110,6 +110,7 @@ fn segmented(
     div()
         .id(id)
         .flex()
+        .flex_wrap()
         .gap_1()
         .p_1()
         .rounded_lg()
@@ -169,14 +170,17 @@ impl Render for ModelTestPage {
 
         div()
             .w_full()
-            .max_w(px(768.0))
-            .mx_auto()
+            .min_w_0()
             .flex()
             .flex_col()
+            .items_center()
             .gap_4()
             .child(page_header("Model Test"))
             .child(
                 div()
+                    .w_full()
+                    .max_w(px(768.0))
+                    .min_w_0()
                     .flex()
                     .flex_col()
                     .gap_4()
@@ -252,7 +256,7 @@ impl Render for ModelTestPage {
                                     .text_color(ui::TEXT_MUTED)
                                     .child("Text"),
                             )
-                            .child(Input::new(&self.text)),
+                            .child(Input::new(&self.text).w_full()),
                     )
                     .child(
                         div()
@@ -325,6 +329,7 @@ fn result_card(provider_label: &str, result: ModelTestResult) -> impl IntoElemen
             .child(
                 div()
                     .flex()
+                    .flex_wrap()
                     .items_center()
                     .justify_between()
                     .child(
@@ -411,6 +416,7 @@ fn result_card(provider_label: &str, result: ModelTestResult) -> impl IntoElemen
             .child(
                 div()
                     .flex()
+                    .flex_wrap()
                     .items_center()
                     .justify_between()
                     .child(

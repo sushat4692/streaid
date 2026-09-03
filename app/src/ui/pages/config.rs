@@ -266,14 +266,17 @@ impl Render for ConfigPage {
 
         div()
             .w_full()
-            .max_w(px(672.0))
-            .mx_auto()
+            .min_w_0()
             .flex()
             .flex_col()
+            .items_center()
             .gap_4()
             .child(page_header("Config"))
             .child(
                 div()
+                    .w_full()
+                    .max_w(px(768.0))
+                    .min_w_0()
                     .rounded_xl()
                     .border_1()
                     .border_color(ui::BORDER)
@@ -343,7 +346,7 @@ fn translation_settings(
                 .text_color(ui::TEXT_MUTED)
                 .child("Gemini API Key"),
         )
-        .child(Input::new(&page.gemini_key).h(px(44.0)))
+        .child(Input::new(&page.gemini_key).w_full().h(px(44.0)))
         .child(
             div().flex().justify_end().child(
                 Button::new("save-api-key")
@@ -421,6 +424,7 @@ fn chat_listener_section(
         .child(
             div()
                 .flex()
+                .flex_wrap()
                 .items_center()
                 .justify_between()
                 .child(section_heading("Chat Listener"))
@@ -456,7 +460,7 @@ fn chat_listener_section(
                     .text_color(ui::TEXT_MUTED)
                     .child("Target Channel"),
             )
-            .child(Input::new(&page.target_channel).h(px(44.0)))
+            .child(Input::new(&page.target_channel).w_full().h(px(44.0)))
         })
         .when(status.channel.is_some(), |d| {
             d.child(
@@ -483,6 +487,7 @@ fn chat_listener_section(
         .child(
             div()
                 .flex()
+                .flex_wrap()
                 .gap_3()
                 .child({
                     let mut btn = Button::new("start-stop").label(if status.is_running {
@@ -545,6 +550,7 @@ fn chat_listener_section(
         .child(
             div()
                 .flex()
+                .flex_wrap()
                 .items_center()
                 .justify_between()
                 .child(
@@ -626,6 +632,7 @@ fn chat_listener_section(
                     .child(
                         div()
                             .flex()
+                            .flex_wrap()
                             .gap_1()
                             .p_0p5()
                             .rounded_lg()
@@ -796,6 +803,7 @@ fn sound_slot(
         .child(
             div()
                 .flex()
+                .flex_wrap()
                 .gap_2()
                 .child(
                     Button::new(upload_id.clone())
@@ -890,11 +898,13 @@ fn overlay_settings(page: &mut ConfigPage, cx: &mut Context<ConfigPage>) -> impl
         .child(
             div()
                 .flex()
+                .flex_wrap()
                 .items_center()
                 .gap_2()
                 .child(
                     div()
                         .flex_1()
+                        .min_w_0()
                         .rounded_lg()
                         .bg(ui::SURFACE)
                         .px_3()

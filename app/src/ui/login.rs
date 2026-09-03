@@ -202,7 +202,7 @@ impl Render for LoginView {
                                     .text_color(ui::TEXT_MUTED)
                                     .child("Client ID"),
                             )
-                            .child(Input::new(&self.client_id_input).h(px(44.0))),
+                            .child(Input::new(&self.client_id_input).w_full().h(px(44.0))),
                     )
                     .when(error.is_some(), |d| {
                         d.child(

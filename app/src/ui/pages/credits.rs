@@ -126,14 +126,17 @@ impl Render for CreditsPage {
     fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         div()
             .w_full()
-            .max_w(px(672.0))
-            .mx_auto()
+            .min_w_0()
             .flex()
             .flex_col()
+            .items_center()
             .gap_4()
             .child(super::page_header("Credits"))
             .child(
                 div()
+                    .w_full()
+                    .max_w(px(768.0))
+                    .min_w_0()
                     .rounded_xl()
                     .border_1()
                     .border_color(ui::BORDER)
@@ -200,9 +203,12 @@ fn credit_section(title: impl Into<SharedString>, items: &[CreditItem]) -> impl 
                 .border_color(hsla(0.0, 0.0, 1.0, 0.05))
                 .rounded_lg()
                 .overflow_hidden()
+                .min_w_0()
                 .children(items.iter().map(|item| {
                     div()
                         .flex()
+                        .flex_wrap()
+                        .min_w_0()
                         .items_center()
                         .justify_between()
                         .gap_4()
@@ -211,6 +217,7 @@ fn credit_section(title: impl Into<SharedString>, items: &[CreditItem]) -> impl 
                         .bg(hsla(0.0, 0.0, 1.0, 0.05))
                         .child(
                             div()
+                                .min_w_0()
                                 .child(
                                     div()
                                         .id(item.name)
@@ -236,6 +243,8 @@ fn credit_section(title: impl Into<SharedString>, items: &[CreditItem]) -> impl 
                         )
                         .child(
                             div()
+                                .flex_shrink_0()
+                                .whitespace_nowrap()
                                 .px_2p5()
                                 .py_1()
                                 .rounded_full()

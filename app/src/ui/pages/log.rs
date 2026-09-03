@@ -25,14 +25,17 @@ impl Render for LogPage {
 
         div()
             .w_full()
-            .max_w(px(672.0))
-            .mx_auto()
+            .min_w_0()
             .flex()
             .flex_col()
+            .items_center()
             .gap_4()
             .child(page_header("Log"))
             .child(
                 div()
+                    .w_full()
+                    .max_w(px(768.0))
+                    .min_w_0()
                     .rounded_xl()
                     .border_1()
                     .border_color(ui::BORDER)
@@ -87,6 +90,7 @@ fn translation_section(
         .child(
             div()
                 .flex()
+                .flex_wrap()
                 .items_center()
                 .justify_between()
                 .child(
@@ -143,6 +147,7 @@ fn translation_section(
                             .child(
                                 div()
                                     .flex()
+                                    .flex_wrap()
                                     .items_center()
                                     .justify_between()
                                     .child(
@@ -257,6 +262,7 @@ fn dictionary_section(
         .child(
             div()
                 .flex()
+                .flex_wrap()
                 .items_center()
                 .justify_between()
                 .child(
@@ -309,6 +315,7 @@ fn dictionary_section(
                             .child(
                                 div()
                                     .flex()
+                                    .flex_wrap()
                                     .items_center()
                                     .justify_between()
                                     .child(

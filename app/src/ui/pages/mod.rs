@@ -63,6 +63,7 @@ impl Render for ShellView {
             .child(
                 div()
                     .flex_1()
+                    .min_w_0()
                     .h_full()
                     .flex()
                     .flex_col()
@@ -71,8 +72,10 @@ impl Render for ShellView {
                         div()
                             .id("content-scroll")
                             .flex_1()
-                            .overflow_y_scroll()
-                            .p_6()
+                            .min_w_0()
+                            .overflow_scroll()
+                            .scrollbar_width(px(10.0))
+                            .p_4()
                             .child(page_element),
                     ),
             )
@@ -274,6 +277,7 @@ fn toast_banner(model: &Entity<AppModel>, cx: &mut Context<ShellView>) -> AnyEle
     };
     div()
         .w_full()
+        .min_w_0()
         .px_6()
         .pt_3()
         .child(
