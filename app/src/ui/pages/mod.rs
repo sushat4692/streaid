@@ -3,6 +3,7 @@ pub mod credits;
 pub mod dashboard;
 pub mod log;
 pub mod model_test;
+pub mod vocabulary;
 
 use gpui::{
     div, hsla, prelude::*, px, AnyElement, App, Context, Entity, FontWeight, IntoElement,
@@ -21,6 +22,7 @@ pub struct ShellView {
     dashboard: Entity<dashboard::DashboardPage>,
     model_test: Entity<model_test::ModelTestPage>,
     config: Entity<config::ConfigPage>,
+    vocabulary: Entity<vocabulary::VocabularyPage>,
     log: Entity<log::LogPage>,
     credits: Entity<credits::CreditsPage>,
 }
@@ -32,6 +34,7 @@ impl ShellView {
             dashboard: cx.new(|cx| dashboard::DashboardPage::new(model.clone(), cx)),
             model_test: cx.new(|cx| model_test::ModelTestPage::new(model.clone(), window, cx)),
             config: cx.new(|cx| config::ConfigPage::new(model.clone(), window, cx)),
+            vocabulary: cx.new(|cx| vocabulary::VocabularyPage::new(model.clone(), cx)),
             log: cx.new(|cx| log::LogPage::new(model.clone(), cx)),
             credits: cx.new(|cx| credits::CreditsPage::new(model.clone(), cx)),
             model,
@@ -50,6 +53,7 @@ impl Render for ShellView {
             Page::Dashboard => self.dashboard.clone().into_any_element(),
             Page::ModelTest => self.model_test.clone().into_any_element(),
             Page::Config => self.config.clone().into_any_element(),
+            Page::Vocabulary => self.vocabulary.clone().into_any_element(),
             Page::Log => self.log.clone().into_any_element(),
             Page::Credits => self.credits.clone().into_any_element(),
         };
@@ -91,10 +95,11 @@ fn sidebar(
 ) -> impl IntoElement {
     let is_running = status.is_running;
     let is_reconnecting = status.reconnecting;
-    let nav_items: [(Page, &'static str); 5] = [
+    let nav_items: [(Page, &'static str); 6] = [
         (Page::Dashboard, "Dashboard"),
         (Page::ModelTest, "Model Test"),
         (Page::Config, "Config"),
+        (Page::Vocabulary, "Vocabulary"),
         (Page::Log, "Log"),
         (Page::Credits, "Credits"),
     ];

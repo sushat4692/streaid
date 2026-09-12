@@ -143,6 +143,7 @@ pub enum Page {
     Dashboard,
     ModelTest,
     Config,
+    Vocabulary,
     Log,
     Credits,
 }

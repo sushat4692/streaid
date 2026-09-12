@@ -6,6 +6,7 @@ pub mod overlay;
 pub mod sounds;
 pub mod translate;
 pub mod ui;
+pub mod vocabulary;
 
 use auth::{shared_state, InnerState};
 use chat::{
@@ -252,7 +253,7 @@ impl TokenBucket {
 }
 
 /// Max Gemini requests per minute. Set below the free-tier RPM (~10).
-const GEMINI_RPM_LIMIT: f64 = 8.0;
+pub(crate) const GEMINI_RPM_LIMIT: f64 = 8.0;
 
 /// Monotonic counter of Gemini API calls (for quota diagnostics).
 static GEMINI_CALL_COUNTER: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
@@ -268,7 +269,7 @@ static GEMINI_RATE_LIMIT: Lazy<std::sync::Mutex<TokenBucket>> = Lazy::new(|| {
     std::sync::Mutex::new(TokenBucket::new(GEMINI_RPM_LIMIT, GEMINI_RPM_LIMIT / 60.0))
 });
 
-fn gemini_budget_try_take() -> bool {
+pub(crate) fn gemini_budget_try_take() -> bool {
     GEMINI_RATE_LIMIT
         .lock()
         .map(|mut b| b.try_take())
@@ -400,7 +401,7 @@ async fn gemini_lookup(
 static GEMINI_KEY_CACHE: Lazy<std::sync::Mutex<Option<String>>> =
     Lazy::new(|| std::sync::Mutex::new(None));
 
-fn get_gemini_api_key() -> Result<String, String> {
+pub(crate) fn get_gemini_api_key() -> Result<String, String> {
     if let Ok(cache) = GEMINI_KEY_CACHE.lock() {
         if let Some(key) = cache.as_ref() {
             return Ok(key.clone());
@@ -1515,6 +1516,16 @@ async fn handle_dictionary_request(
     if source_lang == Language::Unknown {
         eprintln!("Unknown language, skipping");
         return;
+    }
+
+    // Record the word in the vocabulary store in the background: the
+    // two-stage inflection analysis may call Gemini, which must not delay
+    // the chat reply.
+    {
+        let word = word.to_string();
+        spawn_task(async move {
+            vocabulary::record_lookup(&word).await;
+        });
     }
 
     // Provider: local Bonsai model (sidecar) or cloud Gemini API

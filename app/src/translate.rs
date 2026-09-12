@@ -276,6 +276,236 @@ pub async fn translate_text(
     Ok(result)
 }
 
+/// One classified word returned by `classify_words`.
+#[derive(Debug, Clone, Deserialize)]
+pub struct ClassifiedWord {
+    pub word: String,
+    pub category: String,
+}
+
+#[derive(Deserialize)]
+struct ClassifyResponse {
+    categories: Option<Vec<ClassifiedWord>>,
+}
+
+/// Classify a list of words into categories via Gemini. Uses the same
+/// structured-output pattern as `translate_text` (JSON schema enforced).
+/// The categories are returned in the model's order; the caller aggregates.
+pub async fn classify_words(
+    words: &[(String, u64)],
+    api_key: &str,
+) -> Result<Vec<(String, String)>> {
+    if words.is_empty() {
+        anyhow::bail!("No words to classify");
+    }
+
+    let list: Vec<String> = words
+        .iter()
+        .map(|(w, c)| format!("- {} ({})", w, c))
+        .collect();
+    let prompt = format!(
+        r#"以下の単語を、それぞれが属する分野カテゴリに分類してください。
+カテゴリは次のいずれかから選んでください: ゲーム, 料理, 医療, スポーツ, 旅行, 仕事, 音楽, アニメ・漫画, 日常, その他
+
+単語リスト:
+{}
+
+JSON形式で返してください:
+{{ "categories": [ {{ "word": "単語", "category": "カテゴリ" }} ] }}"#,
+        list.join("\n")
+    );
+
+    eprintln!("Classifying {} words via Gemini", words.len());
+
+    let client = Client::builder()
+        .timeout(Duration::from_secs(45))
+        .build()
+        .context("Failed to build HTTP client")?;
+    let url = format!(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key={}",
+        api_key
+    );
+
+    let schema = serde_json::json!({
+        "type": "object",
+        "properties": {
+            "categories": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "word": { "type": "string" },
+                        "category": { "type": "string" }
+                    },
+                    "required": ["word", "category"]
+                }
+            }
+        },
+        "required": ["categories"]
+    });
+
+    let request_body = GeminiRequest {
+        contents: vec![Content {
+            parts: vec![Part { text: prompt }],
+        }],
+        generation_config: GenerationConfig {
+            response_mime_type: "application/json".to_string(),
+            response_schema: ResponseSchema {
+                r#type: "object".to_string(),
+                properties: schema["properties"].clone(),
+                required: vec!["categories".to_string()],
+            },
+        },
+    };
+
+    let response = client
+        .post(&url)
+        .json(&request_body)
+        .send()
+        .await
+        .context("Failed to send request to Gemini API")?;
+
+    let status = response.status();
+    if !status.is_success() {
+        let error_text = response
+            .text()
+            .await
+            .unwrap_or_else(|_| "Unknown error".to_string());
+        anyhow::bail!("Gemini API error ({}): {}", status, error_text);
+    }
+
+    let classify_response: ClassifyResponse = response
+        .json()
+        .await
+        .context("Failed to parse Gemini API response")?;
+
+    let categories = classify_response
+        .categories
+        .ok_or_else(|| anyhow::anyhow!("No categories in Gemini response"))?;
+
+    if categories.is_empty() {
+        anyhow::bail!("No categories returned");
+    }
+
+    Ok(categories
+        .into_iter()
+        .map(|c| (c.word, c.category))
+        .collect())
+}
+
+/// One interpretation of a word: its base (dictionary) form plus the kind of
+/// inflection (plural, past tense, no change, ...).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Interpretation {
+    pub base: String,
+    pub inflection: String,
+}
+
+#[derive(Deserialize)]
+struct InflectResponse {
+    interpretations: Option<Vec<Interpretation>>,
+}
+
+/// Ask Gemini to list ALL possible interpretations of a word (base form +
+/// inflection kind). Same spelling can map to several base forms ("lives" =
+/// plural of "life" or 3rd-person singular of "live"); a word with no
+/// inflection is returned with "変形なし".
+pub async fn inflect_word(word: &str, api_key: &str) -> Result<Vec<Interpretation>> {
+    if word.is_empty() {
+        anyhow::bail!("Empty word");
+    }
+
+    let prompt = format!(
+        r#"単語 "{}" の可能な解釈をすべて列挙してください。
+
+各解釈について:
+- base: 原形（辞書形）
+- inflection: 変形タイプ（複数形 / 三人称単数 / 過去形 / 過去分詞 / 進行形 / 比較級 / 最上級 / 変形なし など）
+
+注意:
+- 同スペルで複数の解釈がある場合は、そのすべてを含めてください（例: "lives" = "life" の複数形, "live" の三人称単数）
+- 変形がない単語は inflection を "変形なし" としてください（例: "used" には "use" の過去形・過去分詞と、形容詞 "used" の両方の可能性があります）
+
+JSON形式で返してください:
+{{ "interpretations": [ {{ "base": "原形", "inflection": "変形タイプ" }} ] }}"#,
+        word
+    );
+
+    eprintln!("Inflecting '{}' via Gemini", word);
+
+    let client = Client::builder()
+        .timeout(Duration::from_secs(45))
+        .build()
+        .context("Failed to build HTTP client")?;
+    let url = format!(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key={}",
+        api_key
+    );
+
+    let schema = serde_json::json!({
+        "type": "object",
+        "properties": {
+            "interpretations": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "base": { "type": "string" },
+                        "inflection": { "type": "string" }
+                    },
+                    "required": ["base", "inflection"]
+                }
+            }
+        },
+        "required": ["interpretations"]
+    });
+
+    let request_body = GeminiRequest {
+        contents: vec![Content {
+            parts: vec![Part { text: prompt }],
+        }],
+        generation_config: GenerationConfig {
+            response_mime_type: "application/json".to_string(),
+            response_schema: ResponseSchema {
+                r#type: "object".to_string(),
+                properties: schema["properties"].clone(),
+                required: vec!["interpretations".to_string()],
+            },
+        },
+    };
+
+    let response = client
+        .post(&url)
+        .json(&request_body)
+        .send()
+        .await
+        .context("Failed to send request to Gemini API")?;
+
+    let status = response.status();
+    if !status.is_success() {
+        let error_text = response
+            .text()
+            .await
+            .unwrap_or_else(|_| "Unknown error".to_string());
+        anyhow::bail!("Gemini API error ({}): {}", status, error_text);
+    }
+
+    let inflect_response: InflectResponse = response
+        .json()
+        .await
+        .context("Failed to parse Gemini API response")?;
+
+    let interpretations = inflect_response
+        .interpretations
+        .ok_or_else(|| anyhow::anyhow!("No interpretations in Gemini response"))?;
+
+    if interpretations.is_empty() {
+        anyhow::bail!("No interpretations returned");
+    }
+
+    Ok(interpretations)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
