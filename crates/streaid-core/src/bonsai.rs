@@ -1,0 +1,288 @@
+//! Local model provider (Bonsai / llama-server sidecar).
+//!
+//! Talks to a locally running `llama-server` (OpenAI-compatible API) instead
+//! of the cloud Gemini API. The same prompts and JSON schemas as the Gemini
+//! provider are reused; output is constrained via `response_format: json_schema`
+//! (llama.cpp grammar-based structured generation).
+
+use anyhow::{Context, Result};
+use reqwest::Client;
+use serde::{Deserialize, Serialize};
+use std::time::Duration;
+
+use crate::dictionary::{build_dictionary_prompt, dictionary_schema, DictionaryResult};
+use crate::translate::{build_translation_prompt, translation_schema, Language, TranslationResult};
+
+/// Base URLs of the local llama-server instances (started as sidecars by
+/// `set_local_model_cmd`). Port 4243 (8B) and 4244 (4B), adjacent to the
+/// overlay's 4242, to avoid conflicts with other local services that
+/// commonly use 8080.
+pub const SERVER_URL_8B: &str = "http://127.0.0.1:4243";
+pub const SERVER_URL_4B: &str = "http://127.0.0.1:4244";
+
+/// Base URL used by the chat listener's default local model (8B).
+pub const SERVER_URL: &str = SERVER_URL_8B;
+
+#[derive(Serialize)]
+struct ChatRequest {
+    messages: Vec<ChatMessage>,
+    temperature: f32,
+    response_format: ResponseFormat,
+}
+
+#[derive(Serialize)]
+struct ChatMessage {
+    role: String,
+    content: String,
+}
+
+#[derive(Serialize)]
+struct ResponseFormat {
+    r#type: String,
+    json_schema: JsonSchema,
+}
+
+#[derive(Serialize)]
+struct JsonSchema {
+    name: String,
+    schema: serde_json::Value,
+}
+
+#[derive(Deserialize)]
+struct ChatResponse {
+    choices: Vec<ChatChoice>,
+}
+
+#[derive(Deserialize)]
+struct ChatChoice {
+    message: ChatResponseMessage,
+}
+
+#[derive(Deserialize)]
+struct ChatResponseMessage {
+    content: String,
+}
+
+/// Returns true when the local llama-server at `base_url` is up and accepting requests.
+pub async fn server_ready_at(base_url: &str) -> bool {
+    let client = Client::new();
+    client
+        .get(format!("{}/health", base_url))
+        .timeout(Duration::from_secs(2))
+        .send()
+        .await
+        .map(|r| r.status().is_success())
+        .unwrap_or(false)
+}
+
+/// Returns true when the default (8B) llama-server is up.
+/// Only used by the ignored integration tests; runtime code uses `server_ready_at`.
+#[cfg_attr(not(test), allow(dead_code))]
+pub async fn server_ready() -> bool {
+    server_ready_at(SERVER_URL).await
+}
+
+/// Translate text using the local model. Mirrors `translate::translate_text`'s contract.
+/// Translate text using the default (8B) model. Only used by the ignored
+/// integration tests; runtime code uses `translate_at`.
+#[cfg_attr(not(test), allow(dead_code))]
+pub async fn translate(text: &str, from_lang: Language) -> Result<TranslationResult> {
+    translate_at(SERVER_URL, text, from_lang).await
+}
+
+/// Translate text using the local model at the given base URL (8B or 4B server).
+pub async fn translate_at(
+    base_url: &str,
+    text: &str,
+    from_lang: Language,
+) -> Result<TranslationResult> {
+    if from_lang == Language::Unknown {
+        anyhow::bail!("Cannot translate unknown language");
+    }
+
+    let target_lang = match from_lang {
+        Language::Japanese => "English",
+        Language::English => "Japanese",
+        Language::Unknown => unreachable!(),
+    };
+
+    let prompt = build_translation_prompt(text, from_lang, target_lang);
+    eprintln!(
+        "[bonsai] Translating {} -> {}: {}",
+        from_lang, target_lang, text
+    );
+
+    let json_text = call_json_chat(base_url, "translate", &prompt, translation_schema()).await?;
+
+    let result: TranslationResult = serde_json::from_str(&json_text)
+        .context("Failed to parse local translation result JSON")?;
+
+    if result.suggestions.is_empty() {
+        anyhow::bail!("No translation suggestions returned");
+    }
+
+    eprintln!(
+        "[bonsai] Translation suggestions: {} (points: {})",
+        result.suggestions.len(),
+        result.points.len()
+    );
+
+    Ok(result)
+}
+
+/// Look up a word using the default (8B) model. Only used by the ignored
+/// integration tests; runtime code uses `lookup_word_at`.
+#[cfg_attr(not(test), allow(dead_code))]
+pub async fn lookup_word(word: &str, from_lang: Language) -> Result<DictionaryResult> {
+    lookup_word_at(SERVER_URL, word, from_lang).await
+}
+
+/// Look up a word using the local model at the given base URL (8B or 4B server).
+pub async fn lookup_word_at(
+    base_url: &str,
+    word: &str,
+    from_lang: Language,
+) -> Result<DictionaryResult> {
+    if from_lang == Language::Unknown {
+        anyhow::bail!("Cannot lookup unknown language");
+    }
+
+    let target_lang = match from_lang {
+        Language::Japanese => "English",
+        Language::English => "Japanese",
+        Language::Unknown => unreachable!(),
+    };
+
+    let prompt = build_dictionary_prompt(word, from_lang, target_lang);
+    eprintln!("[bonsai] Looking up {} word: {}", from_lang, word);
+
+    let json_text = call_json_chat(base_url, "dictionary", &prompt, dictionary_schema()).await?;
+
+    let result: DictionaryResult =
+        serde_json::from_str(&json_text).context("Failed to parse local dictionary result JSON")?;
+
+    eprintln!(
+        "[bonsai] Dictionary result: {} - {}",
+        result.word, result.meaning
+    );
+
+    Ok(result)
+}
+
+/// POST a single-turn chat request with JSON-schema-constrained output and
+/// return the raw JSON text from the response.
+async fn call_json_chat(
+    base_url: &str,
+    name: &str,
+    system_prompt: &str,
+    schema: serde_json::Value,
+) -> Result<String> {
+    let body = ChatRequest {
+        messages: vec![
+            ChatMessage {
+                role: "system".to_string(),
+                content: system_prompt.to_string(),
+            },
+            ChatMessage {
+                role: "user".to_string(),
+                content: "Now provide the JSON response following the exact format above."
+                    .to_string(),
+            },
+        ],
+        temperature: 0.7,
+        response_format: ResponseFormat {
+            r#type: "json_schema".to_string(),
+            json_schema: JsonSchema {
+                name: name.to_string(),
+                schema,
+            },
+        },
+    };
+
+    let client = Client::builder()
+        .timeout(Duration::from_secs(45))
+        .build()
+        .context("Failed to build HTTP client")?;
+    let response = client
+        .post(format!("{}/v1/chat/completions", base_url))
+        .json(&body)
+        .send()
+        .await
+        .context("Failed to reach local llama-server (is the local model enabled and running?)")?;
+
+    let status = response.status();
+    if !status.is_success() {
+        let error_text = response.text().await.unwrap_or_default();
+        anyhow::bail!("llama-server error ({}): {}", status, error_text);
+    }
+
+    let chat: ChatResponse = response
+        .json()
+        .await
+        .context("Failed to parse llama-server response")?;
+
+    chat.choices
+        .into_iter()
+        .next()
+        .map(|c| c.message.content.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .ok_or_else(|| anyhow::anyhow!("No response from local model"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Integration tests against a real llama-server. Ignored by default —
+    // run with `scripts/test-bonsai.sh` (starts the server if needed) or
+    // `cargo test -- --ignored` when the server is already running.
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_server_ready_against_running_server() {
+        assert!(
+            server_ready().await,
+            "llama-server must be running on port 4243 (see scripts/test-bonsai.sh)"
+        );
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_translate_against_running_server() {
+        assert!(server_ready().await, "llama-server not running");
+
+        let result = translate("今日の配信めっちゃ面白かったね", Language::Japanese)
+            .await
+            .expect("translate should succeed");
+
+        assert_eq!(result.suggestions.len(), 3, "expected 3 suggestions");
+        for s in &result.suggestions {
+            assert!(!s.text.is_empty());
+            assert!(
+                matches!(s.formality.as_str(), "casual" | "neutral" | "formal"),
+                "unexpected formality: {}",
+                s.formality
+            );
+        }
+        assert!(!result.points.is_empty(), "expected linguistic points");
+    }
+
+    #[tokio::test]
+    #[ignore]
+    async fn test_lookup_against_running_server() {
+        assert!(server_ready().await, "llama-server not running");
+
+        let result = lookup_word("serendipity", Language::English)
+            .await
+            .expect("lookup should succeed");
+
+        assert_eq!(result.word, "serendipity");
+        assert!(!result.meaning.is_empty(), "expected a meaning");
+        assert!(!result.examples.is_empty(), "expected examples");
+        assert!(
+            result.similar_words.len() >= 3,
+            "expected at least 3 similar words, got {}",
+            result.similar_words.len()
+        );
+    }
+}

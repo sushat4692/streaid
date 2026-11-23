@@ -1,0 +1,17 @@
+[package]
+name = "streaid-ffi"
+description = "C ABI (JSON) bridge for Streaid core, used by native frontends"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "streaid_ffi"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[dependencies]
+streaid-core.workspace = true
+base64.workspace = true
+serde.workspace = true
+serde_json.workspace = true

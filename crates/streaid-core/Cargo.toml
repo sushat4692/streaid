@@ -1,0 +1,28 @@
+[package]
+name = "streaid-core"
+description = "UI-agnostic core for Streaid: Twitch chat, translation, dictionary, commands, memos, shoutouts, local model, overlays"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lib]
+name = "streaid_core"
+
+[dependencies]
+anyhow.workspace = true
+axum.workspace = true
+chrono.workspace = true
+dirs.workspace = true
+futures-util.workspace = true
+keyring.workspace = true
+once_cell.workspace = true
+open.workspace = true
+reqwest.workspace = true
+rodio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tokio-stream.workspace = true
+tokio-tungstenite.workspace = true
+twitch_oauth2.workspace = true

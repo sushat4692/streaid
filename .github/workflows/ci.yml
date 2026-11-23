@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  rust:
+    name: Rust core + FFI
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test -p streaid-core -p streaid-ffi
+      - run: cargo clippy -p streaid-core -p streaid-ffi --all-targets
+      - run: cargo fmt --all --check
+
+  swift:
+    name: Swift bridge + app
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: brew install xcodegen
+      - run: ./scripts/test-ffi-swift.sh
+      - run: |
+          cd apps/macos
+          xcodegen generate
+      - run: |
+          xcodebuild \
+            -project apps/macos/Streaid.xcodeproj \
+            -scheme Streaid \
+            -configuration Debug \
+            -derivedDataPath "$RUNNER_TEMP/derived" \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+      - run: |
+          xcodebuild test \
+            -project apps/macos/Streaid.xcodeproj \
+            -scheme Streaid \
+            -destination 'platform=macOS' \
+            -derivedDataPath "$RUNNER_TEMP/derived-test" \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO

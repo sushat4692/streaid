@@ -1,9 +1,29 @@
-node_modules
+# Rust
+/target/
+/dist/
+**/*.rs.bk
+
+# macOS
 .DS_Store
-dist
-build/*
-!build/icons
-*.local
-!.gitkeep
+
+# Xcode / Swift
+**/DerivedData/
+**/build/
+**/xcuserdata/
+**/*.xcuserstate
+*.dSYM/
+
+# Local environment
 .env
-/data
+.env.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
