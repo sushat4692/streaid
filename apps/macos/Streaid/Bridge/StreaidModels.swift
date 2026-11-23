@@ -1,5 +1,29 @@
 import Foundation
 
+// MARK: - Settings
+
+public struct AppSettings: Codable, Equatable, Sendable {
+    public var locale: String
+    public var notificationsEnabled: Bool
+    public var shoutoutMessage: String
+    public var shoutoutNotFound: String
+    public var shoutoutFailed: String
+    public var shoutoutInfoLength: UInt64
+    public var discordWebhook: String
+
+    public static let `default` = AppSettings(
+        locale: "system",
+        notificationsEnabled: true,
+        shoutoutMessage:
+            "Please check this Recommended Streamer \"%username%\". %url% The last streaming was \"%category%\".",
+        shoutoutNotFound: "Target user \"%user_id%\" wasn't found, please check again.",
+        shoutoutFailed:
+            "Failed to get Channel information of \"%username%\" channel, please try again later.",
+        shoutoutInfoLength: 8,
+        discordWebhook: ""
+    )
+}
+
 // MARK: - System
 
 public struct StreaidCapabilities: Decodable, Sendable {

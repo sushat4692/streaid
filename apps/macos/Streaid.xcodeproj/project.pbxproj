@@ -17,6 +17,7 @@
 		2F2FBA608A91C77317E5F41C /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227C8746379FE33E07BBC2BA /* Theme.swift */; };
 		368E969FC3797F41CE3E9D30 /* VocabularyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9DCEEE0CD1382427ABC9784 /* VocabularyView.swift */; };
 		4809C83E2579723500A0D4B4 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D512BAC0685F22D6172C65D6 /* AppState.swift */; };
+		5452FFD37D57DC7D75FE38DE /* ShoutOutButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037686492CBB94F03A07CC5D /* ShoutOutButton.swift */; };
 		5D45322C466FE9C197CB7841 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0630592C68A1D62CF5EACA94 /* AppDelegate.swift */; };
 		695FBC0B12A234FA1E1799E9 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2660590B8BE8963AA9E208C6 /* Components.swift */; };
 		71B9DA2A95A6B80247F0DB7C /* ShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04E01979FD2640BBCACD27D /* ShellView.swift */; };
@@ -43,6 +44,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		037686492CBB94F03A07CC5D /* ShoutOutButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShoutOutButton.swift; sourceTree = "<group>"; };
 		0630592C68A1D62CF5EACA94 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		145E2A2DA750936E1E56FFA0 /* StreaidApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreaidApp.swift; sourceTree = "<group>"; };
 		227C8746379FE33E07BBC2BA /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
@@ -94,6 +96,7 @@
 			children = (
 				2660590B8BE8963AA9E208C6 /* Components.swift */,
 				B85DFB506A8617DAA3B2CFB3 /* EventTime.swift */,
+				037686492CBB94F03A07CC5D /* ShoutOutButton.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -310,6 +313,7 @@
 				1768D819AB0803609FCF411B /* NotificationService.swift in Sources */,
 				BE1E09C6812053E2F1794211 /* RaidersView.swift in Sources */,
 				71B9DA2A95A6B80247F0DB7C /* ShellView.swift in Sources */,
+				5452FFD37D57DC7D75FE38DE /* ShoutOutButton.swift in Sources */,
 				D59A21719C40E543BCCCE484 /* StreaidApp.swift in Sources */,
 				22398940951593A8BD978BEE /* StreaidCore.swift in Sources */,
 				FC8DBC9F3C639EE3CED52C67 /* StreaidModels.swift in Sources */,

@@ -5,9 +5,11 @@ pub mod commands;
 pub mod dictionary;
 pub mod overlay;
 pub mod platform;
+pub mod shoutout;
 pub mod sounds;
 pub mod store;
 pub mod translate;
+pub mod twitch;
 pub mod vocabulary;
 
 use auth::{shared_state, InnerState};
@@ -55,6 +57,20 @@ static CHAT_STATE: Lazy<Arc<std::sync::Mutex<ChatState>>> =
 /// Wakes the IRC read loop so stop takes effect immediately, even when the
 /// socket is idle or dead (no inbound messages to trip the loop's stop check).
 static CHAT_STOP_NOTIFY: Lazy<Notify> = Lazy::new(Notify::new);
+
+type IrcOut = Option<(mpsc::Sender<String>, String)>;
+
+/// Outbound IRC writer for the current session, used by UI-triggered
+/// shoutouts (which are not initiated by an inbound chat message).
+static IRC_OUT: Lazy<std::sync::Mutex<IrcOut>> = Lazy::new(|| std::sync::Mutex::new(None));
+
+struct IrcOutGuard;
+
+impl Drop for IrcOutGuard {
+    fn drop(&mut self) {
+        *IRC_OUT.lock().unwrap_or_else(|e| e.into_inner()) = None;
+    }
+}
 
 // Bonsai (local model sidecar) state
 /// One MLX model server instance managed as a sidecar.
@@ -1255,6 +1271,8 @@ async fn run_irc_session(ws_stream: WsStream, channel: String) -> Result<(), any
         }
     });
     // The writer finishes on its own once every sender is dropped.
+    *IRC_OUT.lock().unwrap_or_else(|e| e.into_inner()) = Some((out_tx.clone(), channel.clone()));
+    let _irc_out_guard = IrcOutGuard;
 
     // !ts / !d commands are handled serially by a dedicated worker so the
     // read loop stays responsive (PING/PONG, chat_message events) while
@@ -1420,6 +1438,21 @@ async fn send_to_irc(
         .map_err(|e| format!("Failed to send chat message: {}", e))
 }
 
+/// Send a chat message from outside the IRC read loop (e.g. the UI ShoutOut
+/// button). Returns an error when the listener is not running.
+pub async fn send_chat_message(message: &str) -> Result<(), String> {
+    let (tx, channel) = {
+        let guard = IRC_OUT.lock().unwrap_or_else(|e| e.into_inner());
+        guard
+            .clone()
+            .ok_or_else(|| "Chat listener is not running.".to_string())?
+    };
+    let line = format!("PRIVMSG #{} :{}", channel, message);
+    tx.send(line)
+        .await
+        .map_err(|e| format!("Failed to send chat message: {}", e))
+}
+
 /// Serialized handler for chat commands. Runs off the read loop so
 /// PING/PONG and chat_message events are never blocked by API calls.
 async fn handle_commands(
@@ -1438,6 +1471,26 @@ async fn handle_commands(
                 if chat_is_enabled() {
                     handle_dictionary_request(&out_tx, &channel, &message.username, &word).await;
                 }
+            }
+            Some(CommandAction::Shoutout { username, mode }) => {
+                match crate::shoutout::run(&username, mode).await {
+                    Ok(text) => {
+                        if let Err(e) = send_to_irc(&out_tx, &channel, &text).await {
+                            eprintln!("Failed to send shoutout: {}", e);
+                        }
+                    }
+                    Err(e) => {
+                        let _ = send_to_irc(
+                            &out_tx,
+                            &channel,
+                            &format!("@{}: {}", message.username, e),
+                        )
+                        .await;
+                    }
+                }
+            }
+            Some(CommandAction::StopClip) => {
+                crate::shoutout::stop_clip();
             }
             Some(CommandAction::Reply(text)) => {
                 if let Err(e) = send_to_irc(&out_tx, &channel, &text).await {

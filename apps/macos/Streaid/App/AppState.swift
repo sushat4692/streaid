@@ -79,6 +79,8 @@ final class AppState: ObservableObject {
     @Published var raiders: [RaiderRecord] = []
     @Published var commands: [CommandRecord] = []
     @Published var memos: [MemoRecord] = []
+    @Published var settings = AppSettings.default
+    @Published var settingsLoaded = false
     @Published var toast: String?
     @Published var toastKind: ToastKind = .error
 
@@ -126,6 +128,10 @@ final class AppState: ObservableObject {
     var localModelEnabled: Bool { bonsai?.enabled ?? false }
     var activeModel: String { bonsai?.activeModel ?? "8b" }
     var overlayURL: String { capabilities?.overlayUrl ?? "http://localhost:4242" }
+    var alertURL: String {
+        let base = overlayURL.hasSuffix("/") ? String(overlayURL.dropLast()) : overlayURL
+        return "\(base)/alert"
+    }
 
     // MARK: - Bootstrap
 
@@ -163,6 +169,7 @@ final class AppState: ObservableObject {
             await refreshRaiders()
             await refreshCommands()
             await refreshMemos()
+            await refreshSettings()
         } catch {
             showError(error.localizedDescription)
         }
@@ -514,6 +521,12 @@ final class AppState: ObservableObject {
     func setNotificationsEnabled(_ enabled: Bool) {
         notificationsEnabled = enabled
         UserDefaults.standard.set(enabled, forKey: "notificationsEnabled")
+        settings.notificationsEnabled = enabled
+        Task {
+            if self.settingsLoaded {
+                _ = await self.saveSettings()
+            }
+        }
     }
 
     private struct LegacyVolumes: Decodable {
@@ -691,6 +704,66 @@ final class AppState: ObservableObject {
         } catch {
             showError(error.localizedDescription)
         }
+    }
+
+    // MARK: - Settings / shoutout
+
+    func refreshSettings() async {
+        do {
+            let loaded = try await core.getSettings()
+            settings = loaded
+            settingsLoaded = true
+
+            // UserDefaults is the source of truth for the notification toggle
+            // if it was already set (Sprint 1).
+            let defaults = UserDefaults.standard
+            if defaults.object(forKey: "notificationsEnabled") == nil {
+                notificationsEnabled = loaded.notificationsEnabled
+            } else {
+                settings.notificationsEnabled = notificationsEnabled
+            }
+        } catch {
+            showError(error.localizedDescription)
+        }
+    }
+
+    func saveSettings() async -> Bool {
+        do {
+            settings = try await core.saveSettings(settings)
+            return true
+        } catch {
+            showError(error.localizedDescription)
+            return false
+        }
+    }
+
+    func saveShoutoutSettings(
+        message: String,
+        notFound: String,
+        failed: String,
+        infoLength: UInt64
+    ) async -> Bool {
+        var copy = settings
+        copy.shoutoutMessage = message
+        copy.shoutoutNotFound = notFound
+        copy.shoutoutFailed = failed
+        copy.shoutoutInfoLength = infoLength
+        settings = copy
+        return await saveSettings()
+    }
+
+    func runShoutout(username: String, mode: String? = nil) async {
+        do {
+            _ = try await core.runShoutout(username: username, mode: mode)
+        } catch {
+            showError(error.localizedDescription)
+        }
+    }
+
+    func copyAlertURL() {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(alertURL, forType: .string)
+        showSuccess("Alert URL copied.")
     }
 
     // MARK: - Vocabulary

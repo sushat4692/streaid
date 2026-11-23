@@ -287,6 +287,35 @@ public final class StreaidCore: @unchecked Sendable {
         ])
     }
 
+    // MARK: Shoutout / settings
+
+    public func getSettings() async throws -> AppSettings {
+        try await call("settings.get")
+    }
+
+    public func saveSettings(_ settings: AppSettings) async throws -> AppSettings {
+        try await call("settings.set", [
+            "locale": settings.locale,
+            "notifications_enabled": settings.notificationsEnabled,
+            "shoutout_message": settings.shoutoutMessage,
+            "shoutout_not_found": settings.shoutoutNotFound,
+            "shoutout_failed": settings.shoutoutFailed,
+            "shoutout_info_length": settings.shoutoutInfoLength,
+            "discord_webhook": settings.discordWebhook,
+        ])
+    }
+
+    /// Run a shoutout and post the message to chat. `mode` is nil, "info", or "clip".
+    public func runShoutout(username: String, mode: String? = nil) async throws -> String {
+        var params: [String: Any] = ["username": username]
+        if let mode { params["mode"] = mode }
+        return try await call("shoutout.run", params)
+    }
+
+    public func stopShoutoutClip() async throws {
+        try await callVoid("shoutout.stop")
+    }
+
     // MARK: Raiders / commands / memos
 
     public func listRaiders() async throws -> [RaiderRecord] {

@@ -162,6 +162,26 @@ can be called from separate FFI invocations.
 | `vocab.clear` | — | `null` |
 | `vocab.analyze` | — | `[CategoryResult]` |
 
+### settings
+
+| Method | Params | Result |
+|---|---|---|
+| `settings.get` | — | `Settings` |
+| `settings.set` | `Settings` fields | `Settings` |
+
+Settings include `locale`, `notifications_enabled`, shoutout message templates,
+`shoutout_info_length`, and `discord_webhook`.
+
+### shoutout
+
+| Method | Params | Result |
+|---|---|---|
+| `shoutout.run` | `username, mode?` | `string` (the chat message; also posts to chat) |
+| `shoutout.stop` | — | `null` |
+
+`mode` is omitted (message only), `"info"`, or `"clip"`. The alert page is
+`http://localhost:4242/alert`.
+
 ### raiders
 
 | Method | Params | Result |

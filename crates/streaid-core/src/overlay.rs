@@ -22,11 +22,19 @@ pub static OVERLAY_TX: Lazy<broadcast::Sender<OverlayMessage>> =
     Lazy::new(|| broadcast::channel(64).0);
 
 const OVERLAY_HTML: &str = include_str!("overlay.html");
+const ALERT_HTML: &str = include_str!("alert.html");
 
 pub async fn start_overlay_server(port: u16, tx: broadcast::Sender<OverlayMessage>) {
+    let overlay_tx = tx.clone();
+    let alert_tx = tx.clone();
     let app = Router::new()
         .route("/", get(serve_html))
-        .route("/events", get(move || sse_handler(tx.subscribe())));
+        .route("/events", get(move || sse_handler(overlay_tx.subscribe())))
+        .route("/alert", get(serve_alert_html))
+        .route(
+            "/alert/events",
+            get(move || alert_sse_handler(alert_tx.subscribe())),
+        );
 
     let addr = format!("127.0.0.1:{}", port);
     let listener = match tokio::net::TcpListener::bind(&addr).await {
@@ -44,6 +52,10 @@ pub async fn start_overlay_server(port: u16, tx: broadcast::Sender<OverlayMessag
 
 async fn serve_html() -> Html<&'static str> {
     Html(OVERLAY_HTML)
+}
+
+async fn serve_alert_html() -> Html<&'static str> {
+    Html(ALERT_HTML)
 }
 
 async fn sse_handler(
@@ -65,4 +77,16 @@ async fn sse_handler(
     });
 
     Sse::new(history_event.chain(stream)).keep_alive(KeepAlive::default())
+}
+
+async fn alert_sse_handler(
+    rx: broadcast::Receiver<OverlayMessage>,
+) -> Sse<impl futures_util::Stream<Item = Result<Event, Infallible>>> {
+    let stream = BroadcastStream::new(rx).filter_map(|msg| {
+        let msg = msg.ok()?;
+        let data = serde_json::to_string(&msg.data).ok()?;
+        Some(Ok(Event::default().event(msg.event_type).data(data)))
+    });
+
+    Sse::new(stream).keep_alive(KeepAlive::default())
 }

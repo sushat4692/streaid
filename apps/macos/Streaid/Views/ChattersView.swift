@@ -55,6 +55,8 @@ struct ChattersView: View {
                 .font(.caption2.monospacedDigit())
                 .foregroundStyle(Theme.textDim)
 
+            ShoutOutButton(username: chatter.username)
+
             Button {
                 state.removeChatter(chatter)
             } label: {

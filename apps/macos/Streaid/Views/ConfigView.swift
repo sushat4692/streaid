@@ -9,16 +9,25 @@ struct ConfigView: View {
     @State private var showImporter = false
     @State private var importSlot = "chatter"
 
+    @State private var shoutoutMessage = ""
+    @State private var shoutoutNotFound = ""
+    @State private var shoutoutFailed = ""
+    @State private var shoutoutInfoLength: Double = 8
+    @State private var savingShoutout = false
+
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             PageHeader("Config", subtitle: "Credentials, chat behaviour, sounds and the OBS overlay.")
 
             translationSettings
             chatListener
+            shoutoutSettings
             localModel
             soundSettings
             overlaySettings
         }
+        .onAppear { syncShoutoutSettings() }
+        .onChange(of: state.settingsLoaded) { _ in syncShoutoutSettings() }
         .fileImporter(
             isPresented: $showImporter,
             allowedContentTypes: [.audio],
@@ -140,6 +149,82 @@ struct ConfigView: View {
                 .buttonStyle(PrimaryButtonStyle(compact: true))
                 .disabled(state.isBusy)
             }
+        }
+    }
+
+    // MARK: - Shoutout
+
+    private var shoutoutSettings: some View {
+        SectionCard(
+            "Shoutout",
+            subtitle: "Used by !so and the ShoutOut buttons. Placeholders: %username%, %user_id%, %url%, %category%."
+        ) {
+            LabeledField("Shoutout Message") {
+                textArea($shoutoutMessage, minHeight: 64)
+            }
+            LabeledField("Not Found Message") {
+                textArea($shoutoutNotFound, minHeight: 48)
+            }
+            LabeledField("Failed Message") {
+                textArea($shoutoutFailed, minHeight: 48)
+            }
+
+            HStack(spacing: 10) {
+                Text("Info Display Time")
+                    .font(.caption2)
+                    .foregroundStyle(Theme.textDim)
+                Slider(value: $shoutoutInfoLength, in: 0...60, step: 1)
+                    .frame(width: 220)
+                Text("\(Int(shoutoutInfoLength))s")
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(Theme.textDim)
+                Spacer()
+                Button {
+                    saveShoutout()
+                } label: {
+                    if savingShoutout {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Text("Save Shoutout Settings")
+                    }
+                }
+                .buttonStyle(PrimaryButtonStyle(compact: true))
+                .disabled(savingShoutout)
+            }
+        }
+    }
+
+    private func textArea(_ text: Binding<String>, minHeight: CGFloat) -> some View {
+        TextEditor(text: text)
+            .font(.system(size: 13))
+            .scrollContentBackground(.hidden)
+            .padding(8)
+            .frame(minHeight: minHeight)
+            .background(Theme.cardStrong)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .stroke(Theme.border, lineWidth: 1)
+            )
+    }
+
+    private func syncShoutoutSettings() {
+        shoutoutMessage = state.settings.shoutoutMessage
+        shoutoutNotFound = state.settings.shoutoutNotFound
+        shoutoutFailed = state.settings.shoutoutFailed
+        shoutoutInfoLength = Double(state.settings.shoutoutInfoLength)
+    }
+
+    private func saveShoutout() {
+        savingShoutout = true
+        Task {
+            _ = await state.saveShoutoutSettings(
+                message: shoutoutMessage,
+                notFound: shoutoutNotFound,
+                failed: shoutoutFailed,
+                infoLength: UInt64(shoutoutInfoLength)
+            )
+            savingShoutout = false
         }
     }
 
@@ -337,10 +422,33 @@ struct ConfigView: View {
     private var overlaySettings: some View {
         SectionCard(
             "OBS Overlay",
-            subtitle: "Add a Browser Source in OBS and point it at this URL."
+            subtitle: "Add two Browser Sources in OBS: one for translations, one for alerts."
         ) {
+            urlRow(
+                label: "Translation / Dictionary",
+                url: state.overlayURL,
+                copy: { state.copyOverlayURL() }
+            )
+            Divider().overlay(Theme.border)
+            urlRow(
+                label: "Shoutout Alert",
+                url: state.alertURL,
+                copy: { state.copyAlertURL() }
+            )
+
+            Text("Enable a transparent background in OBS. Alert cards scale with the source size.")
+                .font(.caption2)
+                .foregroundStyle(Theme.textDim)
+        }
+    }
+
+    private func urlRow(label: String, url: String, copy: @escaping () -> Void) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(Theme.textDim)
             HStack(spacing: 8) {
-                Text(state.overlayURL)
+                Text(url)
                     .font(.system(size: 13, design: .monospaced))
                     .foregroundStyle(Theme.purpleLight)
                     .textSelection(.enabled)
@@ -353,22 +461,16 @@ struct ConfigView: View {
                             .stroke(Theme.border, lineWidth: 1)
                     )
 
-                Button("Copy") {
-                    state.copyOverlayURL()
-                }
-                .buttonStyle(SecondaryButtonStyle(compact: true))
+                Button("Copy", action: copy)
+                    .buttonStyle(SecondaryButtonStyle(compact: true))
 
                 Button("Open") {
-                    if let url = URL(string: state.overlayURL) {
+                    if let url = URL(string: url) {
                         NSWorkspace.shared.open(url)
                     }
                 }
                 .buttonStyle(SecondaryButtonStyle(compact: true))
             }
-
-            Text("Recommended size: 800×300 · enable a transparent background in OBS.")
-                .font(.caption2)
-                .foregroundStyle(Theme.textDim)
         }
     }
 }

@@ -173,6 +173,14 @@ func runCoreTests(_ core: StreaidCore) async throws {
 
     _ = try await core.listRaiders()
 
+    let settings = try await core.getSettings()
+    var updatedSettings = settings
+    updatedSettings.shoutoutInfoLength = 12
+    let savedSettings = try await core.saveSettings(updatedSettings)
+    guard savedSettings.shoutoutInfoLength == 12 else {
+        fatalError("settings were not saved")
+    }
+
     do {
         _ = try await core.callData("does.not.exist")
         fatalError("unknown methods must throw")

@@ -25,7 +25,15 @@ Sprint 2:
 - FFI CRUD（raiders / commands / memos）
 - `STREAID_DATA_DIR` によるテスト用データ分離
 
-Sprint 3以降は未着手。
+Sprint 3:
+- 読み取り専用Helixクライアント（users / channels / clips）
+- `!so` / `!so user info` / `!so user clip` / `!stop`（mod / broadcaster）
+- Shoutout文面3種 + info表示秒数
+- アラートオーバーレイ `/alert` + SSE（`:4242`）
+- Chatters / Raiders / User Memo のShoutOutボタン
+- `settings.get` / `settings.set` FFI
+
+Sprint 4以降は未着手。
 
 ---
 

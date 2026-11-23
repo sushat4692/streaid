@@ -56,6 +56,8 @@ struct RaidersView: View {
                 .font(.caption2.monospacedDigit())
                 .foregroundStyle(Theme.textDim)
 
+            ShoutOutButton(username: raider.username)
+
             Button {
                 Task { await state.deleteRaider(id: raider.id) }
             } label: {

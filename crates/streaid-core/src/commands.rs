@@ -4,6 +4,7 @@
 //! existing workers; `!dice` and custom commands are answered directly.
 
 use crate::chat::IrcMessage;
+use crate::shoutout::ShoutoutMode;
 use crate::store::{self, CommandAllow};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -13,6 +14,11 @@ const RESERVED: &[&str] = &["ts", "d", "dice", "so", "stop"];
 pub enum CommandAction {
     Translate(String),
     Dictionary(String),
+    Shoutout {
+        username: String,
+        mode: Option<ShoutoutMode>,
+    },
+    StopClip,
     /// Send this text to chat as-is.
     Reply(String),
 }
@@ -86,8 +92,37 @@ pub fn resolve(message: &IrcMessage) -> Option<CommandAction> {
             message.username,
             roll_dice()
         ))),
-        // Implemented in a later sprint.
-        "so" | "stop" => None,
+        "so" => {
+            if !(message.is_mod || message.is_broadcaster) {
+                return None;
+            }
+            let mut parts = args.split_whitespace();
+            let Some(username) = parts.next() else {
+                return Some(CommandAction::Reply(
+                    "* You need to add username: e.g. !so {username}".to_string(),
+                ));
+            };
+            let mode = match parts
+                .next()
+                .map(|part| part.to_ascii_lowercase())
+                .as_deref()
+            {
+                Some("info") => Some(ShoutoutMode::Info),
+                Some("clip") => Some(ShoutoutMode::Clip),
+                _ => None,
+            };
+            Some(CommandAction::Shoutout {
+                username: username.to_string(),
+                mode,
+            })
+        }
+        "stop" => {
+            if message.is_mod || message.is_broadcaster {
+                Some(CommandAction::StopClip)
+            } else {
+                None
+            }
+        }
         _ => {
             let command = store::list_commands()
                 .into_iter()
@@ -187,6 +222,30 @@ mod tests {
 
         assert_eq!(resolve(&message("!ts", false, false, false)), None);
         assert_eq!(resolve(&message("!unknown", false, false, false)), None);
+    }
+
+    #[test]
+    fn shoutout_requires_mod_and_parses_mode() {
+        let mod_msg = message("!so someone info", false, true, false);
+        assert_eq!(
+            resolve(&mod_msg),
+            Some(CommandAction::Shoutout {
+                username: "someone".to_string(),
+                mode: Some(ShoutoutMode::Info),
+            })
+        );
+
+        let clip = message("!so someone clip", false, false, true);
+        assert_eq!(resolve(&clip), None);
+
+        let stop = message("!stop", true, false, false);
+        assert_eq!(resolve(&stop), Some(CommandAction::StopClip));
+
+        let no_user = message("!so", false, true, false);
+        match resolve(&no_user) {
+            Some(CommandAction::Reply(text)) => assert!(text.contains("!so")),
+            other => panic!("unexpected action: {:?}", other),
+        }
     }
 
     #[test]

@@ -122,6 +122,34 @@ fn dispatch(method: &str, params: &Value) -> Result<Value, String> {
             .map(|_| Value::Null)
             .map_err(|e| e.to_string()),
 
+        // ── settings ────────────────────────────────────────────────────
+        "settings.get" => Ok(json!(core::store::load_settings())),
+        "settings.set" => {
+            let settings: core::store::Settings = serde_json::from_value(params.clone())
+                .map_err(|e| format!("invalid settings: {e}"))?;
+            core::store::save_settings(&settings)
+                .map(|_| json!(settings))
+                .map_err(|e| e.to_string())
+        }
+
+        // ── shoutout ─────────────────────────────────────────────────────
+        "shoutout.run" => {
+            ensure_runtime()?;
+            let username: String = param(params, "username")?;
+            let mode = match optional::<String>(params, "mode")?.as_deref() {
+                Some("info") => Some(core::shoutout::ShoutoutMode::Info),
+                Some("clip") => Some(core::shoutout::ShoutoutMode::Clip),
+                _ => None,
+            };
+            let message = core::block_on(core::shoutout::run(&username, mode))?;
+            core::block_on(core::send_chat_message(&message))?;
+            Ok(json!(message))
+        }
+        "shoutout.stop" => {
+            core::shoutout::stop_clip();
+            Ok(Value::Null)
+        }
+
         // ── raiders ──────────────────────────────────────────────────────
         "raiders.list" => Ok(json!(core::store::list_raiders())),
         "raiders.delete" => {
@@ -332,6 +360,7 @@ mod tests {
             "auth.start_device_flow",
             "auth.poll_device_flow",
             "gemini.set_key",
+            "settings.get",
             "raiders.list",
             "commands.list",
             "memos.list",

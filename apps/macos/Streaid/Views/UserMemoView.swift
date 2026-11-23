@@ -65,6 +65,8 @@ struct UserMemoView: View {
                     showForm = true
                 }
                 .buttonStyle(SecondaryButtonStyle(compact: true))
+                ShoutOutButton(username: memo.username)
+
                 Button {
                     Task { await state.deleteMemo(id: memo.id) }
                 } label: {
