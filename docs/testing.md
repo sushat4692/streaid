@@ -1,6 +1,6 @@
 # Manual Testing Guide
 
-Covers the dictionary feature (`!d`) and general feature verification. Run the app in dev mode with `pnpm tauri dev` and test against a live Twitch channel.
+Covers the dictionary feature (`!d`) and general feature verification. Build and run the SwiftUI app with `scripts/build-macos-app.sh --open` (or ⌘R in Xcode) and test against a live Twitch channel.
 
 ## Pre-Testing Checklist
 
@@ -9,7 +9,7 @@ Before testing the dictionary feature, ensure:
 - [ ] Gemini API key is configured in keyring
 - [ ] Twitch authentication is complete
 - [ ] Translation toggle is **enabled** (controls both `!ts` and `!d`)
-- [ ] Application is running in dev mode: `pnpm tauri dev`
+- [ ] Application is running: `scripts/build-macos-app.sh --open` (or Xcode ⌘R)
 - [ ] Connected to a Twitch channel with active chat
 
 ---
@@ -20,7 +20,7 @@ Before testing the dictionary feature, ensure:
 
 **Command:** `!d apple`
 
-**Expected Backend Logs:**
+**Expected core logs (Xcode console / stderr):**
 ```
 Dictionary request: apple
 Dictionary result: DictionaryResult { word: "apple", meaning: "りんご。バラ科...", ... }
@@ -47,7 +47,7 @@ Sent similar words to chat
 
 **Command:** `!d りんご`
 
-**Expected Backend Logs:**
+**Expected core logs (Xcode console / stderr):**
 ```
 Dictionary request: りんご
 Dictionary result: DictionaryResult { word: "りんご", meaning: "Apple. A deciduous tree...", ... }
@@ -101,7 +101,7 @@ Dictionary request: apple
 **Command:** `!d hello`
 
 **Expected Behavior:**
-- No backend logs for dictionary processing
+- No core logs for dictionary processing
 - No chat messages sent
 - No UI updates
 - Command is completely ignored
@@ -222,7 +222,7 @@ After successful lookups, verify in DictionaryLog:
 - [ ] No visible lag in UI when event received
 - [ ] Chat messages appear with ~500ms delay between them
 - [ ] No memory leaks after many lookups
-- [ ] Console shows no errors in browser DevTools
+- [ ] Xcode console / stderr shows no errors
 
 ---
 
@@ -230,7 +230,7 @@ After successful lookups, verify in DictionaryLog:
 
 ### If dictionary doesn't respond:
 
-1. Check backend terminal for logs starting with "Dictionary request:"
+1. Check the Xcode console / stderr for logs starting with "Dictionary request:"
 2. Verify toggle is enabled (green)
 3. Check Gemini API key: Should see log if missing
 4. Verify IRC connection is active
@@ -238,16 +238,16 @@ After successful lookups, verify in DictionaryLog:
 
 ### If chat messages don't appear:
 
-1. Look for "Failed to send" errors in backend logs
+1. Look for "Failed to send" errors in the core logs
 2. Verify IRC connection is stable
 3. Check Twitch chat rate limits (should be fine with 500ms delays)
 
 ### If UI doesn't update:
 
-1. Open browser DevTools console
-2. Look for "Dictionary event received:" log
-3. Check if event payload is correct
-4. Verify DictionaryLog component is mounted (visible on page)
+1. Run from Xcode and check the console
+2. Confirm `AppState` received the event (translation/dictionary list)
+3. Check the `chat.status` / listener state
+4. Verify the Log page is selected and the event is not filtered
 
 ---
 
@@ -310,6 +310,6 @@ If all tests pass:
 
 If tests fail:
 - Note which test case failed
-- Copy exact error messages from backend logs
-- Check browser console for frontend errors
+- Copy exact error messages from the core stderr / Xcode console
+- Check the Xcode console for Swift/core errors
 - Report issue with reproduction steps

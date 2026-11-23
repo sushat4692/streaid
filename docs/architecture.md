@@ -2,58 +2,102 @@
 
 ## Overview
 
-Tauri desktop app: a Rust backend runs a Twitch IRC WebSocket listener and calls the Gemini AI API; a React frontend displays results in real time. An embedded axum HTTP server serves an OBS browser-source overlay.
+```
+┌──────────────────────────── frontends ─────────────────────────────────┐
+│  apps/macos (SwiftUI)                                                   │
+│        │ C ABI (JSON)                                                   │
+└────────┼─────────────────────────────────────────────────────────────────┘
+         ▼
+┌──────────────────────── crates/streaid-ffi ───────────────────────────┐
+│  streaid_init / streaid_dispatch / streaid_poll_events / streaid_free  │
+└────────────────────────────────────────────────────────────────────────┘
+         ▼
+┌──────────────────────── crates/streaid-core ──────────────────────────┐
+│  Twitch IRC listener · Gemini / local model · OAuth · sounds ·        │
+│  vocabulary · OBS overlay (axum :4242) · event channel                │
+└───────────────────────────────────────────────────────────────────────┘
+```
+
+The core has **no UI dependency**. `streaid-core` knows nothing about SwiftUI,
+AppKit, or any windowing framework.
 
 ## Data Flow
 
 ```
-Twitch IRC → tokio-tungstenite WebSocket → lib.rs listener loop
+Twitch IRC
+  → tokio-tungstenite WebSocket → streaid-core::run_irc_session (read loop)
   → chat.rs: is_translation_command() / is_dictionary_command()
-  → translate.rs / dictionary.rs: Gemini API call
-  → Send messages back to Twitch chat (500ms delay between each)
-  → app.emit("translation" | "dictionary", event)  →  React UI
-  → app.emit("chat_message", ChatMessageEvent)      →  React UI (every message)
-  → OVERLAY_TX.send(OverlayMessage)                 →  OBS overlay SSE clients
+  → worker task → translate.rs / dictionary.rs (Gemini, or local model fallback)
+  → Send messages back to Twitch (500 ms delay between each)
+  → EVENT_TX.send(AppEvent::Translation | Dictionary | ChatMessage)
+      → SwiftUI: StreaidCore.eventStream() polls streaid_poll_events() every 100 ms
+  → OVERLAY_TX.send(OverlayMessage) → OBS overlay SSE clients
 ```
 
-## Frontend (`src/`)
+## Crates
 
-| Concern | Detail |
-|---------|--------|
-| Routing | TanStack Router with file-based routing in `src/routes/`. `src/routeTree.gen.ts` is auto-generated — **do not edit it manually**. Files prefixed with `-` are ignored by the router plugin. |
-| Entry | `main.tsx` → `App.tsx` → TanStack Router renders `routes/login.tsx` or `routes/dashboard.tsx` |
-| State | Local React hooks + React context only; no global state library |
-| Styling | Tailwind CSS v4 via `@import 'tailwindcss'` in `index.css`; use `cx` (classnames) for conditional classes |
-| Backend communication | `invoke()` for commands, `listen()` for events (both from `@tauri-apps/api`) |
-
-Components live in `src/components/`, contexts in `src/contexts/`, types in `src/types/chat.ts`, utilities in `src/utils/` (with tests in `src/utils/__tests__/`).
-
-## Backend (`src-tauri/src/`)
+### `crates/streaid-core`
 
 | File | Responsibility |
-|------|---------------|
-| `lib.rs` | Tauri command registration, global shared state, IRC chat listener loop, Bonsai sidecar spawn/kill |
+|------|----------------|
+| `lib.rs` | tokio runtime, shared state, IRC listener supervision (auto-reconnect), Gemini rate limiting, local-model fallback, `AppEvent` channel, `init_runtime` / `block_on` / `drain_events` / `shutdown` |
 | `auth.rs` | Twitch OAuth2 device flow, token storage/refresh via OS keyring |
 | `chat.rs` | Twitch IRC WebSocket connection, command parsing helpers |
-| `translate.rs` | `!ts` command: Gemini API call, language detection, `TranslationResult`, shared prompt/schema builders |
-| `dictionary.rs` | `!d` command: Gemini API call, `DictionaryResult`, shared prompt/schema builders |
-| `bonsai.rs` | Local model provider: OpenAI-compatible llama-server client, JSON-schema constrained output |
-| `sounds.rs` | Audio file save/retrieve/delete for notification sound slots; stores in app data `sounds/` dir |
-| `overlay.rs` | OBS overlay: axum HTTP server on port 4242, SSE endpoint, static `OVERLAY_TX` broadcast channel |
-| `overlay.html` | Transparent overlay HTML embedded into the binary |
+| `translate.rs` | `!ts`: language detection, Gemini call, `TranslationResult` |
+| `dictionary.rs` | `!d`: Gemini call, `DictionaryResult` |
+| `bonsai.rs` | Local model client (OpenAI-compatible llama-server, ports 4243/4244) |
+| `sounds.rs` | Notification sound storage + `rodio` playback |
+| `overlay.rs` | OBS overlay: axum server on port 4242, SSE, embedded `overlay.html` |
+| `vocabulary.rs` | Lookup statistics and AI word-category analysis |
+| `platform.rs` | OS detection and capability flags (MLX availability, etc.) |
 
-## Tauri Commands
+### `crates/streaid-ffi`
 
-Full reference (all 19 commands with args/return types): `docs/commands.md`
+A four-function C ABI (`crates/streaid-ffi/include/streaid.h`). All requests and
+responses are UTF-8 JSON; see `src/api.rs` for the method table. It links
+`streaid-core` and is built as `staticlib` for macOS (`cdylib` is enabled for
+future platforms).
 
-## Backend State & Events
+Ownership: every returned `char *` is freed with `streaid_free()`.
+Threading: `streaid_dispatch` may block (async core methods); call it off the UI thread.
 
-- Shared state: `Arc<Mutex<T>>` with `once_cell::sync::Lazy` for statics
-- Frontend events: `"translation"`, `"dictionary"`, `"chat_message"` — payload types in `docs/commands.md`
-- Overlay SSE: named SSE events pushed from `OVERLAY_TX` broadcast channel
+### `apps/macos`
+
+The macOS SwiftUI app, generated by XcodeGen (`project.yml` → `Streaid.xcodeproj`).
+
+- `App/StreaidApp.swift` — app entry, window scene, menu commands
+- `App/AppState.swift` — `@MainActor` mirror of status/events/auth/sounds/vocabulary
+- `App/AppDelegate.swift` — `applicationWillTerminate` → `core.shutdownSync()`;
+  quits when the last window closes
+- `Bridge/StreaidCore.swift` — async C ABI wrapper (private serial queue)
+- `Bridge/StreaidModels.swift` — `Decodable` mirrors of the core JSON
+- `Views/` — Login, Shell, Dashboard, Config, Model Test, Log, Vocabulary, Credits
+- `ContractTests/` — Swift ↔ Rust contract test
+- `StreaidUITests/` — login-screen UI smoke test
+
+## Shared State & Events
+
+- Shared state: `static Lazy<Arc<Mutex<T>>>` (`CHAT_STATE`, `AUTH_STATE`, `SESSION_LOOKUPS`, `OVERLAY_TX`)
+- Events: `std::sync::mpsc` channel in `lib.rs`; drained by `streaid_poll_events()`
+  (SwiftUI) or `drain_events()` (Rust)
+- Status: the UI polls `chat.status` / `model.status` every 2 s
+- OAuth device-flow state is process-wide (`auth::shared_state()` returns clones
+  of one `Arc`) so start/poll can happen in separate calls
+
+## Platform Support
+
+| Concern | macOS (current) | Future platforms |
+|---|---|---|
+| UI | SwiftUI | not implemented (see `docs/future.md`) |
+| Core | yes | reusable |
+| Local model (MLX) | yes | `local_model_supported() == false` |
+| Keychain | Keychain | `keyring` platform backend |
+| Audio | CoreAudio | `rodio`/`cpal` backend |
+| Overlay server | axum :4242 | same |
+| Architecture | arm64 only | TBD |
 
 ## Technical Limits
 
-- Twitch message max length: 500 characters (truncated with `...` using UTF-8 safe method)
-- Rate limiting: 500ms delay between consecutive Twitch chat messages
-- Translation: sends 4 messages (~2s total); Dictionary: sends 3 messages (~1.5s total)
+- Twitch message max length: 500 characters (truncated with `...`, UTF-8 safe)
+- Rate limiting: 500 ms between consecutive Twitch messages
+- Translation: 4 messages (~2 s total); Dictionary: 3 messages (~1.5 s total)

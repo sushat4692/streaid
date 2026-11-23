@@ -1,23 +1,27 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# Rust
+/target/
+/dist/
+**/*.rs.bk
 
-node_modules
-dist
-dist-ssr
-*.local
+# macOS
+.DS_Store
+
+# Xcode / Swift
+**/DerivedData/
+**/build/
+**/xcuserdata/
+**/*.xcuserstate
+*.dSYM/
+
+# Local environment
+.env
+.env.local
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj

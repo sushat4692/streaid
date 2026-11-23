@@ -1,0 +1,587 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0073614E5AE5445F9989BBE1 /* EventTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = B85DFB506A8617DAA3B2CFB3 /* EventTime.swift */; };
+		0355A7DC2AD24A4D120A8088 /* CreditsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448FE50A95D056534EAE4C5B /* CreditsView.swift */; };
+		12C26F16546321697E109730 /* StreaidUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F91B4287B1DB1EC25588BC /* StreaidUITests.swift */; };
+		15A8186D43393FD738CF595D /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D3C13A9702DAD6607855468 /* DashboardView.swift */; };
+		1F9CF91CDC19E143EF81B25B /* ConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE5D7FBCEA06D4DFCFC2158 /* ConfigView.swift */; };
+		22398940951593A8BD978BEE /* StreaidCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40C2F5093180044DDF66A63 /* StreaidCore.swift */; };
+		2F2FBA608A91C77317E5F41C /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227C8746379FE33E07BBC2BA /* Theme.swift */; };
+		368E969FC3797F41CE3E9D30 /* VocabularyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9DCEEE0CD1382427ABC9784 /* VocabularyView.swift */; };
+		4809C83E2579723500A0D4B4 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D512BAC0685F22D6172C65D6 /* AppState.swift */; };
+		5D45322C466FE9C197CB7841 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0630592C68A1D62CF5EACA94 /* AppDelegate.swift */; };
+		695FBC0B12A234FA1E1799E9 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2660590B8BE8963AA9E208C6 /* Components.swift */; };
+		71B9DA2A95A6B80247F0DB7C /* ShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04E01979FD2640BBCACD27D /* ShellView.swift */; };
+		A17E9848E3CFE39FC3FAB00C /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C029E6B4F245958C869EA0CA /* LogView.swift */; };
+		A417E46B4B84679B44A40228 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71BE1DE0CA8FD1D0CD552E32 /* Assets.xcassets */; };
+		CE07CB6802D638CA849FEBE3 /* ModelTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38F953B98AA1F38E547E2FA9 /* ModelTestView.swift */; };
+		D59A21719C40E543BCCCE484 /* StreaidApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145E2A2DA750936E1E56FFA0 /* StreaidApp.swift */; };
+		F8BD55DC0048B4EDB49892F6 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314E2DD01EEB017551B6ECBB /* LoginView.swift */; };
+		FC8DBC9F3C639EE3CED52C67 /* StreaidModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29CB9DEF3EC35D4AD1A565F /* StreaidModels.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1C681A1F41CDDAEA3E00D79F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 82F3AEBC1E3EDFEC39095782 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4315E6625D711431270B3E7A;
+			remoteInfo = Streaid;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0630592C68A1D62CF5EACA94 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		145E2A2DA750936E1E56FFA0 /* StreaidApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreaidApp.swift; sourceTree = "<group>"; };
+		227C8746379FE33E07BBC2BA /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		2660590B8BE8963AA9E208C6 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
+		2CE5D7FBCEA06D4DFCFC2158 /* ConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigView.swift; sourceTree = "<group>"; };
+		314E2DD01EEB017551B6ECBB /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		38F953B98AA1F38E547E2FA9 /* ModelTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTestView.swift; sourceTree = "<group>"; };
+		448FE50A95D056534EAE4C5B /* CreditsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsView.swift; sourceTree = "<group>"; };
+		5D3C13A9702DAD6607855468 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		71BE1DE0CA8FD1D0CD552E32 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A9DCEEE0CD1382427ABC9784 /* VocabularyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyView.swift; sourceTree = "<group>"; };
+		B5F91B4287B1DB1EC25588BC /* StreaidUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreaidUITests.swift; sourceTree = "<group>"; };
+		B85DFB506A8617DAA3B2CFB3 /* EventTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTime.swift; sourceTree = "<group>"; };
+		C029E6B4F245958C869EA0CA /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
+		C28477A6B5DD3D350E071732 /* Streaid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Streaid.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CF79FA28AB12A2D1283ACDCC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		D29CB9DEF3EC35D4AD1A565F /* StreaidModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreaidModels.swift; sourceTree = "<group>"; };
+		D512BAC0685F22D6172C65D6 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		F04E01979FD2640BBCACD27D /* ShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellView.swift; sourceTree = "<group>"; };
+		F2C22017A9F862C04AE7DDAF /* StreaidUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StreaidUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F40C2F5093180044DDF66A63 /* StreaidCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreaidCore.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0B5215CC68B31D3272A0EBDC /* Bridge */ = {
+			isa = PBXGroup;
+			children = (
+				F40C2F5093180044DDF66A63 /* StreaidCore.swift */,
+				D29CB9DEF3EC35D4AD1A565F /* StreaidModels.swift */,
+			);
+			path = Bridge;
+			sourceTree = "<group>";
+		};
+		0DFD715D42C49B85F1F31FE8 /* StreaidUITests */ = {
+			isa = PBXGroup;
+			children = (
+				B5F91B4287B1DB1EC25588BC /* StreaidUITests.swift */,
+			);
+			path = StreaidUITests;
+			sourceTree = "<group>";
+		};
+		107422505347C43721F9E956 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				2660590B8BE8963AA9E208C6 /* Components.swift */,
+				B85DFB506A8617DAA3B2CFB3 /* EventTime.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		426DD92EAEE26789BBB114E8 /* Streaid */ = {
+			isa = PBXGroup;
+			children = (
+				AE56354EECAB3966ACA8D62D /* App */,
+				0B5215CC68B31D3272A0EBDC /* Bridge */,
+				6F538E0DADA5DDA755FE7C08 /* Resources */,
+				DD5FD89D805019EAB3BECE98 /* Theme */,
+				753F7A7AF686F57BA361EAEC /* Views */,
+				CF79FA28AB12A2D1283ACDCC /* Info.plist */,
+			);
+			path = Streaid;
+			sourceTree = "<group>";
+		};
+		6F538E0DADA5DDA755FE7C08 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				71BE1DE0CA8FD1D0CD552E32 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		753F7A7AF686F57BA361EAEC /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				107422505347C43721F9E956 /* Components */,
+				2CE5D7FBCEA06D4DFCFC2158 /* ConfigView.swift */,
+				448FE50A95D056534EAE4C5B /* CreditsView.swift */,
+				5D3C13A9702DAD6607855468 /* DashboardView.swift */,
+				314E2DD01EEB017551B6ECBB /* LoginView.swift */,
+				C029E6B4F245958C869EA0CA /* LogView.swift */,
+				38F953B98AA1F38E547E2FA9 /* ModelTestView.swift */,
+				F04E01979FD2640BBCACD27D /* ShellView.swift */,
+				A9DCEEE0CD1382427ABC9784 /* VocabularyView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		985E6E91658C77E82ED36651 = {
+			isa = PBXGroup;
+			children = (
+				426DD92EAEE26789BBB114E8 /* Streaid */,
+				0DFD715D42C49B85F1F31FE8 /* StreaidUITests */,
+				BED249BF31372CBE0CA5E51F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AE56354EECAB3966ACA8D62D /* App */ = {
+			isa = PBXGroup;
+			children = (
+				0630592C68A1D62CF5EACA94 /* AppDelegate.swift */,
+				D512BAC0685F22D6172C65D6 /* AppState.swift */,
+				145E2A2DA750936E1E56FFA0 /* StreaidApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		BED249BF31372CBE0CA5E51F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C28477A6B5DD3D350E071732 /* Streaid.app */,
+				F2C22017A9F862C04AE7DDAF /* StreaidUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DD5FD89D805019EAB3BECE98 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				227C8746379FE33E07BBC2BA /* Theme.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4315E6625D711431270B3E7A /* Streaid */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0F92FC28854A6598805AE5A2 /* Build configuration list for PBXNativeTarget "Streaid" */;
+			buildPhases = (
+				5F67D344B498D59E1E87F833 /* Build Rust core */,
+				11265F4165F0AB17FE47B117 /* Sources */,
+				918C079ECA4E955DD03873B3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Streaid;
+			packageProductDependencies = (
+			);
+			productName = Streaid;
+			productReference = C28477A6B5DD3D350E071732 /* Streaid.app */;
+			productType = "com.apple.product-type.application";
+		};
+		87A7B1B0F9C3EE1883E18970 /* StreaidUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4476EC047ADF60410E61E100 /* Build configuration list for PBXNativeTarget "StreaidUITests" */;
+			buildPhases = (
+				586199CC6DEE0FA2A32E94FC /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				177F906E9BB8B0D210752D84 /* PBXTargetDependency */,
+			);
+			name = StreaidUITests;
+			packageProductDependencies = (
+			);
+			productName = StreaidUITests;
+			productReference = F2C22017A9F862C04AE7DDAF /* StreaidUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		82F3AEBC1E3EDFEC39095782 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					4315E6625D711431270B3E7A = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+					87A7B1B0F9C3EE1883E18970 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+						TestTargetID = 4315E6625D711431270B3E7A;
+					};
+				};
+			};
+			buildConfigurationList = 03F97E3D38C107DD81D6415F /* Build configuration list for PBXProject "Streaid" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 985E6E91658C77E82ED36651;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = BED249BF31372CBE0CA5E51F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4315E6625D711431270B3E7A /* Streaid */,
+				87A7B1B0F9C3EE1883E18970 /* StreaidUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		918C079ECA4E955DD03873B3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A417E46B4B84679B44A40228 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		5F67D344B498D59E1E87F833 /* Build Rust core */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Build Rust core";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\"$SRCROOT/../../scripts/build-core.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		11265F4165F0AB17FE47B117 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5D45322C466FE9C197CB7841 /* AppDelegate.swift in Sources */,
+				4809C83E2579723500A0D4B4 /* AppState.swift in Sources */,
+				695FBC0B12A234FA1E1799E9 /* Components.swift in Sources */,
+				1F9CF91CDC19E143EF81B25B /* ConfigView.swift in Sources */,
+				0355A7DC2AD24A4D120A8088 /* CreditsView.swift in Sources */,
+				15A8186D43393FD738CF595D /* DashboardView.swift in Sources */,
+				0073614E5AE5445F9989BBE1 /* EventTime.swift in Sources */,
+				A17E9848E3CFE39FC3FAB00C /* LogView.swift in Sources */,
+				F8BD55DC0048B4EDB49892F6 /* LoginView.swift in Sources */,
+				CE07CB6802D638CA849FEBE3 /* ModelTestView.swift in Sources */,
+				71B9DA2A95A6B80247F0DB7C /* ShellView.swift in Sources */,
+				D59A21719C40E543BCCCE484 /* StreaidApp.swift in Sources */,
+				22398940951593A8BD978BEE /* StreaidCore.swift in Sources */,
+				FC8DBC9F3C639EE3CED52C67 /* StreaidModels.swift in Sources */,
+				2F2FBA608A91C77317E5F41C /* Theme.swift in Sources */,
+				368E969FC3797F41CE3E9D30 /* VocabularyView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		586199CC6DEE0FA2A32E94FC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				12C26F16546321697E109730 /* StreaidUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		177F906E9BB8B0D210752D84 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4315E6625D711431270B3E7A /* Streaid */;
+			targetProxy = 1C681A1F41CDDAEA3E00D79F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		217B7EC472534C51A4314589 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../dist/macos";
+				INFOPLIST_FILE = Streaid/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../dist/macos";
+				OTHER_LDFLAGS = (
+					"$(SRCROOT)/../../dist/macos/libstreaid_ffi.a",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					SystemConfiguration,
+					"-framework",
+					Security,
+					"-framework",
+					CoreFoundation,
+					"-liconv",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = im.sush.streaid;
+				PRODUCT_NAME = Streaid;
+				SDKROOT = macosx;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/../../dist/macos";
+			};
+			name = Release;
+		};
+		797983ED1CA1DD4F4A8F3A60 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		AFE0E7671FAB6D291981B51C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = arm64;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		B2DE7323B90BA757615A3141 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = im.sush.streaid.uitests;
+				SDKROOT = macosx;
+				TEST_TARGET_NAME = Streaid;
+			};
+			name = Release;
+		};
+		F4B5A7246B6706A318F95A47 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/../../dist/macos";
+				INFOPLIST_FILE = Streaid/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../dist/macos";
+				OTHER_LDFLAGS = (
+					"$(SRCROOT)/../../dist/macos/libstreaid_ffi.a",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					SystemConfiguration,
+					"-framework",
+					Security,
+					"-framework",
+					CoreFoundation,
+					"-liconv",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = im.sush.streaid;
+				PRODUCT_NAME = Streaid;
+				SDKROOT = macosx;
+				SWIFT_INCLUDE_PATHS = "$(SRCROOT)/../../dist/macos";
+			};
+			name = Debug;
+		};
+		F94D68CD0147E8DC3B3D88C8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = im.sush.streaid.uitests;
+				SDKROOT = macosx;
+				TEST_TARGET_NAME = Streaid;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		03F97E3D38C107DD81D6415F /* Build configuration list for PBXProject "Streaid" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				797983ED1CA1DD4F4A8F3A60 /* Debug */,
+				AFE0E7671FAB6D291981B51C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		0F92FC28854A6598805AE5A2 /* Build configuration list for PBXNativeTarget "Streaid" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F4B5A7246B6706A318F95A47 /* Debug */,
+				217B7EC472534C51A4314589 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4476EC047ADF60410E61E100 /* Build configuration list for PBXNativeTarget "StreaidUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F94D68CD0147E8DC3B3D88C8 /* Debug */,
+				B2DE7323B90BA757615A3141 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 82F3AEBC1E3EDFEC39095782 /* Project object */;
+}

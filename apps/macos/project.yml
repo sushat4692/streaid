@@ -1,0 +1,99 @@
+name: Streaid
+options:
+  bundleIdPrefix: im.sush
+  deploymentTarget:
+    macOS: "13.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: NO
+    ENABLE_APP_SANDBOX: NO
+    CLANG_ENABLE_MODULES: YES
+    ARCHS: arm64
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+
+targets:
+  Streaid:
+    type: application
+    platform: macOS
+    sources:
+      - path: Streaid
+    preBuildScripts:
+      - name: Build Rust core
+        basedOnDependencyAnalysis: false
+        showEnvVars: false
+        script: |
+          set -e
+          "$SRCROOT/../../scripts/build-core.sh"
+    settings:
+      base:
+        PRODUCT_NAME: Streaid
+        PRODUCT_BUNDLE_IDENTIFIER: im.sush.streaid
+        INFOPLIST_FILE: Streaid/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        SWIFT_INCLUDE_PATHS: "$(SRCROOT)/../../dist/macos"
+        HEADER_SEARCH_PATHS: "$(SRCROOT)/../../dist/macos"
+        LIBRARY_SEARCH_PATHS: "$(SRCROOT)/../../dist/macos"
+        OTHER_LDFLAGS:
+          - "$(SRCROOT)/../../dist/macos/libstreaid_ffi.a"
+          - -framework
+          - AudioUnit
+          - -framework
+          - CoreAudio
+          - -framework
+          - SystemConfiguration
+          - -framework
+          - Security
+          - -framework
+          - CoreFoundation
+          - -liconv
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/../Frameworks"
+    info:
+      path: Streaid/Info.plist
+      properties:
+        CFBundleDisplayName: Streaid
+        CFBundleShortVersionString: "0.7.0"
+        CFBundleVersion: "1"
+        LSApplicationCategoryType: public.app-category.utilities
+        LSMinimumSystemVersion: "13.0"
+        NSHumanReadableCopyright: "MIT License"
+        NSHighResolutionCapable: true
+        NSPrincipalClass: NSApplication
+
+  StreaidUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - path: StreaidUITests
+    dependencies:
+      - target: Streaid
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: im.sush.streaid.uitests
+        TEST_TARGET_NAME: Streaid
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  Streaid:
+    build:
+      targets:
+        Streaid: all
+        StreaidUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - name: StreaidUITests
+    archive:
+      config: Release

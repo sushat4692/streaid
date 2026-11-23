@@ -57,6 +57,6 @@ if [ "${1:-}" = "--chat" ]; then
   echo "Interactive mode — type a sentence (JA or EN), Ctrl-D to quit:"
   python3 "$(dirname "$0")/bonsai_chat.py"
 else
-  cd "$(dirname "$0")/../src-tauri"
+  cd "$(dirname "$0")/.."
   cargo test -- --ignored --nocapture
 fi

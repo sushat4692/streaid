@@ -49,7 +49,7 @@ Installs into the app data directory:
 
 - **Chat model selection**: the "Chat model: 8B / 4B" selector next to the
   toggle picks which model answers `!ts` / `!d` in chat (`set_local_model_variant_cmd`,
-  persisted to `~/Library/Application Support/streaid/local_model_variant`)
+  persisted to `~/Library/Application Support/im.sush.streaid/local_model_variant`)
 - Backend polls `GET /health` until ready (up to 90 s), then `!ts` / `!d`
   requests go to `POST /v1/chat/completions` with
   `response_format: { type: "json_schema", json_schema: {...} }`
@@ -104,8 +104,8 @@ improve the EN→JA case.
 
 ## Files
 
-- `src-tauri/src/bonsai.rs` — OpenAI-compatible client (per-server base URL)
-- `src-tauri/src/lib.rs` — sidecar spawn/kill (one per model), model registry
+- `crates/streaid-core/src/bonsai.rs` — OpenAI-compatible client (per-server base URL)
+- `crates/streaid-core/src/lib.rs` — sidecar spawn/kill (one per model), model registry
   (`BONSAI_MODELS`), `set_local_model_cmd`, `set_local_model_variant_cmd`,
   `get_bonsai_status_cmd`, provider branching in the chat listener
 - `scripts/setup-bonsai.sh` — one-shot setup: venv + mlx-lm + model downloads
