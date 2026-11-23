@@ -11,6 +11,10 @@ enum ToastKind {
 
 enum Page: String, CaseIterable, Identifiable {
     case dashboard
+    case chatters
+    case raiders
+    case commands
+    case userMemo
     case modelTest
     case config
     case vocabulary
@@ -22,6 +26,10 @@ enum Page: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .dashboard: return "Dashboard"
+        case .chatters: return "Chatters"
+        case .raiders: return "Raiders"
+        case .commands: return "Commands"
+        case .userMemo: return "User Memo"
         case .modelTest: return "Model Test"
         case .config: return "Config"
         case .vocabulary: return "Vocabulary"
@@ -33,6 +41,10 @@ enum Page: String, CaseIterable, Identifiable {
     var icon: String {
         switch self {
         case .dashboard: return "rectangle.grid.1x2"
+        case .chatters: return "person.2"
+        case .raiders: return "tornado"
+        case .commands: return "terminal"
+        case .userMemo: return "note.text"
         case .modelTest: return "wand.and.stars"
         case .config: return "gearshape"
         case .vocabulary: return "character.book.closed"
@@ -64,7 +76,9 @@ final class AppState: ObservableObject {
     @Published var translations: [TranslationEvent] = []
     @Published var lookups: [DictionaryEvent] = []
     @Published var chatters: [Chatter] = []
-    @Published var raiders: [RaidEvent] = []
+    @Published var raiders: [RaiderRecord] = []
+    @Published var commands: [CommandRecord] = []
+    @Published var memos: [MemoRecord] = []
     @Published var toast: String?
     @Published var toastKind: ToastKind = .error
 
@@ -146,6 +160,9 @@ final class AppState: ObservableObject {
             }
             await refreshSounds()
             await refreshVocabulary()
+            await refreshRaiders()
+            await refreshCommands()
+            await refreshMemos()
         } catch {
             showError(error.localizedDescription)
         }
@@ -223,10 +240,6 @@ final class AppState: ObservableObject {
                 Task { try? await core.playSound(path: sound.path, volume: volume) }
             }
         case .raid(let value):
-            raiders.insert(value, at: 0)
-            if raiders.count > 500 {
-                raiders.removeLast(raiders.count - 500)
-            }
             if let sound = soundRaid {
                 Task { try? await core.playSound(path: sound.path, volume: volumeRaid) }
             }
@@ -236,6 +249,7 @@ final class AppState: ObservableObject {
                     body: "Thank you for raiding \"\(value.fromDisplayName)\""
                 )
             }
+            Task { [weak self] in await self?.refreshRaiders() }
         case .unknown:
             break
         }
@@ -573,6 +587,107 @@ final class AppState: ObservableObject {
         do {
             try await core.setLocalModelVariant(variant)
             bonsai = try? await core.localModelStatus()
+        } catch {
+            showError(error.localizedDescription)
+        }
+    }
+
+    // MARK: - Chatters / raiders
+
+    func removeChatter(_ chatter: Chatter) {
+        chatters.removeAll { $0.id == chatter.id }
+        seenUsers.remove(chatter.username)
+    }
+
+    func refreshRaiders() async {
+        do {
+            raiders = try await core.listRaiders()
+        } catch {
+            showError(error.localizedDescription)
+        }
+    }
+
+    func deleteRaider(id: String) async {
+        do {
+            raiders = try await core.deleteRaider(id: id)
+        } catch {
+            showError(error.localizedDescription)
+        }
+    }
+
+    // MARK: - Commands
+
+    func refreshCommands() async {
+        do {
+            commands = try await core.listCommands()
+        } catch {
+            showError(error.localizedDescription)
+        }
+    }
+
+    func saveCommand(
+        id: String,
+        command: String,
+        body: String,
+        memo: String,
+        allow: String
+    ) async -> Bool {
+        do {
+            commands = try await core.saveCommand(
+                id: id,
+                command: command,
+                body: body,
+                memo: memo,
+                allow: allow
+            )
+            return true
+        } catch {
+            showError(error.localizedDescription)
+            return false
+        }
+    }
+
+    func deleteCommand(id: String) async {
+        do {
+            commands = try await core.deleteCommand(id: id)
+        } catch {
+            showError(error.localizedDescription)
+        }
+    }
+
+    // MARK: - User memos
+
+    func refreshMemos() async {
+        do {
+            memos = try await core.listMemos()
+        } catch {
+            showError(error.localizedDescription)
+        }
+    }
+
+    func saveMemo(
+        id: String,
+        username: String,
+        nickname: String,
+        memo: String
+    ) async -> Bool {
+        do {
+            memos = try await core.saveMemo(
+                id: id,
+                username: username,
+                nickname: nickname,
+                memo: memo
+            )
+            return true
+        } catch {
+            showError(error.localizedDescription)
+            return false
+        }
+    }
+
+    func deleteMemo(id: String) async {
+        do {
+            memos = try await core.deleteMemo(id: id)
         } catch {
             showError(error.localizedDescription)
         }

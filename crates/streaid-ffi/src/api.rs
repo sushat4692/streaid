@@ -122,6 +122,53 @@ fn dispatch(method: &str, params: &Value) -> Result<Value, String> {
             .map(|_| Value::Null)
             .map_err(|e| e.to_string()),
 
+        // ── raiders ──────────────────────────────────────────────────────
+        "raiders.list" => Ok(json!(core::store::list_raiders())),
+        "raiders.delete" => {
+            let id: String = param(params, "id")?;
+            core::store::delete_raider(&id)
+                .map(|records| json!(records))
+                .map_err(|e| e.to_string())
+        }
+
+        // ── commands ─────────────────────────────────────────────────────
+        "commands.list" => Ok(json!(core::store::list_commands())),
+        "commands.save" => {
+            let record: core::store::CommandRecord = serde_json::from_value(params.clone())
+                .map_err(|e| format!("invalid command: {e}"))?;
+            let name = core::commands::validate_custom(&record.command, &record.body)?;
+            let mut record = record;
+            record.command = name;
+            core::store::save_command(record)
+                .map(|records| json!(records))
+                .map_err(|e| e.to_string())
+        }
+        "commands.delete" => {
+            let id: String = param(params, "id")?;
+            core::store::delete_command(&id)
+                .map(|records| json!(records))
+                .map_err(|e| e.to_string())
+        }
+
+        // ── memos ────────────────────────────────────────────────────────
+        "memos.list" => Ok(json!(core::store::list_memos())),
+        "memos.save" => {
+            let record: core::store::MemoRecord =
+                serde_json::from_value(params.clone()).map_err(|e| format!("invalid memo: {e}"))?;
+            if record.username.trim().is_empty() {
+                return Err("username is required".to_string());
+            }
+            core::store::save_memo(record)
+                .map(|records| json!(records))
+                .map_err(|e| e.to_string())
+        }
+        "memos.delete" => {
+            let id: String = param(params, "id")?;
+            core::store::delete_memo(&id)
+                .map(|records| json!(records))
+                .map_err(|e| e.to_string())
+        }
+
         // ── gemini ───────────────────────────────────────────────────────
         "gemini.set_key" => {
             let key: String = param(params, "key")?;
@@ -285,6 +332,9 @@ mod tests {
             "auth.start_device_flow",
             "auth.poll_device_flow",
             "gemini.set_key",
+            "raiders.list",
+            "commands.list",
+            "memos.list",
             "chat.status",
             "chat.start",
             "model.status",

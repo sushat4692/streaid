@@ -287,6 +287,62 @@ public final class StreaidCore: @unchecked Sendable {
         ])
     }
 
+    // MARK: Raiders / commands / memos
+
+    public func listRaiders() async throws -> [RaiderRecord] {
+        try await call("raiders.list")
+    }
+
+    public func deleteRaider(id: String) async throws -> [RaiderRecord] {
+        try await call("raiders.delete", ["id": id])
+    }
+
+    public func listCommands() async throws -> [CommandRecord] {
+        try await call("commands.list")
+    }
+
+    public func saveCommand(
+        id: String,
+        command: String,
+        body: String,
+        memo: String,
+        allow: String
+    ) async throws -> [CommandRecord] {
+        try await call("commands.save", [
+            "id": id,
+            "command": command,
+            "body": body,
+            "memo": memo,
+            "allow": allow,
+        ])
+    }
+
+    public func deleteCommand(id: String) async throws -> [CommandRecord] {
+        try await call("commands.delete", ["id": id])
+    }
+
+    public func listMemos() async throws -> [MemoRecord] {
+        try await call("memos.list")
+    }
+
+    public func saveMemo(
+        id: String,
+        username: String,
+        nickname: String,
+        memo: String
+    ) async throws -> [MemoRecord] {
+        try await call("memos.save", [
+            "id": id,
+            "username": username,
+            "nickname": nickname,
+            "memo": memo,
+        ])
+    }
+
+    public func deleteMemo(id: String) async throws -> [MemoRecord] {
+        try await call("memos.delete", ["id": id])
+    }
+
     // MARK: Vocabulary
 
     public func vocabularySummary() async throws -> VocabularySummary {

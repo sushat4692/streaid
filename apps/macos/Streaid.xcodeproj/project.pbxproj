@@ -22,8 +22,12 @@
 		71B9DA2A95A6B80247F0DB7C /* ShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F04E01979FD2640BBCACD27D /* ShellView.swift */; };
 		A17E9848E3CFE39FC3FAB00C /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C029E6B4F245958C869EA0CA /* LogView.swift */; };
 		A417E46B4B84679B44A40228 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71BE1DE0CA8FD1D0CD552E32 /* Assets.xcassets */; };
+		B7331E40005A7237E7CE6EF2 /* CommandsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6E7F08D2A8E50D1A357AF3D /* CommandsView.swift */; };
+		BE1E09C6812053E2F1794211 /* RaidersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58BC271475FA47406E11F0B3 /* RaidersView.swift */; };
+		CAE2FD8465CAA8D225CEFF11 /* ChattersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F0395BD6B2F81CCD4D98A9 /* ChattersView.swift */; };
 		CE07CB6802D638CA849FEBE3 /* ModelTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38F953B98AA1F38E547E2FA9 /* ModelTestView.swift */; };
 		D59A21719C40E543BCCCE484 /* StreaidApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 145E2A2DA750936E1E56FFA0 /* StreaidApp.swift */; };
+		D7409CDE9D500E3CF0D188FD /* UserMemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A93E152A7A2B010EC1F964BB /* UserMemoView.swift */; };
 		F8BD55DC0048B4EDB49892F6 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 314E2DD01EEB017551B6ECBB /* LoginView.swift */; };
 		FC8DBC9F3C639EE3CED52C67 /* StreaidModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29CB9DEF3EC35D4AD1A565F /* StreaidModels.swift */; };
 /* End PBXBuildFile section */
@@ -47,16 +51,20 @@
 		314E2DD01EEB017551B6ECBB /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		38F953B98AA1F38E547E2FA9 /* ModelTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTestView.swift; sourceTree = "<group>"; };
 		448FE50A95D056534EAE4C5B /* CreditsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsView.swift; sourceTree = "<group>"; };
+		58BC271475FA47406E11F0B3 /* RaidersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaidersView.swift; sourceTree = "<group>"; };
 		5D3C13A9702DAD6607855468 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		71BE1DE0CA8FD1D0CD552E32 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A93E152A7A2B010EC1F964BB /* UserMemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserMemoView.swift; sourceTree = "<group>"; };
 		A9DCEEE0CD1382427ABC9784 /* VocabularyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VocabularyView.swift; sourceTree = "<group>"; };
 		B5F91B4287B1DB1EC25588BC /* StreaidUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreaidUITests.swift; sourceTree = "<group>"; };
 		B85DFB506A8617DAA3B2CFB3 /* EventTime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventTime.swift; sourceTree = "<group>"; };
 		C029E6B4F245958C869EA0CA /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogView.swift; sourceTree = "<group>"; };
 		C28477A6B5DD3D350E071732 /* Streaid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Streaid.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C3F0395BD6B2F81CCD4D98A9 /* ChattersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChattersView.swift; sourceTree = "<group>"; };
 		CF79FA28AB12A2D1283ACDCC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D29CB9DEF3EC35D4AD1A565F /* StreaidModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreaidModels.swift; sourceTree = "<group>"; };
 		D512BAC0685F22D6172C65D6 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		D6E7F08D2A8E50D1A357AF3D /* CommandsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandsView.swift; sourceTree = "<group>"; };
 		E2FD83EE52CC3AB0124D3F1F /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		F04E01979FD2640BBCACD27D /* ShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellView.swift; sourceTree = "<group>"; };
 		F2C22017A9F862C04AE7DDAF /* StreaidUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StreaidUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -115,13 +123,17 @@
 			isa = PBXGroup;
 			children = (
 				107422505347C43721F9E956 /* Components */,
+				C3F0395BD6B2F81CCD4D98A9 /* ChattersView.swift */,
+				D6E7F08D2A8E50D1A357AF3D /* CommandsView.swift */,
 				2CE5D7FBCEA06D4DFCFC2158 /* ConfigView.swift */,
 				448FE50A95D056534EAE4C5B /* CreditsView.swift */,
 				5D3C13A9702DAD6607855468 /* DashboardView.swift */,
 				314E2DD01EEB017551B6ECBB /* LoginView.swift */,
 				C029E6B4F245958C869EA0CA /* LogView.swift */,
 				38F953B98AA1F38E547E2FA9 /* ModelTestView.swift */,
+				58BC271475FA47406E11F0B3 /* RaidersView.swift */,
 				F04E01979FD2640BBCACD27D /* ShellView.swift */,
+				A93E152A7A2B010EC1F964BB /* UserMemoView.swift */,
 				A9DCEEE0CD1382427ABC9784 /* VocabularyView.swift */,
 			);
 			path = Views;
@@ -285,6 +297,8 @@
 			files = (
 				5D45322C466FE9C197CB7841 /* AppDelegate.swift in Sources */,
 				4809C83E2579723500A0D4B4 /* AppState.swift in Sources */,
+				CAE2FD8465CAA8D225CEFF11 /* ChattersView.swift in Sources */,
+				B7331E40005A7237E7CE6EF2 /* CommandsView.swift in Sources */,
 				695FBC0B12A234FA1E1799E9 /* Components.swift in Sources */,
 				1F9CF91CDC19E143EF81B25B /* ConfigView.swift in Sources */,
 				0355A7DC2AD24A4D120A8088 /* CreditsView.swift in Sources */,
@@ -294,11 +308,13 @@
 				F8BD55DC0048B4EDB49892F6 /* LoginView.swift in Sources */,
 				CE07CB6802D638CA849FEBE3 /* ModelTestView.swift in Sources */,
 				1768D819AB0803609FCF411B /* NotificationService.swift in Sources */,
+				BE1E09C6812053E2F1794211 /* RaidersView.swift in Sources */,
 				71B9DA2A95A6B80247F0DB7C /* ShellView.swift in Sources */,
 				D59A21719C40E543BCCCE484 /* StreaidApp.swift in Sources */,
 				22398940951593A8BD978BEE /* StreaidCore.swift in Sources */,
 				FC8DBC9F3C639EE3CED52C67 /* StreaidModels.swift in Sources */,
 				2F2FBA608A91C77317E5F41C /* Theme.swift in Sources */,
+				D7409CDE9D500E3CF0D188FD /* UserMemoView.swift in Sources */,
 				368E969FC3797F41CE3E9D30 /* VocabularyView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -14,7 +14,8 @@ if [ ! -f "$DIST/libstreaid_ffi.a" ] || [ ! -f "$DIST/StreaidFFI/module.modulema
 fi
 
 TMP="$(mktemp -d)"
-trap 'rm -rf "$TMP"' EXIT
+export STREAID_DATA_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP" "$STREAID_DATA_DIR"' EXIT
 
 export STREAID_DISABLE_BACKGROUND=1
 

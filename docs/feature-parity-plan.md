@@ -9,15 +9,23 @@
 
 承認: 2026-11-23（最小Helixクライアント実装 / Discordは `!d` のみ）
 
-実装状況: **Sprint 1 完了（2026-11-23）**
+実装状況: **Sprint 1 / Sprint 2 完了（2026-11-23）**
 
+Sprint 1:
 - IRCタグ / USERNOTICE（Raid）パース
 - `ChatMessageEvent` 拡張 + `RaidEvent`
 - commands / memos / raiders / settings のJSONストア
 - `chatter` / `chat` / `raid` の通知音スロット（`first` / `remaining` 読み替え）
 - `UNUserNotificationCenter` による通知基盤
 
-Sprint 2以降は未着手。
+Sprint 2:
+- Chatters / Raiders 一覧ページ（削除対応）
+- カスタムコマンド + 権限 + `!dice` + 管理UI
+- User Memo のCRUD + 管理UI
+- FFI CRUD（raiders / commands / memos）
+- `STREAID_DATA_DIR` によるテスト用データ分離
+
+Sprint 3以降は未着手。
 
 ---
 

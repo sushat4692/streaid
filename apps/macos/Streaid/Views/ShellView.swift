@@ -60,35 +60,39 @@ struct ShellView: View {
     }
 
     private var nav: some View {
-        VStack(spacing: 3) {
-            ForEach(Page.allCases) { page in
-                Button {
-                    state.page = page
-                } label: {
-                    HStack(spacing: 9) {
-                        Image(systemName: page.icon)
-                            .frame(width: 16)
-                        Text(page.title)
-                        Spacer()
+        ScrollView {
+            VStack(spacing: 3) {
+                ForEach(Page.allCases) { page in
+                    Button {
+                        state.page = page
+                    } label: {
+                        HStack(spacing: 9) {
+                            Image(systemName: page.icon)
+                                .frame(width: 16)
+                            Text(page.title)
+                            Spacer()
+                        }
+                        .font(.system(size: 13, weight: .medium))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 8)
+                        .foregroundStyle(
+                            state.page == page ? Theme.textPrimary : Theme.textDim
+                        )
+                        .background(
+                            state.page == page
+                                ? Color.white.opacity(0.08)
+                                : Color.clear
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                     }
-                    .font(.system(size: 13, weight: .medium))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .foregroundStyle(
-                        state.page == page ? Theme.textPrimary : Theme.textDim
-                    )
-                    .background(
-                        state.page == page
-                            ? Color.white.opacity(0.08)
-                            : Color.clear
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
+            .padding(.horizontal, 10)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
         }
-        .padding(.horizontal, 10)
-        .padding(.top, 12)
+        .scrollIndicators(.hidden)
     }
 
     private var account: some View {
@@ -156,6 +160,14 @@ struct ShellView: View {
         switch state.page {
         case .dashboard:
             DashboardView()
+        case .chatters:
+            ChattersView()
+        case .raiders:
+            RaidersView()
+        case .commands:
+            CommandsView()
+        case .userMemo:
+            UserMemoView()
         case .modelTest:
             ModelTestView()
         case .config:

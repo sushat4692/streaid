@@ -110,6 +110,34 @@ public struct Chatter: Identifiable, Sendable {
     public let firstSeen: Date
 }
 
+/// A persisted raid entry.
+public struct RaiderRecord: Decodable, Identifiable, Sendable {
+    public let id: String
+    public let channel: String
+    public let username: String
+    public let displayName: String
+    public let viewers: UInt64
+    public let timestamp: String
+}
+
+public struct CommandRecord: Decodable, Identifiable, Sendable {
+    public let id: String
+    public let command: String
+    public let body: String
+    public let memo: String
+    public let allow: String
+    public let createdAt: String
+}
+
+public struct MemoRecord: Decodable, Identifiable, Sendable {
+    public let id: String
+    public let username: String
+    public let nickname: String
+    public let memo: String
+    public let createdAt: String
+    public let updatedAt: String
+}
+
 /// One event from the core's event channel, tagged by `type`.
 public enum StreaidEvent: Decodable, Sendable {
     case translation(TranslationEvent)

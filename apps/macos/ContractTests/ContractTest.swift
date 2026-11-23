@@ -114,8 +114,14 @@ func runCoreTests(_ core: StreaidCore) async throws {
     }
 
     let appDataDir = try await core.appDataDir()
-    guard appDataDir.contains("im.sush.streaid") else {
-        fatalError("unexpected app_data_dir: \(appDataDir)")
+    if let expected = ProcessInfo.processInfo.environment["STREAID_DATA_DIR"] {
+        guard appDataDir == expected else {
+            fatalError("app_data_dir did not honor STREAID_DATA_DIR: \(appDataDir)")
+        }
+    } else {
+        guard appDataDir.contains("im.sush.streaid") else {
+            fatalError("unexpected app_data_dir: \(appDataDir)")
+        }
     }
 
     let overlayURL = try await core.overlayURL()
@@ -137,6 +143,35 @@ func runCoreTests(_ core: StreaidCore) async throws {
     guard summary.totalWords >= 0 else {
         fatalError("invalid vocabulary summary")
     }
+
+    // JSON stores (the script points STREAID_DATA_DIR at a temp dir).
+    let commands = try await core.saveCommand(
+        id: "",
+        command: "!contract_test",
+        body: "hello from the contract test",
+        memo: "temporary",
+        allow: "everyone"
+    )
+    guard let command = commands.first(where: { $0.command == "contract_test" }) else {
+        fatalError("command was not saved")
+    }
+    let afterCommandDelete = try await core.deleteCommand(id: command.id)
+    guard !afterCommandDelete.contains(where: { $0.id == command.id }) else {
+        fatalError("command was not deleted")
+    }
+
+    let memos = try await core.saveMemo(
+        id: "",
+        username: "contract_user",
+        nickname: "Contract",
+        memo: "hello"
+    )
+    guard let memo = memos.first(where: { $0.username == "contract_user" }) else {
+        fatalError("memo was not saved")
+    }
+    _ = try await core.deleteMemo(id: memo.id)
+
+    _ = try await core.listRaiders()
 
     do {
         _ = try await core.callData("does.not.exist")

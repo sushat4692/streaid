@@ -36,9 +36,13 @@ For tests and CLI harnesses, set:
 
 ```bash
 export STREAID_DISABLE_BACKGROUND=1
+export STREAID_DATA_DIR="$(mktemp -d)"
 ```
 
-to skip the overlay server and token refresh (no ports, no keychain access).
+`STREAID_DISABLE_BACKGROUND=1` skips the overlay server and token refresh
+(no ports, no keychain access). `STREAID_DATA_DIR` points user-managed JSON
+files (commands/memos/raiders/settings) at a temporary directory; use it for
+contract tests and CI.
 On Unix, set this in the shell rather than only from managed code: .NET does
 not always propagate `Environment.SetEnvironmentVariable` to the native
 environment (it does on Windows).
@@ -158,6 +162,32 @@ can be called from separate FFI invocations.
 | `vocab.clear` | — | `null` |
 | `vocab.analyze` | — | `[CategoryResult]` |
 
+### raiders
+
+| Method | Params | Result |
+|---|---|---|
+| `raiders.list` | — | `[RaiderRecord]` |
+| `raiders.delete` | `id` | `[RaiderRecord]` |
+
+### commands
+
+| Method | Params | Result |
+|---|---|---|
+| `commands.list` | — | `[CommandRecord]` |
+| `commands.save` | `id?, command, body, memo?, allow` | `[CommandRecord]` |
+| `commands.delete` | `id` | `[CommandRecord]` |
+
+`allow` is `broadcaster`, `mod`, `vip`, or `everyone`. Built-in names
+(`ts`, `d`, `dice`, `so`, `stop`) are reserved and rejected.
+
+### memos
+
+| Method | Params | Result |
+|---|---|---|
+| `memos.list` | — | `[MemoRecord]` |
+| `memos.save` | `id?, username, nickname?, memo?` | `[MemoRecord]` |
+| `memos.delete` | `id` | `[MemoRecord]` |
+
 ### overlay
 
 | Method | Params | Result |
@@ -212,6 +242,9 @@ CategoryResult   { category, words, total_count }
 SessionLookup    { word, timestamp }
 ChatMessageEvent { username, display_name, user_id?, color?, badges, is_mod, is_vip, is_broadcaster, is_subscriber, message, channel, timestamp }
 RaidEvent        { from_login, from_display_name, viewers, channel, timestamp }
+RaiderRecord     { id, channel, username, display_name, viewers, timestamp }
+CommandRecord    { id, command, body, memo, allow, created_at }
+MemoRecord       { id, username, nickname, memo, created_at, updated_at }
 ```
 
 ## Platform frontends

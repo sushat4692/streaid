@@ -1,6 +1,7 @@
 pub mod auth;
 pub mod bonsai;
 pub mod chat;
+pub mod commands;
 pub mod dictionary;
 pub mod overlay;
 pub mod platform;
@@ -10,10 +11,8 @@ pub mod translate;
 pub mod vocabulary;
 
 use auth::{shared_state, InnerState};
-use chat::{
-    connect_to_irc, extract_dictionary_word, extract_translate_text, is_dictionary_command,
-    is_translate_command, parse_irc_privmsg, parse_raid_usernotice, WsStream,
-};
+use chat::{connect_to_irc, parse_irc_privmsg, parse_raid_usernotice, IrcMessage, WsStream};
+use commands::CommandAction;
 use dictionary::lookup_word;
 use futures_util::{SinkExt, StreamExt};
 use once_cell::sync::Lazy;
@@ -143,6 +142,10 @@ pub const APP_DIR_NAME: &str = "im.sush.streaid";
 /// macOS, `%APPDATA%\im.sush.streaid` on Windows).
 /// Holds the app log, the Bonsai sidecar, and the uploaded sound files.
 pub fn app_data_dir() -> PathBuf {
+    // Tests/CI and portable installs can point the core at a temporary dir.
+    if let Some(dir) = std::env::var_os("STREAID_DATA_DIR") {
+        return PathBuf::from(dir);
+    }
     dirs::config_dir()
         .map(|d| d.join(APP_DIR_NAME))
         .unwrap_or_else(|| PathBuf::from("."))
@@ -1256,7 +1259,7 @@ async fn run_irc_session(ws_stream: WsStream, channel: String) -> Result<(), any
     // !ts / !d commands are handled serially by a dedicated worker so the
     // read loop stays responsive (PING/PONG, chat_message events) while
     // Gemini is busy.
-    let (cmd_tx, cmd_rx) = mpsc::channel::<(String, String)>(32);
+    let (cmd_tx, cmd_rx) = mpsc::channel::<IrcMessage>(32);
     spawn_task(handle_commands(cmd_rx, out_tx.clone(), channel.clone()));
 
     let mut last_ping_sent = Instant::now();
@@ -1323,18 +1326,15 @@ async fn run_irc_session(ws_stream: WsStream, channel: String) -> Result<(), any
                                 "Raid from {} ({} viewers)",
                                 raid.from_login, raid.viewers
                             );
-                            let persisted = raid.clone();
-                            spawn_task(async move {
-                                if let Err(e) = crate::store::add_raider(
-                                    &persisted.channel,
-                                    &persisted.from_login,
-                                    &persisted.from_display_name,
-                                    persisted.viewers,
-                                    &persisted.timestamp,
-                                ) {
-                                    eprintln!("Failed to persist raid: {}", e);
-                                }
-                            });
+                            if let Err(e) = crate::store::add_raider(
+                                &raid.channel,
+                                &raid.from_login,
+                                &raid.from_display_name,
+                                raid.viewers,
+                                &raid.timestamp,
+                            ) {
+                                eprintln!("Failed to persist raid: {}", e);
+                            }
                             emit_event(AppEvent::Raid(RaidEvent {
                                 from_login: raid.from_login,
                                 from_display_name: raid.from_display_name,
@@ -1374,20 +1374,10 @@ async fn run_irc_session(ws_stream: WsStream, channel: String) -> Result<(), any
                             };
                             emit_event(AppEvent::ChatMessage(chat_event));
 
-                            // Check if translation is enabled
-                            if !chat_is_enabled() {
-                                continue;
-                            }
-
-                            // Hand off commands to the worker (serialized, so
-                            // replies stay in request order)
-                            let is_command = is_translate_command(&irc_msg.message)
-                                || is_dictionary_command(&irc_msg.message);
-                            if is_command
-                                && cmd_tx
-                                    .send((irc_msg.username, irc_msg.message))
-                                    .await
-                                    .is_err()
+                            // Hand every `!` command to the worker. The worker
+                            // applies the !ts/!d toggle and permissions.
+                            if irc_msg.message.trim_start().starts_with('!')
+                                && cmd_tx.send(irc_msg.clone()).await.is_err()
                             {
                                 eprintln!("Failed to queue command (worker gone)");
                             }
@@ -1430,22 +1420,33 @@ async fn send_to_irc(
         .map_err(|e| format!("Failed to send chat message: {}", e))
 }
 
-/// Serialized handler for !ts / !d commands. Runs off the read loop so
+/// Serialized handler for chat commands. Runs off the read loop so
 /// PING/PONG and chat_message events are never blocked by API calls.
 async fn handle_commands(
-    mut cmd_rx: mpsc::Receiver<(String, String)>,
+    mut cmd_rx: mpsc::Receiver<IrcMessage>,
     out_tx: mpsc::Sender<String>,
     channel: String,
 ) {
-    while let Some((username, message)) = cmd_rx.recv().await {
-        if is_translate_command(&message) {
-            if let Some(text) = extract_translate_text(&message) {
-                handle_translate_request(&out_tx, &channel, &username, &text).await;
+    while let Some(message) = cmd_rx.recv().await {
+        match commands::resolve(&message) {
+            Some(CommandAction::Translate(text)) => {
+                if chat_is_enabled() {
+                    handle_translate_request(&out_tx, &channel, &message.username, &text).await;
+                }
             }
-        } else if is_dictionary_command(&message) {
-            if let Some(word) = extract_dictionary_word(&message) {
-                handle_dictionary_request(&out_tx, &channel, &username, &word).await;
+            Some(CommandAction::Dictionary(word)) => {
+                if chat_is_enabled() {
+                    handle_dictionary_request(&out_tx, &channel, &message.username, &word).await;
+                }
             }
+            Some(CommandAction::Reply(text)) => {
+                if let Err(e) = send_to_irc(&out_tx, &channel, &text).await {
+                    eprintln!("Failed to send command reply: {}", e);
+                }
+                // Keep custom command spam within Twitch's rate limits.
+                tokio::time::sleep(Duration::from_millis(500)).await;
+            }
+            None => {}
         }
     }
 }

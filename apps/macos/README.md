@@ -23,6 +23,8 @@ apps/macos/
 - `App/StreaidApp.swift` — app entry + root routing
 - `App/AppState.swift` — `@MainActor` view model (auth, chat, sounds, events)
 - `Views/LoginView.swift`, `ShellView.swift`, `DashboardView.swift`
+- `Views/ChattersView.swift`, `RaidersView.swift`, `CommandsView.swift`,
+  `UserMemoView.swift`
 - `Views/ConfigView.swift`, `ModelTestView.swift`, `LogView.swift`,
   `VocabularyView.swift`, `CreditsView.swift`
 - `Theme/Theme.swift` + `Views/Components/` — palette and widgets
