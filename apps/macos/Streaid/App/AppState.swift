@@ -63,6 +63,8 @@ final class AppState: ObservableObject {
 
     @Published var translations: [TranslationEvent] = []
     @Published var lookups: [DictionaryEvent] = []
+    @Published var chatters: [Chatter] = []
+    @Published var raiders: [RaidEvent] = []
     @Published var toast: String?
     @Published var toastKind: ToastKind = .error
 
@@ -75,10 +77,13 @@ final class AppState: ObservableObject {
     @Published var localModelBusy = false
 
     @Published var geminiKeyConfigured = false
-    @Published var soundFirst: SoundFile?
-    @Published var soundRemaining: SoundFile?
-    @Published var volumeFirst: Double = 1.0
-    @Published var volumeRemaining: Double = 1.0
+    @Published var notificationsEnabled = true
+    @Published var soundChatter: SoundFile?
+    @Published var soundChat: SoundFile?
+    @Published var soundRaid: SoundFile?
+    @Published var volumeChatter: Double = 1.0
+    @Published var volumeChat: Double = 1.0
+    @Published var volumeRaid: Double = 1.0
 
     @Published var vocabSummary: VocabularySummary?
     @Published var vocabAnalysis: [CategoryResult] = []
@@ -92,6 +97,8 @@ final class AppState: ObservableObject {
     init() {
         self.core = StreaidCore()
         loadVolumes()
+        loadNotificationSettings()
+        NotificationService.shared.setup()
         startEventPump()
         startStatusPolling()
         Task { [weak self] in await self?.bootstrap() }
@@ -190,10 +197,44 @@ final class AppState: ObservableObject {
         case .chatMessage(let value):
             let isFirst = !seenUsers.contains(value.username)
             seenUsers.insert(value.username)
-            let sound = isFirst ? soundFirst : soundRemaining
-            let volume = isFirst ? volumeFirst : volumeRemaining
+
+            if isFirst {
+                chatters.insert(
+                    Chatter(
+                        id: value.userId ?? value.username,
+                        username: value.username,
+                        displayName: value.displayName,
+                        color: value.color,
+                        firstSeen: Date()
+                    ),
+                    at: 0
+                )
+                if notificationsEnabled {
+                    NotificationService.shared.post(
+                        title: "Chatter has come",
+                        body: "Thank you for coming \"\(value.displayName)\""
+                    )
+                }
+            }
+
+            let sound = isFirst ? soundChatter : soundChat
+            let volume = isFirst ? volumeChatter : volumeChat
             if let sound {
                 Task { try? await core.playSound(path: sound.path, volume: volume) }
+            }
+        case .raid(let value):
+            raiders.insert(value, at: 0)
+            if raiders.count > 500 {
+                raiders.removeLast(raiders.count - 500)
+            }
+            if let sound = soundRaid {
+                Task { try? await core.playSound(path: sound.path, volume: volumeRaid) }
+            }
+            if notificationsEnabled {
+                NotificationService.shared.post(
+                    title: "\(value.viewers) Raider has come",
+                    body: "Thank you for raiding \"\(value.fromDisplayName)\""
+                )
             }
         case .unknown:
             break
@@ -316,6 +357,8 @@ final class AppState: ObservableObject {
         deviceCode = nil
         translations.removeAll()
         lookups.removeAll()
+        chatters.removeAll()
+        raiders.removeAll()
         seenUsers.removeAll()
     }
 
@@ -378,10 +421,11 @@ final class AppState: ObservableObject {
     // MARK: - Sounds
 
     func refreshSounds() async {
-        do { soundFirst = try await core.sound(slot: "first") } catch { soundFirst = nil }
-        do { soundRemaining = try await core.sound(slot: "remaining") } catch {
-            soundRemaining = nil
+        do { soundChatter = try await core.sound(slot: "chatter") } catch {
+            soundChatter = nil
         }
+        do { soundChat = try await core.sound(slot: "chat") } catch { soundChat = nil }
+        do { soundRaid = try await core.sound(slot: "raid") } catch { soundRaid = nil }
     }
 
     func uploadSound(slot: String, url: URL) async {
@@ -412,29 +456,50 @@ final class AppState: ObservableObject {
     }
 
     func previewSound(slot: String) {
-        let sound = slot == "first" ? soundFirst : soundRemaining
-        let volume = slot == "first" ? volumeFirst : volumeRemaining
+        let sound = sound(for: slot)
+        let volume = volume(for: slot)
         guard let sound else { return }
         Task { try? await core.playSound(path: sound.path, volume: volume) }
     }
 
     func sound(for slot: String) -> SoundFile? {
-        slot == "first" ? soundFirst : soundRemaining
+        switch slot {
+        case "chatter": return soundChatter
+        case "chat": return soundChat
+        case "raid": return soundRaid
+        default: return nil
+        }
     }
 
     func volume(for slot: String) -> Double {
-        slot == "first" ? volumeFirst : volumeRemaining
+        switch slot {
+        case "chatter": return volumeChatter
+        case "chat": return volumeChat
+        case "raid": return volumeRaid
+        default: return 1.0
+        }
     }
 
     func setVolume(slot: String, value: Double) {
         let clamped = min(max(value, 0.0), 1.0)
-        if slot == "first" {
-            volumeFirst = clamped
-            UserDefaults.standard.set(clamped, forKey: "volumeFirst")
-        } else {
-            volumeRemaining = clamped
-            UserDefaults.standard.set(clamped, forKey: "volumeRemaining")
+        switch slot {
+        case "chatter":
+            volumeChatter = clamped
+            UserDefaults.standard.set(clamped, forKey: "volumeChatter")
+        case "chat":
+            volumeChat = clamped
+            UserDefaults.standard.set(clamped, forKey: "volumeChat")
+        case "raid":
+            volumeRaid = clamped
+            UserDefaults.standard.set(clamped, forKey: "volumeRaid")
+        default:
+            break
         }
+    }
+
+    func setNotificationsEnabled(_ enabled: Bool) {
+        notificationsEnabled = enabled
+        UserDefaults.standard.set(enabled, forKey: "notificationsEnabled")
     }
 
     private struct LegacyVolumes: Decodable {
@@ -445,25 +510,47 @@ final class AppState: ObservableObject {
     private func loadVolumes() {
         let defaults = UserDefaults.standard
 
+        // Carry over the previous slot names.
+        if defaults.object(forKey: "volumeChatter") == nil,
+            let old = defaults.object(forKey: "volumeFirst") as? Double
+        {
+            defaults.set(old, forKey: "volumeChatter")
+        }
+        if defaults.object(forKey: "volumeChat") == nil,
+            let old = defaults.object(forKey: "volumeRemaining") as? Double
+        {
+            defaults.set(old, forKey: "volumeChat")
+        }
+
         // One-time import from the previous app's volumes.json.
-        if defaults.object(forKey: "volumeFirst") == nil,
-            defaults.object(forKey: "volumeRemaining") == nil
+        if defaults.object(forKey: "volumeChatter") == nil,
+            defaults.object(forKey: "volumeChat") == nil
         {
             let legacy = FileManager.default.homeDirectoryForCurrentUser
                 .appendingPathComponent("Library/Application Support/im.sush.streaid/volumes.json")
             if let data = try? Data(contentsOf: legacy),
                 let volumes = try? JSONDecoder().decode(LegacyVolumes.self, from: data)
             {
-                defaults.set(volumes.first, forKey: "volumeFirst")
-                defaults.set(volumes.remaining, forKey: "volumeRemaining")
+                defaults.set(volumes.first, forKey: "volumeChatter")
+                defaults.set(volumes.remaining, forKey: "volumeChat")
             }
         }
 
-        if defaults.object(forKey: "volumeFirst") != nil {
-            volumeFirst = defaults.double(forKey: "volumeFirst")
+        if defaults.object(forKey: "volumeChatter") != nil {
+            volumeChatter = defaults.double(forKey: "volumeChatter")
         }
-        if defaults.object(forKey: "volumeRemaining") != nil {
-            volumeRemaining = defaults.double(forKey: "volumeRemaining")
+        if defaults.object(forKey: "volumeChat") != nil {
+            volumeChat = defaults.double(forKey: "volumeChat")
+        }
+        if defaults.object(forKey: "volumeRaid") != nil {
+            volumeRaid = defaults.double(forKey: "volumeRaid")
+        }
+    }
+
+    private func loadNotificationSettings() {
+        let defaults = UserDefaults.standard
+        if defaults.object(forKey: "notificationsEnabled") != nil {
+            notificationsEnabled = defaults.bool(forKey: "notificationsEnabled")
         }
     }
 

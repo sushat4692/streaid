@@ -122,6 +122,7 @@ CRITICAL: When a task touches the areas below, use your Read tool to load the re
 - `docs/ffi.md` — C ABI / JSON method reference (when touching `crates/streaid-ffi` or a native frontend)
 - `docs/native-ui-migration.md` — migration history and current remaining tasks
 - `docs/future.md` — deferred directions (Windows)
+- `docs/feature-parity-plan.md` — Electron-era feature comparison and restoration plan
 - `docs/features.md` — `!ts` / `!d` formats, language detection, toggle, sound notifications, OBS overlay details
 - `docs/bonsai.md` — local model provider (Bonsai/llama-server sidecar) details
 - `docs/conventions.md` — full Rust conventions, credentials, troubleshooting

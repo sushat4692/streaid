@@ -184,7 +184,15 @@ can be called from separate FFI invocations.
 
 ```json
 {"type":"chat_message","data":{
-  "username":"carol","message":"hi","channel":"mychannel","timestamp":"..."}}
+  "username":"carol","display_name":"Carol","user_id":"123","color":"#FF0000",
+  "badges":["moderator/1"],"is_mod":true,"is_vip":false,"is_broadcaster":false,
+  "is_subscriber":false,"message":"hi","channel":"mychannel","timestamp":"..."}}
+```
+
+```json
+{"type":"raid","data":{
+  "from_login":"raider","from_display_name":"Raider","viewers":42,
+  "channel":"mychannel","timestamp":"..."}}
 ```
 
 Unknown `type` values must be ignored (forward compatibility).
@@ -202,6 +210,8 @@ SoundFile        { path, file_name }
 VocabularySummary{ total_words, total_lookups, top_words: [{word, count, source_forms: [[form,count]]}], ambiguous: [{word,count,candidates}] }
 CategoryResult   { category, words, total_count }
 SessionLookup    { word, timestamp }
+ChatMessageEvent { username, display_name, user_id?, color?, badges, is_mod, is_vip, is_broadcaster, is_subscriber, message, channel, timestamp }
+RaidEvent        { from_login, from_display_name, viewers, channel, timestamp }
 ```
 
 ## Platform frontends

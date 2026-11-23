@@ -5,13 +5,14 @@ pub mod dictionary;
 pub mod overlay;
 pub mod platform;
 pub mod sounds;
+pub mod store;
 pub mod translate;
 pub mod vocabulary;
 
 use auth::{shared_state, InnerState};
 use chat::{
     connect_to_irc, extract_dictionary_word, extract_translate_text, is_dictionary_command,
-    is_translate_command, parse_irc_privmsg, WsStream,
+    is_translate_command, parse_irc_privmsg, parse_raid_usernotice, WsStream,
 };
 use dictionary::lookup_word;
 use futures_util::{SinkExt, StreamExt};
@@ -186,7 +187,25 @@ pub struct DictionaryEvent {
 #[derive(serde::Serialize, Clone, Debug)]
 pub struct ChatMessageEvent {
     pub username: String,
+    pub display_name: String,
+    pub user_id: Option<String>,
+    pub color: Option<String>,
+    pub badges: Vec<String>,
+    pub is_mod: bool,
+    pub is_vip: bool,
+    pub is_broadcaster: bool,
+    pub is_subscriber: bool,
     pub message: String,
+    pub channel: String,
+    pub timestamp: String,
+}
+
+/// A raid (`USERNOTICE` with `msg-id=raid`).
+#[derive(serde::Serialize, Clone, Debug)]
+pub struct RaidEvent {
+    pub from_login: String,
+    pub from_display_name: String,
+    pub viewers: u64,
     pub channel: String,
     pub timestamp: String,
 }
@@ -230,6 +249,7 @@ pub fn session_lookups() -> Vec<SessionLookup> {
 #[serde(tag = "type", content = "data", rename_all = "snake_case")]
 pub enum AppEvent {
     ChatMessage(ChatMessageEvent),
+    Raid(RaidEvent),
     Translation(TranslationEvent),
     Dictionary(DictionaryEvent),
 }
@@ -1298,6 +1318,33 @@ async fn run_irc_session(ws_stream: WsStream, channel: String) -> Result<(), any
                             break;
                         }
 
+                        if let Some(raid) = parse_raid_usernotice(&line) {
+                            eprintln!(
+                                "Raid from {} ({} viewers)",
+                                raid.from_login, raid.viewers
+                            );
+                            let persisted = raid.clone();
+                            spawn_task(async move {
+                                if let Err(e) = crate::store::add_raider(
+                                    &persisted.channel,
+                                    &persisted.from_login,
+                                    &persisted.from_display_name,
+                                    persisted.viewers,
+                                    &persisted.timestamp,
+                                ) {
+                                    eprintln!("Failed to persist raid: {}", e);
+                                }
+                            });
+                            emit_event(AppEvent::Raid(RaidEvent {
+                                from_login: raid.from_login,
+                                from_display_name: raid.from_display_name,
+                                viewers: raid.viewers,
+                                channel: raid.channel,
+                                timestamp: raid.timestamp,
+                            }));
+                            continue;
+                        }
+
                         if let Some(irc_msg) = parse_irc_privmsg(&line) {
                             eprintln!("Message from {}: {}", irc_msg.username, irc_msg.message);
 
@@ -1313,9 +1360,17 @@ async fn run_irc_session(ws_stream: WsStream, channel: String) -> Result<(), any
                             // (fires regardless of toggle)
                             let chat_event = ChatMessageEvent {
                                 username: irc_msg.username.clone(),
+                                display_name: irc_msg.display_name.clone(),
+                                user_id: irc_msg.user_id.clone(),
+                                color: irc_msg.color.clone(),
+                                badges: irc_msg.badges.clone(),
+                                is_mod: irc_msg.is_mod,
+                                is_vip: irc_msg.is_vip,
+                                is_broadcaster: irc_msg.is_broadcaster,
+                                is_subscriber: irc_msg.is_subscriber,
                                 message: irc_msg.message.clone(),
                                 channel: channel.clone(),
-                                timestamp: chrono::Utc::now().to_rfc3339(),
+                                timestamp: irc_msg.timestamp.clone(),
                             };
                             emit_event(AppEvent::ChatMessage(chat_event));
 

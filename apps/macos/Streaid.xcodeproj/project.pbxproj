@@ -11,6 +11,7 @@
 		0355A7DC2AD24A4D120A8088 /* CreditsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 448FE50A95D056534EAE4C5B /* CreditsView.swift */; };
 		12C26F16546321697E109730 /* StreaidUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F91B4287B1DB1EC25588BC /* StreaidUITests.swift */; };
 		15A8186D43393FD738CF595D /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D3C13A9702DAD6607855468 /* DashboardView.swift */; };
+		1768D819AB0803609FCF411B /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2FD83EE52CC3AB0124D3F1F /* NotificationService.swift */; };
 		1F9CF91CDC19E143EF81B25B /* ConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CE5D7FBCEA06D4DFCFC2158 /* ConfigView.swift */; };
 		22398940951593A8BD978BEE /* StreaidCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40C2F5093180044DDF66A63 /* StreaidCore.swift */; };
 		2F2FBA608A91C77317E5F41C /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227C8746379FE33E07BBC2BA /* Theme.swift */; };
@@ -56,6 +57,7 @@
 		CF79FA28AB12A2D1283ACDCC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D29CB9DEF3EC35D4AD1A565F /* StreaidModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreaidModels.swift; sourceTree = "<group>"; };
 		D512BAC0685F22D6172C65D6 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		E2FD83EE52CC3AB0124D3F1F /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		F04E01979FD2640BBCACD27D /* ShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShellView.swift; sourceTree = "<group>"; };
 		F2C22017A9F862C04AE7DDAF /* StreaidUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StreaidUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F40C2F5093180044DDF66A63 /* StreaidCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreaidCore.swift; sourceTree = "<group>"; };
@@ -139,6 +141,7 @@
 			children = (
 				0630592C68A1D62CF5EACA94 /* AppDelegate.swift */,
 				D512BAC0685F22D6172C65D6 /* AppState.swift */,
+				E2FD83EE52CC3AB0124D3F1F /* NotificationService.swift */,
 				145E2A2DA750936E1E56FFA0 /* StreaidApp.swift */,
 			);
 			path = App;
@@ -290,6 +293,7 @@
 				A17E9848E3CFE39FC3FAB00C /* LogView.swift in Sources */,
 				F8BD55DC0048B4EDB49892F6 /* LoginView.swift in Sources */,
 				CE07CB6802D638CA849FEBE3 /* ModelTestView.swift in Sources */,
+				1768D819AB0803609FCF411B /* NotificationService.swift in Sources */,
 				71B9DA2A95A6B80247F0DB7C /* ShellView.swift in Sources */,
 				D59A21719C40E543BCCCE484 /* StreaidApp.swift in Sources */,
 				22398940951593A8BD978BEE /* StreaidCore.swift in Sources */,

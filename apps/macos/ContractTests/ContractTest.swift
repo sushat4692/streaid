@@ -40,12 +40,30 @@ func runDecodingTests() throws {
     }
 
     let chat = """
-        {"type":"chat_message","data":{"username":"carol","message":"hi","channel":"chan",
-        "timestamp":"t"}}
+        {"type":"chat_message","data":{"username":"carol","display_name":"Carol",
+        "user_id":"123","color":"#FF0000","badges":["moderator/1"],"is_mod":true,
+        "is_vip":false,"is_broadcaster":false,"is_subscriber":false,"message":"hi",
+        "channel":"chan","timestamp":"t"}}
         """
     let chatEvent = try decoder.decode(StreaidEvent.self, from: Data(chat.utf8))
-    guard case .chatMessage(let value) = chatEvent, value.channel == "chan" else {
+    guard case .chatMessage(let value) = chatEvent,
+        value.channel == "chan",
+        value.displayName == "Carol",
+        value.isMod
+    else {
         fatalError("chat message event decoding failed")
+    }
+
+    let raid = """
+        {"type":"raid","data":{"from_login":"raider","from_display_name":"Raider",
+        "viewers":42,"channel":"chan","timestamp":"t"}}
+        """
+    let raidEvent = try decoder.decode(StreaidEvent.self, from: Data(raid.utf8))
+    guard case .raid(let raidValue) = raidEvent,
+        raidValue.viewers == 42,
+        raidValue.fromDisplayName == "Raider"
+    else {
+        fatalError("raid event decoding failed")
     }
 
     let modelTest = """

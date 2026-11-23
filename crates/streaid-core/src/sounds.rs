@@ -25,15 +25,37 @@ fn find_sound_file(dir: &Path, sound_type: &str) -> Option<PathBuf> {
     None
 }
 
-pub fn save_sound(sound_type: &str, data: &[u8], file_name: &str) -> Result<()> {
-    let dir = sounds_dir()?;
+/// Current slot names replaced the old `first` / `remaining` names. Keep
+/// reading the old files so existing users do not lose their sounds.
+fn legacy_alias(sound_type: &str) -> Option<&'static str> {
+    match sound_type {
+        "chatter" => Some("first"),
+        "chat" => Some("remaining"),
+        _ => None,
+    }
+}
 
-    // Delete existing files for this sound type
+fn find_sound_file_with_alias(dir: &Path, sound_type: &str) -> Option<PathBuf> {
+    find_sound_file(dir, sound_type)
+        .or_else(|| legacy_alias(sound_type).and_then(|alias| find_sound_file(dir, alias)))
+}
+
+fn remove_sound_files(dir: &Path, sound_type: &str) {
     for ext in SUPPORTED_EXTS {
         let path = dir.join(format!("{}.{}", sound_type, ext));
         if path.exists() {
             std::fs::remove_file(&path).ok();
         }
+    }
+}
+
+pub fn save_sound(sound_type: &str, data: &[u8], file_name: &str) -> Result<()> {
+    let dir = sounds_dir()?;
+
+    // Delete existing files for this sound type (including the legacy alias).
+    remove_sound_files(&dir, sound_type);
+    if let Some(alias) = legacy_alias(sound_type) {
+        remove_sound_files(&dir, alias);
     }
 
     // Determine extension from file_name
@@ -51,7 +73,7 @@ pub fn save_sound(sound_type: &str, data: &[u8], file_name: &str) -> Result<()> 
 
 pub fn get_sound(sound_type: &str) -> Result<Option<SoundFile>> {
     let dir = sounds_dir()?;
-    let Some(path) = find_sound_file(&dir, sound_type) else {
+    let Some(path) = find_sound_file_with_alias(&dir, sound_type) else {
         return Ok(None);
     };
 
@@ -66,8 +88,21 @@ pub fn get_sound(sound_type: &str) -> Result<Option<SoundFile>> {
 
 pub fn delete_sound(sound_type: &str) -> Result<()> {
     let dir = sounds_dir()?;
-    if let Some(path) = find_sound_file(&dir, sound_type) {
-        std::fs::remove_file(path).context("Failed to delete sound file")?;
+    remove_sound_files(&dir, sound_type);
+    if let Some(alias) = legacy_alias(sound_type) {
+        remove_sound_files(&dir, alias);
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_legacy_aliases() {
+        assert_eq!(legacy_alias("chatter"), Some("first"));
+        assert_eq!(legacy_alias("chat"), Some("remaining"));
+        assert_eq!(legacy_alias("raid"), None);
+    }
 }

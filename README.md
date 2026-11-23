@@ -59,6 +59,7 @@ your Gemini API key and start the chat listener.
 - **Local model (Bonsai)**: `docs/bonsai.md`
 - **Manual testing**: `docs/testing.md`
 - **Future outlook (Windows)**: `docs/future.md`
+- **Electron feature parity plan**: `docs/feature-parity-plan.md`
 - **Legacy Tauri IPC reference**: `docs/legacy/tauri-commands.md`
 
 ## Local Model Setup (optional)

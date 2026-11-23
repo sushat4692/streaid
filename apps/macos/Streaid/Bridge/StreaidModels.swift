@@ -79,9 +79,35 @@ public struct DictionaryEvent: Decodable, Sendable {
 
 public struct ChatMessageEvent: Decodable, Sendable {
     public let username: String
+    public let displayName: String
+    public let userId: String?
+    public let color: String?
+    public let badges: [String]
+    public let isMod: Bool
+    public let isVip: Bool
+    public let isBroadcaster: Bool
+    public let isSubscriber: Bool
     public let message: String
     public let channel: String
     public let timestamp: String
+}
+
+/// A raid (`USERNOTICE` with `msg-id=raid`).
+public struct RaidEvent: Decodable, Sendable {
+    public let fromLogin: String
+    public let fromDisplayName: String
+    public let viewers: UInt64
+    public let channel: String
+    public let timestamp: String
+}
+
+/// One chatter seen during this app session.
+public struct Chatter: Identifiable, Sendable {
+    public let id: String
+    public let username: String
+    public let displayName: String
+    public let color: String?
+    public let firstSeen: Date
 }
 
 /// One event from the core's event channel, tagged by `type`.
@@ -89,6 +115,7 @@ public enum StreaidEvent: Decodable, Sendable {
     case translation(TranslationEvent)
     case dictionary(DictionaryEvent)
     case chatMessage(ChatMessageEvent)
+    case raid(RaidEvent)
     case unknown(String)
 
     private enum CodingKeys: String, CodingKey {
@@ -106,6 +133,8 @@ public enum StreaidEvent: Decodable, Sendable {
             self = .dictionary(try container.decode(DictionaryEvent.self, forKey: .data))
         case "chat_message":
             self = .chatMessage(try container.decode(ChatMessageEvent.self, forKey: .data))
+        case "raid":
+            self = .raid(try container.decode(RaidEvent.self, forKey: .data))
         default:
             self = .unknown(type)
         }

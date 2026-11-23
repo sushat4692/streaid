@@ -141,7 +141,18 @@ Windows のコードは置かない。将来の展望は `docs/future.md` を参
 
 ---
 
-## 6. 決定事項
+## 6. Electron版の機能復旧
+
+確定プランは `docs/feature-parity-plan.md`。
+
+- Tier 1（chatter / raider、通知、音、カスタムコマンド、メモ）はすべて実施
+- Tier 2 は `!so` / `!stop` とアラートオーバーレイ（`:4242/alert`）のみ。
+  読み取り専用の最小Helixクライアントを使い、チャンネル編集・追加スコープは行わない
+- Tier 3 は日本語UIとDiscord Webhook（`!d`）のみ
+- Host、チャンネル情報/テンプレート、旧SQLite辞書、旧コマンド、更新確認、
+  About/Help、Electronデータ移行は対象外
+
+## 7. 決定事項
 
 - 最小 macOS: 13.0
 - アーキテクチャ: arm64 のみ（Intel 非対応）

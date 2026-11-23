@@ -7,7 +7,7 @@ struct ConfigView: View {
 
     @State private var geminiKey = ""
     @State private var showImporter = false
-    @State private var importSlot = "first"
+    @State private var importSlot = "chatter"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
@@ -236,18 +236,37 @@ struct ConfigView: View {
     private var soundSettings: some View {
         SectionCard(
             "Sound Notifications",
-            subtitle: "Play a sound when a chatter sends a message. First-message tracking resets on app restart."
+            subtitle: "First-message tracking resets on app restart."
         ) {
+            Toggle(
+                "Desktop notifications",
+                isOn: Binding(
+                    get: { state.notificationsEnabled },
+                    set: { state.setNotificationsEnabled($0) }
+                )
+            )
+            .toggleStyle(.switch)
+            .tint(Theme.purple)
+            .font(.caption)
+
+            Divider().overlay(Theme.border)
+
             soundSlot(
-                slot: "first",
+                slot: "chatter",
                 title: "New Chatter Sound",
                 subtitle: "Plays the first time a user speaks in this session."
             )
             Divider().overlay(Theme.border)
             soundSlot(
-                slot: "remaining",
+                slot: "chat",
                 title: "Returning Chatter Sound",
                 subtitle: "Plays for every later message from that user."
+            )
+            Divider().overlay(Theme.border)
+            soundSlot(
+                slot: "raid",
+                title: "Raid Sound",
+                subtitle: "Plays when someone raids your channel."
             )
         }
     }
