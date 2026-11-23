@@ -1,8 +1,10 @@
 # AGENTS.md
 
-Streaid is a native macOS app that listens to a Twitch IRC chat channel and provides
-real-time Japanese ↔ English translation (`!ts`) and dictionary lookup (`!d`) via the
-Gemini AI API, with an optional on-device local model (Bonsai).
+Streaid is a native macOS app for Twitch streamers. It reads chat to provide
+real-time Japanese ↔ English translation (`!ts`) and dictionary lookup (`!d`),
+tracks chatters and raids, runs custom commands and user memos, and powers
+shoutouts and OBS overlays. Translation and lookup use Gemini or the optional
+on-device Bonsai model.
 
 The repository is a **monorepo**:
 - `crates/streaid-core` — UI-agnostic Rust core
@@ -55,12 +57,19 @@ Cargo.toml                  # workspace (core + ffi)
 crates/streaid-core/        # UI-agnostic Rust core (no UI dependencies)
   src/lib.rs                # runtime, state, chat supervision, rate limiting, events
   src/auth.rs               # Twitch OAuth device flow (OS keyring)
-  src/chat.rs               # IRC WebSocket connect/parse
+  src/chat.rs               # IRC tags, PRIVMSG, USERNOTICE raids
+  src/commands.rs           # !ts/!d/!dice/!so/!stop + custom commands/permissions
   src/translate.rs          # !ts (Gemini / local model)
   src/dictionary.rs         # !d (Gemini / local model)
   src/bonsai.rs             # local model client (llama-server, ports 4243/4244)
-  src/sounds.rs             # sound storage + rodio playback
-  src/overlay.rs            # OBS overlay HTTP server (port 4242)
+  src/store.rs              # JSON stores: commands/memos/raiders/settings
+  src/twitch.rs             # read-only Helix (users/channels/clips)
+  src/shoutout.rs           # !so/!stop messages + info/clip alert events
+  src/discord.rs            # !d Discord webhook posts
+  src/sounds.rs             # chatter/chat/raid sound storage + rodio playback
+  src/overlay.rs            # :4242 / and /alert SSE servers
+  src/overlay.html          # translation/dictionary overlay
+  src/alert.html            # shoutout info/clip overlay
   src/vocabulary.rs         # vocabulary tracking
   src/platform.rs           # OS capability detection (MLX availability, etc.)
 crates/streaid-ffi/         # C ABI (JSON) for SwiftUI / future frontends
@@ -72,8 +81,9 @@ apps/macos/                 # SwiftUI app (XcodeGen)
   Streaid/
     App/                    # StreaidApp + AppState + AppDelegate
     Bridge/                 # StreaidCore.swift / StreaidModels.swift
-    Theme/                  # palette
-    Views/                  # Login, Shell, Dashboard, Config, ModelTest, Log, ...
+    Theme/                  # palette + L10n (en/ja)
+    Views/                  # Login, Shell, Dashboard, Config, ModelTest, Log,
+                            # Chatters, Raiders, Commands, UserMemo, ...
     Resources/              # Assets.xcassets / Info.plist
   StreaidUITests/           # login-screen UI smoke test
   ContractTests/            # Swift -> core contract test
@@ -86,12 +96,13 @@ docs/                       # developer documentation (see "External File Loadin
 
 ```
 Twitch IRC → tokio-tungstenite WebSocket → streaid-core::run_irc_session (read loop)
-  → chat.rs: is_translation_command() / is_dictionary_command()
-  → worker task → translate.rs / dictionary.rs: Gemini or local model
+  → chat.rs: parse tags / PRIVMSG / USERNOTICE(raid)
+  → commands.rs: resolve !ts / !d / !dice / !so / !stop / custom commands
+  → worker task → translate.rs / dictionary.rs / twitch.rs / shoutout.rs
   → Send messages back to Twitch chat (500ms delay between each)
-  → EVENT_TX.send(AppEvent::Translation|Dictionary|ChatMessage)
+  → EVENT_TX.send(AppEvent::ChatMessage|Raid|Translation|Dictionary)
       → SwiftUI: StreaidCore.eventStream() polls streaid_poll_events() every 100 ms
-  → OVERLAY_TX.send(OverlayMessage) → OBS overlay SSE clients
+  → OVERLAY_TX.send(OverlayMessage) → /events and /alert/events SSE clients
 ```
 
 SwiftUI calls the core through the JSON C ABI (`StreaidCore.swift`). The core keeps
@@ -114,6 +125,12 @@ immediately usable from every native frontend. Keep JSON field names stable and 
 - **Platform-specific features**: gate macOS-only code behind `platform::local_model_supported()`; do not add Windows code until `docs/future.md` says work has started
 - **UI test escape hatches**: `STREAID_SKIP_AUTH=1` (skip Keychain, stay on login), `STREAID_DISABLE_BACKGROUND=1` (skip overlay/token refresh), and `STREAID_FORCE_LOCALE=ja` (Japanese UI)
 - **Events**: never emit from the read loop directly — send `AppEvent` via `emit_event()`
+- **Commands**: built-in names `ts`, `d`, `dice`, `so`, `stop` are reserved. Custom commands are stored in `commands.json` and checked with IRC tags (broadcaster/mod/vip/everyone). `!ts`/`!d` respect the translation toggle; custom commands do not.
+- **Persistence**: user-managed data lives in `app_data_dir()` as JSON (`commands.json`, `memos.json`, `raiders.json`, `settings.json`). `STREAID_DATA_DIR` overrides the directory for tests/CI.
+- **Twitch API**: `twitch.rs` is read-only (users/channels/clips) and uses the existing token; do not add `channel:manage:broadcast` or channel editing without an explicit decision.
+- **Overlays**: `/` is the translation/dictionary overlay; `/alert` is the shoutout overlay. The alert page accepts `?lang=ja`.
+- **Localization**: UI strings go through `L10n.t(...)`; add both English and Japanese entries in `Theme/L10n.swift` when adding UI text.
+- **Discord**: when `settings.discord_webhook` is set, successful `!d` lookups post an embed asynchronously; failures must not break the chat reply.
 
 ## External File Loading
 
@@ -122,7 +139,7 @@ CRITICAL: When a task touches the areas below, use your Read tool to load the re
 - `docs/ffi.md` — C ABI / JSON method reference (when touching `crates/streaid-ffi` or a native frontend)
 - `docs/native-ui-migration.md` — migration history and current remaining tasks
 - `docs/future.md` — deferred directions (Windows)
-- `docs/feature-parity-plan.md` — Electron-era feature comparison and restoration plan
+- `docs/feature-parity-plan.md` — Electron-era feature comparison, restoration plan and sprint status
 - `docs/features.md` — `!ts` / `!d` formats, language detection, toggle, sound notifications, OBS overlay details
 - `docs/bonsai.md` — local model provider (Bonsai/llama-server sidecar) details
 - `docs/conventions.md` — full Rust conventions, credentials, troubleshooting

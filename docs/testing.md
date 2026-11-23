@@ -300,6 +300,51 @@ Copy-paste these into Twitch chat (with toggle enabled):
 
 ---
 
+## Electron Parity Checklist
+
+Run with a real Twitch channel. The core logs are visible in the Xcode console
+(or when launching the binary from a terminal).
+
+### Chatter / Raid tracking
+- [ ] First message from a new user triggers a desktop notification + `chatter` sound
+- [ ] A second message from the same user plays `chat` sound
+- [ ] Chatters page lists the user; delete removes them (next message is first again)
+- [ ] A raid triggers a notification + `raid` sound
+- [ ] Raiders page shows display name, login, viewer count, time; delete works
+- [ ] `raiders.json` survives an app restart
+
+### Custom commands / memos
+- [ ] `!dice` replies with a 1–6 result
+- [ ] Create `!hello` for everyone; it replies with its body
+- [ ] Change permissions to mod/vip/broadcaster and verify each role
+- [ ] Reserved names (`ts`, `d`, `dice`, `so`, `stop`) are rejected
+- [ ] User Memo add/edit/delete persists to `memos.json`
+
+### Shoutout / alerts
+- [ ] `!so user` replies with the rendered shoutout message
+- [ ] `!so user info` shows the profile alert on `http://localhost:4242/alert`
+- [ ] `!so user clip` plays the latest clip (Twitch embed) in OBS
+- [ ] `!stop` stops the clip alert
+- [ ] ShoutOut buttons in Chatters/Raiders/User Memo do the same
+- [ ] Missing user / failed channel lookup returns the configured fallback message
+- [ ] Alert page URL accepts `?lang=ja`
+
+### Settings / language / Discord
+- [ ] Language picker switches the whole UI (System / English / 日本語)
+- [ ] `STREAID_FORCE_LOCALE=ja` shows the Japanese login screen (UI test)
+- [ ] Shoutout templates and info duration persist across restart
+- [ ] Discord Webhook URL saves; `!d` posts an embed
+- [ ] Invalid webhook does not break the chat reply
+- [ ] Alert URL in Config includes `?lang=ja` when Japanese is selected
+
+### Regression
+- [ ] `!ts` sends 4 replies and appears in Log + overlay
+- [ ] `!d` sends 3 replies and appears in Log + overlay + Vocabulary
+- [ ] Bonsai enable/disable and Model Test still work
+- [ ] App quits cleanly and stops Bonsai child processes
+
+---
+
 ## Next Steps After Testing
 
 If all tests pass:

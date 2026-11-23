@@ -1,6 +1,6 @@
 [package]
 name = "streaid-core"
-description = "UI-agnostic core for Streaid: Twitch chat, translation, dictionary, local model, overlay"
+description = "UI-agnostic core for Streaid: Twitch chat, translation, dictionary, commands, memos, shoutouts, local model, overlays"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true

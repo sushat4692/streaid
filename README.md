@@ -1,7 +1,10 @@
 # Streaid
 
-A native macOS app that listens to a Twitch IRC chat channel and provides real-time
-Japanese ↔ English translation and dictionary lookup via the Gemini AI API.
+A native macOS app for Twitch streamers. It reads chat to provide real-time
+Japanese ↔ English translation (`!ts`) and dictionary lookup (`!d`), tracks
+chatters and raids, runs custom commands and user memos, and powers shoutouts
+and OBS overlays. Translation and lookup use Gemini or the optional on-device
+Bonsai model.
 
 The repository is a monorepo with a UI-agnostic Rust core and a SwiftUI frontend.
 Windows is a possible future direction (see `docs/future.md`), but no Windows code
@@ -22,8 +25,13 @@ docs/                  developer documentation
 - **`!ts`** — real-time Japanese ↔ English translation (3 formality levels + linguistic reasoning)
 - **`!d`** — dictionary lookup (meaning, examples, synonyms)
 - **Local model (Bonsai)** — optional on-device LLM provider (runs offline, no API key)
-- **OBS overlay** — live translation events on stream via embedded HTTP server (`http://localhost:4242`)
-- **Sound notifications** — configurable slots with volume control
+- **Chatters / Raiders** — first-message tracking, raid history, desktop notifications, 3 sound slots
+- **Custom commands** — broadcaster/mod/vip/everyone permissions, `!dice`, management UI
+- **User memos** — nickname and notes for chatters/streamers
+- **Shoutouts** — `!so`, `!so user info`, `!so user clip`, `!stop`, plus UI buttons
+- **OBS overlays** — translation/dictionary (`:4242/`) and shoutout alerts (`:4242/alert`)
+- **Japanese / English UI** — runtime language switch, localized alerts/notifications
+- **Discord Webhook** — post `!d` lookups as embeds
 - OAuth2 device flow for Twitch, Gemini API key stored in the macOS Keychain
 - Auto-reconnecting Twitch IRC connection (keepalive heartbeat, backoff, `RECONNECT` handling)
 

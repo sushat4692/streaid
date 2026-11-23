@@ -39,7 +39,10 @@ Sprint 4:
 - Discord Webhook（`!d` の結果をEmbed投稿）
 - 日本語ログイン画面のXCUITest
 
-Sprint 5（QA / パッケージ）は未着手。
+Sprint 5:
+- README / AGENTS / architecture / testing / FFI ドキュメントの最終更新
+- 全テスト・Swift契約テスト・XCUITest・Release/DMGビルドの確認
+- 手動受け入れ（実Twitch / OBS / Discord）は未実施
 
 ---
 

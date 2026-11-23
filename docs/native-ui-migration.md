@@ -99,6 +99,11 @@ Windows のコードは置かない。将来の展望は `docs/future.md` を参
 - [ ] Bonsai の有効化 / 8B・4B 切替 / 停止、モデルテスト
 - [ ] 語彙の記録・AI 分析
 - [ ] 既存データ（`bonsai/`・`sounds/`・`streaid.log`）が読めること
+- [ ] Chatters / Raiders の通知・音・一覧・削除
+- [ ] カスタムコマンド（権限 + `!dice`）と User Memo
+- [ ] `!so` / `!so user info|clip` / `!stop` と OBS アラート
+- [ ] 日本語UI（System / English / 日本語）とアラート `?lang=ja`
+- [ ] Discord Webhook への `!d` 投稿
 
 ### P1: リリース前に必須
 
@@ -121,6 +126,7 @@ Windows のコードは置かない。将来の展望は `docs/future.md` を参
 - [x] Bonsai 未有効時の Model Test プロバイダー無効化
 - [x] 音量設定の移行（旧 `volumes.json` → `UserDefaults`）
 - [ ] アプリアイコン 1024px 原本（現在は 512px のアップスケール）
+- [ ] 日本語UIの全画面レビュー（文字切れ・余白）
 
 ### P3: 配布
 
