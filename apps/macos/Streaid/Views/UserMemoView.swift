@@ -42,6 +42,7 @@ struct UserMemoView: View {
         }
         .sheet(isPresented: $showForm) {
             MemoFormView(editing: editing)
+                .id(editing?.id ?? "new")
                 .environmentObject(state)
         }
     }

@@ -42,6 +42,7 @@ struct CommandsView: View {
         }
         .sheet(isPresented: $showForm) {
             CommandFormView(editing: editing)
+                .id(editing?.id ?? "new")
                 .environmentObject(state)
         }
     }
