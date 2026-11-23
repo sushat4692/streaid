@@ -1,10 +1,12 @@
 # AGENTS.md
 
-Streaid is a native macOS app for Twitch streamers. It reads chat to provide
-real-time Japanese ↔ English translation (`!ts`) and dictionary lookup (`!d`),
-tracks chatters and raids, runs custom commands and user memos, and powers
-shoutouts and OBS overlays. Translation and lookup use Gemini or the optional
-on-device Bonsai model.
+Streaid is a native desktop app for Twitch streamers, currently shipping a macOS
+frontend. The Rust core and JSON C ABI are UI-agnostic, so other native
+frontends can be added later. It reads chat to provide real-time Japanese ↔
+English translation (`!ts`) and dictionary lookup (`!d`), tracks chatters and
+raids, runs custom commands and user memos, and powers shoutouts and OBS
+overlays. Translation and lookup use Gemini or the optional on-device Bonsai
+model.
 
 The repository is a **monorepo**:
 - `crates/streaid-core` — UI-agnostic Rust core

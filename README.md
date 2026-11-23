@@ -1,14 +1,15 @@
 # Streaid
 
-A native macOS app for Twitch streamers. It reads chat to provide real-time
-Japanese ↔ English translation (`!ts`) and dictionary lookup (`!d`), tracks
-chatters and raids, runs custom commands and user memos, and powers shoutouts
-and OBS overlays. Translation and lookup use Gemini or the optional on-device
-Bonsai model.
+A native desktop app for Twitch streamers, currently available on macOS. It reads
+chat to provide real-time Japanese ↔ English translation (`!ts`) and dictionary
+lookup (`!d`), tracks chatters and raids, runs custom commands and user memos,
+and powers shoutouts and OBS overlays. Translation and lookup use Gemini or the
+optional on-device Bonsai model. The Rust core and JSON C ABI are UI-agnostic,
+so other native frontends can be added later.
 
-The repository is a monorepo with a UI-agnostic Rust core and a SwiftUI frontend.
-Windows is a possible future direction (see `docs/future.md`), but no Windows code
-is currently maintained.
+The repository is a monorepo with a UI-agnostic Rust core and a native SwiftUI
+frontend for macOS. Windows is a possible future direction (see `docs/future.md`),
+but no Windows code is currently maintained.
 
 ## Repository layout
 
