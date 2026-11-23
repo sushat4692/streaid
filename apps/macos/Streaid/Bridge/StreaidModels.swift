@@ -22,6 +22,21 @@ public struct AppSettings: Codable, Equatable, Sendable {
         shoutoutInfoLength: 8,
         discordWebhook: ""
     )
+
+    public static let japaneseDefaults = AppSettings(
+        locale: "ja",
+        notificationsEnabled: true,
+        shoutoutMessage:
+            "おすすめ配信者「%username%」をチェック！ %url% 前回の配信は「%category%」でした。",
+        shoutoutNotFound: "「%user_id%」が見つかりませんでした。もう一度確認してください。",
+        shoutoutFailed: "「%username%」のチャンネル情報を取得できませんでした。後でもう一度お試しください。",
+        shoutoutInfoLength: 8,
+        discordWebhook: ""
+    )
+
+    public static func defaults(for locale: String) -> AppSettings {
+        locale == "ja" ? japaneseDefaults : .default
+    }
 }
 
 // MARK: - System

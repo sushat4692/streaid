@@ -169,8 +169,9 @@ can be called from separate FFI invocations.
 | `settings.get` | — | `Settings` |
 | `settings.set` | `Settings` fields | `Settings` |
 
-Settings include `locale`, `notifications_enabled`, shoutout message templates,
-`shoutout_info_length`, and `discord_webhook`.
+Settings include `locale` (`system`/`en`/`ja`), `notifications_enabled`,
+shoutout message templates, `shoutout_info_length`, and `discord_webhook`.
+When `discord_webhook` is set, successful `!d` lookups post an embed to Discord.
 
 ### shoutout
 

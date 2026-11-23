@@ -33,7 +33,13 @@ Sprint 3:
 - Chatters / Raiders / User Memo のShoutOutボタン
 - `settings.get` / `settings.set` FFI
 
-Sprint 4以降は未着手。
+Sprint 4:
+- 日本語UI（`L10n`、言語設定、アラートページの `?lang=ja`）
+- `!dice` の日本語応答
+- Discord Webhook（`!d` の結果をEmbed投稿）
+- 日本語ログイン画面のXCUITest
+
+Sprint 5（QA / パッケージ）は未着手。
 
 ---
 

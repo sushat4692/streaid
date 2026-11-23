@@ -25,19 +25,19 @@ struct LoginView: View {
                 Card(padding: 24) {
                     VStack(alignment: .leading, spacing: 18) {
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("Connect your Twitch account")
+                            Text(L10n.t("Connect your Twitch account"))
                                 .font(.title3.weight(.semibold))
                                 .foregroundStyle(Theme.textPrimary)
                             Text(
-                                "Streaid reads chat with a bot account so it can answer !ts and !d. Use the Client ID of your Twitch application."
+                                L10n.t("Streaid reads chat with a bot account so it can answer !ts and !d. Use the Client ID of your Twitch application.")
                             )
                             .font(.caption)
                             .foregroundStyle(Theme.textDim)
                             .fixedSize(horizontal: false, vertical: true)
                         }
 
-                        LabeledField("Client ID") {
-                            TextField("Twitch application Client ID", text: $state.clientID)
+                        LabeledField(L10n.t("Client ID")) {
+                            TextField(L10n.t("Twitch application Client ID"), text: $state.clientID)
                                 .textFieldStyle(.plain)
                                 .font(.system(size: 13, design: .monospaced))
                                 .padding(10)
@@ -54,7 +54,7 @@ struct LoginView: View {
                             Button {
                                 state.saveClientID()
                             } label: {
-                                Text("Save Client ID")
+                                Text(L10n.t("Save Client ID"))
                             }
                             .buttonStyle(SecondaryButtonStyle())
                             .disabled(
@@ -71,15 +71,15 @@ struct LoginView: View {
                                     }
                                     Text(
                                         state.isAuthenticating
-                                            ? "Waiting for authorization…"
-                                            : "Log in with Twitch")
+                                            ? L10n.t("Waiting for authorization…")
+                                            : L10n.t("Log in with Twitch"))
                                 }
                             }
                             .buttonStyle(PrimaryButtonStyle())
                             .disabled(state.isAuthenticating)
 
                             if state.isAuthenticating {
-                                Button("Cancel") {
+                                Button(L10n.t("Cancel")) {
                                     state.cancelAuthentication()
                                 }
                                 .buttonStyle(SecondaryButtonStyle())
@@ -100,14 +100,14 @@ struct LoginView: View {
                         Divider().overlay(Theme.border)
 
                         Link(
-                            "Create a Twitch application",
+                            L10n.t("Create a Twitch application"),
                             destination: URL(string: "https://dev.twitch.tv/console/apps")!
                         )
                         .font(.caption)
                         .tint(Theme.purpleLight)
 
                         Text(
-                            "Scopes used: chat:read, chat:edit. Tokens are stored in the macOS Keychain."
+                            L10n.t("Scopes used: chat:read, chat:edit. Tokens are stored in the macOS Keychain.")
                         )
                         .font(.caption2)
                         .foregroundStyle(Theme.textDim)
@@ -138,7 +138,7 @@ struct LoginView: View {
             Text("Streaid")
                 .font(.system(size: 30, weight: .bold))
                 .foregroundStyle(Theme.textPrimary)
-            Text("This app is aiding your streaming.")
+            Text(L10n.t("This app is aiding your streaming."))
                 .font(.subheadline)
                 .foregroundStyle(Theme.textDim)
         }
@@ -146,7 +146,7 @@ struct LoginView: View {
 
     private func deviceCodeBox(_ info: DeviceCodeInfo) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Enter this code on Twitch")
+            Text(L10n.t("Enter this code on Twitch"))
                 .font(.caption.weight(.medium))
                 .foregroundStyle(Theme.textMuted)
 
@@ -156,13 +156,13 @@ struct LoginView: View {
                     .foregroundStyle(Theme.purpleLight)
                     .textSelection(.enabled)
 
-                Button("Open Twitch") {
+                Button(L10n.t("Open Twitch")) {
                     state.openVerificationURL()
                 }
                 .buttonStyle(SecondaryButtonStyle(compact: true))
             }
 
-            Text("This code expires in about \(info.expiresIn / 60) minutes.")
+            Text(L10n.f("This code expires in about %d minutes.", Int(info.expiresIn / 60)))
                 .font(.caption2)
                 .foregroundStyle(Theme.textDim)
         }

@@ -3,6 +3,7 @@ pub mod bonsai;
 pub mod chat;
 pub mod commands;
 pub mod dictionary;
+pub mod discord;
 pub mod overlay;
 pub mod platform;
 pub mod shoutout;
@@ -1794,6 +1795,26 @@ async fn handle_dictionary_request(
                 event_type: "dictionary".to_string(),
                 data: serde_json::to_value(&event).unwrap_or_default(),
             });
+
+            let settings = crate::store::load_settings();
+            if !settings.discord_webhook.trim().is_empty() {
+                let webhook = settings.discord_webhook.clone();
+                let user = username.to_string();
+                let word = result.word.clone();
+                let meaning = result.meaning.clone();
+                let examples = result.examples.clone();
+                let source = source_lang.to_string();
+                let target = target_lang.to_string();
+                spawn_task(async move {
+                    if let Err(e) = crate::discord::post_lookup(
+                        &webhook, &user, &word, &meaning, &examples, &source, &target,
+                    )
+                    .await
+                    {
+                        eprintln!("Discord webhook failed: {}", e);
+                    }
+                });
+            }
         }
         Err(ProviderError::Skipped) => {
             eprintln!("[rate-limit] skipped (no local model available)");

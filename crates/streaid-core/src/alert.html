@@ -68,6 +68,13 @@
 </div>
 
 <script>
+  const lang = new URLSearchParams(location.search).get('lang') === 'ja' ? 'ja' : 'en';
+  const labels = {
+    en: { kicker: 'Please check the Streamer!' },
+    ja: { kicker: '配信者をチェック！' }
+  };
+  document.querySelector('.kicker').textContent = labels[lang].kicker;
+
   const info = document.getElementById('info');
   const infoImage = document.getElementById('info-image');
   const infoName = document.getElementById('info-name');

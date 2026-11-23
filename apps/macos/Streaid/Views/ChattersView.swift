@@ -6,16 +6,16 @@ struct ChattersView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             PageHeader(
-                "Chatters",
-                subtitle: "Users who spoke in this session. First-message tracking resets on restart."
+                L10n.t("Chatters"),
+                subtitle: L10n.t("Users who spoke in this session. First-message tracking resets on restart.")
             )
 
-            SectionCard("Chatters (\(state.chatters.count))") {
+            SectionCard(L10n.f("Chatters (%d)", state.chatters.count)) {
                 if state.chatters.isEmpty {
                     EmptyState(
                         icon: "person.2",
-                        title: "No chatters yet",
-                        message: "Users will appear here when they speak in chat."
+                        title: L10n.t("No chatters yet"),
+                        message: L10n.t("Users will appear here when they speak in chat.")
                     )
                 } else {
                     VStack(spacing: 0) {
@@ -63,7 +63,7 @@ struct ChattersView: View {
                 Image(systemName: "trash")
             }
             .buttonStyle(DangerButtonStyle())
-            .help("Remove from this session")
+            .help(L10n.t("Remove from this session"))
         }
         .padding(.vertical, 8)
     }

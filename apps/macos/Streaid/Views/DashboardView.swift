@@ -6,8 +6,8 @@ struct DashboardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             PageHeader(
-                "Dashboard",
-                subtitle: "Real-time Japanese ↔ English translation and dictionary lookup for Twitch chat."
+                L10n.t("Dashboard"),
+                subtitle: L10n.t("Real-time Japanese ↔ English translation and dictionary lookup for Twitch chat.")
             )
 
             HStack(alignment: .top, spacing: 14) {
@@ -26,7 +26,7 @@ struct DashboardView: View {
                         Image(systemName: "info.circle")
                             .foregroundStyle(Theme.blue)
                         Text(
-                            "Start the listener to answer !ts (translation) and !d (dictionary) in chat."
+                            L10n.t("Start the listener to answer !ts (translation) and !d (dictionary) in chat.")
                         )
                         .font(.caption)
                         .foregroundStyle(Theme.textMuted)
@@ -37,19 +37,19 @@ struct DashboardView: View {
     }
 
     private var listenerCard: some View {
-        SectionCard("Chat Listener") {
+        SectionCard(L10n.t("Chat Listener")) {
             HStack {
                 StatusPill(status: state.status)
                 Spacer()
                 if state.status.reconnecting {
-                    Text("Retrying connection…")
+                    Text(L10n.t("Retrying connection…"))
                         .font(.caption2)
                         .foregroundStyle(Theme.yellow)
                 }
             }
 
             VStack(alignment: .leading, spacing: 3) {
-                Text("Channel")
+                Text(L10n.t("Channel"))
                     .font(.caption.weight(.medium))
                     .foregroundStyle(Theme.textDim)
                 Text(channelLabel)
@@ -58,7 +58,7 @@ struct DashboardView: View {
             }
 
             Toggle(
-                "Enable !ts / !d",
+                L10n.t("Enable !ts / !d"),
                 isOn: Binding(
                     get: { state.translationEnabled },
                     set: { value in
@@ -80,7 +80,7 @@ struct DashboardView: View {
                     }
                 }
             } label: {
-                Text(state.isRunning ? "Stop Listening" : "Start Listening")
+                Text(state.isRunning ? L10n.t("Stop Listening") : L10n.t("Start Listening"))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(PrimaryButtonStyle())
@@ -90,16 +90,16 @@ struct DashboardView: View {
     }
 
     private var statsCard: some View {
-        SectionCard("Session") {
+        SectionCard(L10n.t("Session")) {
             HStack(spacing: 18) {
-                stat(value: "\(state.translations.count)", label: "Translations", color: Theme.purpleLight)
-                stat(value: "\(state.lookups.count)", label: "Lookups", color: Theme.blue)
+                stat(value: "\(state.translations.count)", label: L10n.t("Translations"), color: Theme.purpleLight)
+                stat(value: "\(state.lookups.count)", label: L10n.t("Lookups"), color: Theme.blue)
             }
 
             Divider().overlay(Theme.border)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Provider")
+                Text(L10n.t("Provider"))
                     .font(.caption.weight(.medium))
                     .foregroundStyle(Theme.textDim)
                 Text(providerLabel)
@@ -122,14 +122,14 @@ struct DashboardView: View {
     }
 
     private var latestTranslationCard: some View {
-        SectionCard("Latest Translation") {
+        SectionCard(L10n.t("Latest Translation")) {
             if let latest = state.translations.first {
                 translationRow(latest)
             } else {
                 EmptyState(
                     icon: "character.bubble",
-                    title: "No translations yet",
-                    message: "Japanese or English messages with !ts will appear here."
+                    title: L10n.t("No translations yet"),
+                    message: L10n.t("Japanese or English messages with !ts will appear here.")
                 )
             }
         }
@@ -137,14 +137,14 @@ struct DashboardView: View {
     }
 
     private var latestDictionaryCard: some View {
-        SectionCard("Latest Dictionary Lookup") {
+        SectionCard(L10n.t("Latest Dictionary Lookup")) {
             if let latest = state.lookups.first {
                 dictionaryRow(latest)
             } else {
                 EmptyState(
                     icon: "character.book.closed",
-                    title: "No lookups yet",
-                    message: "Words looked up with !d will appear here."
+                    title: L10n.t("No lookups yet"),
+                    message: L10n.t("Words looked up with !d will appear here.")
                 )
             }
         }
@@ -177,7 +177,7 @@ struct DashboardView: View {
             ForEach(Array(event.suggestions.enumerated()), id: \.offset) { _, suggestion in
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Pill(
-                        text: suggestion.formality,
+                        text: L10n.t(suggestion.formality),
                         color: formalityColor(suggestion.formality)
                     )
                     Text(suggestion.text)
@@ -225,7 +225,7 @@ struct DashboardView: View {
 
             if !event.examples.isEmpty {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("Examples")
+                    Text(L10n.t("Examples"))
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(Theme.textDim)
                     ForEach(Array(event.examples.enumerated()), id: \.offset) { _, example in
@@ -238,7 +238,7 @@ struct DashboardView: View {
 
             if !event.similarWords.isEmpty {
                 HStack(spacing: 5) {
-                    Text("Similar:")
+                    Text(L10n.t("Similar:"))
                         .font(.caption2)
                         .foregroundStyle(Theme.textDim)
                     ForEach(event.similarWords, id: \.self) { word in
@@ -256,14 +256,14 @@ struct DashboardView: View {
         if !state.targetChannel.isEmpty {
             return "#\(state.targetChannel)"
         }
-        return "Your channel"
+        return L10n.t("Your channel")
     }
 
     private var providerLabel: String {
         guard let bonsai = state.bonsai, bonsai.enabled else {
-            return "Gemini API"
+            return L10n.t("Gemini API")
         }
-        return "Local model (Bonsai \(bonsai.activeModel.uppercased()))"
+        return L10n.f("Local model (Bonsai %@)", bonsai.activeModel.uppercased())
     }
 
     private func formalityColor(_ value: String) -> Color {

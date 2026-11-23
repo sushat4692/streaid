@@ -87,11 +87,16 @@ pub fn resolve(message: &IrcMessage) -> Option<CommandAction> {
             let word = args.split_whitespace().next()?;
             Some(CommandAction::Dictionary(word.to_string()))
         }
-        "dice" => Some(CommandAction::Reply(format!(
-            "@{}: You rolled a {}",
-            message.username,
-            roll_dice()
-        ))),
+        "dice" => {
+            let settings = store::load_settings();
+            let roll = roll_dice();
+            let text = if settings.locale == "ja" {
+                format!("@{}: サイコロの目は {} です", message.username, roll)
+            } else {
+                format!("@{}: You rolled a {}", message.username, roll)
+            };
+            Some(CommandAction::Reply(text))
+        }
         "so" => {
             if !(message.is_mod || message.is_broadcaster) {
                 return None;

@@ -6,16 +6,16 @@ struct RaidersView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             PageHeader(
-                "Raiders",
-                subtitle: "Raid history for this channel (newest first)."
+                L10n.t("Raiders"),
+                subtitle: L10n.t("Raid history for this channel (newest first).")
             )
 
-            SectionCard("Raiders (\(state.raiders.count))") {
+            SectionCard(L10n.f("Raiders (%d)", state.raiders.count)) {
                 if state.raiders.isEmpty {
                     EmptyState(
                         icon: "tornado",
-                        title: "No raids yet",
-                        message: "Raids will appear here with their viewer counts."
+                        title: L10n.t("No raids yet"),
+                        message: L10n.t("Raids will appear here with their viewer counts.")
                     )
                 } else {
                     VStack(spacing: 0) {
@@ -51,7 +51,7 @@ struct RaidersView: View {
 
             Spacer()
 
-            Pill(text: "\(raider.viewers) viewers", color: Theme.blue)
+            Pill(text: L10n.f("%d viewers", Int(raider.viewers)), color: Theme.blue)
             Text(EventTime.clock(raider.timestamp))
                 .font(.caption2.monospacedDigit())
                 .foregroundStyle(Theme.textDim)
@@ -64,7 +64,7 @@ struct RaidersView: View {
                 Image(systemName: "trash")
             }
             .buttonStyle(DangerButtonStyle())
-            .help("Delete this raid")
+            .help(L10n.t("Delete this raid"))
         }
         .padding(.vertical, 8)
     }

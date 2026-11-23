@@ -19,7 +19,7 @@ struct StreaidApp: App {
         .commands {
             CommandGroup(replacing: .newItem) {}
             CommandGroup(replacing: .appSettings) {
-                Button("Settings…") {
+                Button(L10n.t("Settings…")) {
                     state.page = .config
                 }
                 .keyboardShortcut(",", modifiers: .command)
@@ -49,6 +49,7 @@ struct RootView: View {
             }
         }
         .animation(.easeInOut(duration: 0.18), value: state.toast)
+        .id(state.resolvedLocale)
         .background(Theme.background)
         .preferredColorScheme(.dark)
     }

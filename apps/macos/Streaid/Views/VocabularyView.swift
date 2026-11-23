@@ -8,8 +8,8 @@ struct VocabularyView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             PageHeader(
-                "Vocabulary",
-                subtitle: "Words looked up with !d, normalized by the AI into base forms."
+                L10n.t("Vocabulary"),
+                subtitle: L10n.t("Words looked up with !d, normalized by the AI into base forms.")
             )
 
             summaryCard
@@ -21,41 +21,41 @@ struct VocabularyView: View {
             await state.refreshVocabulary()
         }
         .confirmationDialog(
-            "Clear the entire vocabulary?",
+            L10n.t("Clear the entire vocabulary?"),
             isPresented: $showClearConfirmation,
             titleVisibility: .visible
         ) {
-            Button("Clear Vocabulary", role: .destructive) {
+            Button(L10n.t("Clear Vocabulary"), role: .destructive) {
                 Task { await state.clearVocabulary() }
             }
-            Button("Cancel", role: .cancel) {}
+            Button(L10n.t("Cancel"), role: .cancel) {}
         } message: {
-            Text("This removes all recorded words and inflection history.")
+            Text(L10n.t("This removes all recorded words and inflection history."))
         }
     }
 
     private var summaryCard: some View {
-        SectionCard("Summary") {
+        SectionCard(L10n.t("Summary")) {
             HStack(spacing: 22) {
                 stat(
                     value: "\(state.vocabSummary?.totalWords ?? 0)",
-                    label: "Base words",
+                    label: L10n.t("Base words"),
                     color: Theme.purpleLight
                 )
                 stat(
                     value: "\(state.vocabSummary?.totalLookups ?? 0)",
-                    label: "Lookups",
+                    label: L10n.t("Lookups"),
                     color: Theme.blue
                 )
                 Spacer()
 
-                Button("Analyze with AI") {
+                Button(L10n.t("Analyze with AI")) {
                     Task { await state.analyzeVocabulary() }
                 }
                 .buttonStyle(SecondaryButtonStyle(compact: true))
                 .disabled(state.vocabAnalyzing)
 
-                Button("Clear") {
+                Button(L10n.t("Clear")) {
                     showClearConfirmation = true
                 }
                 .buttonStyle(DangerButtonStyle())
@@ -65,7 +65,7 @@ struct VocabularyView: View {
             if state.vocabAnalyzing {
                 HStack(spacing: 8) {
                     ProgressView().controlSize(.small)
-                    Text("Classifying words…")
+                    Text(L10n.t("Classifying words…"))
                         .font(.caption)
                         .foregroundStyle(Theme.textMuted)
                 }
@@ -76,7 +76,7 @@ struct VocabularyView: View {
     private var analysisCard: some View {
         Group {
             if !state.vocabAnalysis.isEmpty {
-                SectionCard("AI Categories") {
+                SectionCard(L10n.t("AI Categories")) {
                     ForEach(state.vocabAnalysis, id: \.category) { category in
                         VStack(alignment: .leading, spacing: 5) {
                             HStack {
@@ -84,7 +84,7 @@ struct VocabularyView: View {
                                     .font(.system(size: 13, weight: .semibold))
                                     .foregroundStyle(Theme.textPrimary)
                                 Spacer()
-                                Text("\(category.totalCount) lookups")
+                                Text(L10n.f("%d lookups", Int(category.totalCount)))
                                     .font(.caption2)
                                     .foregroundStyle(Theme.textDim)
                             }
@@ -102,13 +102,13 @@ struct VocabularyView: View {
     }
 
     private var topWordsCard: some View {
-        SectionCard("Top Words") {
+        SectionCard(L10n.t("Top Words")) {
             let words = state.vocabSummary?.topWords ?? []
             if words.isEmpty {
                 EmptyState(
                     icon: "character.book.closed",
-                    title: "No words yet",
-                    message: "Run !d in chat, or use Model Test with the dictionary mode."
+                    title: L10n.t("No words yet"),
+                    message: L10n.t("Run !d in chat, or use Model Test with the dictionary mode.")
                 )
             } else {
                 VStack(alignment: .leading, spacing: 10) {
@@ -146,8 +146,8 @@ struct VocabularyView: View {
         return Group {
             if !ambiguous.isEmpty {
                 SectionCard(
-                    "Ambiguous Words",
-                    subtitle: "Words the model interpreted as multiple base forms."
+                    L10n.t("Ambiguous Words"),
+                    subtitle: L10n.t("Words the model interpreted as multiple base forms.")
                 ) {
                     ForEach(ambiguous, id: \.word) { entry in
                         HStack(alignment: .firstTextBaseline, spacing: 8) {

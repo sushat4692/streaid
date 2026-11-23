@@ -112,15 +112,15 @@ struct CreditsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             PageHeader(
-                "Credits",
-                subtitle: "Streaid is built on the work of these projects and models."
+                L10n.t("Credits"),
+                subtitle: L10n.t("Streaid is built on the work of these projects and models.")
             )
 
-            section("Models & APIs", items: models)
-            section("macOS App", items: app)
-            section("Rust Core", items: core)
+            section(L10n.t("Models & APIs"), items: models)
+            section(L10n.t("macOS App"), items: app)
+            section(L10n.t("Rust Core"), items: core)
 
-            Text("Streaid is released under the MIT License.")
+            Text(L10n.t("Streaid is released under the MIT License."))
                 .font(.caption2)
                 .foregroundStyle(Theme.textDim)
                 .padding(.top, 4)
@@ -136,7 +136,7 @@ struct CreditsView: View {
                             Text(item.name)
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(Theme.textPrimary)
-                            Text(item.role)
+                            Text(L10n.t(item.role))
                                 .font(.caption2)
                                 .foregroundStyle(Theme.textDim)
                         }
@@ -154,7 +154,7 @@ struct CreditsView: View {
                                     .foregroundStyle(Theme.purpleLight)
                             }
                             .buttonStyle(.plain)
-                            .accessibilityLabel("Open \(item.name)")
+                            .accessibilityLabel(L10n.f("Open %@", item.name))
                         }
                     }
                     Divider().overlay(Theme.border)

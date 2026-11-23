@@ -9,7 +9,7 @@ struct LogView: View {
 
         var id: String { rawValue }
         var title: String {
-            self == .translations ? "Translations" : "Dictionary"
+            self == .translations ? L10n.t("Translations") : L10n.t("Dictionary")
         }
     }
 
@@ -17,9 +17,9 @@ struct LogView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            PageHeader("Log", subtitle: "Events received during this app session.")
+            PageHeader(L10n.t("Log"), subtitle: L10n.t("Events received during this app session."))
 
-            Picker("Log", selection: $tab) {
+            Picker(L10n.t("Log"), selection: $tab) {
                 ForEach(Tab.allCases) { tab in
                     Text(tab.title).tag(tab)
                 }
@@ -41,8 +41,8 @@ struct LogView: View {
             if state.translations.isEmpty {
                 EmptyState(
                     icon: "character.bubble",
-                    title: "No translations yet",
-                    message: "Messages with !ts will appear here."
+                    title: L10n.t("No translations yet"),
+                    message: L10n.t("Messages with !ts will appear here.")
                 )
             } else {
                 LazyVStack(alignment: .leading, spacing: 0) {
@@ -62,8 +62,8 @@ struct LogView: View {
             if state.lookups.isEmpty {
                 EmptyState(
                     icon: "character.book.closed",
-                    title: "No lookups yet",
-                    message: "Words looked up with !d will appear here."
+                    title: L10n.t("No lookups yet"),
+                    message: L10n.t("Words looked up with !d will appear here.")
                 )
             } else {
                 LazyVStack(alignment: .leading, spacing: 0) {
@@ -100,7 +100,7 @@ struct LogView: View {
             ForEach(Array(event.suggestions.enumerated()), id: \.offset) { _, suggestion in
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Pill(
-                        text: suggestion.formality,
+                        text: L10n.t(suggestion.formality),
                         color: formalityColor(suggestion.formality)
                     )
                     Text(suggestion.text)
@@ -160,7 +160,7 @@ struct LogView: View {
 
             if !event.similarWords.isEmpty {
                 HStack(spacing: 5) {
-                    Text("Similar:")
+                    Text(L10n.t("Similar:"))
                         .font(.caption2)
                         .foregroundStyle(Theme.textDim)
                     ForEach(event.similarWords, id: \.self) { word in

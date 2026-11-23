@@ -7,9 +7,9 @@ struct ShoutOutButton: View {
 
     var body: some View {
         Menu {
-            Button("Shoutout") { run(nil) }
-            Button("Show Info") { run("info") }
-            Button("Show Clip") { run("clip") }
+            Button(L10n.t("Shoutout")) { run(nil) }
+            Button(L10n.t("Show Info")) { run("info") }
+            Button(L10n.t("Show Clip")) { run("clip") }
         } label: {
             Image(systemName: "speaker.wave.2")
         }

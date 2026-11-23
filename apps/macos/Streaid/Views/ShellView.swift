@@ -112,7 +112,7 @@ struct ShellView: View {
                         .font(.system(size: 12, weight: .bold))
                         .foregroundStyle(.white)
                 }
-                Text(state.username ?? "Unknown User")
+                Text(state.username ?? L10n.t("Unknown User"))
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.textMuted)
                     .lineLimit(1)
@@ -130,7 +130,7 @@ struct ShellView: View {
                     }
                 }
             } label: {
-                Text(state.isRunning ? "Stop Listening" : "Start Listening")
+                Text(state.isRunning ? L10n.t("Stop Listening") : L10n.t("Start Listening"))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(PrimaryButtonStyle())
@@ -139,7 +139,7 @@ struct ShellView: View {
             Button {
                 Task { await state.logout() }
             } label: {
-                Text("Logout")
+                Text(L10n.t("Logout"))
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(SecondaryButtonStyle(compact: true))

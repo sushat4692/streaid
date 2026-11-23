@@ -14,16 +14,20 @@ struct ConfigView: View {
     @State private var shoutoutFailed = ""
     @State private var shoutoutInfoLength: Double = 8
     @State private var savingShoutout = false
+    @State private var discordWebhook = ""
+    @State private var savingDiscord = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            PageHeader("Config", subtitle: "Credentials, chat behaviour, sounds and the OBS overlay.")
+            PageHeader(L10n.t("Config"), subtitle: L10n.t("Credentials, chat behaviour, sounds and the OBS overlay."))
 
+            languageSettings
             translationSettings
             chatListener
             shoutoutSettings
             localModel
             soundSettings
+            discordSettings
             overlaySettings
         }
         .onAppear { syncShoutoutSettings() }
@@ -39,19 +43,43 @@ struct ConfigView: View {
         }
     }
 
+    // MARK: - Language
+
+    private var languageSettings: some View {
+        SectionCard(
+            L10n.t("Language"),
+            subtitle: L10n.t("Choose the app language.")
+        ) {
+            Picker(
+                L10n.t("Language"),
+                selection: Binding(
+                    get: { state.settings.locale },
+                    set: { state.setLocale($0) }
+                )
+            ) {
+                Text(L10n.t("System")).tag("system")
+                Text(L10n.t("English")).tag("en")
+                Text("日本語").tag("ja")
+            }
+            .pickerStyle(.segmented)
+            .frame(width: 360)
+            .labelsHidden()
+        }
+    }
+
     // MARK: - Translation
 
     private var translationSettings: some View {
         SectionCard(
-            "Translation Settings",
-            subtitle: "Gemini is used for !ts and !d unless the local model is enabled."
+            L10n.t("Translation Settings"),
+            subtitle: L10n.t("Gemini is used for !ts and !d unless the local model is enabled.")
         ) {
-            LabeledField("Gemini API Key") {
+            LabeledField(L10n.t("Gemini API Key")) {
                 HStack(spacing: 8) {
                     SecureField(
                         state.geminiKeyConfigured
-                            ? "•••••••• (saved in Keychain)"
-                            : "Enter your Gemini API key",
+                            ? L10n.t("•••••••• (saved in Keychain)")
+                            : L10n.t("Enter your Gemini API key"),
                         text: $geminiKey
                     )
                     .textFieldStyle(.plain)
@@ -64,7 +92,7 @@ struct ConfigView: View {
                             .stroke(Theme.border, lineWidth: 1)
                     )
 
-                    Button("Save API Key") {
+                    Button(L10n.t("Save API Key")) {
                         let key = geminiKey.trimmingCharacters(in: .whitespacesAndNewlines)
                         Task {
                             if await state.saveGeminiKey(key) {
@@ -79,15 +107,15 @@ struct ConfigView: View {
 
             HStack(spacing: 8) {
                 Pill(
-                    text: state.geminiKeyConfigured ? "Configured" : "Not configured",
+                    text: state.geminiKeyConfigured ? L10n.t("Configured") : L10n.t("Not configured"),
                     color: state.geminiKeyConfigured ? Theme.green : Theme.yellow
                 )
-                Text("Stored in the macOS Keychain.")
+                Text(L10n.t("Stored in the macOS Keychain."))
                     .font(.caption2)
                     .foregroundStyle(Theme.textDim)
                 Spacer()
                 Link(
-                    "Get a key from Google AI Studio",
+                    L10n.t("Get a key from Google AI Studio"),
                     destination: URL(string: "https://aistudio.google.com/app/apikey")!
                 )
                 .font(.caption)
@@ -100,11 +128,11 @@ struct ConfigView: View {
 
     private var chatListener: some View {
         SectionCard(
-            "Chat Listener",
-            subtitle: "Blank channel = monitor the authenticated account's own channel."
+            L10n.t("Chat Listener"),
+            subtitle: L10n.t("Blank channel = monitor the authenticated account's own channel.")
         ) {
-            LabeledField("Target Channel") {
-                TextField("your_channel", text: $state.targetChannel)
+            LabeledField(L10n.t("Target Channel")) {
+                TextField(L10n.t("your_channel"), text: $state.targetChannel)
                     .textFieldStyle(.plain)
                     .font(.system(size: 13, design: .monospaced))
                     .padding(10)
@@ -120,7 +148,7 @@ struct ConfigView: View {
                 StatusPill(status: state.status)
 
                 Toggle(
-                    "Enable !ts / !d",
+                    L10n.t("Enable !ts / !d"),
                     isOn: Binding(
                         get: { state.translationEnabled },
                         set: { value in
@@ -144,7 +172,7 @@ struct ConfigView: View {
                         }
                     }
                 } label: {
-                    Text(state.isRunning ? "Stop Listening" : "Start Listening")
+                    Text(state.isRunning ? L10n.t("Stop Listening") : L10n.t("Start Listening"))
                 }
                 .buttonStyle(PrimaryButtonStyle(compact: true))
                 .disabled(state.isBusy)
@@ -156,21 +184,21 @@ struct ConfigView: View {
 
     private var shoutoutSettings: some View {
         SectionCard(
-            "Shoutout",
-            subtitle: "Used by !so and the ShoutOut buttons. Placeholders: %username%, %user_id%, %url%, %category%."
+            L10n.t("Shoutout"),
+            subtitle: L10n.t("Used by !so and the ShoutOut buttons. Placeholders: %username%, %user_id%, %url%, %category%.")
         ) {
-            LabeledField("Shoutout Message") {
+            LabeledField(L10n.t("Shoutout Message")) {
                 textArea($shoutoutMessage, minHeight: 64)
             }
-            LabeledField("Not Found Message") {
+            LabeledField(L10n.t("Not Found Message")) {
                 textArea($shoutoutNotFound, minHeight: 48)
             }
-            LabeledField("Failed Message") {
+            LabeledField(L10n.t("Failed Message")) {
                 textArea($shoutoutFailed, minHeight: 48)
             }
 
             HStack(spacing: 10) {
-                Text("Info Display Time")
+                Text(L10n.t("Info Display Time"))
                     .font(.caption2)
                     .foregroundStyle(Theme.textDim)
                 Slider(value: $shoutoutInfoLength, in: 0...60, step: 1)
@@ -179,13 +207,19 @@ struct ConfigView: View {
                     .font(.caption2.monospacedDigit())
                     .foregroundStyle(Theme.textDim)
                 Spacer()
+                Button(L10n.t("Reset to Defaults")) {
+                    applyDefaultShoutout()
+                }
+                .buttonStyle(SecondaryButtonStyle(compact: true))
+                .disabled(savingShoutout)
+
                 Button {
                     saveShoutout()
                 } label: {
                     if savingShoutout {
                         ProgressView().controlSize(.small)
                     } else {
-                        Text("Save Shoutout Settings")
+                        Text(L10n.t("Save Shoutout Settings"))
                     }
                 }
                 .buttonStyle(PrimaryButtonStyle(compact: true))
@@ -209,10 +243,19 @@ struct ConfigView: View {
     }
 
     private func syncShoutoutSettings() {
+        discordWebhook = state.settings.discordWebhook
         shoutoutMessage = state.settings.shoutoutMessage
         shoutoutNotFound = state.settings.shoutoutNotFound
         shoutoutFailed = state.settings.shoutoutFailed
         shoutoutInfoLength = Double(state.settings.shoutoutInfoLength)
+    }
+
+    private func applyDefaultShoutout() {
+        let defaults = AppSettings.defaults(for: state.resolvedLocale)
+        shoutoutMessage = defaults.shoutoutMessage
+        shoutoutNotFound = defaults.shoutoutNotFound
+        shoutoutFailed = defaults.shoutoutFailed
+        shoutoutInfoLength = Double(defaults.shoutoutInfoLength)
     }
 
     private func saveShoutout() {
@@ -234,12 +277,12 @@ struct ConfigView: View {
     private var localModel: some View {
         if state.localModelSupported {
             SectionCard(
-                "Local Model (Bonsai)",
-                subtitle: "Answer !ts and !d on-device with MLX. No API key required."
+                L10n.t("Local Model (Bonsai)"),
+                subtitle: L10n.t("Answer !ts and !d on-device with MLX. No API key required.")
             ) {
                 HStack {
                     Toggle(
-                        "Enable Local Model",
+                        L10n.t("Enable Local Model"),
                         isOn: Binding(
                             get: { state.localModelEnabled },
                             set: { value in
@@ -255,7 +298,7 @@ struct ConfigView: View {
                     if state.localModelBusy {
                         HStack(spacing: 7) {
                             ProgressView().controlSize(.small)
-                            Text("Starting local model… (up to 90s)")
+                            Text(L10n.t("Starting local model… (up to 90s)"))
                                 .font(.caption2)
                                 .foregroundStyle(Theme.textMuted)
                         }
@@ -264,7 +307,7 @@ struct ConfigView: View {
                     Spacer()
 
                     Picker(
-                        "Chat model",
+                        L10n.t("Chat model"),
                         selection: Binding(
                             get: { state.activeModel },
                             set: { value in
@@ -283,7 +326,7 @@ struct ConfigView: View {
                 if let bonsai = state.bonsai {
                     HStack(spacing: 8) {
                         Pill(
-                            text: bonsai.runtimeFound ? "Runtime ready" : "Runtime missing",
+                            text: bonsai.runtimeFound ? L10n.t("Runtime ready") : L10n.t("Runtime missing"),
                             color: bonsai.runtimeFound ? Theme.green : Theme.yellow
                         )
                         ForEach(bonsai.models, id: \.name) { model in
@@ -299,7 +342,7 @@ struct ConfigView: View {
 
                     if !bonsai.runtimeFound || bonsai.models.contains(where: { !$0.modelFound }) {
                         Text(
-                            "Run scripts/setup-bonsai.sh to download the MLX runtime and models."
+                            L10n.t("Run scripts/setup-bonsai.sh to download the MLX runtime and models.")
                         )
                         .font(.caption2)
                         .foregroundStyle(Theme.textDim)
@@ -311,20 +354,20 @@ struct ConfigView: View {
 
     private func modelStatus(_ model: BonsaiModelStatus) -> String {
         let name = model.name.uppercased()
-        if model.running { return "\(name) running" }
-        if model.modelFound { return "\(name) ready" }
-        return "\(name) missing"
+        if model.running { return L10n.f("%@ running", name) }
+        if model.modelFound { return L10n.f("%@ ready", name) }
+        return L10n.f("%@ missing", name)
     }
 
     // MARK: - Sounds
 
     private var soundSettings: some View {
         SectionCard(
-            "Sound Notifications",
-            subtitle: "First-message tracking resets on app restart."
+            L10n.t("Sound Notifications"),
+            subtitle: L10n.t("First-message tracking resets on app restart.")
         ) {
             Toggle(
-                "Desktop notifications",
+                L10n.t("Desktop notifications"),
                 isOn: Binding(
                     get: { state.notificationsEnabled },
                     set: { state.setNotificationsEnabled($0) }
@@ -338,20 +381,20 @@ struct ConfigView: View {
 
             soundSlot(
                 slot: "chatter",
-                title: "New Chatter Sound",
-                subtitle: "Plays the first time a user speaks in this session."
+                title: L10n.t("New Chatter Sound"),
+                subtitle: L10n.t("Plays the first time a user speaks in this session.")
             )
             Divider().overlay(Theme.border)
             soundSlot(
                 slot: "chat",
-                title: "Returning Chatter Sound",
-                subtitle: "Plays for every later message from that user."
+                title: L10n.t("Returning Chatter Sound"),
+                subtitle: L10n.t("Plays for every later message from that user.")
             )
             Divider().overlay(Theme.border)
             soundSlot(
                 slot: "raid",
-                title: "Raid Sound",
-                subtitle: "Plays when someone raids your channel."
+                title: L10n.t("Raid Sound"),
+                subtitle: L10n.t("Plays when someone raids your channel.")
             )
         }
     }
@@ -366,26 +409,26 @@ struct ConfigView: View {
                     Text(title)
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(Theme.textPrimary)
-                    Text(file?.fileName ?? "No file set")
+                    Text(file?.fileName ?? L10n.t("No file set"))
                         .font(.caption2)
                         .foregroundStyle(Theme.textDim)
                         .lineLimit(1)
                 }
                 Spacer()
 
-                Button("Choose") {
+                Button(L10n.t("Choose")) {
                     importSlot = slot
                     showImporter = true
                 }
                 .buttonStyle(SecondaryButtonStyle(compact: true))
 
-                Button("Preview") {
+                Button(L10n.t("Preview")) {
                     state.previewSound(slot: slot)
                 }
                 .buttonStyle(SecondaryButtonStyle(compact: true))
                 .disabled(file == nil)
 
-                Button("Clear") {
+                Button(L10n.t("Clear")) {
                     Task { await state.deleteSound(slot: slot) }
                 }
                 .buttonStyle(DangerButtonStyle())
@@ -393,7 +436,7 @@ struct ConfigView: View {
             }
 
             HStack(spacing: 10) {
-                Text("Volume")
+                Text(L10n.t("Volume"))
                     .font(.caption2)
                     .foregroundStyle(Theme.textDim)
                 Slider(
@@ -417,26 +460,70 @@ struct ConfigView: View {
         }
     }
 
+    // MARK: - Discord
+
+    private var discordSettings: some View {
+        SectionCard(
+            L10n.t("Discord Webhook"),
+            subtitle: L10n.t("Post !d lookups to a Discord channel.")
+        ) {
+            LabeledField(L10n.t("Webhook URL")) {
+                HStack(spacing: 8) {
+                    TextField("https://discord.com/api/webhooks/...", text: $discordWebhook)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 12, design: .monospaced))
+                        .padding(10)
+                        .background(Theme.cardStrong)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .stroke(Theme.border, lineWidth: 1)
+                        )
+
+                    Button {
+                        saveDiscord()
+                    } label: {
+                        if savingDiscord {
+                            ProgressView().controlSize(.small)
+                        } else {
+                            Text(L10n.t("Save Webhook"))
+                        }
+                    }
+                    .buttonStyle(PrimaryButtonStyle(compact: true))
+                    .disabled(savingDiscord)
+                }
+            }
+        }
+    }
+
+    private func saveDiscord() {
+        savingDiscord = true
+        Task {
+            _ = await state.saveDiscordWebhook(discordWebhook)
+            savingDiscord = false
+        }
+    }
+
     // MARK: - Overlay
 
     private var overlaySettings: some View {
         SectionCard(
-            "OBS Overlay",
-            subtitle: "Add two Browser Sources in OBS: one for translations, one for alerts."
+            L10n.t("OBS Overlay"),
+            subtitle: L10n.t("Add two Browser Sources in OBS: one for translations, one for alerts.")
         ) {
             urlRow(
-                label: "Translation / Dictionary",
+                label: L10n.t("Translation / Dictionary"),
                 url: state.overlayURL,
                 copy: { state.copyOverlayURL() }
             )
             Divider().overlay(Theme.border)
             urlRow(
-                label: "Shoutout Alert",
+                label: L10n.t("Shoutout Alert"),
                 url: state.alertURL,
                 copy: { state.copyAlertURL() }
             )
 
-            Text("Enable a transparent background in OBS. Alert cards scale with the source size.")
+            Text(L10n.t("Enable a transparent background in OBS. Alert cards scale with the source size."))
                 .font(.caption2)
                 .foregroundStyle(Theme.textDim)
         }
@@ -461,10 +548,10 @@ struct ConfigView: View {
                             .stroke(Theme.border, lineWidth: 1)
                     )
 
-                Button("Copy", action: copy)
+                Button(L10n.t("Copy"), action: copy)
                     .buttonStyle(SecondaryButtonStyle(compact: true))
 
-                Button("Open") {
+                Button(L10n.t("Open")) {
                     if let url = URL(string: url) {
                         NSWorkspace.shared.open(url)
                     }

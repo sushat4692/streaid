@@ -25,16 +25,16 @@ enum Page: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .dashboard: return "Dashboard"
-        case .chatters: return "Chatters"
-        case .raiders: return "Raiders"
-        case .commands: return "Commands"
-        case .userMemo: return "User Memo"
-        case .modelTest: return "Model Test"
-        case .config: return "Config"
-        case .vocabulary: return "Vocabulary"
-        case .log: return "Log"
-        case .credits: return "Credits"
+        case .dashboard: return L10n.t("Dashboard")
+        case .chatters: return L10n.t("Chatters")
+        case .raiders: return L10n.t("Raiders")
+        case .commands: return L10n.t("Commands")
+        case .userMemo: return L10n.t("User Memo")
+        case .modelTest: return L10n.t("Model Test")
+        case .config: return L10n.t("Config")
+        case .vocabulary: return L10n.t("Vocabulary")
+        case .log: return L10n.t("Log")
+        case .credits: return L10n.t("Credits")
         }
     }
 
@@ -112,6 +112,7 @@ final class AppState: ObservableObject {
 
     init() {
         self.core = StreaidCore()
+        applyLocale()
         loadVolumes()
         loadNotificationSettings()
         NotificationService.shared.setup()
@@ -130,7 +131,34 @@ final class AppState: ObservableObject {
     var overlayURL: String { capabilities?.overlayUrl ?? "http://localhost:4242" }
     var alertURL: String {
         let base = overlayURL.hasSuffix("/") ? String(overlayURL.dropLast()) : overlayURL
-        return "\(base)/alert"
+        let suffix = resolvedLocale == "ja" ? "?lang=ja" : ""
+        return "\(base)/alert\(suffix)"
+    }
+
+    /// "system" resolves from the OS preferred language.
+    var resolvedLocale: String {
+        // UI-test / screenshot override.
+        if let forced = ProcessInfo.processInfo.environment["STREAID_FORCE_LOCALE"] {
+            return forced == "ja" ? "ja" : "en"
+        }
+        if settings.locale == "system" {
+            return Locale.preferredLanguages.first?.hasPrefix("ja") == true ? "ja" : "en"
+        }
+        return settings.locale == "ja" ? "ja" : "en"
+    }
+
+    func applyLocale() {
+        L10n.locale = resolvedLocale
+    }
+
+    func setLocale(_ locale: String) {
+        settings.locale = locale
+        applyLocale()
+        Task {
+            if self.settingsLoaded {
+                _ = await self.saveSettings()
+            }
+        }
     }
 
     // MARK: - Bootstrap
@@ -235,8 +263,8 @@ final class AppState: ObservableObject {
                 )
                 if notificationsEnabled {
                     NotificationService.shared.post(
-                        title: "Chatter has come",
-                        body: "Thank you for coming \"\(value.displayName)\""
+                        title: L10n.t("Chatter has come"),
+                        body: L10n.f("Thank you for coming \"%@\"", value.displayName)
                     )
                 }
             }
@@ -252,8 +280,8 @@ final class AppState: ObservableObject {
             }
             if notificationsEnabled {
                 NotificationService.shared.post(
-                    title: "\(value.viewers) Raider has come",
-                    body: "Thank you for raiding \"\(value.fromDisplayName)\""
+                    title: L10n.f("%d Raider has come", Int(value.viewers)),
+                    body: L10n.f("Thank you for raiding \"%@\"", value.fromDisplayName)
                 )
             }
             Task { [weak self] in await self?.refreshRaiders() }
@@ -306,7 +334,7 @@ final class AppState: ObservableObject {
         Task { [weak self] in
             do {
                 try await self?.core.saveClientID(id)
-                self?.showSuccess("Client ID saved.")
+                self?.showSuccess(L10n.t("Client ID saved."))
             } catch {
                 self?.showError(error.localizedDescription)
             }
@@ -316,7 +344,7 @@ final class AppState: ObservableObject {
     func authenticate() async {
         let id = clientID.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !id.isEmpty else {
-            loginError = "Enter your Twitch Client ID first."
+            loginError = L10n.t("Enter your Twitch Client ID first.")
             return
         }
 
@@ -355,7 +383,7 @@ final class AppState: ObservableObject {
                 }
             }
             deviceCode = nil
-            loginError = "Authentication timed out. Please try again."
+            loginError = L10n.t("Authentication timed out. Please try again.")
         } catch is CancellationError {
             deviceCode = nil
             loginError = nil
@@ -461,7 +489,7 @@ final class AppState: ObservableObject {
                 data: data
             )
             await refreshSounds()
-            showSuccess("Sound saved.")
+            showSuccess(L10n.t("Sound saved."))
         } catch {
             showError(error.localizedDescription)
         }
@@ -713,6 +741,7 @@ final class AppState: ObservableObject {
             let loaded = try await core.getSettings()
             settings = loaded
             settingsLoaded = true
+            applyLocale()
 
             // UserDefaults is the source of truth for the notification toggle
             // if it was already set (Sprint 1).
@@ -749,7 +778,18 @@ final class AppState: ObservableObject {
         copy.shoutoutFailed = failed
         copy.shoutoutInfoLength = infoLength
         settings = copy
-        return await saveSettings()
+        let ok = await saveSettings()
+        if ok { showSuccess(L10n.t("Shoutout settings saved.")) }
+        return ok
+    }
+
+    func saveDiscordWebhook(_ url: String) async -> Bool {
+        var copy = settings
+        copy.discordWebhook = url.trimmingCharacters(in: .whitespacesAndNewlines)
+        settings = copy
+        let ok = await saveSettings()
+        if ok { showSuccess(L10n.t("Discord webhook saved.")) }
+        return ok
     }
 
     func runShoutout(username: String, mode: String? = nil) async {
@@ -763,7 +803,7 @@ final class AppState: ObservableObject {
     func copyAlertURL() {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(alertURL, forType: .string)
-        showSuccess("Alert URL copied.")
+        showSuccess(L10n.t("Alert URL copied."))
     }
 
     // MARK: - Vocabulary
@@ -799,6 +839,6 @@ final class AppState: ObservableObject {
     func copyOverlayURL() {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(overlayURL, forType: .string)
-        showSuccess("Overlay URL copied.")
+        showSuccess(L10n.t("Overlay URL copied."))
     }
 }

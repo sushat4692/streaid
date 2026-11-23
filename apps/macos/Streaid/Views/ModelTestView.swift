@@ -13,11 +13,11 @@ struct ModelTestView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             PageHeader(
-                "Model Test",
-                subtitle: "Try a translation or dictionary lookup without posting to Twitch."
+                L10n.t("Model Test"),
+                subtitle: L10n.t("Try a translation or dictionary lookup without posting to Twitch.")
             )
 
-            SectionCard("Input") {
+            SectionCard(L10n.t("Input")) {
                 TextEditor(text: $text)
                     .font(.system(size: 13))
                     .scrollContentBackground(.hidden)
@@ -31,15 +31,15 @@ struct ModelTestView: View {
                     )
 
                 HStack(spacing: 14) {
-                    Picker("Mode", selection: $mode) {
-                        Text("Translation").tag("ts")
-                        Text("Dictionary").tag("d")
+                    Picker(L10n.t("Mode"), selection: $mode) {
+                        Text(L10n.t("Translation")).tag("ts")
+                        Text(L10n.t("Dictionary")).tag("d")
                     }
                     .pickerStyle(.segmented)
                     .frame(width: 220)
                     .labelsHidden()
 
-                    Picker("Provider", selection: $provider) {
+                    Picker(L10n.t("Provider"), selection: $provider) {
                         Text("Gemini").tag("gemini")
                         Text("Bonsai 8B").tag("bonsai-8b")
                         Text("Bonsai 4B").tag("bonsai-4b")
@@ -55,7 +55,7 @@ struct ModelTestView: View {
                             if running {
                                 ProgressView().controlSize(.small)
                             }
-                            Text(running ? "Running…" : "Run Test")
+                            Text(running ? L10n.t("Running…") : L10n.t("Run Test"))
                         }
                     }
                     .buttonStyle(PrimaryButtonStyle())
@@ -67,27 +67,27 @@ struct ModelTestView: View {
                 }
 
                 if !providerAvailable {
-                    Text("Enable the local model in Config before using a Bonsai provider.")
+                    Text(L10n.t("Enable the local model in Config before using a Bonsai provider."))
                         .font(.caption2)
                         .foregroundStyle(Theme.yellow)
                 }
 
                 if mode == "ts" {
-                    Text("Japanese input returns English suggestions (and vice versa).")
+                    Text(L10n.t("Japanese input returns English suggestions (and vice versa)."))
                         .font(.caption2)
                         .foregroundStyle(Theme.textDim)
                 } else {
-                    Text("Only the first word is looked up.")
+                    Text(L10n.t("Only the first word is looked up."))
                         .font(.caption2)
                         .foregroundStyle(Theme.textDim)
                 }
             }
 
-            SectionCard("Result") {
+            SectionCard(L10n.t("Result")) {
                 if running {
                     HStack(spacing: 8) {
                         ProgressView().controlSize(.small)
-                        Text("Asking the model…")
+                        Text(L10n.t("Asking the model…"))
                             .font(.caption)
                             .foregroundStyle(Theme.textMuted)
                     }
@@ -102,8 +102,8 @@ struct ModelTestView: View {
                 } else {
                     EmptyState(
                         icon: "wand.and.stars",
-                        title: "No result yet",
-                        message: "Enter text above and run a test."
+                        title: L10n.t("No result yet"),
+                        message: L10n.t("Enter text above and run a test.")
                     )
                 }
             }
@@ -128,7 +128,7 @@ struct ModelTestView: View {
 
                 ForEach(Array(value.suggestions.enumerated()), id: \.offset) { _, suggestion in
                     HStack(alignment: .firstTextBaseline, spacing: 8) {
-                        Pill(text: suggestion.formality, color: formalityColor(suggestion.formality))
+                        Pill(text: L10n.t(suggestion.formality), color: formalityColor(suggestion.formality))
                         Text(suggestion.text)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundStyle(Theme.textPrimary)
@@ -165,7 +165,7 @@ struct ModelTestView: View {
                     .fixedSize(horizontal: false, vertical: true)
 
                 if !value.examples.isEmpty {
-                    Text("Examples")
+                    Text(L10n.t("Examples"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Theme.textDim)
                     ForEach(Array(value.examples.enumerated()), id: \.offset) { _, example in
@@ -177,7 +177,7 @@ struct ModelTestView: View {
 
                 if !value.similarWords.isEmpty {
                     HStack(spacing: 5) {
-                        Text("Similar:")
+                        Text(L10n.t("Similar:"))
                             .font(.caption2)
                             .foregroundStyle(Theme.textDim)
                         ForEach(value.similarWords, id: \.self) { word in

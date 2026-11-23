@@ -10,25 +10,25 @@ struct UserMemoView: View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(alignment: .bottom) {
                 PageHeader(
-                    "User Memo",
-                    subtitle: "Notes about chatters and streamers."
+                    L10n.t("User Memo"),
+                    subtitle: L10n.t("Notes about chatters and streamers.")
                 )
                 Spacer()
                 Button {
                     editing = nil
                     showForm = true
                 } label: {
-                    Label("New Memo", systemImage: "plus")
+                    Label(L10n.t("New Memo"), systemImage: "plus")
                 }
                 .buttonStyle(PrimaryButtonStyle(compact: true))
             }
 
-            SectionCard("Memos (\(state.memos.count))") {
+            SectionCard(L10n.f("Memos (%d)", state.memos.count)) {
                 if state.memos.isEmpty {
                     EmptyState(
                         icon: "note.text",
-                        title: "No memos yet",
-                        message: "Store a nickname or a note for a user."
+                        title: L10n.t("No memos yet"),
+                        message: L10n.t("Store a nickname or a note for a user.")
                     )
                 } else {
                     VStack(spacing: 0) {
@@ -60,7 +60,7 @@ struct UserMemoView: View {
                 Text(EventTime.clock(memo.updatedAt))
                     .font(.caption2.monospacedDigit())
                     .foregroundStyle(Theme.textDim)
-                Button("Edit") {
+                Button(L10n.t("Edit")) {
                     editing = memo
                     showForm = true
                 }
@@ -106,11 +106,11 @@ private struct MemoFormView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(editing == nil ? "New Memo" : "Edit Memo")
+            Text(editing == nil ? L10n.t("New Memo") : L10n.t("Edit Memo"))
                 .font(.headline)
                 .foregroundStyle(Theme.textPrimary)
 
-            LabeledField("Username") {
+            LabeledField(L10n.t("Username")) {
                 TextField("username", text: $username)
                     .textFieldStyle(.plain)
                     .font(.system(size: 13, design: .monospaced))
@@ -124,7 +124,7 @@ private struct MemoFormView: View {
                     .disabled(editing != nil)
             }
 
-            LabeledField("Nickname (optional)") {
+            LabeledField(L10n.t("Nickname (optional)")) {
                 TextField("nickname", text: $nickname)
                     .textFieldStyle(.plain)
                     .padding(10)
@@ -136,7 +136,7 @@ private struct MemoFormView: View {
                     )
             }
 
-            LabeledField("Memo") {
+            LabeledField(L10n.t("Memo")) {
                 TextEditor(text: $memo)
                     .font(.system(size: 13))
                     .scrollContentBackground(.hidden)
@@ -152,7 +152,7 @@ private struct MemoFormView: View {
 
             HStack {
                 Spacer()
-                Button("Cancel") { dismiss() }
+                Button(L10n.t("Cancel")) { dismiss() }
                     .buttonStyle(SecondaryButtonStyle())
                 Button {
                     save()
@@ -160,7 +160,7 @@ private struct MemoFormView: View {
                     if saving {
                         ProgressView().controlSize(.small)
                     } else {
-                        Text("Save")
+                        Text(L10n.t("Save"))
                     }
                 }
                 .buttonStyle(PrimaryButtonStyle())

@@ -112,7 +112,7 @@ immediately usable from every native frontend. Keep JSON field names stable and 
 - **App data**: `app_data_dir()` (macOS `~/Library/Application Support/im.sush.streaid`). Must match the bundle identifier so existing data is preserved: bonsai sidecar, sounds, logs, volumes
 - **Secrets**: Twitch token and Gemini API key live in the macOS Keychain (service `streaid`); never log or commit them
 - **Platform-specific features**: gate macOS-only code behind `platform::local_model_supported()`; do not add Windows code until `docs/future.md` says work has started
-- **UI test escape hatches**: `STREAID_SKIP_AUTH=1` (skip Keychain, stay on login) and `STREAID_DISABLE_BACKGROUND=1` (skip overlay/token refresh)
+- **UI test escape hatches**: `STREAID_SKIP_AUTH=1` (skip Keychain, stay on login), `STREAID_DISABLE_BACKGROUND=1` (skip overlay/token refresh), and `STREAID_FORCE_LOCALE=ja` (Japanese UI)
 - **Events**: never emit from the read loop directly — send `AppEvent` via `emit_event()`
 
 ## External File Loading

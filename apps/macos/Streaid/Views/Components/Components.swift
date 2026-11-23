@@ -92,8 +92,8 @@ struct StatusPill: View {
     }
 
     private var label: String {
-        if status.reconnecting { return "Reconnecting…" }
-        return status.isRunning ? "Running" : "Stopped"
+        if status.reconnecting { return L10n.t("Reconnecting…") }
+        return status.isRunning ? L10n.t("Running") : L10n.t("Stopped")
     }
 
     var body: some View {
@@ -264,7 +264,7 @@ struct ToastBanner: View {
                     .foregroundStyle(Theme.textDim)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Dismiss")
+            .accessibilityLabel(L10n.t("Dismiss"))
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)

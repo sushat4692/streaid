@@ -10,25 +10,25 @@ struct CommandsView: View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(alignment: .bottom) {
                 PageHeader(
-                    "Commands",
-                    subtitle: "Built-ins: !ts, !d, !dice. Custom commands cannot override them."
+                    L10n.t("Commands"),
+                    subtitle: L10n.t("Built-ins: !ts, !d, !dice. Custom commands cannot override them.")
                 )
                 Spacer()
                 Button {
                     editing = nil
                     showForm = true
                 } label: {
-                    Label("New Command", systemImage: "plus")
+                    Label(L10n.t("New Command"), systemImage: "plus")
                 }
                 .buttonStyle(PrimaryButtonStyle(compact: true))
             }
 
-            SectionCard("Custom Commands (\(state.commands.count))") {
+            SectionCard(L10n.f("Custom Commands (%d)", state.commands.count)) {
                 if state.commands.isEmpty {
                     EmptyState(
                         icon: "terminal",
-                        title: "No custom commands",
-                        message: "Add a command such as !hello and choose who can use it."
+                        title: L10n.t("No custom commands"),
+                        message: L10n.t("Add a command such as !hello and choose who can use it.")
                     )
                 } else {
                     VStack(spacing: 0) {
@@ -53,12 +53,12 @@ struct CommandsView: View {
                 Text("!\(command.command)")
                     .font(.system(size: 13, weight: .semibold, design: .monospaced))
                     .foregroundStyle(Theme.purpleLight)
-                Pill(text: command.allow, color: allowColor(command.allow))
+                Pill(text: allowLabel(command.allow), color: allowColor(command.allow))
                 Spacer()
                 Text(EventTime.clock(command.createdAt))
                     .font(.caption2.monospacedDigit())
                     .foregroundStyle(Theme.textDim)
-                Button("Edit") {
+                Button(L10n.t("Edit")) {
                     editing = command
                     showForm = true
                 }
@@ -83,6 +83,15 @@ struct CommandsView: View {
             }
         }
         .padding(.vertical, 10)
+    }
+
+    private func allowLabel(_ allow: String) -> String {
+        switch allow {
+        case "broadcaster": return L10n.t("Broadcaster")
+        case "mod": return L10n.t("Moderator")
+        case "vip": return "VIP"
+        default: return L10n.t("Everyone")
+        }
     }
 
     private func allowColor(_ allow: String) -> Color {
@@ -117,11 +126,11 @@ private struct CommandFormView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(editing == nil ? "New Command" : "Edit Command")
+            Text(editing == nil ? L10n.t("New Command") : L10n.t("Edit Command"))
                 .font(.headline)
                 .foregroundStyle(Theme.textPrimary)
 
-            LabeledField("Command") {
+            LabeledField(L10n.t("Command")) {
                 TextField("!hello", text: $command)
                     .textFieldStyle(.plain)
                     .font(.system(size: 13, design: .monospaced))
@@ -134,7 +143,7 @@ private struct CommandFormView: View {
                     )
             }
 
-            LabeledField("Response") {
+            LabeledField(L10n.t("Response")) {
                 TextEditor(text: $body_)
                     .font(.system(size: 13))
                     .scrollContentBackground(.hidden)
@@ -148,8 +157,8 @@ private struct CommandFormView: View {
                     )
             }
 
-            LabeledField("Memo (optional)") {
-                TextField("What is this command for?", text: $memo)
+            LabeledField(L10n.t("Memo (optional)")) {
+                TextField(L10n.t("What is this command for?"), text: $memo)
                     .textFieldStyle(.plain)
                     .padding(10)
                     .background(Theme.cardStrong)
@@ -160,12 +169,12 @@ private struct CommandFormView: View {
                     )
             }
 
-            LabeledField("Allowed") {
-                Picker("Allowed", selection: $allow) {
-                    Text("Everyone").tag("everyone")
+            LabeledField(L10n.t("Allowed")) {
+                Picker(L10n.t("Allowed"), selection: $allow) {
+                    Text(L10n.t("Everyone")).tag("everyone")
                     Text("VIP").tag("vip")
-                    Text("Moderator").tag("mod")
-                    Text("Broadcaster").tag("broadcaster")
+                    Text(L10n.t("Moderator")).tag("mod")
+                    Text(L10n.t("Broadcaster")).tag("broadcaster")
                 }
                 .pickerStyle(.segmented)
                 .labelsHidden()
@@ -173,7 +182,7 @@ private struct CommandFormView: View {
 
             HStack {
                 Spacer()
-                Button("Cancel") { dismiss() }
+                Button(L10n.t("Cancel")) { dismiss() }
                     .buttonStyle(SecondaryButtonStyle())
                 Button {
                     save()
@@ -181,7 +190,7 @@ private struct CommandFormView: View {
                     if saving {
                         ProgressView().controlSize(.small)
                     } else {
-                        Text("Save")
+                        Text(L10n.t("Save"))
                     }
                 }
                 .buttonStyle(PrimaryButtonStyle())
