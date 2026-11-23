@@ -78,8 +78,8 @@ intentionally not provided.
 2. Add the module search path: `$(SRCROOT)/../../dist/macos`
    (`SWIFT_INCLUDE_PATHS` / `HEADER_SEARCH_PATHS`), so `import StreaidFFI` resolves.
 3. Add linker flags:
-   `-framework AudioUnit -framework CoreAudio -framework SystemConfiguration
-    -framework Security -framework CoreFoundation -liconv`.
+   `-framework AudioUnit -framework AudioToolbox -framework CoreAudio
+    -framework SystemConfiguration -framework Security -framework CoreFoundation -liconv`.
 4. Set `MACOSX_DEPLOYMENT_TARGET` to match `scripts/build-core.sh` (default 13.0).
 5. At launch, create one `StreaidCore()` on the main thread and keep it in
    your `@Observable` app state.

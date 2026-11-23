@@ -485,6 +485,7 @@ pub(crate) fn get_gemini_api_key() -> Result<String, String> {
         }
     }
     let key = keyring::Entry::new("streaid", "gemini_api_key")
+        .map_err(|_| "No Gemini API key configured".to_string())?
         .get_password()
         .map_err(|_| "No Gemini API key configured".to_string())?;
     if let Ok(mut cache) = GEMINI_KEY_CACHE.lock() {
@@ -495,6 +496,7 @@ pub(crate) fn get_gemini_api_key() -> Result<String, String> {
 
 pub fn set_gemini_api_key(api_key: &str) -> Result<(), String> {
     keyring::Entry::new("streaid", "gemini_api_key")
+        .map_err(|e| format!("Failed to open Gemini API key entry: {}", e))?
         .set_password(api_key)
         .map_err(|e| format!("Failed to save Gemini API key: {}", e))?;
     if let Ok(mut cache) = GEMINI_KEY_CACHE.lock() {
@@ -1265,7 +1267,7 @@ async fn run_irc_session(ws_stream: WsStream, channel: String) -> Result<(), any
     let (out_tx, mut out_rx) = mpsc::channel::<String>(64);
     spawn_task(async move {
         while let Some(msg) = out_rx.recv().await {
-            if let Err(e) = write.send(Message::Text(msg)).await {
+            if let Err(e) = write.send(Message::Text(msg.into())).await {
                 eprintln!("Failed to send to IRC: {}", e);
                 break;
             }
@@ -1911,7 +1913,7 @@ pub fn shutdown() {
 pub fn play_sound_file(path: PathBuf, volume: f32) {
     std::thread::spawn(move || {
         use std::io::BufReader;
-        let Ok((_stream, handle)) = rodio::OutputStream::try_default() else {
+        let Ok(stream) = rodio::DeviceSinkBuilder::open_default_sink() else {
             return;
         };
         let Ok(file) = std::fs::File::open(&path) else {
@@ -1920,12 +1922,10 @@ pub fn play_sound_file(path: PathBuf, volume: f32) {
         let Ok(decoder) = rodio::Decoder::new(BufReader::new(file)) else {
             return;
         };
-        let Ok(sink) = rodio::Sink::try_new(&handle) else {
-            return;
-        };
-        sink.set_volume(volume.clamp(0.0, 1.0));
-        sink.append(decoder);
-        sink.sleep_until_end();
+        let player = rodio::Player::connect_new(stream.mixer());
+        player.set_volume(volume.clamp(0.0, 1.0));
+        player.append(decoder);
+        player.sleep_until_end();
     });
 }
 

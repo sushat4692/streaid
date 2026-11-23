@@ -49,6 +49,8 @@ targets:
           - -framework
           - AudioUnit
           - -framework
+          - AudioToolbox
+          - -framework
           - CoreAudio
           - -framework
           - SystemConfiguration

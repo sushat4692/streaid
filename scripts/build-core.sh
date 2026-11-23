@@ -51,5 +51,6 @@ echo "  $OUT/streaid.h"
 echo "  $OUT/StreaidFFI/module.modulemap"
 echo
 echo "Linker flags (from: cargo rustc -- --print native-static-libs):"
-echo "  -framework AudioUnit -framework CoreAudio -framework SystemConfiguration"
-echo "  -framework Security -framework CoreFoundation -liconv -lSystem -lc -lm"
+echo "  -framework AudioUnit -framework AudioToolbox -framework CoreAudio"
+echo "  -framework SystemConfiguration -framework Security -framework CoreFoundation"
+echo "  -liconv -lSystem -lc -lm"
