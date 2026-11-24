@@ -95,8 +95,8 @@ struct DashboardView: View {
     private var statsCard: some View {
         SectionCard(L10n.t("Session")) {
             HStack(spacing: 18) {
-                stat(value: "\(state.translations.count)", label: L10n.t("Translations"), color: Theme.purpleLight)
-                stat(value: "\(state.lookups.count)", label: L10n.t("Lookups"), color: Theme.blue)
+                stat(value: "\(state.dashboardStats.translations)", label: L10n.t("Translations"), color: Theme.purpleLight)
+                stat(value: "\(state.dashboardStats.lookups)", label: L10n.t("Lookups"), color: Theme.blue)
             }
 
             Divider().overlay(Theme.border)
@@ -150,12 +150,12 @@ struct DashboardView: View {
         SectionCard(L10n.t("Audience")) {
             HStack(spacing: 18) {
                 stat(
-                    value: "\(state.chatters.count)",
+                    value: "\(state.dashboardStats.chatters)",
                     label: L10n.t("Chatters"),
                     color: Theme.green
                 )
                 stat(
-                    value: "\(state.raiders.count)",
+                    value: "\(state.dashboardStats.raiders)",
                     label: L10n.t("Raiders"),
                     color: Theme.blue
                 )
@@ -197,12 +197,12 @@ struct DashboardView: View {
         SectionCard(L10n.t("Commands & Memos")) {
             HStack(spacing: 18) {
                 stat(
-                    value: "\(state.commands.count)",
+                    value: "\(state.dashboardStats.commands)",
                     label: L10n.t("Commands"),
                     color: Theme.purpleLight
                 )
                 stat(
-                    value: "\(state.memos.count)",
+                    value: "\(state.dashboardStats.memos)",
                     label: L10n.t("User Memo"),
                     color: Theme.yellow
                 )

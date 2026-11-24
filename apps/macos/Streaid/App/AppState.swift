@@ -105,6 +105,19 @@ final class AppState: ObservableObject {
     @Published var vocabAnalysis: [CategoryResult] = []
     @Published var vocabAnalyzing = false
 
+    struct DashboardStats {
+        let translations: Int
+        let lookups: Int
+        let chatters: Int
+        let raiders: Int
+        let commands: Int
+        let memos: Int
+    }
+
+    /// Sample-only counters shown on the dashboard screenshot. Lists still
+    /// contain a few representative entries; these keep the dashboard busy.
+    private var demoStats: DashboardStats?
+
     private var seenUsers: Set<String> = []
     private var eventTask: Task<Void, Never>?
     private var statusTask: Task<Void, Never>?
@@ -184,6 +197,15 @@ final class AppState: ObservableObject {
         settingsLoaded = true
         applyLocale()
 
+        demoStats = DashboardStats(
+            translations: 1284,
+            lookups: 3672,
+            chatters: 342,
+            raiders: 18,
+            commands: 24,
+            memos: 46
+        )
+
         chatters = [
             Chatter(id: "u1", username: "kiritan", displayName: "Kiritan", color: "#FF8A65", firstSeen: now.addingTimeInterval(-420)),
             Chatter(id: "u2", username: "sush", displayName: "SUSH", color: "#9146FF", firstSeen: now.addingTimeInterval(-380)),
@@ -193,8 +215,8 @@ final class AppState: ObservableObject {
         ]
 
         raiders = [
-            RaiderRecord(id: "r1", channel: "sushat4692", username: "raider_one", displayName: "RaiderOne", viewers: 128, timestamp: timestamp(-300)),
-            RaiderRecord(id: "r2", channel: "sushat4692", username: "night_owl", displayName: "NightOwl", viewers: 42, timestamp: timestamp(-900)),
+            RaiderRecord(id: "r1", channel: "sushat4692", username: "raider_one", displayName: "RaiderOne", viewers: 1284, timestamp: timestamp(-300)),
+            RaiderRecord(id: "r2", channel: "sushat4692", username: "night_owl", displayName: "NightOwl", viewers: 420, timestamp: timestamp(-900)),
         ]
 
         commands = [
@@ -284,6 +306,18 @@ final class AppState: ObservableObject {
     var localModelEnabled: Bool { bonsai?.enabled ?? false }
     var activeModel: String { bonsai?.activeModel ?? "8b" }
     var overlayURL: String { capabilities?.overlayUrl ?? "http://localhost:4242" }
+
+    var dashboardStats: DashboardStats {
+        demoStats
+            ?? DashboardStats(
+                translations: translations.count,
+                lookups: lookups.count,
+                chatters: chatters.count,
+                raiders: raiders.count,
+                commands: commands.count,
+                memos: memos.count
+            )
+    }
     var alertURL: String {
         let base = overlayURL.hasSuffix("/") ? String(overlayURL.dropLast()) : overlayURL
         let suffix = resolvedLocale == "ja" ? "?lang=ja" : ""
