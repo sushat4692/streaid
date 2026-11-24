@@ -133,7 +133,9 @@ struct DashboardView: View {
                 .foregroundStyle(Theme.textPrimary)
 
             LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: 300), spacing: 14)],
+                columns: [
+                    GridItem(.adaptive(minimum: 300), spacing: 14, alignment: .top)
+                ],
                 spacing: 14
             ) {
                 audienceCard

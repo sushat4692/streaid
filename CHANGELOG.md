@@ -24,6 +24,7 @@ Historical note:
 ### Fixed
 
 - The entire sidebar navigation row is now clickable, not just the label text.
+- Dashboard feature cards are top-aligned within their grid row.
 
 ## [0.7.0] - 2026-11-23
 
