@@ -55,33 +55,40 @@ fn save_tokens(access: &str, refresh: Option<&str>, expires_in_secs: Option<u64>
         saved_at_epoch: Some(now_unix_secs()),
         expires_in_secs,
     };
-    keyring::Entry::new(TOKEN_SERVICE, TOKEN_ENTRY)
+    let entry = keyring::Entry::new(TOKEN_SERVICE, TOKEN_ENTRY)
+        .map_err(|e| anyhow::anyhow!("opening keyring entry: {}", e))?;
+    entry
         .set_password(&serde_json::to_string(&blob).context("serializing stored tokens")?)
         .context("saving tokens to keyring")?;
-    let _ = keyring::Entry::new(TOKEN_SERVICE, LEGACY_ACCESS_KEY).delete_password();
-    let _ = keyring::Entry::new(TOKEN_SERVICE, LEGACY_REFRESH_KEY).delete_password();
+    for key in [LEGACY_ACCESS_KEY, LEGACY_REFRESH_KEY] {
+        if let Ok(entry) = keyring::Entry::new(TOKEN_SERVICE, key) {
+            let _ = entry.delete_credential();
+        }
+    }
     Ok(())
 }
 
 fn load_tokens() -> Result<Option<StoredTokens>> {
-    match keyring::Entry::new(TOKEN_SERVICE, TOKEN_ENTRY).get_password() {
+    match keyring::Entry::new(TOKEN_SERVICE, TOKEN_ENTRY).and_then(|entry| entry.get_password()) {
         Ok(json) => serde_json::from_str(&json)
             .map(Some)
             .context("parsing stored tokens"),
         Err(keyring::Error::NoEntry) => migrate_legacy_tokens(),
-        Err(e) => Err(e).context("reading tokens from keyring"),
+        Err(e) => Err(anyhow::anyhow!("reading tokens from keyring: {}", e)),
     }
 }
 
 /// One-time migration from the old two-entry layout. Legacy entries have no
 /// expiry metadata, so the refresh loop stays silent until the next auth.
 fn migrate_legacy_tokens() -> Result<Option<StoredTokens>> {
-    let access = match keyring::Entry::new(TOKEN_SERVICE, LEGACY_ACCESS_KEY).get_password() {
+    let access = match keyring::Entry::new(TOKEN_SERVICE, LEGACY_ACCESS_KEY)
+        .and_then(|entry| entry.get_password())
+    {
         Ok(at) => at,
         Err(_) => return Ok(None),
     };
     let refresh = keyring::Entry::new(TOKEN_SERVICE, LEGACY_REFRESH_KEY)
-        .get_password()
+        .and_then(|entry| entry.get_password())
         .ok();
     let blob = StoredTokens {
         access_token: access,
@@ -89,17 +96,24 @@ fn migrate_legacy_tokens() -> Result<Option<StoredTokens>> {
         saved_at_epoch: None,
         expires_in_secs: None,
     };
-    let _ = keyring::Entry::new(TOKEN_SERVICE, TOKEN_ENTRY)
-        .set_password(&serde_json::to_string(&blob).context("serializing migrated tokens")?);
-    let _ = keyring::Entry::new(TOKEN_SERVICE, LEGACY_ACCESS_KEY).delete_password();
-    let _ = keyring::Entry::new(TOKEN_SERVICE, LEGACY_REFRESH_KEY).delete_password();
+    if let Ok(entry) = keyring::Entry::new(TOKEN_SERVICE, TOKEN_ENTRY) {
+        let _ = entry
+            .set_password(&serde_json::to_string(&blob).context("serializing migrated tokens")?);
+    }
+    for key in [LEGACY_ACCESS_KEY, LEGACY_REFRESH_KEY] {
+        if let Ok(entry) = keyring::Entry::new(TOKEN_SERVICE, key) {
+            let _ = entry.delete_credential();
+        }
+    }
     Ok(Some(blob))
 }
 
 fn delete_tokens() {
-    let _ = keyring::Entry::new(TOKEN_SERVICE, TOKEN_ENTRY).delete_password();
-    let _ = keyring::Entry::new(TOKEN_SERVICE, LEGACY_ACCESS_KEY).delete_password();
-    let _ = keyring::Entry::new(TOKEN_SERVICE, LEGACY_REFRESH_KEY).delete_password();
+    for key in [TOKEN_ENTRY, LEGACY_ACCESS_KEY, LEGACY_REFRESH_KEY] {
+        if let Ok(entry) = keyring::Entry::new(TOKEN_SERVICE, key) {
+            let _ = entry.delete_credential();
+        }
+    }
 }
 
 /// Whether a token is stored, propagating keychain errors (locked/denied).

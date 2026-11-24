@@ -117,7 +117,7 @@ pub async fn connect_to_irc(
     eprintln!("Step 1: Requesting capabilities...");
     write
         .send(Message::Text(
-            "CAP REQ :twitch.tv/tags twitch.tv/commands".to_string(),
+            "CAP REQ :twitch.tv/tags twitch.tv/commands".into(),
         ))
         .await
         .context("Failed to request capabilities")?;
@@ -125,14 +125,16 @@ pub async fn connect_to_irc(
     // 2. PASS - Send OAuth token
     eprintln!("Step 2: Sending PASS (OAuth token)...");
     write
-        .send(Message::Text(format!("PASS {}", oauth_token)))
+        .send(Message::Text(format!("PASS {}", oauth_token).into()))
         .await
         .context("Failed to send PASS")?;
 
     // 3. NICK - Send username
     eprintln!("Step 3: Sending NICK: {}", username.to_lowercase());
     write
-        .send(Message::Text(format!("NICK {}", username.to_lowercase())))
+        .send(Message::Text(
+            format!("NICK {}", username.to_lowercase()).into(),
+        ))
         .await
         .context("Failed to send NICK")?;
 
@@ -176,7 +178,7 @@ pub async fn connect_to_irc(
                 if line.starts_with("PING") {
                     let pong = line.replace("PING", "PONG");
                     write
-                        .send(Message::Text(pong))
+                        .send(Message::Text(pong.into()))
                         .await
                         .context("Failed to send PONG during auth")?;
                 }
@@ -195,7 +197,7 @@ pub async fn connect_to_irc(
     // Now that we're authenticated, join the target channel
     eprintln!("Step 4: Joining channel #{}", target_channel);
     write
-        .send(Message::Text(format!("JOIN #{}", target_channel)))
+        .send(Message::Text(format!("JOIN #{}", target_channel).into()))
         .await
         .context("Failed to send JOIN")?;
 
@@ -234,7 +236,7 @@ pub async fn connect_to_irc(
                 if line.starts_with("PING") {
                     let pong = line.replace("PING", "PONG");
                     write
-                        .send(Message::Text(pong))
+                        .send(Message::Text(pong.into()))
                         .await
                         .context("Failed to send PONG during JOIN")?;
                 }

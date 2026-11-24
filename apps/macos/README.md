@@ -66,7 +66,8 @@ STREAID_SKIP_AUTH=1 STREAID_DISABLE_BACKGROUND=1 \
 `STREAID_SKIP_AUTH=1` keeps the app on the login screen and skips Keychain
 access; `STREAID_DISABLE_BACKGROUND=1` skips the overlay server and token
 refresh. `STREAID_FORCE_LOCALE=ja` forces the Japanese UI for screenshots and
-UI tests. Useful for screenshots and CI.
+UI tests. `STREAID_DEMO=1` opens the dashboard with populated sample data
+(useful for screenshots and UI work).
 
 The target builds **arm64 only** (`ARCHS: arm64`). Intel support is
 intentionally not provided.
@@ -78,8 +79,8 @@ intentionally not provided.
 2. Add the module search path: `$(SRCROOT)/../../dist/macos`
    (`SWIFT_INCLUDE_PATHS` / `HEADER_SEARCH_PATHS`), so `import StreaidFFI` resolves.
 3. Add linker flags:
-   `-framework AudioUnit -framework CoreAudio -framework SystemConfiguration
-    -framework Security -framework CoreFoundation -liconv`.
+   `-framework AudioUnit -framework AudioToolbox -framework CoreAudio
+    -framework SystemConfiguration -framework Security -framework CoreFoundation -liconv`.
 4. Set `MACOSX_DEPLOYMENT_TARGET` to match `scripts/build-core.sh` (default 13.0).
 5. At launch, create one `StreaidCore()` on the main thread and keep it in
    your `@Observable` app state.

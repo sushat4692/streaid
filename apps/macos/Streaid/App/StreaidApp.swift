@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 @main
@@ -11,7 +12,17 @@ struct StreaidApp: App {
                 .environmentObject(state)
                 .preferredColorScheme(.dark)
                 .frame(minWidth: 820, minHeight: 560)
-                .onAppear { appDelegate.state = state }
+                .onAppear {
+                    appDelegate.state = state
+                    if ProcessInfo.processInfo.environment["STREAID_DEMO"] == "1" {
+                        DispatchQueue.main.async {
+                            guard let window = NSApp.windows.first else { return }
+                            window.setContentSize(NSSize(width: 1200, height: 1000))
+                            window.center()
+                            NSApp.activate(ignoringOtherApps: true)
+                        }
+                    }
+                }
         }
         .windowStyle(.titleBar)
         .windowToolbarStyle(.unifiedCompact)

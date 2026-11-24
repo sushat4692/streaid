@@ -97,6 +97,28 @@ enum L10n {
         // Dashboard
         "Real-time Japanese ↔ English translation and dictionary lookup for Twitch chat.":
             "Twitchチャットの日本語↔英語翻訳と辞書検索をリアルタイムで行います。",
+        "Translation, audience tracking, commands and alerts for your Twitch stream.":
+            "翻訳・視聴者追跡・コマンド・アラートでTwitch配信を支援します。",
+        "Feature Overview": "機能概要",
+        "Audience": "オーディエンス",
+        "Commands & Memos": "コマンド / メモ",
+        "Shoutout & Alerts": "シャウトアウト / アラート",
+        "Local Model & Integrations": "ローカルモデル / 連携",
+        "Local model": "ローカルモデル",
+        "Enabled": "有効",
+        "Disabled": "無効",
+        "Open Config": "設定を開く",
+        "Open Alert": "アラートを開く",
+        "Open Overlay": "オーバーレイを開く",
+        "Last raid: %@ · %d viewers": "最新レイド: %@ · %d 視聴者",
+        "No recent raid": "最近のレイドはありません",
+        "Built-ins: !ts, !d, !dice": "ビルトイン: !ts, !d, !dice",
+        "!so sends a message and can show profile or clip alerts.":
+            "!so はメッセージを送信し、プロフィールやクリップのアラートを表示できます。",
+        "%d commands": "%d コマンド",
+        "%d memos": "%d メモ",
+        "%d chatters": "%d チャッター",
+        "%d raids": "%d レイド",
         "Chat Listener": "チャットリスナー",
         "Channel": "チャンネル",
         "Enable !ts / !d": "!ts / !d を有効化",

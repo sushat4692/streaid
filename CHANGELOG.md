@@ -8,6 +8,31 @@ Historical note:
 - **0.6.0** — gpui rewrite (`gpui` branch, untagged).
 - **0.7.0** — SwiftUI + Rust core monorepo (`feature/native`).
 
+## [0.7.1] - 2026-11-24
+
+### Added
+
+- `scripts/clean-target.sh` for reclaiming Rust build artifacts. The default
+  keeps the release library used by the Xcode app.
+- `STREAID_DEMO=1` sample-data mode for dashboard screenshots and UI work.
+
+### Changed
+
+- Updated Rust dependencies: axum 0.8, reqwest 0.13, keyring 4, rodio 0.23,
+  tokio-tungstenite 0.30, twitch_oauth2 0.17, dirs 7 and open 5.
+- Added `AudioToolbox` to the macOS linker flags for rodio 0.23.
+- Reduced `target/` size: dependencies no longer carry debug info, while
+  workspace crates keep line tables.
+- Replaced the app icon with the new Icon Composer design.
+- Dashboard now summarizes audience, commands/memos, shoutouts/alerts, and
+  local model/integrations, with an updated feature-focused subtitle.
+- Version bumped to 0.7.1.
+
+### Fixed
+
+- The entire sidebar navigation row is now clickable, not just the label text.
+- Dashboard feature cards are top-aligned within their grid row.
+
 ## [0.7.0] - 2026-11-23
 
 ### Added
