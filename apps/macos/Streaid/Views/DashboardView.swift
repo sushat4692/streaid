@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct DashboardView: View {
@@ -7,13 +8,15 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 18) {
             PageHeader(
                 L10n.t("Dashboard"),
-                subtitle: L10n.t("Real-time Japanese ↔ English translation and dictionary lookup for Twitch chat.")
+                subtitle: L10n.t("Translation, audience tracking, commands and alerts for your Twitch stream.")
             )
 
             HStack(alignment: .top, spacing: 14) {
                 listenerCard
                 statsCard
             }
+
+            featureOverview
 
             HStack(alignment: .top, spacing: 14) {
                 latestTranslationCard
@@ -118,6 +121,199 @@ struct DashboardView: View {
             Text(label)
                 .font(.caption2)
                 .foregroundStyle(Theme.textDim)
+        }
+    }
+
+    // MARK: - Feature overview
+
+    private var featureOverview: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(L10n.t("Feature Overview"))
+                .font(.headline)
+                .foregroundStyle(Theme.textPrimary)
+
+            LazyVGrid(
+                columns: [GridItem(.adaptive(minimum: 300), spacing: 14)],
+                spacing: 14
+            ) {
+                audienceCard
+                commandsCard
+                shoutoutCard
+                integrationsCard
+            }
+        }
+    }
+
+    private var audienceCard: some View {
+        SectionCard(L10n.t("Audience")) {
+            HStack(spacing: 18) {
+                stat(
+                    value: "\(state.chatters.count)",
+                    label: L10n.t("Chatters"),
+                    color: Theme.green
+                )
+                stat(
+                    value: "\(state.raiders.count)",
+                    label: L10n.t("Raiders"),
+                    color: Theme.blue
+                )
+                Spacer()
+            }
+
+            if let raid = state.raiders.first {
+                Text(
+                    L10n.f(
+                        "Last raid: %@ · %d viewers",
+                        raid.displayName,
+                        Int(raid.viewers)
+                    )
+                )
+                .font(.caption)
+                .foregroundStyle(Theme.textMuted)
+                .lineLimit(2)
+            } else {
+                Text(L10n.t("No recent raid"))
+                    .font(.caption)
+                    .foregroundStyle(Theme.textDim)
+            }
+
+            HStack(spacing: 8) {
+                Button(L10n.t("Chatters")) {
+                    state.page = .chatters
+                }
+                .buttonStyle(SecondaryButtonStyle(compact: true))
+
+                Button(L10n.t("Raiders")) {
+                    state.page = .raiders
+                }
+                .buttonStyle(SecondaryButtonStyle(compact: true))
+            }
+        }
+    }
+
+    private var commandsCard: some View {
+        SectionCard(L10n.t("Commands & Memos")) {
+            HStack(spacing: 18) {
+                stat(
+                    value: "\(state.commands.count)",
+                    label: L10n.t("Commands"),
+                    color: Theme.purpleLight
+                )
+                stat(
+                    value: "\(state.memos.count)",
+                    label: L10n.t("User Memo"),
+                    color: Theme.yellow
+                )
+                Spacer()
+            }
+
+            Text(L10n.t("Built-ins: !ts, !d, !dice"))
+                .font(.caption2)
+                .foregroundStyle(Theme.textDim)
+
+            HStack(spacing: 8) {
+                Button(L10n.t("Commands")) {
+                    state.page = .commands
+                }
+                .buttonStyle(SecondaryButtonStyle(compact: true))
+
+                Button(L10n.t("User Memo")) {
+                    state.page = .userMemo
+                }
+                .buttonStyle(SecondaryButtonStyle(compact: true))
+            }
+        }
+    }
+
+    private var shoutoutCard: some View {
+        SectionCard(L10n.t("Shoutout & Alerts")) {
+            Text(L10n.t("!so sends a message and can show profile or clip alerts."))
+                .font(.caption)
+                .foregroundStyle(Theme.textMuted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            HStack(spacing: 8) {
+                Button(L10n.t("Open Alert")) {
+                    open(state.alertURL)
+                }
+                .buttonStyle(SecondaryButtonStyle(compact: true))
+
+                Button(L10n.t("Open Overlay")) {
+                    open(state.overlayURL)
+                }
+                .buttonStyle(SecondaryButtonStyle(compact: true))
+            }
+
+            Text(state.alertURL)
+                .font(.system(size: 10, design: .monospaced))
+                .foregroundStyle(Theme.textDim)
+                .lineLimit(1)
+                .textSelection(.enabled)
+        }
+    }
+
+    private var integrationsCard: some View {
+        SectionCard(L10n.t("Local Model & Integrations")) {
+            HStack {
+                Text(L10n.t("Local model"))
+                    .font(.caption)
+                    .foregroundStyle(Theme.textMuted)
+                Spacer()
+                Pill(
+                    text: state.localModelEnabled ? L10n.t("Enabled") : L10n.t("Disabled"),
+                    color: state.localModelEnabled ? Theme.green : Theme.textDim
+                )
+            }
+
+            if let bonsai = state.bonsai {
+                Text(L10n.f("Local model (Bonsai %@)", bonsai.activeModel.uppercased()))
+                    .font(.caption2)
+                    .foregroundStyle(Theme.textDim)
+            }
+
+            Divider().overlay(Theme.border)
+
+            HStack {
+                Text(L10n.t("Discord Webhook"))
+                    .font(.caption)
+                    .foregroundStyle(Theme.textMuted)
+                Spacer()
+                Pill(
+                    text: state.settings.discordWebhook.isEmpty
+                        ? L10n.t("Not configured") : L10n.t("Configured"),
+                    color: state.settings.discordWebhook.isEmpty
+                        ? Theme.textDim : Theme.green
+                )
+            }
+
+            HStack {
+                Text(L10n.t("Language"))
+                    .font(.caption)
+                    .foregroundStyle(Theme.textMuted)
+                Spacer()
+                Text(languageLabel)
+                    .font(.caption)
+                    .foregroundStyle(Theme.textPrimary)
+            }
+
+            Button(L10n.t("Open Config")) {
+                state.page = .config
+            }
+            .buttonStyle(SecondaryButtonStyle(compact: true))
+        }
+    }
+
+    private func open(_ url: String) {
+        if let url = URL(string: url) {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    private var languageLabel: String {
+        switch state.settings.locale {
+        case "ja": return "日本語"
+        case "en": return "English"
+        default: return state.resolvedLocale == "ja" ? "日本語" : "English"
         }
     }
 

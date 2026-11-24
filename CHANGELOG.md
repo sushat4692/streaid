@@ -16,6 +16,11 @@ Historical note:
   tokio-tungstenite 0.30, twitch_oauth2 0.17, dirs 7 and open 5.
 - Added `AudioToolbox` to the macOS linker flags for rodio 0.23.
 
+### Changed
+
+- Dashboard now summarizes audience, commands/memos, shoutouts/alerts, and
+  local model/integrations, with an updated feature-focused subtitle.
+
 ### Fixed
 
 - The entire sidebar navigation row is now clickable, not just the label text.
