@@ -29,6 +29,10 @@ cargo test -p streaid-core -- --nocapture
 cargo check -p streaid-core
 cargo clippy --workspace --all-targets
 cargo fmt --all
+
+# Reclaim disk (target/ is gitignored)
+scripts/clean-target.sh            # dev/test only; keeps the release lib
+scripts/clean-target.sh --all
 ```
 
 macOS app:

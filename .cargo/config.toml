@@ -1,0 +1,21 @@
+# Keep `target/` small without hurting day-to-day debugging of our own crates.
+#
+# Dependencies (367 crates) were the bulk of the target directory. They keep
+# full debug info by default even though we rarely step into them. Our own
+# crates keep line tables so backtraces still point at the right source line.
+
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
+
+[profile.test]
+debug = "line-tables-only"
+
+[profile.test.package."*"]
+debug = false
+
+# Release binaries/static libraries only need symbols, not debug info.
+[profile.release]
+strip = "debuginfo"

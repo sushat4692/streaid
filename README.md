@@ -99,6 +99,19 @@ DEVELOPER_ID="Developer ID Application: ..." \
 The script uses hardened runtime, `notarytool`, and `stapler` when those
 environment variables are set. See `packaging/README.md`.
 
+## Disk Usage
+
+Rust build artifacts live in `target/` (gitignored). To reclaim space:
+
+```bash
+scripts/clean-target.sh            # remove dev/test artifacts, keep release
+scripts/clean-target.sh --release  # remove release artifacts, keep dev
+scripts/clean-target.sh --all      # remove everything
+```
+
+`.cargo/config.toml` keeps debug info for our crates but disables it for
+dependencies, which is where most of the disk usage came from.
+
 ## Tests & Checks
 
 ```bash
