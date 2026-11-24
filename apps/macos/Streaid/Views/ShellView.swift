@@ -73,8 +73,10 @@ struct ShellView: View {
                             Spacer()
                         }
                         .font(.system(size: 13, weight: .medium))
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 8)
+                        .contentShape(Rectangle())
                         .foregroundStyle(
                             state.page == page ? Theme.textPrimary : Theme.textDim
                         )
