@@ -114,11 +114,166 @@ final class AppState: ObservableObject {
         self.core = StreaidCore()
         applyLocale()
         loadVolumes()
-        loadNotificationSettings()
-        NotificationService.shared.setup()
-        startEventPump()
-        startStatusPolling()
-        Task { [weak self] in await self?.bootstrap() }
+
+        if Self.demoMode {
+            applyDemoData()
+        } else {
+            loadNotificationSettings()
+            NotificationService.shared.setup()
+            startEventPump()
+            startStatusPolling()
+            Task { [weak self] in await self?.bootstrap() }
+        }
+    }
+
+    /// `STREAID_DEMO=1` shows populated sample data for screenshots/UI work.
+    static var demoMode: Bool {
+        ProcessInfo.processInfo.environment["STREAID_DEMO"] == "1"
+    }
+
+    private func applyDemoData() {
+        let now = Date()
+        func timestamp(_ offset: TimeInterval) -> String {
+            ISO8601DateFormatter().string(from: now.addingTimeInterval(offset))
+        }
+
+        loggedIn = true
+        username = "sushat4692"
+        clientID = "demo-client-id"
+        targetChannel = "sushat4692"
+        page = .dashboard
+        isBusy = false
+        toast = nil
+
+        status = ChatStatus(
+            connected: true,
+            isRunning: true,
+            isEnabled: true,
+            reconnecting: false,
+            channel: "sushat4692",
+            lastTargetChannel: "sushat4692"
+        )
+        capabilities = StreaidCapabilities(
+            apiVersion: 1,
+            os: "macos",
+            platform: "macOS",
+            localModelSupported: true,
+            appDataDir: "~/Library/Application Support/im.sush.streaid",
+            overlayUrl: "http://localhost:4242"
+        )
+        bonsai = BonsaiStatus(
+            enabled: true,
+            runtimeFound: true,
+            activeModel: "8b",
+            models: [
+                BonsaiModelStatus(name: "8b", running: true, modelFound: true),
+                BonsaiModelStatus(name: "4b", running: false, modelFound: true),
+            ]
+        )
+        geminiKeyConfigured = true
+        notificationsEnabled = true
+        settings = AppSettings(
+            locale: "en",
+            notificationsEnabled: true,
+            shoutoutMessage: "Please check this Recommended Streamer \"%username%\". %url% The last streaming was \"%category%\".",
+            shoutoutNotFound: "Target user \"%user_id%\" wasn't found, please check again.",
+            shoutoutFailed: "Failed to get Channel information of \"%username%\" channel, please try again later.",
+            shoutoutInfoLength: 8,
+            discordWebhook: "https://discord.com/api/webhooks/demo"
+        )
+        settingsLoaded = true
+        applyLocale()
+
+        chatters = [
+            Chatter(id: "u1", username: "kiritan", displayName: "Kiritan", color: "#FF8A65", firstSeen: now.addingTimeInterval(-420)),
+            Chatter(id: "u2", username: "sush", displayName: "SUSH", color: "#9146FF", firstSeen: now.addingTimeInterval(-380)),
+            Chatter(id: "u3", username: "mochi", displayName: "Mochi", color: "#4ADE80", firstSeen: now.addingTimeInterval(-240)),
+            Chatter(id: "u4", username: "aoi", displayName: "Aoi", color: "#60A5FA", firstSeen: now.addingTimeInterval(-120)),
+            Chatter(id: "u5", username: "tomo", displayName: "Tomo", color: "#FACC15", firstSeen: now.addingTimeInterval(-60)),
+        ]
+
+        raiders = [
+            RaiderRecord(id: "r1", channel: "sushat4692", username: "raider_one", displayName: "RaiderOne", viewers: 128, timestamp: timestamp(-300)),
+            RaiderRecord(id: "r2", channel: "sushat4692", username: "night_owl", displayName: "NightOwl", viewers: 42, timestamp: timestamp(-900)),
+        ]
+
+        commands = [
+            CommandRecord(id: "c1", command: "hello", body: "Welcome to the stream! Enjoy your stay.", memo: "Greeting", allow: "everyone", createdAt: timestamp(-86400 * 5)),
+            CommandRecord(id: "c2", command: "socials", body: "Twitter: @sushat4692 / GitHub: sushat4692", memo: "Links", allow: "everyone", createdAt: timestamp(-86400 * 3)),
+            CommandRecord(id: "c3", command: "discord", body: "Join the community Discord for updates and chat.", memo: "Community", allow: "mod", createdAt: timestamp(-86400)),
+        ]
+
+        memos = [
+            MemoRecord(id: "m1", username: "kiritan", nickname: "Kiritan", memo: "Regular viewer. Likes retro games and coffee.", createdAt: timestamp(-86400 * 10), updatedAt: timestamp(-3600)),
+            MemoRecord(id: "m2", username: "night_owl", nickname: "NightOwl", memo: "Raids often on weekends.", createdAt: timestamp(-86400 * 4), updatedAt: timestamp(-1800)),
+        ]
+
+        translations = [
+            TranslationEvent(
+                originalUser: "kiritan",
+                originalMessage: "今日の配信めっちゃ面白かった！",
+                suggestions: [
+                    TranslationSuggestion(text: "That stream was so much fun!", formality: "casual"),
+                    TranslationSuggestion(text: "Today's stream was really interesting.", formality: "neutral"),
+                    TranslationSuggestion(text: "I found today's broadcast quite enjoyable.", formality: "formal"),
+                ],
+                points: [
+                    "「めっちゃ」is a casual intensifier",
+                    "「面白かった」is the past tense of 面白い (interesting/fun)",
+                ],
+                timestamp: timestamp(-45),
+                sourceLang: "Japanese",
+                targetLang: "English"
+            ),
+            TranslationEvent(
+                originalUser: "mochi",
+                originalMessage: "I'll be there for the next stream!",
+                suggestions: [
+                    TranslationSuggestion(text: "次の配信も見に行くね！", formality: "casual"),
+                    TranslationSuggestion(text: "次の配信にも参加します。", formality: "neutral"),
+                    TranslationSuggestion(text: "次回の配信も拝見いたします。", formality: "formal"),
+                ],
+                points: [
+                    "Casual future intent with 〜に行く",
+                    "Adds friendly reassurance",
+                ],
+                timestamp: timestamp(-240),
+                sourceLang: "English",
+                targetLang: "Japanese"
+            ),
+        ]
+
+        lookups = [
+            DictionaryEvent(
+                originalUser: "sush",
+                originalWord: "serendipity",
+                word: "serendipity",
+                meaning: "The occurrence of events by chance in a happy or beneficial way.",
+                examples: ["Meeting her was pure serendipity."],
+                similarWords: ["chance", "fortune", "luck"],
+                timestamp: timestamp(-120),
+                sourceLang: "English",
+                targetLang: "Japanese"
+            ),
+            DictionaryEvent(
+                originalUser: "kiritan",
+                originalWord: "木漏れ日",
+                word: "木漏れ日",
+                meaning: "Sunlight filtering through the leaves of trees.",
+                examples: ["木漏れ日がとてもきれいだった。"],
+                similarWords: ["日差し", "光", "木陰"],
+                timestamp: timestamp(-600),
+                sourceLang: "Japanese",
+                targetLang: "English"
+            ),
+        ]
+
+        vocabSummary = VocabularySummary(
+            totalWords: 128,
+            totalLookups: 342,
+            topWords: [],
+            ambiguous: []
+        )
     }
 
     // MARK: - Derived

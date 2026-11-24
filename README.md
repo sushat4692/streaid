@@ -7,6 +7,10 @@ and powers shoutouts and OBS overlays. Translation and lookup use Gemini or the
 optional on-device Bonsai model. The Rust core and JSON C ABI are UI-agnostic,
 so other native frontends can be added later.
 
+<p align="center">
+  <img src="docs/images/dashboard.png" alt="Streaid dashboard with sample data" width="900">
+</p>
+
 The repository is a monorepo with a UI-agnostic Rust core and a native SwiftUI
 frontend for macOS. Windows is a possible future direction (see `docs/future.md`),
 but no Windows code is currently maintained.

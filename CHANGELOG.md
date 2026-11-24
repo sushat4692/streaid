@@ -22,6 +22,7 @@ Historical note:
 
 - `scripts/clean-target.sh` for reclaiming Rust build artifacts. The default
   keeps the release library used by the Xcode app.
+- `STREAID_DEMO=1` sample-data mode for dashboard screenshots and UI work.
 
 ### Changed
 
