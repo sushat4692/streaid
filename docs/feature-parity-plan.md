@@ -3,7 +3,7 @@
 作成日: 2026-11-23
 比較対象:
 - **Electron版**: `master`（v0.4.1、`electron/` + `renderer/` + `alert/`）
-- **現行版**: `feature/native`（SwiftUI + Rust core 0.7.0）
+- **現行版**: `feature/native`（SwiftUI + Rust core 0.7.1）
 
 このドキュメントは計画と実装状況を記録する。実装はSprint単位で進める。
 
