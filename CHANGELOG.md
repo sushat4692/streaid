@@ -17,6 +17,7 @@ Historical note:
 - Added `AudioToolbox` to the macOS linker flags for rodio 0.23.
 - Reduced `target/` size: dependencies no longer carry debug info, while
   workspace crates keep line tables.
+- Replaced the app icon with the new Icon Composer design.
 
 ### Added
 
